@@ -2,6 +2,6 @@
   "name": "flutter widgets",
   "id": "842128343887142055",
   "api": "1.0.0",
-  "main": "code.js",
-  "ui": "ui.html"
+  "main": "dist/code.js",
+  "ui": "dist/ui.html"
 }

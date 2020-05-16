@@ -1,6 +1,8 @@
 // This plugin will open a modal to prompt the user to enter a number, and
 // it will then create that many rectangles on the screen.
 
+import { getOpacity, getTextAligned } from "./simple_methods";
+
 // This file holds the main code for the plugins. It has access to the *document*.
 // You can access browser APIs in the <script> tag inside "ui.html" which has a
 // full browser environment (see documentation).
@@ -11,9 +13,6 @@
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
-
-let masterComponents: Map<string, ComponentNode> = new Map();
-let diffInMasterComps: Map<string, Array<string>> = new Map();
 
 const rgbTohex = (r: number, g: number, b: number) => {
   const hex =
@@ -29,55 +28,6 @@ const rgbTohex = (r: number, g: number, b: number) => {
 // Wait a minute!
 // This can be made directly in Flutter!
 // A lot more people will benefit from it!
-// const retrieveMasterComponents = (
-//   sceneNode: ReadonlyArray<SceneNode>
-// ): string => {
-//   let comp = "";
-//   for (const node of sceneNode) {
-//     if (node.type === "INSTANCE") {
-//       masterComponents.set(node.masterComponent.name, node.masterComponent);
-
-//       let arr = diffInMasterComps.get(node.masterComponent.name) ?? Array();
-
-//       node.masterComponent.children.forEach((d) => {
-//         let masterChild = d;
-//         let instanceChild = node.children.find((dd) => dd.id.includes(d.id));
-//         if (instanceChild !== undefined) {
-//           if (masterChild.visible !== instanceChild.visible) {
-//             arr.push("VISIBLE");
-//           }
-//           if (
-//             masterChild.type === "RECTANGLE" &&
-//             instanceChild.type === "RECTANGLE"
-//           ) {
-//             // if (masterChild.fills[0].color !== instanceChild.fills[0].color) {
-//             //   arr.push("COLOR");
-//             // }
-//           }
-//         }
-//       });
-
-//       diffInMasterComps.set(node.masterComponent.name, arr);
-//     }
-
-//     if (
-//       node.type === "INSTANCE" ||
-//       node.type === "FRAME" ||
-//       node.type === "GROUP"
-//     ) {
-//       retrieveMasterComponents(node.children);
-//     }
-//   }
-
-//   return comp;
-// };
-
-// [getContainerPosition] can get confused.
-// If the parent frame is identified to be a Stack, it adds an unnecessary Positioned()
-// which causes error in Flutter.
-// Therefore, this will used as a counter. On the beggining, check if the parent of the selected is a stack,
-// if it is, set this to 1. When it reaches [getContainerPosition], subtract 1. Only execute the function when 0.
-let ignoreStackParent: number;
 
 let parentId: string = "";
 
@@ -124,6 +74,11 @@ const generatePadding = (
 ): string => {
   // Add padding if necessary!
   // This must happen before Stack or after the Positioned, but not before.
+
+  // padding is only valid for auto layout.
+  // [horizontalPadding] and [verticalPadding] can have values even when AutoLayout is off
+  if (node.layoutMode === "NONE") return ``;
+
   if (node.horizontalPadding > 0 || node.verticalPadding > 0) {
     const propHorizontalPadding =
       node.horizontalPadding > 0
@@ -250,38 +205,110 @@ const getContainerPosition = (
   return ``;
 };
 
-// properties named propSomething always take care of ","
-// sometimes a property might not exist, so it doesn't add ","
-const buildContainer = (
-  node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode,
-  child: string = ""
+const getContainerSize = (
+  node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode
 ) => {
-  const propBoxDecoration: string = getContainerDecoration(node);
-
   /// WIDTH AND HEIGHT
   /// Will the width and height be necessary?
 
   // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
-  let propWidthHeight = ``;
+
+  // when the child has the same size as the parent, don't set the size twice
+  if (
+    node.type === "FRAME" ||
+    node.type === "INSTANCE" ||
+    node.type === "COMPONENT"
+  ) {
+    if (node.children.length === 1) {
+      const child = node.children[0];
+      if (child.width === node.width && child.height && node.height) {
+        return ``;
+      }
+    }
+  }
+
+  let nodeHeight = node.height;
+  let nodeWidth = node.width;
+
+  // Flutter doesn't support OUTSIDE or CENTER, only INSIDE.
+  // Therefore, to give the same feeling, the height and width will be slighly increased.
+  // node.strokes.lenght is necessary because [strokeWeight] can exist even without strokes.
+  if (node.strokes.length) {
+    if (node.strokeAlign === "OUTSIDE") {
+      nodeHeight += node.strokeWeight * 2;
+      nodeWidth += node.strokeWeight * 2;
+    } else if (node.strokeAlign === "CENTER") {
+      nodeHeight += node.strokeWeight;
+      nodeWidth += node.strokeWeight;
+    }
+  }
+
+  const propHeight = `height: ${nodeHeight}, `;
+  const propWidth = `width: ${nodeWidth}, `;
+
   if (
     node.type === "FRAME" ||
     node.type === "INSTANCE" ||
     node.type === "COMPONENT"
   ) {
     if (node.counterAxisSizingMode === "FIXED") {
-      propWidthHeight = `width: ${node.width}, height: ${node.height}, `;
-    } else {
       // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.
       if (node.layoutMode === "HORIZONTAL") {
-        propWidthHeight = `width: ${node.width}, `;
+        return propHeight;
       } else if (node.layoutMode === "VERTICAL") {
         // when AutoLayout is VERTICAL, height is set by Figma and width is auto.
-        propWidthHeight = `height: ${node.height}, `;
+        return propWidth;
       }
+      return `${propWidth}${propHeight}`;
     }
   } else if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-    propWidthHeight = `width: ${node.width}, height: ${node.height}, `;
+    return `${propWidth}${propHeight}`;
   }
+
+  return ``;
+};
+
+const convertFontWeight = (weight: string) => {
+  switch (weight) {
+    case "Thin":
+      return "100";
+    case "Extra Light":
+      return "200";
+    case "Light":
+      return "300";
+    case "Regular":
+      return "400";
+    case "Medium":
+      return "500";
+    case "Semi Bold":
+      return "600";
+    case "Bold":
+      return "700";
+    case "Extra Bold":
+      return "800";
+    case "Black":
+      return "900";
+    default:
+      return "400";
+  }
+};
+
+// properties named propSomething always take care of ","
+// sometimes a property might not exist, so it doesn't add ","
+const buildContainer = (
+  node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode,
+  child: string = ""
+) => {
+  // ignore the view when size is zero or less
+  // while technically it shouldn't get less than 0, due to rounding errors,
+  // it can get to values like: -0.000004196293048153166
+  if (node.width <= 0 || node.height <= 0) {
+    return child;
+  }
+
+  const propBoxDecoration: string = getContainerDecoration(node);
+
+  const propWidthHeight: string = getContainerSize(node);
 
   /// CONTAINER
   /// Put everything together
@@ -304,7 +331,14 @@ const buildContainer = (
 
   // retrieve the position when the parent is a Stack.
   const propPositioned: string = getContainerPosition(node, propContainer);
-  return propPositioned ? propPositioned : propContainer;
+
+  const updatedChild = propPositioned ? propPositioned : propContainer;
+
+  let applyVisibility: string = !node.visible
+    ? `Visibility(visible: ${node.visible}, child: ${updatedChild}),`
+    : updatedChild;
+
+  return applyVisibility;
 };
 
 // lint ideas:
@@ -314,9 +348,6 @@ const recur = (sceneNode: ReadonlyArray<SceneNode>): string => {
   const sceneLen = sceneNode.length;
 
   sceneNode.forEach((node, index) => {
-    console.log("AHAHAHAHA");
-    console.log(node.type);
-
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += buildContainer(node);
     } else if (node.type === "VECTOR") {
@@ -331,7 +362,7 @@ const recur = (sceneNode: ReadonlyArray<SceneNode>): string => {
         ),
       ),`;
     } else if (node.type === "GROUP") {
-      // TODO need to handle FILL differently!
+      // TODO generate Rows or Columns instead of Stack when Group is simple enough (two or three items) and they aren't on top of one another.
       // comp += recur(node.children);
       comp += `Stack(children:[${recur(node.children)}],),`;
     } else if (
@@ -368,18 +399,6 @@ const recur = (sceneNode: ReadonlyArray<SceneNode>): string => {
 
       const color = flutterColor(node.fills);
 
-      /*
-${
-            node.fontName !== figma.mixed
-              ? `${
-                  node.fontName.style.toLowerCase() === "bold"
-                    ? "fontWeight: FontWeight.bold"
-                    : ``
-                }`
-              : ``
-          },
-*/
-
       let child: string = `
       Text(
         "${node.characters}",
@@ -395,9 +414,11 @@ ${
               ? `fontFamily: ${node.fontName.family}`
               : ``
           },
-          //${
+          ${
             node.fontName !== figma.mixed
-              ? `fontWeight: ${node.fontName.style}`
+              ? `fontWeight: FontWeight.w${convertFontWeight(
+                  node.fontName.style
+                )}`
               : ``
           },
           ${color}
@@ -405,31 +426,29 @@ ${
       ),`;
 
       if (node.opacity !== 1) {
-        child += `
-        Opacity(
-            opacity: ${node.opacity},
-            child: ${child}
-        ),`;
+        child = getOpacity(node, child);
       }
 
       // this must be run before [node.textAutoResize], else Align will overwrite TextAlign.
       // when [node.textAutoResize] !== "NONE", the box will have auto size and therefore the align attribute will be ignored.
-      if (
-        node.textAlignVertical === "CENTER" &&
-        node.textAutoResize === "NONE"
-      ) {
-        child += `Center(child: ${child}),`;
-      } else if (
-        node.textAlignVertical === "BOTTOM" &&
-        node.textAutoResize === "NONE"
-      ) {
-        child += `
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: ${child}
-        ),
-        `;
-      }
+      // if (
+      //   node.textAlignVertical === "CENTER" &&
+      //   node.textAutoResize === "NONE"
+      // ) {
+      //   child += `Center(child: ${child}),`;
+      // } else if (
+      //   node.textAlignVertical === "BOTTOM" &&
+      //   node.textAutoResize === "NONE"
+      // ) {
+      //   child += `
+      //   Align(
+      //     alignment: Alignment.bottomCenter,
+      //     child: ${child}
+      //   ),
+      //   `;
+      // }
+      const textAligned = getTextAligned(node, child);
+      if (textAligned) child = textAligned;
 
       if (node.textAutoResize === "NONE") {
         // = instead of += because we want to replace it
@@ -452,7 +471,6 @@ ${
       }
 
       const positioned = getContainerPosition(node, child);
-      console.log(positioned);
       if (positioned) {
         comp += positioned;
       } else {
@@ -491,11 +509,9 @@ if (figma.currentPage.selection.length > 0) {
 
 const result = recur(figma.currentPage.selection);
 console.log(result);
-// figma.closePlugin();
+figma.closePlugin();
 
 // figma.ui.onmessage = (msg) => {
-//   console.log("hahahaha!!!");
-
 //   recur(figma.currentPage.selection);
 //   // Make sure to close the plugin when you're done. Otherwise the plugin will
 //   // keep running, which shows the cancel button at the bottom of the screen.
