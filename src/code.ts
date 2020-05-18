@@ -14,11 +14,17 @@ import { getOpacity, getTextAligned } from "./simple_methods";
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
 
-const rgbTohex = (r: number, g: number, b: number) => {
+const rgbTohex = (
+  color: RGB | RGBA,
+  alpha: number = "a" in color ? color.a : 1.0
+): string => {
+  // when color is RGBA, alpha is set automatically
+  // when color is RGB, alpha need to be set manually (default: 1.0)
   const hex =
-    ((r * 255) | (1 << 8)).toString(16).slice(1) +
-    ((g * 255) | (1 << 8)).toString(16).slice(1) +
-    ((b * 255) | (1 << 8)).toString(16).slice(1);
+    ((alpha * 255) | (1 << 8)).toString(16).slice(1) +
+    ((color.r * 255) | (1 << 8)).toString(16).slice(1) +
+    ((color.g * 255) | (1 << 8)).toString(16).slice(1) +
+    ((color.b * 255) | (1 << 8)).toString(16).slice(1);
 
   return hex;
 };
@@ -45,14 +51,12 @@ const flutterColor = (fills: ReadonlyArray<Paint> | PluginAPI["mixed"]) => {
   if (fills !== figma.mixed && fills.length > 0) {
     let fill = fills[0];
     if (fill.type === "SOLID") {
+      let opacity = fill.opacity ?? 1.0;
+
       // if fill isn't visible, it shouldn't be painted.
-      return fill.visible === false
-        ? ``
-        : `color: Color(0xff${rgbTohex(
-            fill.color.r,
-            fill.color.g,
-            fill.color.b
-          )}),`;
+      return fill.visible
+        ? `color: Color(0x${rgbTohex(fill.color, opacity)}),`
+        : ``;
     }
   }
 
@@ -65,8 +69,8 @@ const flutterCornerRadius = (
   if (node.type === "ELLIPSE") return "";
 
   return node.cornerRadius !== figma.mixed
-    ? `borderRadius: BorderRadius.circular(${node.cornerRadius}),`
-    : `borderRadius: BorderRadius.only(topLeft: ${node.topLeftRadius}, topRight: ${node.topRightRadius}, bottomLeft: ${node.bottomLeftRadius}, bottomRight: ${node.bottomRightRadius}),`;
+    ? `borderRadius: BorderRadius.circular(${node.cornerRadius}), `
+    : `borderRadius: BorderRadius.only(topLeft: ${node.topLeftRadius}, topRight: ${node.topRightRadius}, bottomLeft: ${node.bottomLeftRadius}, bottomRight: ${node.bottomRightRadius}), `;
 };
 
 const generatePadding = (
@@ -117,13 +121,33 @@ const getContainerDecoration = (
       ? `border: Border.all(${propStrokeColor}${propStrokeWidth}),`
       : ``;
 
+  let propBoxShadow = "";
+  if (node.effects.length > 0) {
+    const drop_shadow: Array<ShadowEffect> = node.effects.filter(
+      (d): d is ShadowEffect => d.type === "DROP_SHADOW"
+    );
+    let boxShadow = "";
+    if (drop_shadow) {
+      drop_shadow.forEach((d: ShadowEffect) => {
+        d.radius;
+        boxShadow += `BoxShadow(
+          color: ${rgbTohex(d.color)},
+          blurRadius: ${d.radius},
+          offset: Offset(${d.offset.x}, ${d.offset.y}),
+        ), `;
+      });
+    }
+    // TODO inner shadow, layer blur
+    propBoxShadow = `boxShadow: [ ${boxShadow} ]`;
+  }
+
   // retrieve the borderRadius, when existent (returns "" for EllipseNode)
   const propBorderRadius = flutterCornerRadius(node);
 
   // generate the decoration, or just the backgroundColor
   const propBoxDecoration =
     node.cornerRadius !== 0 || propStrokeColor || propShape
-      ? `decoration: BoxDecoration(${propBorderRadius}${propShape}${propBorder}${propBackgroundColor}),`
+      ? `decoration: BoxDecoration(${propBorderRadius}${propShape}${propBorder}${propBoxShadow}${propBackgroundColor}),`
       : `${propBackgroundColor}`;
 
   return propBoxDecoration;
@@ -310,11 +334,20 @@ const buildContainer = (
 
   const propWidthHeight: string = getContainerSize(node);
 
+  if (node.fills !== figma.mixed && node.fills.length > 0) {
+    let fill = node.fills[0];
+
+    // todo IMAGE and multiple Gradients
+    if (fill.type === "IMAGE") {
+    }
+  }
+
   /// CONTAINER
   /// Put everything together
-  const propChild = child ? `child: ${child}` : ``;
+  const propChild: string = child ? `child: ${child}` : ``;
 
-  let propPadding = ``;
+  // [propPadding] will be "padding: const EdgeInsets.symmetric(...)" or ""
+  let propPadding: string = ``;
   if (
     node.type === "FRAME" ||
     node.type === "COMPONENT" ||
@@ -323,22 +356,37 @@ const buildContainer = (
     propPadding = generatePadding(node);
   }
 
-  // if [propWidthHeight] and [propBoxDecoration] werent set, just return the child.
-  const propContainer =
-    propWidthHeight || propBoxDecoration
-      ? `\nContainer(${propWidthHeight}${propBoxDecoration}${propPadding}${propChild}),`
-      : child;
+  // Container is a container if [propWidthHeight] and [propBoxDecoration] are set.
+  let propContainer: string;
+  if (propWidthHeight || propBoxDecoration) {
+    propContainer = `\nContainer(${propWidthHeight}${propBoxDecoration}${propPadding}${propChild}),`;
+  } else if (propPadding) {
+    propContainer = `\nPadding(${propPadding}${propChild}),`;
+  } else {
+    propContainer = child;
+  }
+
+  // Rotation. This must be done before Position is added.
+  // that's how you convert angles to clockwise radians: angle * -pi/180
+  // using 3.14159 as Pi for enough precision and to avoid importing math lib.
+  const propRotation =
+    node.rotation > 0
+      ? `Transform.rotate(angle: ${
+          node.rotation * (-3.14159 / 180)
+        }, child: ${propContainer})`
+      : propContainer;
+
+  // Visibility. This must be done before Position is added.
+  const propVisibility: string = !node.visible
+    ? `Visibility(visible: ${node.visible}, child: ${propRotation}),`
+    : propRotation;
 
   // retrieve the position when the parent is a Stack.
-  const propPositioned: string = getContainerPosition(node, propContainer);
+  const propPositioned: string = getContainerPosition(node, propVisibility);
 
-  const updatedChild = propPositioned ? propPositioned : propContainer;
+  const updatedChild: string = propPositioned ? propPositioned : propVisibility;
 
-  let applyVisibility: string = !node.visible
-    ? `Visibility(visible: ${node.visible}, child: ${updatedChild}),`
-    : updatedChild;
-
-  return applyVisibility;
+  return updatedChild;
 };
 
 // lint ideas:
@@ -351,8 +399,7 @@ const recur = (sceneNode: ReadonlyArray<SceneNode>): string => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += buildContainer(node);
     } else if (node.type === "VECTOR") {
-      // TODO
-      // Vector support in Flutter is... complicated.
+      // TODO Vector support in Flutter is complicated.
       comp += `\nCenter(
           child: Container(
           //todo this is a vector. 
