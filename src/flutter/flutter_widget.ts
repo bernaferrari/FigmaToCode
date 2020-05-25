@@ -1,9 +1,11 @@
+import { mapWidthHeightSize } from "./../tailwind/tailwind_wrappers";
 import {
   rgbTohex,
   convertFontWeight,
   flutterColor,
   mostFrequentString,
 } from "./flutter_helpers";
+import { convertPxToTailwindAttr } from "../tailwind/tailwind_wrappers";
 
 export const makeTextComponent = (node: TextNode): string => {
   let alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
@@ -177,7 +179,7 @@ const getCornerRadiusProp = (
 
 const getContainerSizeProp = (
   node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode
-) => {
+): string => {
   /// WIDTH AND HEIGHT
   /// Will the width and height be necessary?
 
@@ -190,7 +192,7 @@ const getContainerSizeProp = (
     if (node.children.length === 1) {
       const child = node.children[0];
       if (child.width === node.width && child.height && node.height) {
-        return ``;
+        return "";
       }
     }
   }
@@ -234,7 +236,7 @@ const getContainerSizeProp = (
     return `${propWidth}${propHeight}`;
   }
 
-  return ``;
+  return "";
 };
 
 const getPaddingProp = (node: DefaultFrameMixin): string => {

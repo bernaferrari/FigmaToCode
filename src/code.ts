@@ -1,3 +1,4 @@
+import { tailwindMain } from "./tailwind/tailwind_main";
 import { flutterMain } from "./flutter/flutter_main";
 let parentId: string = "";
 
@@ -6,7 +7,26 @@ if (figma.currentPage.selection.length > 0) {
   parentId = figma.currentPage.selection[0].parent?.id ?? "";
 }
 
-const result = flutterMain(parentId, figma.currentPage.selection);
+const isJSX = true;
+
+let mode:
+  | "flutter"
+  | "swiftui"
+  | "html"
+  | "tailwind"
+  | "bootstrap"
+  | "material" = "tailwind";
+
+let result = "";
+mode = "tailwind";
+
+// @ts-ignore
+if (mode === "flutter") {
+  result = flutterMain(parentId, figma.currentPage.selection);
+} else if (mode === "tailwind") {
+  result = tailwindMain(parentId, figma.currentPage.selection);
+}
+
 console.log(result);
 figma.closePlugin();
 
