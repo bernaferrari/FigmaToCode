@@ -125,7 +125,7 @@ export const getTailwindColor = (color: string): string => {
 };
 
 // https://stackoverflow.com/a/20762713
-export const mostFrequentString = (arr: Array<string>) => {
+export const mostFrequentString = (arr: Array<any>) => {
   return arr
     .sort(
       (a, b) =>

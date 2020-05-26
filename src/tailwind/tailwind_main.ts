@@ -1,10 +1,11 @@
-import {
-  makeContainer,
-  makeTextComponent,
-  rowColumnProps,
-} from "./tailwind_widget";
+import { mostFrequentString } from "./tailwind_helpers";
+import { rowColumnProps, getContainerSizeProp } from "./tailwind_widget";
 import { tailwindAttributesBuilder } from "./tailwind_builder";
-import { retrieveContainerPosition } from "./tailwind_wrappers";
+import {
+  convertPxToTailwindAttr,
+  mapWidthHeightSize,
+  isInsideAutoAutoLayout,
+} from "./tailwind_wrappers";
 
 let parentId = "";
 
@@ -45,7 +46,10 @@ const tailwindWidgetGenerator = (
 
 const tailwindGroup = (node: GroupNode): string => {
   // TODO generate Rows or Columns instead of Stack when Group is simple enough (two or three items) and they aren't on top of one another.
-  return `<div class=\"relative\">${tailwindWidgetGenerator(
+  const attributes = autoAutoLayoutAttr(node);
+  const size = getContainerSizeProp(node);
+
+  return `<div class=\"${size}${attributes}\">${tailwindWidgetGenerator(
     node.children
   )}</div>`;
 };
@@ -54,6 +58,7 @@ const tailwindText = (node: TextNode): string => {
   // follow the website order, to make it easier
   const builderResult = new tailwindAttributesBuilder()
     .containerPosition(node, parentId)
+    .widthHeight(node)
     // todo fontFamily (via node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}`)
     // todo font smoothing
     .fontSize(node)
@@ -75,14 +80,75 @@ const tailwindText = (node: TextNode): string => {
   return `<p ${builderResult}> ${charsWithLineBreak} </p>`;
 };
 
+const autoAutoLayoutAttr = (
+  node: FrameNode | ComponentNode | InstanceNode | GroupNode
+): string => {
+  node.children.forEach((d) => {
+    node.children.forEach((dd) => {
+      if (
+        (d !== dd && d.x > dd.x && d.x < dd.x + dd.width) ||
+        (d.y > dd.y && d.y < dd.y + dd.height)
+      ) {
+        // detect colision
+        // parent is relative. The children shall be absolute
+        return "relative";
+      }
+    });
+  });
+
+  const autoAutoLayout = isInsideAutoAutoLayout(node);
+
+  if (autoAutoLayout[0] === "false") {
+    console.log("autoAutoLayout is false!");
+    return "relative";
+  }
+
+  // https://tailwindcss.com/docs/space/
+  // space between items
+  const spacing = convertPxToTailwindAttr(
+    mostFrequentString(autoAutoLayout[1]),
+    mapWidthHeightSize
+  );
+
+  const rowOrColumn = autoAutoLayout[0] === "sd-x" ? "flex-row " : "flex-col ";
+  const spaceDirection: "x" | "y" = autoAutoLayout[0] === "sd-x" ? "x" : "y";
+  const space = `space-${spaceDirection}-${spacing} `;
+
+  const orderedChildren: Array<SceneNode> = [...node.children].sort(
+    (a, b) => a[spaceDirection] - b[spaceDirection]
+  );
+
+  const width_or_height = spaceDirection === "x" ? "width" : "height";
+  const lastElement = orderedChildren[orderedChildren.length - 1];
+  const firstElement = orderedChildren[0];
+
+  // lastY - firstY + lastHeight = total area
+  const totalArea =
+    lastElement[width_or_height] -
+    firstElement[width_or_height] +
+    lastElement[spaceDirection];
+
+  // threshold
+  const isCentered = firstElement[spaceDirection] * 2 + totalArea < 2;
+  const contentAlign = isCentered ? "content-center" : "";
+
+  // align according to the most frequent way the children are aligned.
+  const layoutAlign =
+    mostFrequentString(node.children.map((d) => d.layoutAlign)) === "MIN"
+      ? ""
+      : "justify-center ";
+
+  return `flex ${rowOrColumn}${space}${layoutAlign}${contentAlign}`;
+};
+
 const tailwindFrame = (
   node: FrameNode | ComponentNode | InstanceNode
 ): string => {
   const children = tailwindWidgetGenerator(node.children);
 
   if (node.layoutMode === "NONE" && node.children.length > 1) {
-    // parent is relative. The children shall be absolute
-    return tailwindContainer(node, children, "relative");
+    const rowColumn = autoAutoLayoutAttr(node);
+    return tailwindContainer(node, children, rowColumn);
   } else if (node.children.length > 1) {
     const rowColumn = rowColumnProps(node);
     return tailwindContainer(node, children, rowColumn);
@@ -133,7 +199,7 @@ export const tailwindContainer = (
     .borderRadius(node);
 
   if (builder.attributes || additionalAttr) {
-    return `\n<div ${builder.buildAttributes(
+    return `\n<div ${node.name} ${builder.buildAttributes(
       additionalAttr
     )}>${children}</div>`;
   }

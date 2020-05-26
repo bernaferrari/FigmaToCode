@@ -1,4 +1,3 @@
-import { tailwindAttributesBuilder } from "./tailwind_builder";
 import { mostFrequentString } from "./tailwind_helpers";
 
 import {
@@ -28,8 +27,13 @@ export const rowColumnProps = (
   return `flex ${rowOrColumn}${space}${layoutAlign}`;
 };
 
+export const magicMargin = 32;
+
 export const getContainerSizeProp = (
-  node: DefaultFrameMixin | DefaultShapeMixin
+  node:
+    | DefaultFrameMixin // Frame
+    | (BaseNodeMixin & LayoutMixin & ChildrenMixin) // Group
+    | DefaultShapeMixin // Shapes
 ): string => {
   /// WIDTH AND HEIGHT
   /// Will the width and height be necessary?
@@ -50,25 +54,43 @@ export const getContainerSizeProp = (
   // tailwind doesn't support OUTSIDE or CENTER, only INSIDE.
   // Therefore, to give the same feeling, the height and width will be slighly increased.
   // node.strokes.lenght is necessary because [strokeWeight] can exist even without strokes.
-  if (node.strokes.length) {
-    if (node.strokeAlign === "OUTSIDE") {
-      nodeHeight += node.strokeWeight * 2;
-      nodeWidth += node.strokeWeight * 2;
-    } else if (node.strokeAlign === "CENTER") {
-      nodeHeight += node.strokeWeight;
-      nodeWidth += node.strokeWeight;
-    }
-  }
+  // if (node.strokes.length) {
+  //   if (node.strokeAlign === "OUTSIDE") {
+  //     nodeHeight += node.strokeWeight * 2;
+  //     nodeWidth += node.strokeWeight * 2;
+  //   } else if (node.strokeAlign === "CENTER") {
+  //     nodeHeight += node.strokeWeight;
+  //     nodeWidth += node.strokeWeight;
+  //   }
+  // }
 
-  const propHeight = `h-${convertPxToTailwindAttr(
+  let propHeight = `h-${convertPxToTailwindAttr(
     nodeHeight,
     mapWidthHeightSize
   )} `;
 
-  const propWidth = `w-${convertPxToTailwindAttr(
+  let propWidth = `w-${convertPxToTailwindAttr(
     nodeWidth,
     mapWidthHeightSize
   )} `;
+
+  if (node.parent !== null && "width" in node.parent) {
+    // set the width to max if the view is near the corner
+    // that will be complemented with margins from [retrieveContainerPosition]
+    if (
+      node.parent.x - node.x <= magicMargin &&
+      nodeWidth + 2 * magicMargin >= node.parent.width
+    ) {
+      propWidth = "w-full ";
+    }
+
+    if (
+      node.parent.y - node.y <= magicMargin &&
+      nodeHeight + 2 * magicMargin >= node.parent.height
+    ) {
+      propHeight = "h-full ";
+    }
+  }
 
   if ("layoutMode" in node) {
     // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.

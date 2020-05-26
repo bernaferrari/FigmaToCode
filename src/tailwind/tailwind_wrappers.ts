@@ -1,3 +1,6 @@
+import { mostFrequentString } from "./tailwind_helpers";
+import { magicMargin } from "./tailwind_widget";
+
 export const nearestValue = (goal: number, array: Array<number>) => {
   return array.reduce(function (prev, curr) {
     return Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev;
@@ -83,6 +86,69 @@ export const convertPxToTailwindAttr = (
   ];
 };
 
+const calculateIntervalY = (node: ChildrenMixin): Array<number> => {
+  const orderedChildren: Array<SceneNode> = [...node.children];
+  const childrenY: Array<SceneNode> = orderedChildren.sort((a, b) => a.y - b.y);
+  const intervalY = [];
+  for (var i = 0; i < childrenY.length - 1; i++) {
+    intervalY.push(childrenY[i + 1].y - (childrenY[i].y + childrenY[i].height));
+  }
+  return intervalY;
+};
+
+const calculateIntervalX = (node: ChildrenMixin): Array<number> => {
+  const orderedChildren: Array<SceneNode> = [...node.children];
+  const childrenX: Array<SceneNode> = orderedChildren.sort((a, b) => a.x - b.x);
+  const intervalY = [];
+  for (var i = 0; i < childrenX.length - 1; i++) {
+    intervalY.push(childrenX[i + 1].x - (childrenX[i].x + childrenX[i].width));
+  }
+  return intervalY;
+};
+
+const sd = (numbers: Array<number>) => {
+  const mean = numbers.reduce((acc, n) => acc + n) / numbers.length;
+  return Math.sqrt(
+    numbers.reduce((acc, n) => (n - mean) ** 2) / (numbers.length - 1)
+  );
+};
+
+export const isInsideAutoAutoLayout = (
+  node: ChildrenMixin
+): ["false" | "sd-x" | "sd-y", Array<number>] => {
+  const intervalY = calculateIntervalY(node);
+
+  if (intervalY.length === 0) {
+    return ["false", []];
+  }
+
+  if (intervalY.every((d) => d < 0)) {
+    const intervalX = calculateIntervalX(node);
+    const standardDeviation = sd(intervalX);
+    // [standardDeviation] is Infinity when [intervalX] len is 1
+    if (
+      standardDeviation === Infinity ||
+      standardDeviation < autoLayoutTolerance
+    ) {
+      return ["sd-x", intervalX];
+    }
+  } else if (intervalY.every((d) => d > 0)) {
+    const standardDeviation = sd(intervalY);
+    // [standardDeviation] is Infinity when [intervalY] len is 1
+    if (
+      standardDeviation === Infinity ||
+      standardDeviation < autoLayoutTolerance
+    ) {
+      return ["sd-y", intervalY];
+    }
+  }
+
+  return ["false", []];
+};
+
+// this is a magic number
+const autoLayoutTolerance = 4;
+
 export const retrieveContainerPosition = (
   node: SceneNode,
   parentId: string
@@ -90,26 +156,36 @@ export const retrieveContainerPosition = (
   const parent = node.parent;
 
   // avoid adding Positioned() when parent is not a Stack(), which can happen at the beggining
-  if (parent === null || parentId === parent.id) {
+  if (parent === null) {
+    //|| parentId === parent.id
     return "";
   }
 
-  // check if view is in a stack. Group and Frames must have more than 1 element
   if (
     (parent.type === "GROUP" && parent.children.length > 1) ||
-    ((parent.type === "FRAME" ||
-      parent.type === "INSTANCE" ||
-      parent.type === "COMPONENT") &&
+    ("layoutMode" in parent &&
       parent.layoutMode === "NONE" &&
       parent.children.length > 1)
   ) {
+    // check if view is in a stack. Group and Frames must have more than 1 element
     // [--x--][-width-][--x--]
     // that's how the formula below works, to see if view is centered
-    const centerX = 2 * node.x + node.width === parent.width;
-    const centerY = 2 * node.y + node.height === parent.height;
+
+    // this is needed for Groups, where node.x is not relative to zero. This is ignored for Frame.
+    const parentX = "layoutMode" in parent ? 0 : parent.x;
+    const parentY = "layoutMode" in parent ? 0 : parent.y;
+
+    const centerX = 2 * (node.x - parentX) + node.width === parent.width;
+    const centerY = 2 * (node.y - parentY) + node.height === parent.height;
 
     if (centerX && centerY) {
-      return "absolute inset-0 m-auto ";
+      // this was the only I could manage to center a div with absolute
+      // https://stackoverflow.com/a/59807846
+      if (node.type === "TEXT") {
+        // frame don't need to be centered
+        return "absolute inset-0 flex items-center justify-center ";
+      }
+      return "absolute inset-0 ";
     } else if (centerX) {
       if (node.y === 0) {
         // y = top, x = center
@@ -131,6 +207,53 @@ export const retrieveContainerPosition = (
       }
       // y = center, x = any
       // there is no Alignment for this, therefore it goes to manual mode.
+    }
+
+    // set the width to max if the view is near the corner
+    // that will be complemented with margins from [retrieveContainerPosition]
+    let prop = "";
+
+    if (parent.type === "GROUP" || "layoutMode" in parent) {
+      const autoAutoLayout = isInsideAutoAutoLayout(parent);
+      if (autoAutoLayout[0] === "sd-y" || "layoutMode" in node) {
+        // centerX threshold
+        if (parent.width - (node.x * 2 + node.width) < 2) {
+          prop += `mx-${convertPxToTailwindAttr(node.x, mapWidthHeightSize)} `;
+        } else {
+          if (node.x > 0 && node.x < magicMargin) {
+            prop += `ml-${convertPxToTailwindAttr(
+              node.x,
+              mapWidthHeightSize
+            )} `;
+          }
+          if (parent.width - (node.x + node.width) < magicMargin) {
+            const size = parent.width - node.x - node.width;
+            prop += `mr-${convertPxToTailwindAttr(size, mapWidthHeightSize)} `;
+          }
+        }
+      }
+
+      if (autoAutoLayout[0] === "sd-x" || "layoutMode" in node) {
+        // centerY threshold
+        if (parent.height - (node.y * 2 + node.height) < 2) {
+          prop += `my-${convertPxToTailwindAttr(node.y, mapWidthHeightSize)} `;
+        } else {
+          if (node.y > 0 && node.y < magicMargin) {
+            prop += `mt-${convertPxToTailwindAttr(
+              node.y,
+              mapWidthHeightSize
+            )} `;
+          }
+          if (parent.height - (node.y + node.height) < magicMargin) {
+            const size = parent.height - node.y - node.height;
+            prop += `mb-${convertPxToTailwindAttr(size, mapWidthHeightSize)} `;
+          }
+        }
+      }
+    }
+
+    if (prop) {
+      return prop;
     }
 
     // manual mode, just use the position.

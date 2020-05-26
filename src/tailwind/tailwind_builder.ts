@@ -15,9 +15,9 @@ import { tailwindColor } from "./tailwind_helpers";
 export class tailwindAttributesBuilder implements CodeBuilder {
   attributes: string = "";
   style: string = "";
-  isJSX: boolean = true;
+  isJSX: boolean = false;
 
-  constructor(optAttribute: string = "", optIsJSX: boolean = true) {
+  constructor(optAttribute: string = "", optIsJSX: boolean = false) {
     this.attributes = optAttribute;
     this.isJSX = optIsJSX;
   }
@@ -333,7 +333,12 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    * https://tailwindcss.com/docs/height/
    * example: w-64 h-16
    */
-  widthHeight(node: DefaultFrameMixin | DefaultShapeMixin): this {
+  widthHeight(
+    node:
+      | DefaultFrameMixin
+      | (GeometryMixin & BaseNodeMixin & LayoutMixin & ChildrenMixin)
+      | DefaultShapeMixin
+  ): this {
     this.attributes += getContainerSizeProp(node);
     return this;
   }
