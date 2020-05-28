@@ -1,5 +1,4 @@
-import { mostFrequentString } from "./tailwind_helpers";
-import { magicMargin } from "./tailwind_widget";
+import { magicMargin, getContainerSizeProp } from "./tailwind_widget";
 
 export const nearestValue = (goal: number, array: Array<number>) => {
   return array.reduce(function (prev, curr) {
@@ -69,7 +68,7 @@ export const mapWidthHeightSize: Record<number, string> = {
   6: "24",
   8: "32",
   10: "40",
-  12: "58",
+  12: "48",
   14: "56",
   16: "64",
 };
@@ -111,6 +110,26 @@ const sd = (numbers: Array<number>) => {
   return Math.sqrt(
     numbers.reduce((acc, n) => (n - mean) ** 2) / (numbers.length - 1)
   );
+};
+
+export const retrieveAALOrderedChildren = (
+  node: ChildrenMixin
+): ReadonlyArray<SceneNode> => {
+  const intervalY = calculateIntervalY(node);
+
+  if (intervalY.length === 0) {
+    return [];
+  }
+
+  const orderedChildren: Array<SceneNode> = [...node.children];
+
+  if (intervalY.every((d) => d < 0)) {
+    return orderedChildren.sort((a, b) => a.x - b.x);
+  } else if (intervalY.every((d) => d > 0)) {
+    return orderedChildren.sort((a, b) => a.y - b.y);
+  }
+
+  return node.children;
 };
 
 export const isInsideAutoAutoLayout = (
@@ -156,36 +175,45 @@ export const retrieveContainerPosition = (
   const parent = node.parent;
 
   // avoid adding Positioned() when parent is not a Stack(), which can happen at the beggining
-  if (parent === null) {
-    //|| parentId === parent.id
+  if (parent === null || parentId === parent.id) {
     return "";
   }
 
+  // if (parent.parent?.id === parentId && parent.parent?.type === "GROUP") {
+  //   // ignore when Group is nested into another Group
+  //   return "";
+  // }
+
   if (
-    (parent.type === "GROUP" && parent.children.length > 1) ||
-    ("layoutMode" in parent &&
-      parent.layoutMode === "NONE" &&
-      parent.children.length > 1)
+    parent.type === "GROUP" ||
+    ("layoutMode" in parent && parent.layoutMode === "NONE")
   ) {
     // check if view is in a stack. Group and Frames must have more than 1 element
     // [--x--][-width-][--x--]
     // that's how the formula below works, to see if view is centered
 
     // this is needed for Groups, where node.x is not relative to zero. This is ignored for Frame.
+    // todo transform these into a helper function
     const parentX = "layoutMode" in parent ? 0 : parent.x;
     const parentY = "layoutMode" in parent ? 0 : parent.y;
 
-    const centerX = 2 * (node.x - parentX) + node.width === parent.width;
-    const centerY = 2 * (node.y - parentY) + node.height === parent.height;
+    // < 4 is a threshold. If === is used, there can be rounding errors (28.002 !== 28)
+    const centerX =
+      Math.abs(2 * (node.x - parentX) + node.width - parent.width) < 4;
+    const centerY =
+      Math.abs(2 * (node.y - parentY) + node.height - parent.height) < 4;
+
+    // if (centerY) {
+    //   // this was the only I could manage to center a div with absolute
+    //   // https://stackoverflow.com/a/59807846
+
+    //   // frame don't need to be centered
+    //   return "h-full flex items-center ";
+    // }
 
     if (centerX && centerY) {
-      // this was the only I could manage to center a div with absolute
-      // https://stackoverflow.com/a/59807846
-      if (node.type === "TEXT") {
-        // frame don't need to be centered
-        return "absolute inset-0 flex items-center justify-center ";
-      }
-      return "absolute inset-0 ";
+      const size = node.type === "TEXT" ? "w-full h-full " : "";
+      return `${size}absolute flex items-center justify-center `;
     } else if (centerX) {
       if (node.y === 0) {
         // y = top, x = center
@@ -211,49 +239,71 @@ export const retrieveContainerPosition = (
 
     // set the width to max if the view is near the corner
     // that will be complemented with margins from [retrieveContainerPosition]
-    let prop = "";
 
     if (parent.type === "GROUP" || "layoutMode" in parent) {
+      const sizeConverter = (attr: string, num: number): string => {
+        const result = convertPxToTailwindAttr(num, mapWidthHeightSize);
+        if (+result > 0) {
+          return `${attr}-${result} `;
+        }
+        return "";
+      };
+
+      // when inside autoAutoLayout, mx will be useless (self-align will determine this)
+      // todo calculate the margin together with spacing, so that items can be individually offseted
+
       const autoAutoLayout = isInsideAutoAutoLayout(parent);
-      if (autoAutoLayout[0] === "sd-y" || "layoutMode" in node) {
-        // centerX threshold
-        if (parent.width - (node.x * 2 + node.width) < 2) {
-          prop += `mx-${convertPxToTailwindAttr(node.x, mapWidthHeightSize)} `;
-        } else {
-          if (node.x > 0 && node.x < magicMargin) {
-            prop += `ml-${convertPxToTailwindAttr(
-              node.x,
-              mapWidthHeightSize
-            )} `;
-          }
-          if (parent.width - (node.x + node.width) < magicMargin) {
-            const size = parent.width - node.x - node.width;
-            prop += `mr-${convertPxToTailwindAttr(size, mapWidthHeightSize)} `;
-          }
-        }
+      if (autoAutoLayout[0] !== "false") {
+        return "";
       }
 
-      if (autoAutoLayout[0] === "sd-x" || "layoutMode" in node) {
-        // centerY threshold
-        if (parent.height - (node.y * 2 + node.height) < 2) {
-          prop += `my-${convertPxToTailwindAttr(node.y, mapWidthHeightSize)} `;
-        } else {
-          if (node.y > 0 && node.y < magicMargin) {
-            prop += `mt-${convertPxToTailwindAttr(
-              node.y,
-              mapWidthHeightSize
-            )} `;
-          }
-          if (parent.height - (node.y + node.height) < magicMargin) {
-            const size = parent.height - node.y - node.height;
-            prop += `mb-${convertPxToTailwindAttr(size, mapWidthHeightSize)} `;
-          }
-        }
-      }
-    }
+      // let prop = "";
+      // this is necessary because Group uses relative position, while Frame is absolute
+      // const parentX = parent.type === "GROUP" ? parent.x : 0;
+      // const parentY = parent.type === "GROUP" ? parent.y : 0;
 
-    if (prop) {
-      return prop;
+      //   const autoAutoLayout = isInsideAutoAutoLayout(parent);
+      //   if (autoAutoLayout[0] === "sd-y" || "layoutMode" in node) {
+      //     // centerX threshold
+      //     // width - (40 - 0) * 2 + nodeWidth is zero when centered
+
+      //     const mx = parent.width - ((node.x - parentX) * 2 + node.width);
+      //     if (mx < 4 && mx > -4) {
+      //       prop += sizeConverter("mx", node.x - parentX);
+      //     } else {
+      //       if (node.x - parentX > 0 && node.x - parentX < magicMargin) {
+      //         prop += sizeConverter("ml", node.x - parentX);
+      //       }
+      //       if (parent.width - (node.x - parentX + node.width) < magicMargin) {
+      //         prop += sizeConverter("mr", parent.width - node.x - node.width);
+      //       }
+      //     }
+      //   }
+
+      //   if (autoAutoLayout[0] === "sd-x" || "layoutMode" in node) {
+      //     autoAutoLayout[1];
+
+      //     // centerY threshold
+      //     const my = parent.height - ((node.y - parentY) * 2 + node.height);
+      //     if (my < 4 && my > -4) {
+      //       prop += sizeConverter("my", node.y - parentY);
+      //     } else {
+      //       const mt = node.y - parentY;
+      //       if (mt > 0 && mt < magicMargin) {
+      //         prop += sizeConverter("mt", node.y - parentY);
+      //       }
+      //       const mb = parent.height - (node.y - parentY + node.height);
+      //       if (mb < magicMargin) {
+      //         prop += sizeConverter("mb", mb);
+      //       }
+      //     }
+      //   }
+      //   if (prop) {
+      //     return prop;
+      //   }
+      //   // when inside an autoAutoLayout, there is no need to get the absolute position
+      //   return "";
+      // }
     }
 
     // manual mode, just use the position.

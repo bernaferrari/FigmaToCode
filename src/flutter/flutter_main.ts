@@ -71,6 +71,7 @@ const flutterText = (node: TextNode): string => {
     .createText(node)
     .opacity(node)
     .textInAlign(node)
+    .textAutoSize(node)
     .containerPosition(node, parentId);
 
   return builder.child;

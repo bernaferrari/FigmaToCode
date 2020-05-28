@@ -1,10 +1,11 @@
-import { mostFrequentString } from "./tailwind_helpers";
+import { mostFrequentString, vectorColor } from "./tailwind_helpers";
 import { rowColumnProps, getContainerSizeProp } from "./tailwind_widget";
 import { tailwindAttributesBuilder } from "./tailwind_builder";
 import {
   convertPxToTailwindAttr,
   mapWidthHeightSize,
   isInsideAutoAutoLayout,
+  retrieveAALOrderedChildren,
 } from "./tailwind_wrappers";
 
 let parentId = "";
@@ -46,19 +47,29 @@ const tailwindWidgetGenerator = (
 
 const tailwindGroup = (node: GroupNode): string => {
   // TODO generate Rows or Columns instead of Stack when Group is simple enough (two or three items) and they aren't on top of one another.
+
+  if (node.children.length === 1) {
+    // ignore group if possible
+    return tailwindWidgetGenerator(node.children);
+  }
+
   const attributes = autoAutoLayoutAttr(node);
+
+  // don't generate size for group because its size is derived from children
   const size = getContainerSizeProp(node);
 
+  // retrieve the children ordered when AutoAutoLayout is identified
   return `<div class=\"${size}${attributes}\">${tailwindWidgetGenerator(
-    node.children
+    retrieveAALOrderedChildren(node)
   )}</div>`;
 };
 
 const tailwindText = (node: TextNode): string => {
   // follow the website order, to make it easier
   const builderResult = new tailwindAttributesBuilder()
+    .visibility(node)
     .containerPosition(node, parentId)
-    .widthHeight(node)
+    .textAutoSize(node)
     // todo fontFamily (via node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}`)
     // todo font smoothing
     .fontSize(node)
@@ -67,6 +78,7 @@ const tailwindText = (node: TextNode): string => {
     .lineHeight(node)
     // todo text lists (<li>)
     .textAlign(node)
+    .layoutAlign(node, parentId)
     .customColor(node.fills, "text")
     .textTransform(node)
     .buildAttributes();
@@ -133,12 +145,12 @@ const autoAutoLayoutAttr = (
   const contentAlign = isCentered ? "content-center" : "";
 
   // align according to the most frequent way the children are aligned.
-  const layoutAlign =
-    mostFrequentString(node.children.map((d) => d.layoutAlign)) === "MIN"
-      ? ""
-      : "justify-center ";
+  // const layoutAlign =
+  //   mostFrequentString(node.children.map((d) => d.layoutAlign)) === "MIN"
+  //     ? ""
+  //     : "justify-center ";
 
-  return `flex ${rowOrColumn}${space}${layoutAlign}${contentAlign}`;
+  return `inline-flex ${rowOrColumn}${space}${contentAlign}items-center`;
 };
 
 const tailwindFrame = (
@@ -149,17 +161,44 @@ const tailwindFrame = (
   if (node.layoutMode === "NONE" && node.children.length > 1) {
     const rowColumn = autoAutoLayoutAttr(node);
     return tailwindContainer(node, children, rowColumn);
-  } else if (node.children.length > 1) {
+  } else {
+    // always get the flex
     const rowColumn = rowColumnProps(node);
     return tailwindContainer(node, children, rowColumn);
-  } else {
-    return tailwindContainer(node, children);
   }
 };
 
 const tailwindVector = (node: VectorNode) => {
-  // TODO Vector support.
-  return `<div height=\"${node.height}\" width=\"${node.width}\"></div>`;
+  // ignore when invisible
+  if (node.visible === false) {
+    return "";
+  }
+
+  const builder = new tailwindAttributesBuilder()
+    .widthHeight(node)
+    .autoLayoutPadding(node)
+    .containerPosition(node, parentId)
+    .opacity(node)
+    .rotation(node)
+    .shadow(node)
+    .layoutAlign(node, parentId)
+    .customColor(node.strokes, "border")
+    .borderWidth(node)
+    .buildAttributes();
+
+  return `<div ${builder}><svg viewBox="0 0 ${node.width} ${
+    node.height
+  }" xmlns="http://www.w3.org/2000/svg">
+    ${node.vectorPaths.map(
+      (d) => `<path
+            fill-rule="${d.windingRule}"
+            stroke="${vectorColor(node.fills)}"
+            d="${d.data}"
+          />`
+    )}
+    </svg></div>`;
+
+  // return `<div height=\"${node.height}\" width=\"${node.width}\"></div>`;
   // return `<svg height="${node.height}" width="${node.width}">
   // <path d="${node.vectorPaths[0].data}" />
   // </svg>`;
@@ -186,9 +225,11 @@ export const tailwindContainer = (
   }
 
   const builder = new tailwindAttributesBuilder()
+    .visibility(node)
     .widthHeight(node)
     .autoLayoutPadding(node)
     .containerPosition(node, parentId)
+    .layoutAlign(node, parentId)
     .customColor(node.fills, "bg")
     // TODO image and gradient support
     .opacity(node)
@@ -199,7 +240,7 @@ export const tailwindContainer = (
     .borderRadius(node);
 
   if (builder.attributes || additionalAttr) {
-    return `\n<div ${node.name} ${builder.buildAttributes(
+    return `\n<div ${builder.buildAttributes(
       additionalAttr
     )}>${children}</div>`;
   }

@@ -1,10 +1,11 @@
+import { rgbTohex } from "./../flutter/flutter_helpers";
 import { nearestValue } from "./tailwind_wrappers";
 
 // retrieve the SOLID color for tailwind
 export const tailwindColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
   kind: string
-) => {
+): string => {
   // kind can be text, bg, border...
   if (fills !== figma.mixed && fills.length > 0) {
     let fill = fills[0];
@@ -31,6 +32,25 @@ export const tailwindColor = (
 
       // if fill isn't visible, it shouldn't be painted.
       return fill.visible ? `${colorProp}${opacityProp}` : "";
+    }
+  }
+
+  return "";
+};
+
+export const vectorColor = (
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+): string => {
+  // kind can be text, bg, border...
+  if (fills !== figma.mixed && fills.length > 0) {
+    let fill = fills[0];
+    if (fill.type === "SOLID") {
+      const hex =
+        ((fill.color.r * 255) | (1 << 8)).toString(16).slice(1) +
+        ((fill.color.g * 255) | (1 << 8)).toString(16).slice(1) +
+        ((fill.color.b * 255) | (1 << 8)).toString(16).slice(1);
+
+      return fill.visible ? `${hex}` : "";
     }
   }
 

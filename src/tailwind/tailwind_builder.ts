@@ -8,8 +8,9 @@ import {
   mapBorderRadius,
   mapWidthHeightSize,
   retrieveContainerPosition,
+  isInsideAutoAutoLayout,
 } from "./tailwind_wrappers";
-import { getContainerSizeProp } from "./tailwind_widget";
+import { getContainerSizeProp, magicMargin } from "./tailwind_widget";
 import { tailwindColor } from "./tailwind_helpers";
 
 export class tailwindAttributesBuilder implements CodeBuilder {
@@ -57,7 +58,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    */
   visibility(node: SceneNode): this {
     if (!node.visible) {
-      this.attributes += `invisible`;
+      this.attributes += "invisible ";
     }
     return this;
   }
@@ -72,25 +73,40 @@ export class tailwindAttributesBuilder implements CodeBuilder {
     // using 3.14159 as Pi for enough precision and to avoid importing math lib.
     if (node.rotation > 0) {
       const array = [-180, -90, -45, 45, 90, 180];
-      const nearest = nearestValue(node.rotation, array);
-      let minusIfNegative = nearest < 0 ? `-` : ``;
+      let nearest = nearestValue(node.rotation, array);
+      let minusIfNegative = "";
+      if (nearest < 0) {
+        minusIfNegative = "-";
+        nearest = -nearest;
+      }
 
-      this.attributes += `${minusIfNegative}rotate-${nearest}}) `;
+      this.attributes += `${minusIfNegative}rotate-${nearest} `;
     }
     return this;
   }
 
   containerPosition(node: SceneNode, parentId: string): this {
-    let position = retrieveContainerPosition(node, parentId);
-    if (position === "absoluteManualLayout") {
+    const position = retrieveContainerPosition(node, parentId);
+    if (
+      position === "absoluteManualLayout" &&
+      node.parent !== null &&
+      "width" in node.parent
+    ) {
       // tailwind can't deal with absolute layouts.
+
+      const parentX = "layoutMode" in node.parent ? 0 : node.parent.x;
+      const parentY = "layoutMode" in node.parent ? 0 : node.parent.y;
+
+      const left = node.x - parentX;
+      const top = node.y - parentY;
+
       // todo need a way to improve this
       if (this.isJSX) {
-        this.style = ` style={{left:${node.x}, top:${node.y}}}`;
+        this.style = ` style={{left:${left}, top:${top}}}`;
       } else {
-        this.style = ` style="left:${node.x};top:${node.y}"`;
+        this.style = ` style="left:${left};top:${top}"`;
       }
-      position = "";
+      this.attributes += "absolute ";
     } else {
       this.attributes += position;
     }
@@ -102,6 +118,60 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   }
 
   textAutoSize(node: TextNode): this {
+    if (node.parent !== null && "layoutMode" in node.parent) {
+      if (node.parent.layoutMode === "VERTICAL") {
+        // when parent is AutoLayout, the text width is set by the parent
+        return this;
+      }
+    }
+
+    if (node.textAutoResize === "NONE") {
+      const hRem = convertPxToTailwindAttr(node.height, mapWidthHeightSize);
+      const wRem = convertPxToTailwindAttr(node.width, mapWidthHeightSize);
+
+      let propHeight = `h-${hRem} `;
+      let propWidth = `w-${wRem} `;
+
+      if (node.parent !== null && "width" in node.parent) {
+        // set the width to max if the view is near the corner
+        // that will be complemented with margins from [retrieveContainerPosition]
+        // the third check [parentWidth - nodeWidth >= 2 * magicMargin]
+        // was made to avoid setting h-full when parent is almost the same size as children
+        if (
+          node.parent.x - node.x <= magicMargin &&
+          node.width + 2 * magicMargin >= node.parent.width &&
+          node.parent.width - node.width >= 2 * magicMargin
+        ) {
+          propWidth = "w-full ";
+        }
+
+        if (
+          node.parent.y - node.y <= magicMargin &&
+          node.height + 2 * magicMargin >= node.parent.height &&
+          node.parent.height - node.height >= 2 * magicMargin
+        ) {
+          propHeight = "h-full ";
+        }
+      }
+
+      this.attributes += propHeight;
+      this.attributes += propWidth;
+    } else if (node.textAutoResize === "HEIGHT") {
+      const wRem = convertPxToTailwindAttr(node.width, mapWidthHeightSize);
+      let propHeight = `w-${wRem} `;
+
+      if (node.parent !== null && "width" in node.parent) {
+        if (
+          node.parent.x - node.x <= magicMargin &&
+          node.width + 2 * magicMargin >= node.parent.width &&
+          node.parent.width - node.width >= 2 * magicMargin
+        ) {
+          propHeight = "w-full ";
+        }
+      }
+
+      this.attributes += propHeight;
+    }
     return this;
   }
 
@@ -356,6 +426,35 @@ export class tailwindAttributesBuilder implements CodeBuilder {
 
     const classOrClassName = this.isJSX ? "className" : "class";
     return `${classOrClassName}=\"${this.attributes}\"${this.style}`;
+  }
+
+  layoutAlign(node: BaseNode & LayoutMixin, parentId: string): this {
+    if (node.parent !== null && parentId !== node.parent.id) {
+      // standard auto layout
+
+      let layoutMode = "";
+      if ("layoutMode" in node.parent) {
+        if (node.parent.layoutMode !== "NONE") {
+          if (node.layoutAlign === "MIN") {
+            layoutMode = "self-start ";
+          } else if (node.layoutAlign === "MAX") {
+            layoutMode = "self-end ";
+          }
+          // MIN is default, but the parent has items-center because of Figma
+        }
+      }
+
+      if (!layoutMode) {
+        const isInAutoAutoLayout = isInsideAutoAutoLayout(node.parent);
+        if (isInAutoAutoLayout[0] !== "false") {
+          // todo calculate this
+        }
+      }
+
+      this.attributes += layoutMode;
+    }
+
+    return this;
   }
 
   /**
