@@ -1,4 +1,5 @@
-import { mostFrequentString } from "./tailwind_helpers";
+let shouldOptimize: boolean;
+shouldOptimize = true;
 
 import {
   convertPxToTailwindAttr,
@@ -9,24 +10,56 @@ export const rowColumnProps = (
   node: FrameNode | ComponentNode | InstanceNode
 ): string => {
   // ROW or COLUMN
-  const rowOrColumn =
-    node.layoutMode === "HORIZONTAL" ? "flex-row " : "flex-col ";
+
+  // [optimization]
+  // flex, by default, has flex-row. Therefore, it can be omitted.
+  const flexRow = shouldOptimize ? "" : "flex-row ";
+
+  let rowOrColumn = node.layoutMode === "HORIZONTAL" ? flexRow : "flex-col ";
 
   // https://tailwindcss.com/docs/space/
   // space between items
   const spacing = convertPxToTailwindAttr(node.itemSpacing, mapWidthHeightSize);
   const spaceDirection = node.layoutMode === "HORIZONTAL" ? "x" : "y";
-  const space = `space-${spaceDirection}-${spacing} `;
+
+  // space is visually ignored when there are less than two children
+  let space =
+    shouldOptimize && node.children.length < 2
+      ? ""
+      : `space-${spaceDirection}-${spacing} `;
 
   // align according to the most frequent way the children are aligned.
-
   // todo layoutAlign should go to individual fields and this should be threated as an optimization
   // const layoutAlign =
   //   mostFrequentString(node.children.map((d) => d.layoutAlign)) === "MIN"
   //     ? ""
   //     : "items-center ";
 
-  return `inline-flex ${rowOrColumn}${space}items-center`;
+  // [optimization]
+  // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, item-center.
+  const layoutAlign =
+    node.layoutMode === "VERTICAL" &&
+    node.children.every((d) => d.layoutAlign === "STRETCH")
+      ? ""
+      : "items-center ";
+
+  // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
+  const flex =
+    node.parent &&
+    "layoutMode" in node.parent &&
+    node.parent.layoutMode === "VERTICAL"
+      ? "flex "
+      : "inline-flex ";
+
+  if (
+    node.children.length === 1 &&
+    "layoutMode" in node.children[0] &&
+    node.children[0].layoutMode !== "NONE"
+  ) {
+    return "";
+  }
+
+  return `${flex}${rowOrColumn}${space}${layoutAlign}`;
 };
 
 export const magicMargin = 32;
@@ -38,16 +71,13 @@ export const getContainerSizeProp = (
     | DefaultShapeMixin // Shapes
 ): string => {
   /// WIDTH AND HEIGHT
-  /// Will the width and height be necessary?
 
-  if (node.parent !== null && "layoutMode" in node.parent) {
-    if (
-      node.parent.layoutMode === "VERTICAL" &&
-      "layoutMode" in node &&
-      node.layoutMode !== "NONE"
-    ) {
-      // when parent is AutoLayout and node is Text or AutoLayout, the width is set by the parent
-      return "";
+  // if layoutAlign is STRETCH, w/h should be full
+  if (node.layoutAlign === "STRETCH") {
+    if (node.parent && "layoutMode" in node.parent) {
+      if (node.parent.layoutMode === "VERTICAL") {
+        return "";
+      }
     }
   }
 
@@ -89,28 +119,28 @@ export const getContainerSizeProp = (
   let propWidth = `w-${wRem} `;
 
   // if OUTSIDE stroke is set, the result might be weird, so manually increase the view size
-  if (nodeWidth !== node.width && +wRem < 32) {
-    if (wRem === convertPxToTailwindAttr(node.width, mapWidthHeightSize)) {
-      const arr = Object.values(mapWidthHeightSize)
-        .map((d) => +d)
-        .sort((a, b) => a - b);
-      const index = arr.indexOf(+wRem);
+  // if (nodeWidth !== node.width && +wRem < 32) {
+  //   if (wRem === convertPxToTailwindAttr(node.width, mapWidthHeightSize)) {
+  //     const arr = Object.values(mapWidthHeightSize)
+  //       .map((d) => +d)
+  //       .sort((a, b) => a - b);
+  //     const index = arr.indexOf(+wRem);
 
-      // no need to check maximum array because of < 32 above
-      propWidth = `w-${arr[index + 1]} `;
-    }
-  }
+  //     // no need to check maximum array because of < 32 above
+  //     propWidth = `w-${arr[index + 1]} `;
+  //   }
+  // }
 
-  if (nodeHeight !== node.height && +hRem < 32) {
-    if (hRem === convertPxToTailwindAttr(node.height, mapWidthHeightSize)) {
-      const arr = Object.values(mapWidthHeightSize)
-        .map((d) => +d)
-        .sort((a, b) => a - b);
-      const index = arr.indexOf(+hRem);
-      // no need to check maximum array because of < 32 above
-      propHeight = `h-${arr[index + 1]} `;
-    }
-  }
+  // if (nodeHeight !== node.height && +hRem < 32) {
+  //   if (hRem === convertPxToTailwindAttr(node.height, mapWidthHeightSize)) {
+  //     const arr = Object.values(mapWidthHeightSize)
+  //       .map((d) => +d)
+  //       .sort((a, b) => a - b);
+  //     const index = arr.indexOf(+hRem);
+  //     // no need to check maximum array because of < 32 above
+  //     propHeight = `h-${arr[index + 1]} `;
+  //   }
+  // }
 
   if (node.parent !== null && "width" in node.parent) {
     // set the width to max if the view is near the corner

@@ -25,7 +25,9 @@ const tailwindWidgetGenerator = (
   let comp = "";
 
   sceneNode.forEach((node) => {
-    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
+    if (node.visible === false) {
+      // ignore when node is invisible
+    } else if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += tailwindContainer(node, "");
     } else if (node.type === "VECTOR") {
       comp += tailwindVector(node);
@@ -48,20 +50,23 @@ const tailwindWidgetGenerator = (
 const tailwindGroup = (node: GroupNode): string => {
   // TODO generate Rows or Columns instead of Stack when Group is simple enough (two or three items) and they aren't on top of one another.
 
-  if (node.children.length === 1) {
-    // ignore group if possible
-    return tailwindWidgetGenerator(node.children);
-  }
+  // experiment: completely ignore Groups
+  return tailwindWidgetGenerator(retrieveAALOrderedChildren(node));
 
-  const attributes = autoAutoLayoutAttr(node);
+  // if (node.children.length === 1) {
+  //   // ignore group if possible
+  //   return tailwindWidgetGenerator(node.children);
+  // }
 
-  // don't generate size for group because its size is derived from children
-  const size = getContainerSizeProp(node);
+  // const attributes = autoAutoLayoutAttr(node);
 
-  // retrieve the children ordered when AutoAutoLayout is identified
-  return `<div class=\"${size}${attributes}\">${tailwindWidgetGenerator(
-    retrieveAALOrderedChildren(node)
-  )}</div>`;
+  // // don't generate size for group because its size is derived from children
+  // const size = getContainerSizeProp(node);
+
+  // // retrieve the children ordered when AutoAutoLayout is identified
+  // return `<div class=\"${size}${attributes}\">${tailwindWidgetGenerator(
+  //   retrieveAALOrderedChildren(node)
+  // )}</div>`;
 };
 
 const tailwindText = (node: TextNode): string => {
@@ -111,7 +116,6 @@ const autoAutoLayoutAttr = (
   const autoAutoLayout = isInsideAutoAutoLayout(node);
 
   if (autoAutoLayout[0] === "false") {
-    console.log("autoAutoLayout is false!");
     return "relative";
   }
 
@@ -150,7 +154,14 @@ const autoAutoLayoutAttr = (
   //     ? ""
   //     : "justify-center ";
 
-  return `inline-flex ${rowOrColumn}${space}${contentAlign}items-center`;
+  const flex =
+    node.parent &&
+    "layoutMode" in node.parent &&
+    node.parent.layoutMode !== "NONE"
+      ? "flex "
+      : "inline-flex ";
+
+  return `${flex}${rowOrColumn}${space}${contentAlign}items-center`;
 };
 
 const tailwindFrame = (
@@ -159,12 +170,13 @@ const tailwindFrame = (
   const children = tailwindWidgetGenerator(node.children);
 
   if (node.layoutMode === "NONE" && node.children.length > 1) {
-    const rowColumn = autoAutoLayoutAttr(node);
-    return tailwindContainer(node, children, rowColumn);
-  } else {
-    // always get the flex
+    // const rowColumn = autoAutoLayoutAttr(node);
+    return tailwindContainer(node, children, "");
+  } else if (node.children.length > 1) {
     const rowColumn = rowColumnProps(node);
     return tailwindContainer(node, children, rowColumn);
+  } else {
+    return tailwindContainer(node, children, "");
   }
 };
 

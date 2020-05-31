@@ -431,7 +431,6 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   layoutAlign(node: BaseNode & LayoutMixin, parentId: string): this {
     if (node.parent !== null && parentId !== node.parent.id) {
       // standard auto layout
-
       let layoutMode = "";
       if ("layoutMode" in node.parent) {
         if (node.parent.layoutMode !== "NONE") {
