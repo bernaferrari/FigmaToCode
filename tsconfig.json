@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
+    "outDir": "./dist/",
     "strict": true,
+    "module": "es6",
+    "sourceMap": true,
     "target": "es6",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@figma"
-    ]
+    "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types", "./node_modules/@figma", "./types"]
   }
 }

@@ -1,3 +1,4 @@
+import * as nearestColor from "nearest-color";
 import { rgbTohex } from "./../flutter/flutter_helpers";
 import { nearestValue } from "./tailwind_wrappers";
 
@@ -208,10 +209,10 @@ export const tailwindColors: Record<string, string> = {
 
 export const tailwindColorsKeys = Object.keys(tailwindColors);
 
-export const nearestColor = require("nearest-color").from(tailwindColorsKeys);
+export const tailwindNearestColor = nearestColor.from(tailwindColorsKeys);
 
 export const getTailwindColor = (color: string): string => {
-  return tailwindColors[nearestColor(color)];
+  return tailwindColors[tailwindNearestColor(color)];
 };
 
 // https://stackoverflow.com/a/20762713

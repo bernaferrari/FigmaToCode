@@ -165,10 +165,11 @@ export const getContainerSizeProp = (
   let propWidth = `w-${wRem} `;
 
   // if node is too big for tailwind to handle, just let it be full
+  // if its width is larger than 256 or the sum of its children
   if (
     node.width > 256 &&
     "children" in node &&
-    Math.max(...node.children.map((d) => d.width)) > 256
+    node.children.reduce((acc, d) => acc + d.width, 0) > 256
   ) {
     propWidth = "w-full ";
   }
@@ -182,7 +183,12 @@ export const getContainerSizeProp = (
     // compare if height is same as parent, with a small threshold
     // commented because h-auto is better than h-full most of the time on responsiviness
     // todo improve this. Buggy in small layouts, good in big.
-    if (node.parent.height - node.height < 2 && node.height > 256) {
+    if (
+      node.parent.height - node.height < 2 ||
+      node.height > 256 ||
+      ("children" in node &&
+        node.children.reduce((acc, d) => acc + d.height, 0) > 256)
+    ) {
       // propHeight = "h-full ";
       propHeight = "";
     }
@@ -237,7 +243,6 @@ export const getContainerSizeProp = (
       propHeight = "h-full ";
     }
   }
-  console.log("entrou aqui ->", propHeight);
 
   if ("layoutMode" in node) {
     // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
@@ -259,7 +264,6 @@ export const getContainerSizeProp = (
   } else {
     return `${propWidth}${propHeight}`;
   }
-  console.log("saiu aqui");
 
   return "";
 };

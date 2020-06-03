@@ -1,16 +1,18 @@
-import { expect } from "chai";
-import { nearestColor, getTailwindColor } from "../tailwind/tailwind_helpers";
+import {
+  tailwindNearestColor,
+  getTailwindColor,
+} from "../../tailwind/tailwind_helpers";
 
 describe("Nearest colors", () => {
   it("can it identify nearby colors?", () => {
-    expect(nearestColor("#fff5f5")).to.equal("#fff5f5");
-    expect(nearestColor("#fff5f4")).to.equal("#fff5f5");
-    expect(nearestColor("#fff5f6")).to.equal("#fff5f5");
+    expect(tailwindNearestColor("#fff5f5")).toEqual("#fff5f5");
+    expect(tailwindNearestColor("#fff5f4")).toEqual("#fff5f5");
+    expect(tailwindNearestColor("#fff5f6")).toEqual("#fff5f5");
   });
 
   it("can it identify tailwind colors?", () => {
     const tailwindCompare = (color: string, equals: string) => {
-      expect(getTailwindColor(color)).to.equal(equals);
+      expect(getTailwindColor(color)).toEqual(equals);
     };
 
     tailwindCompare("#fff5f4", "red-100");

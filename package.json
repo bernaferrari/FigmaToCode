@@ -5,26 +5,33 @@
   "main": "code.js",
   "scripts": {
     "build": "npx webpack --mode=development --watch",
-    "test": "mocha -r ts-node/register src/test/*"
+    "test": "jest",
+    "coverage": "nyc npm run test"
   },
   "author": "",
   "license": "",
   "dependencies": {
     "@figma/plugin-typings": "^1.15.0",
+    "@types/jest": "^25.2.3",
+    "figma-api-stub": "0.0.41",
     "nearest-color": "^0.4.4"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.11",
-    "@types/mocha": "^7.0.2",
-    "chai": "^4.2.0",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/preset-typescript": "^7.10.1",
+    "@types/node": "^14.0.9",
+    "babel-jest": "^26.0.1",
+    "cross-env": "^5.2.1",
     "css-loader": "^3.5.3",
     "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^4.3.0",
-    "mocha": "^7.1.2",
+    "jest": "^26.0.1",
+    "nyc": "^14.1.1",
     "style-loader": "^1.2.1",
-    "ts-loader": "^7.0.4",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.9.2",
+    "ts-loader": "^7.0.5",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.3",
     "url-loader": "^4.1.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
