@@ -24,7 +24,7 @@ export const tailwindColor = (
       // ignore the 100. If opacity was changed, let it be visible.
       const opacityProp =
         opacity !== 1.0
-          ? `${kind}-opacity-${nearestValue(opacity, [0, 25, 50, 75])} `
+          ? `${kind}-opacity-${nearestValue(opacity, [0, 0.25, 0.50, 0.75])} `
           : "";
 
       // example: text-red-500
@@ -134,6 +134,76 @@ export const tailwindColors: Record<string, string> = {
   "#c05621": "orange-700",
   "#9c4221": "orange-800",
   "#7b341e": "orange-900",
+
+  "#FFFFF0": "yellow-100",
+  "#FEFCBF": "yellow-200",
+  "#FAF089": "yellow-300",
+  "#F6E05E": "yellow-400",
+  "#ECC94B": "yellow-500",
+  "#D69E2E": "yellow-600",
+  "#B7791F": "yellow-700",
+  "#975A16": "yellow-800",
+  "#744210": "yellow-900",
+
+  "#F0FFF4": "green-100",
+  "#C6F6D5": "green-200",
+  "#9AE6B4": "green-300",
+  "#68D391": "green-400",
+  "#48BB78": "green-500",
+  "#38A169": "green-600",
+  "#2F855A": "green-700",
+  "#276749": "green-800",
+  "#22543D": "green-900",
+
+  "#E6FFFA": "teal-100",
+  "#B2F5EA": "teal-200",
+  "#81E6D9": "teal-300",
+  "#4FD1C5": "teal-400",
+  "#38B2AC": "teal-500",
+  "#319795": "teal-600",
+  "#2C7A7B": "teal-700",
+  "#285E61": "teal-800",
+  "#234E52": "teal-900",
+
+  "#EBF8FF": "blue-100",
+  "#BEE3F8": "blue-200",
+  "#90CDF4": "blue-300",
+  "#63B3ED": "blue-400",
+  "#4299E1": "blue-500",
+  "#3182CE": "blue-600",
+  "#2B6CB0": "blue-700",
+  "#2C5282": "blue-800",
+  "#2A4365": "blue-900",
+
+  "#EBF4FF": "indigo-100",
+  "#C3DAFE": "indigo-200",
+  "#A3BFFA": "indigo-300",
+  "#7F9CF5": "indigo-400",
+  "#667EEA": "indigo-500",
+  "#5A67D8": "indigo-600",
+  "#4C51BF": "indigo-700",
+  "#434190": "indigo-800",
+  "#3C366B": "indigo-900",
+
+  "#FAF5FF": "purple-100",
+  "#E9D8FD": "purple-200",
+  "#D6BCFA": "purple-300",
+  "#B794F4": "purple-400",
+  "#9F7AEA": "purple-500",
+  "#805AD5": "purple-600",
+  "#6B46C1": "purple-700",
+  "#553C9A": "purple-800",
+  "#44337A": "purple-900",
+
+  "#FFF5F7": "pink-100",
+  "#FED7E2": "pink-200",
+  "#FBB6CE": "pink-300",
+  "#F687B3": "pink-400",
+  "#ED64A6": "pink-500",
+  "#D53F8C": "pink-600",
+  "#B83280": "pink-700",
+  "#97266D": "pink-800",
+  "#702459": "pink-900",
 };
 
 export const tailwindColorsKeys = Object.keys(tailwindColors);

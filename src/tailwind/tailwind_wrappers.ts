@@ -1,3 +1,4 @@
+import { CustomNodeMap } from "./tailwind_main";
 export const nearestValue = (goal: number, array: Array<number>) => {
   return array.reduce(function (prev, curr) {
     return Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev;
@@ -51,7 +52,7 @@ export const mapBorderRadius: Record<number, string> = {
 };
 
 export const mapWidthHeightSize: Record<number, string> = {
-  0: "0",
+  // 0: "0",
   0.25: "1",
   0.5: "2",
   0.75: "3",
@@ -96,11 +97,11 @@ const calculateIntervalY = (node: ChildrenMixin): Array<number> => {
 const calculateIntervalX = (node: ChildrenMixin): Array<number> => {
   const orderedChildren: Array<SceneNode> = [...node.children];
   const childrenX: Array<SceneNode> = orderedChildren.sort((a, b) => a.x - b.x);
-  const intervalY = [];
+  const intervalX = [];
   for (var i = 0; i < childrenX.length - 1; i++) {
-    intervalY.push(childrenX[i + 1].x - (childrenX[i].x + childrenX[i].width));
+    intervalX.push(childrenX[i + 1].x - (childrenX[i].x + childrenX[i].width));
   }
-  return intervalY;
+  return intervalX;
 };
 
 const sd = (numbers: Array<number>) => {
@@ -113,9 +114,14 @@ const sd = (numbers: Array<number>) => {
 export const retrieveAALOrderedChildren = (
   node: ChildrenMixin
 ): ReadonlyArray<SceneNode> => {
+  if (node.children.length === 1) {
+    return node.children;
+  }
+
   const intervalY = calculateIntervalY(node);
 
   if (intervalY.length === 0) {
+    // this should never happen if node.children > 1
     return [];
   }
 
@@ -128,6 +134,65 @@ export const retrieveAALOrderedChildren = (
   }
 
   return node.children;
+};
+
+export const isInsideAutoAutoLayout2 = (
+  children: ReadonlyArray<SceneNode>
+): ["false" | "sd-x" | "sd-y", Array<number>] => {
+  const calculateInterval = (
+    children: ReadonlyArray<SceneNode>,
+    x_or_y: "x" | "y"
+  ): Array<number> => {
+    const orderedChildren: Array<SceneNode> = [...children];
+    const h_or_w: "width" | "height" = x_or_y === "x" ? "width" : "height";
+
+    const sorted: Array<SceneNode> = orderedChildren.sort(
+      (a, b) => a[x_or_y] - b[x_or_y]
+    );
+    const interval = [];
+    for (var i = 0; i < sorted.length - 1; i++) {
+      interval.push(
+        sorted[i + 1][x_or_y] - (sorted[i][x_or_y] + sorted[i][h_or_w])
+      );
+    }
+    return interval;
+  };
+
+  const intervalY = calculateInterval(children, "y");
+
+  if (intervalY.length === 0) {
+    return ["false", []];
+  }
+
+  if (intervalY.every((d) => d < 0)) {
+    const intervalX = calculateInterval(children, "x");
+
+    // if all values in intervalY are zero, sd result will be NaN
+    const notZero = intervalX.reduce((acc, d) => acc + d) > 0;
+    const standardDeviation = notZero ? sd(intervalX) : 0;
+
+    // [standardDeviation] is Infinity when [intervalX] len is 1
+    if (
+      standardDeviation === Infinity ||
+      standardDeviation < autoLayoutTolerance
+    ) {
+      return ["sd-x", intervalX];
+    }
+  } else if (intervalY.every((d) => d > 0)) {
+    // if all values in intervalY are zero, sd result will be NaN
+    const notZero = intervalY.reduce((acc, d) => acc + d) > 0;
+    const standardDeviation = notZero ? sd(intervalY) : 0;
+
+    // [standardDeviation] is Infinity when [intervalY] len is 1
+    if (
+      standardDeviation === Infinity ||
+      standardDeviation < autoLayoutTolerance
+    ) {
+      return ["sd-y", intervalY];
+    }
+  }
+
+  return ["false", []];
 };
 
 export const isInsideAutoAutoLayout = (
@@ -177,15 +242,39 @@ export const retrieveContainerPosition = (
     return "";
   }
 
-  // if (parent.parent?.id === parentId && parent.parent?.type === "GROUP") {
-  //   // ignore when Group is nested into another Group
-  //   return "";
-  // }
+  // if node is a Group and has only one child, ignore it; child will set the size
+  if (
+    parent.type === "GROUP" &&
+    parent.children.length === 1 &&
+    parent.width === node.width &&
+    parent.height === node.height
+  ) {
+    return "";
+  }
+
+  if (
+    "width" in parent &&
+    parent.width === node.width &&
+    parent.height === node.height
+  ) {
+    return "";
+  }
+
+  if (node.parent && CustomNodeMap[node.parent?.id]?.hasCustomAutoLayout) {
+    // when in AutoAutoLayout, it is inside a Flex, therefore the position doesn't matter
+    return "";
+  }
 
   if (
     parent.type === "GROUP" ||
-    ("layoutMode" in parent && parent.layoutMode === "NONE")
+    ("layoutMode" in parent &&
+      parent.layoutMode === "NONE" &&
+      parent.children.length > 1) ||
+    ("children" in node &&
+      "width" in parent &&
+      node.children.every((d) => d.type === "VECTOR"))
   ) {
+    // when parent is GROUP or FRAME, try to position the node in it
     // check if view is in a stack. Group and Frames must have more than 1 element
     // [--x--][-width-][--x--]
     // that's how the formula below works, to see if view is centered
@@ -211,7 +300,7 @@ export const retrieveContainerPosition = (
 
     if (centerX && centerY) {
       const size = node.type === "TEXT" ? "w-full h-full " : "";
-      return `${size}absolute flex items-center justify-center `;
+      return `${size}absolute inset-0 m-auto `;
     } else if (centerX) {
       if (node.y === 0) {
         // y = top, x = center
@@ -237,7 +326,6 @@ export const retrieveContainerPosition = (
 
     // set the width to max if the view is near the corner
     // that will be complemented with margins from [retrieveContainerPosition]
-
     if (parent.type === "GROUP" || "layoutMode" in parent) {
       const sizeConverter = (attr: string, num: number): string => {
         const result = convertPxToTailwindAttr(num, mapWidthHeightSize);
@@ -249,11 +337,6 @@ export const retrieveContainerPosition = (
 
       // when inside autoAutoLayout, mx will be useless (self-align will determine this)
       // todo calculate the margin together with spacing, so that items can be individually offseted
-
-      const autoAutoLayout = isInsideAutoAutoLayout(parent);
-      if (autoAutoLayout[0] !== "false") {
-        return "";
-      }
 
       // let prop = "";
       // this is necessary because Group uses relative position, while Frame is absolute

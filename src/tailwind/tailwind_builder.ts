@@ -16,11 +16,14 @@ import { tailwindColor } from "./tailwind_helpers";
 export class tailwindAttributesBuilder implements CodeBuilder {
   attributes: string = "";
   style: string = "";
+  styleSeparator: string = "";
   isJSX: boolean = false;
 
-  constructor(optAttribute: string = "", optIsJSX: boolean = false) {
+  constructor(optAttribute: string = "", optIsJSX: boolean) {
     this.attributes = optAttribute;
     this.isJSX = optIsJSX;
+    this.styleSeparator = this.isJSX ? "," : ";";
+    this.style = this.isJSX ? " style={{" : ' style="';
   }
 
   createText(node: TextNode): this {
@@ -43,11 +46,12 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    * https://tailwindcss.com/docs/opacity/
    * default is [0, 25, 50, 75, 100], but '100' will be ignored:
    * if opacity was changed, let it be visible. Therefore, 98% => 75
+   * node.opacity is between [0, 1]; output will be [0, 100]
    */
   opacity(node: BlendMixin): this {
     if (node.opacity !== 1) {
       const values = [0, 25, 50, 75];
-      this.attributes += `opacity-${nearestValue(node.opacity, values)} `;
+      this.attributes += `opacity-${nearestValue(node.opacity * 100, values)} `;
     }
     return this;
   }
@@ -86,6 +90,10 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   }
 
   containerPosition(node: SceneNode, parentId: string): this {
+    if (node.parent?.id === parentId) {
+      return this;
+    }
+
     const position = retrieveContainerPosition(node, parentId);
     if (
       position === "absoluteManualLayout" &&
@@ -101,11 +109,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
       const top = node.y - parentY;
 
       // todo need a way to improve this
-      if (this.isJSX) {
-        this.style = ` style={{left:${left}, top:${top}}}`;
-      } else {
-        this.style = ` style="left:${left};top:${top}"`;
-      }
+      this.style += `left:${left}${this.styleSeparator} top:${top}`;
       this.attributes += "absolute ";
     } else {
       this.attributes += position;
@@ -172,6 +176,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
 
       this.attributes += propHeight;
     }
+
     return this;
   }
 
@@ -269,7 +274,10 @@ export class tailwindAttributesBuilder implements CodeBuilder {
     // if alignHorizontal is LEFT, don't do anything because that is native
     const alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
 
-    if (node.layoutAlign === "MIN" && alignHorizontal !== "left") {
+    if (
+      node.textAlignHorizontal !== "LEFT" &&
+      node.textAutoResize !== "WIDTH_AND_HEIGHT"
+    ) {
       this.attributes += `text-${alignHorizontal} `;
     }
 
@@ -359,14 +367,14 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    * example: rounded-sm
    * example: rounded-tr-lg
    */
-  borderRadius(
-    node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode
-  ): this {
+  borderRadius(node: SceneNode): this {
     if (node.type === "ELLIPSE") {
       this.attributes += "rounded-full ";
       return this;
+    } else if (!("cornerRadius" in node) || !("topLeftRadius" in node)) {
+      // todo are there Nodes with cornerRadius but without topLeftRadius?
+      return this;
     }
-
     if (node.cornerRadius === 0) {
       // ignore when 0
       return this;
@@ -406,7 +414,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   widthHeight(
     node:
       | DefaultFrameMixin
-      | (GeometryMixin & BaseNodeMixin & LayoutMixin & ChildrenMixin)
+      | (BaseNodeMixin & LayoutMixin & ChildrenMixin)
       | DefaultShapeMixin
   ): this {
     this.attributes += getContainerSizeProp(node);
@@ -423,6 +431,11 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   buildAttributes(additionalAttr: string = ""): string {
     this.attributes += additionalAttr;
     this.removeTrailingSpace();
+    if (this.style.length < 12) {
+      this.style = "";
+    } else {
+      this.style += this.isJSX ? `}}` : ';"';
+    }
 
     const classOrClassName = this.isJSX ? "className" : "class";
     return `${classOrClassName}=\"${this.attributes}\"${this.style}`;
