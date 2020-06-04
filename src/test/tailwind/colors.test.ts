@@ -1,7 +1,7 @@
 import {
   tailwindNearestColor,
   getTailwindColor,
-} from "../../tailwind/tailwind_helpers";
+} from "../../tailwind/colors";
 
 describe("Nearest colors", () => {
   it("can it identify nearby colors?", () => {

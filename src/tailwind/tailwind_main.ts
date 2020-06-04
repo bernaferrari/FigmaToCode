@@ -1,12 +1,7 @@
-import { mostFrequentString, vectorColor } from "./tailwind_helpers";
-import { rowColumnProps, getContainerSizeProp } from "./tailwind_widget";
+import { vectorColor } from "./colors";
 import { tailwindAttributesBuilder } from "./tailwind_builder";
-import {
-  convertPxToTailwindAttr,
-  mapWidthHeightSize,
-  retrieveAALOrderedChildren,
-  isInsideAutoAutoLayout2,
-} from "./tailwind_wrappers";
+import { pxToLayoutSize } from "./conversion_tables";
+import { CustomNode } from "./custom_node";
 
 let parentId = "";
 
@@ -14,59 +9,6 @@ const isJsx = true;
 
 // this is a global map containg all the AutoLayout information.
 export const CustomNodeMap: Record<string, CustomNode> = {};
-
-class CustomNode {
-  // when auto layout is detected even when AutoLayout is not being used
-  hasCustomAutoLayout: boolean = false;
-
-  // the direction
-  customAutoLayoutDirection: "false" | "sd-x" | "sd-y" = "false";
-
-  // the spacing
-  customAutoLayoutSpacing: Array<number> = [];
-
-  // if custom layout is horizontal, they are ordered using x, else y.
-  orderedChildren: ReadonlyArray<SceneNode> = [];
-
-  attributes: string = "";
-
-  constructor(node: SceneNode) {
-    this.setCustomAutoLayout(node);
-    CustomNodeMap[node.id] = this;
-  }
-
-  private setCustomAutoLayout(node: SceneNode) {
-    // if node is GROUP or FRAME without AutoLayout, try to detect it.
-    if (
-      node.type === "GROUP" ||
-      ("layoutMode" in node && node.layoutMode === "NONE")
-    ) {
-      this.orderedChildren = retrieveAALOrderedChildren(node);
-
-      const onlyVisibleChildren = node.children.filter((d) => d.visible);
-      const detectedAutoLayout = isInsideAutoAutoLayout2(onlyVisibleChildren);
-
-      this.hasCustomAutoLayout = detectedAutoLayout[0] !== "false";
-      this.customAutoLayoutDirection = detectedAutoLayout[0];
-      this.customAutoLayoutSpacing = detectedAutoLayout[1];
-
-      // skip when there is only one child and it takes full size
-      if (
-        !this.hasCustomAutoLayout &&
-        this.orderedChildren.length === 1 &&
-        node.height === this.orderedChildren[0].height &&
-        node.width === this.orderedChildren[0].width
-      ) {
-        // this.attributes = "";
-      } else {
-        this.attributes = autoAutoLayoutAttr(
-          this.orderedChildren,
-          detectedAutoLayout
-        );
-      }
-    }
-  }
-}
 
 export const tailwindMain = (
   parentId_src: string,
@@ -210,83 +152,6 @@ const tailwindText = (node: TextNode): string => {
   return `<p ${builderResult}> ${charsWithLineBreak} </p>`;
 };
 
-const autoAutoLayoutAttr = (
-  children: ReadonlyArray<SceneNode>,
-  autoAutoLayout: ["sd-x" | "sd-y" | "false", Array<number>]
-): string => {
-  if (children.length === 0) {
-    return "";
-  }
-
-  // children.forEach((d) => {
-  //   children.forEach((dd) => {
-  //     if (
-  //       (d !== dd && d.x > dd.x && d.x < dd.x + dd.width) ||
-  //       (d.y > dd.y && d.y < dd.y + dd.height)
-  //     ) {
-  //       // detect colision
-  //       // parent is relative. The children shall be absolute
-  //       console.log("autoAutoLayoutAttr collision detected");
-  //       return "relative";
-  //     }
-  //   });
-  // });
-
-  // const autoAutoLayout = isInsideAutoAutoLayout2(children);
-
-  if (autoAutoLayout[0] === "false") {
-    return "relative";
-  }
-
-  // https://tailwindcss.com/docs/space/
-  // space between items, if necessary
-  const spacing = autoAutoLayout[1].every((d) => d === 0)
-    ? 0
-    : convertPxToTailwindAttr(
-        mostFrequentString(autoAutoLayout[1]),
-        mapWidthHeightSize
-      );
-
-  const rowOrColumn = autoAutoLayout[0] === "sd-x" ? "flex-row " : "flex-col ";
-  const spaceDirection: "x" | "y" = autoAutoLayout[0] === "sd-x" ? "x" : "y";
-  const space = spacing > 0 ? `space-${spaceDirection}-${spacing} ` : "";
-
-  const orderedChildren: Array<SceneNode> = [...children].sort(
-    (a, b) => a[spaceDirection] - b[spaceDirection]
-  );
-
-  const width_or_height = spaceDirection === "x" ? "width" : "height";
-  const lastElement = orderedChildren[orderedChildren.length - 1];
-  const firstElement = orderedChildren[0];
-
-  // lastY - firstY + lastHeight = total area
-  const totalArea =
-    lastElement[width_or_height] -
-    firstElement[width_or_height] +
-    lastElement[spaceDirection];
-
-  // threshold
-  const isCentered = firstElement[spaceDirection] * 2 + totalArea < 2;
-  const contentAlign = isCentered ? "content-center " : "";
-
-  // align according to the most frequent way the children are aligned.
-  // const layoutAlign =
-  //   mostFrequentString(node.children.map((d) => d.layoutAlign)) === "MIN"
-  //     ? ""
-  //     : "justify-center ";
-
-  const parent = children[0].parent;
-
-  const flex = "flex ";
-
-  // const flex =
-  //   parent && "layoutMode" in parent && parent.layoutMode !== "NONE"
-  //     ? "flex "
-  //     : "inline-flex ";
-
-  return `${flex}${rowOrColumn}${space}${contentAlign}items-center`;
-};
-
 const tailwindFrame = (
   node: FrameNode | ComponentNode | InstanceNode
 ): string => {
@@ -386,4 +251,69 @@ export const tailwindContainer = (
     )}>${children}</div>`;
   }
   return children;
+};
+
+const shouldOptimize = true;
+
+export const rowColumnProps = (
+  node: FrameNode | ComponentNode | InstanceNode
+): string => {
+  // ROW or COLUMN
+
+  // [optimization]
+  // flex, by default, has flex-row. Therefore, it can be omitted.
+  const flexRow = shouldOptimize ? "" : "flex-row ";
+
+  let rowOrColumn = node.layoutMode === "HORIZONTAL" ? flexRow : "flex-col ";
+
+  // https://tailwindcss.com/docs/space/
+  // space between items
+  const spacing = pxToLayoutSize(node.itemSpacing);
+  const spaceDirection = node.layoutMode === "HORIZONTAL" ? "x" : "y";
+
+  // space is visually ignored when there are less than two children
+  let space =
+    shouldOptimize && node.children.length < 2
+      ? ""
+      : `space-${spaceDirection}-${spacing} `;
+
+  // align according to the most frequent way the children are aligned.
+  // todo layoutAlign should go to individual fields and this should be threated as an optimization
+  // const layoutAlign =
+  //   mostFrequentString(node.children.map((d) => d.layoutAlign)) === "MIN"
+  //     ? ""
+  //     : "items-center ";
+
+  // [optimization]
+  // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, item-center.
+  const layoutAlign =
+    node.layoutMode === "VERTICAL" &&
+    node.children.every((d) => d.layoutAlign === "STRETCH")
+      ? ""
+      : "items-center ";
+
+  // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
+  const flex =
+    node.parent &&
+    "layoutMode" in node.parent &&
+    node.parent.layoutMode === node.layoutMode
+      ? "flex "
+      : "inline-flex ";
+
+  if (
+    node.children.length === 1 &&
+    "layoutMode" in node.children[0] &&
+    node.children[0].layoutMode !== "NONE"
+  ) {
+    return "";
+  }
+
+  if (
+    node.children.length === 1 &&
+    node.children[0].layoutAlign === "STRETCH"
+  ) {
+    return "";
+  }
+
+  return `${flex}${rowOrColumn}${space}${layoutAlign}`;
 };

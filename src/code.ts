@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 import { tailwindMain } from "./tailwind/tailwind_main";
 import { flutterMain } from "./flutter/flutter_main";
 let parentId: string = "";

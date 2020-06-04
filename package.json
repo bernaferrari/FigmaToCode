@@ -6,28 +6,27 @@
   "scripts": {
     "build": "npx webpack --mode=development --watch",
     "test": "jest",
-    "coverage": "nyc npm run test"
+    "coverage": "jest --coverage"
   },
   "author": "",
   "license": "",
   "dependencies": {
     "@figma/plugin-typings": "^1.15.0",
-    "@types/jest": "^25.2.3",
-    "figma-api-stub": "0.0.41",
     "nearest-color": "^0.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-typescript": "^7.10.1",
+    "@types/jest": "^25.2.3",
     "@types/node": "^14.0.9",
     "babel-jest": "^26.0.1",
     "cross-env": "^5.2.1",
     "css-loader": "^3.5.3",
+    "figma-api-stub": "0.0.41",
     "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^4.3.0",
     "jest": "^26.0.1",
-    "nyc": "^14.1.1",
     "style-loader": "^1.2.1",
     "ts-loader": "^7.0.5",
     "ts-node": "^8.10.2",

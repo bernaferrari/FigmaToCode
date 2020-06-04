@@ -1,17 +1,15 @@
 import { CodeBuilder } from "../builder_interface";
+import { getContainerSizeProp, magicMargin } from "./size";
+import { tailwindColor } from "./colors";
 import {
-  mapLetterSpacing,
-  convertPxToTailwindAttr,
-  mapAbsoluteLineHeight,
-  mapFontSize,
+  pxToMapLetterSpacing,
+  pxToAbsoluteLineHeight,
+  pxToBorderRadius,
+  pxToLayoutSize,
+  pxToFontSize,
   nearestValue,
-  mapBorderRadius,
-  mapWidthHeightSize,
-  retrieveContainerPosition,
-  isInsideAutoAutoLayout,
-} from "./tailwind_wrappers";
-import { getContainerSizeProp, magicMargin } from "./tailwind_widget";
-import { tailwindColor } from "./tailwind_helpers";
+} from "./conversion_tables";
+import { retrieveContainerPosition } from "./position";
 
 export class tailwindAttributesBuilder implements CodeBuilder {
   attributes: string = "";
@@ -49,7 +47,8 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    * node.opacity is between [0, 1]; output will be [0, 100]
    */
   opacity(node: BlendMixin): this {
-    if (node.opacity !== 1) {
+    // [when testing] node.opacity can be undefined
+    if (node.opacity !== undefined && node.opacity !== 1) {
       const values = [0, 25, 50, 75];
       this.attributes += `opacity-${nearestValue(node.opacity * 100, values)} `;
     }
@@ -61,7 +60,8 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    * example: invisible
    */
   visibility(node: SceneNode): this {
-    if (!node.visible) {
+    // [when testing] node.visible can be undefined
+    if (node.visible !== undefined && !node.visible) {
       this.attributes += "invisible ";
     }
     return this;
@@ -75,7 +75,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   rotation(node: LayoutMixin): this {
     // that's how you convert angles to clockwise radians: angle * -pi/180
     // using 3.14159 as Pi for enough precision and to avoid importing math lib.
-    if (node.rotation > 0) {
+    if (node.rotation !== undefined && node.rotation !== 0) {
       const array = [-180, -90, -45, 45, 90, 180];
       let nearest = nearestValue(node.rotation, array);
       let minusIfNegative = "";
@@ -130,8 +130,8 @@ export class tailwindAttributesBuilder implements CodeBuilder {
     }
 
     if (node.textAutoResize === "NONE") {
-      const hRem = convertPxToTailwindAttr(node.height, mapWidthHeightSize);
-      const wRem = convertPxToTailwindAttr(node.width, mapWidthHeightSize);
+      const hRem = pxToLayoutSize(node.height);
+      const wRem = pxToLayoutSize(node.width);
 
       let propHeight = `h-${hRem} `;
       let propWidth = `w-${wRem} `;
@@ -161,7 +161,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
       this.attributes += propHeight;
       this.attributes += propWidth;
     } else if (node.textAutoResize === "HEIGHT") {
-      const wRem = convertPxToTailwindAttr(node.width, mapWidthHeightSize);
+      const wRem = pxToLayoutSize(node.width);
       let propHeight = `w-${wRem} `;
 
       if (node.parent !== null && "width" in node.parent) {
@@ -191,10 +191,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   fontSize(node: TextNode): this {
     // example: text-md
     if (node.fontSize !== figma.mixed) {
-      this.attributes += `text-${convertPxToTailwindAttr(
-        node.fontSize,
-        mapFontSize
-      )} `;
+      this.attributes += `text-${pxToFontSize(node.fontSize)} `;
     }
 
     return this;
@@ -232,10 +229,12 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    */
   letterSpacing = (node: TextNode): this => {
     if (node.letterSpacing !== figma.mixed) {
-      if (node.letterSpacing.unit === "PIXELS") {
-        this.attributes += `tracking-${convertPxToTailwindAttr(
-          node.letterSpacing.value,
-          mapLetterSpacing
+      if (
+        node.letterSpacing.unit === "PIXELS" &&
+        node.letterSpacing.value !== 0
+      ) {
+        this.attributes += `tracking-${pxToMapLetterSpacing(
+          node.letterSpacing.value
         )} `;
       } else if (node.letterSpacing.unit === "PERCENT") {
         // todo PERCENT
@@ -253,9 +252,8 @@ export class tailwindAttributesBuilder implements CodeBuilder {
       if (node.lineHeight.unit === "AUTO") {
         // default, ignore
       } else if (node.lineHeight.unit === "PIXELS") {
-        this.attributes += `leading-${convertPxToTailwindAttr(
-          node.lineHeight.value,
-          mapAbsoluteLineHeight
+        this.attributes += `leading-${pxToAbsoluteLineHeight(
+          node.lineHeight.value
         )} `;
       } else if (node.lineHeight.unit === "PERCENT") {
         // todo add support for relative line height (normal, relaxed, loose, snug, tight).
@@ -321,7 +319,8 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    * example: shadow
    */
   shadow(node: BlendMixin): this {
-    if (node.effects.length > 0) {
+    // [when testing] node.effects can be undefined
+    if (node.effects && node.effects.length > 0) {
       const drop_shadow: Array<ShadowEffect> = node.effects.filter(
         (d): d is ShadowEffect => d.type === "DROP_SHADOW"
       );
@@ -355,7 +354,8 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    */
   borderWidth(node: GeometryMixin): this {
     // [node.strokeWeight] can have a value even when there are no strokes
-    if (node.strokes.length > 0 && node.strokeWeight > 0) {
+    // [when testing] node.effects can be undefined
+    if (node.strokes && node.strokes.length > 0 && node.strokeWeight > 0) {
       const array = [2, 4, 8];
       this.attributes += `border-${nearestValue(node.strokeWeight, array)} `;
     }
@@ -371,35 +371,36 @@ export class tailwindAttributesBuilder implements CodeBuilder {
     if (node.type === "ELLIPSE") {
       this.attributes += "rounded-full ";
       return this;
-    } else if (!("cornerRadius" in node) || !("topLeftRadius" in node)) {
-      // todo are there Nodes with cornerRadius but without topLeftRadius?
+    } else if ("cornerRadius" in node && !("topLeftRadius" in node)) {
+      // probably only used when testing
+      if (node.cornerRadius !== figma.mixed) {
+        this.attributes += `rounded-${pxToBorderRadius(node.cornerRadius)} `;
+      }
       return this;
-    }
-    if (node.cornerRadius === 0) {
+    } else if (!("topLeftRadius" in node)) {
+      return this;
+    } else if (node.cornerRadius === 0) {
       // ignore when 0
       return this;
     }
 
-    const border = (value: number): string =>
-      convertPxToTailwindAttr(value, mapBorderRadius);
-
     let comp = "";
 
     if (node.cornerRadius !== figma.mixed) {
-      comp += `rounded-${border(node.cornerRadius)} `;
+      comp += `rounded-${pxToBorderRadius(node.cornerRadius)} `;
     } else {
       // todo optimize for tr/tl/br/bl instead of t/r/l/b
       if (node.topLeftRadius !== 0) {
-        comp += `rounded-tl-${border(node.topLeftRadius)} `;
+        comp += `rounded-tl-${pxToBorderRadius(node.topLeftRadius)} `;
       }
       if (node.topRightRadius !== 0) {
-        comp += `rounded-tr-${border(node.topRightRadius)} `;
+        comp += `rounded-tr-${pxToBorderRadius(node.topRightRadius)} `;
       }
       if (node.bottomLeftRadius !== 0) {
-        comp += `rounded-bl-${border(node.bottomLeftRadius)} `;
+        comp += `rounded-bl-${pxToBorderRadius(node.bottomLeftRadius)} `;
       }
       if (node.bottomLeftRadius !== 0) {
-        comp += `rounded-br-${border(node.bottomRightRadius)} `;
+        comp += `rounded-br-${pxToBorderRadius(node.bottomRightRadius)} `;
       }
     }
 
@@ -456,12 +457,13 @@ export class tailwindAttributesBuilder implements CodeBuilder {
         }
       }
 
-      if (!layoutMode) {
-        const isInAutoAutoLayout = isInsideAutoAutoLayout(node.parent);
-        if (isInAutoAutoLayout[0] !== "false") {
-          // todo calculate this
-        }
-      }
+      // todo uncomment this
+      // if (!layoutMode) {
+      //   const isInAutoAutoLayout = isInsideAutoAutoLayout(node.parent);
+      //   if (isInAutoAutoLayout[0] !== "false") {
+      //     // todo calculate this
+      //   }
+      // }
 
       this.attributes += layoutMode;
     }
@@ -480,19 +482,17 @@ export class tailwindAttributesBuilder implements CodeBuilder {
     // [horizontalPadding] and [verticalPadding] can have values even when AutoLayout is off
     if ("layoutMode" in node && node.layoutMode !== "NONE") {
       if (node.horizontalPadding > 0) {
-        this.attributes += `px-${convertPxToTailwindAttr(
-          node.horizontalPadding,
-          mapWidthHeightSize
-        )} `;
+        this.attributes += `px-${pxToLayoutSize(node.horizontalPadding)} `;
       }
 
       if (node.verticalPadding > 0) {
-        this.attributes += `py-${convertPxToTailwindAttr(
-          node.verticalPadding,
-          mapWidthHeightSize
-        )} `;
+        this.attributes += `py-${pxToLayoutSize(node.verticalPadding)} `;
       }
     }
     return this;
+  }
+
+  reset() {
+    this.attributes = "";
   }
 }

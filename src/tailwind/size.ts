@@ -1,127 +1,9 @@
 let shouldOptimize: boolean;
 shouldOptimize = true;
 
-import {
-  convertPxToTailwindAttr,
-  mapWidthHeightSize,
-} from "./tailwind_wrappers";
-
-export const rowColumnProps = (
-  node: FrameNode | ComponentNode | InstanceNode
-): string => {
-  // ROW or COLUMN
-
-  // [optimization]
-  // flex, by default, has flex-row. Therefore, it can be omitted.
-  const flexRow = shouldOptimize ? "" : "flex-row ";
-
-  let rowOrColumn = node.layoutMode === "HORIZONTAL" ? flexRow : "flex-col ";
-
-  // https://tailwindcss.com/docs/space/
-  // space between items
-  const spacing = convertPxToTailwindAttr(node.itemSpacing, mapWidthHeightSize);
-  const spaceDirection = node.layoutMode === "HORIZONTAL" ? "x" : "y";
-
-  // space is visually ignored when there are less than two children
-  let space =
-    shouldOptimize && node.children.length < 2
-      ? ""
-      : `space-${spaceDirection}-${spacing} `;
-
-  // align according to the most frequent way the children are aligned.
-  // todo layoutAlign should go to individual fields and this should be threated as an optimization
-  // const layoutAlign =
-  //   mostFrequentString(node.children.map((d) => d.layoutAlign)) === "MIN"
-  //     ? ""
-  //     : "items-center ";
-
-  // [optimization]
-  // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, item-center.
-  const layoutAlign =
-    node.layoutMode === "VERTICAL" &&
-    node.children.every((d) => d.layoutAlign === "STRETCH")
-      ? ""
-      : "items-center ";
-
-  // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
-  const flex =
-    node.parent &&
-    "layoutMode" in node.parent &&
-    node.parent.layoutMode === node.layoutMode
-      ? "flex "
-      : "inline-flex ";
-
-  if (
-    node.children.length === 1 &&
-    "layoutMode" in node.children[0] &&
-    node.children[0].layoutMode !== "NONE"
-  ) {
-    return "";
-  }
-
-  if (
-    node.children.length === 1 &&
-    node.children[0].layoutAlign === "STRETCH"
-  ) {
-    return "";
-  }
-
-  return `${flex}${rowOrColumn}${space}${layoutAlign}`;
-};
+import { pxToLayoutSize } from "./conversion_tables";
 
 export const magicMargin = 32;
-
-// makes the view size bigger when there is a stroke
-const getNodeSizeWithStrokes = (
-  node:
-    | DefaultFrameMixin // Frame
-    | (BaseNodeMixin & LayoutMixin & ChildrenMixin) // Group
-    | DefaultShapeMixin // Shapes
-): Array<number> => {
-  let nodeHeight = node.height;
-  let nodeWidth = node.width;
-
-  // tailwind doesn't support OUTSIDE or CENTER, only INSIDE.
-  // Therefore, to give the same feeling, the height and width will be slighly increased.
-  // node.strokes.lenght is necessary because [strokeWeight] can exist even without strokes.
-  if ("strokes" in node && node.strokes.length) {
-    if (node.strokeAlign === "OUTSIDE") {
-      nodeHeight += node.strokeWeight * 2;
-      nodeWidth += node.strokeWeight * 2;
-    } else if (node.strokeAlign === "CENTER") {
-      nodeHeight += node.strokeWeight * 1.5;
-      nodeWidth += node.strokeWeight * 1.5;
-    }
-  }
-
-  if ("children" in node) {
-    // if any children has an OUTSIDE or CENTER stroke and, with that stroke,
-    // the child gets a size bigger than parent, adjust parent to be larger
-    node.children
-      .filter((d) => "strokeWeight" in d && d.strokes.length)
-      .forEach((d) => {
-        if ("strokeWeight" in d) {
-          if (d.strokeAlign === "OUTSIDE") {
-            if (nodeWidth < d.width + d.strokeWeight * 2) {
-              nodeWidth += d.strokeWeight * 2;
-            }
-            if (nodeHeight < d.height + d.strokeWeight * 2) {
-              nodeHeight += d.strokeWeight * 2;
-            }
-          } else if (d.strokeAlign === "CENTER") {
-            if (nodeWidth < d.width + d.strokeWeight * 1.5) {
-              nodeWidth += d.strokeWeight * 2;
-            }
-            if (nodeHeight < d.height + d.strokeWeight * 1.5) {
-              nodeHeight += d.strokeWeight * 1.5;
-            }
-          }
-        }
-      });
-  }
-
-  return [nodeWidth, nodeHeight];
-};
 
 export const getContainerSizeProp = (
   node:
@@ -158,8 +40,8 @@ export const getContainerSizeProp = (
 
   const [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
 
-  const hRem = convertPxToTailwindAttr(nodeHeight, mapWidthHeightSize);
-  const wRem = convertPxToTailwindAttr(nodeWidth, mapWidthHeightSize);
+  const hRem = pxToLayoutSize(nodeHeight);
+  const wRem = pxToLayoutSize(nodeWidth);
 
   let propHeight = `h-${hRem} `;
   let propWidth = `w-${wRem} `;
@@ -266,4 +148,60 @@ export const getContainerSizeProp = (
   }
 
   return "";
+};
+
+// makes the view size bigger when there is a stroke
+const getNodeSizeWithStrokes = (
+  node:
+    | DefaultFrameMixin // Frame
+    | (BaseNodeMixin & LayoutMixin & ChildrenMixin) // Group
+    | DefaultShapeMixin // Shapes
+): Array<number> => {
+  let nodeHeight = node.height;
+  let nodeWidth = node.width;
+
+  if (!("strokes" in node)) {
+    return [nodeWidth, nodeHeight];
+  }
+
+  // tailwind doesn't support OUTSIDE or CENTER, only INSIDE.
+  // Therefore, to give the same feeling, the height and width will be slighly increased.
+  // node.strokes.lenght is necessary because [strokeWeight] can exist even without strokes.
+  if (node.strokes.length) {
+    if (node.strokeAlign === "OUTSIDE") {
+      nodeHeight += node.strokeWeight * 2;
+      nodeWidth += node.strokeWeight * 2;
+    } else if (node.strokeAlign === "CENTER") {
+      nodeHeight += node.strokeWeight * 1.5;
+      nodeWidth += node.strokeWeight * 1.5;
+    }
+  }
+
+  if ("children" in node) {
+    // if any children has an OUTSIDE or CENTER stroke and, with that stroke,
+    // the child gets a size bigger than parent, adjust parent to be larger
+    node.children
+      .filter((d) => "strokeWeight" in d && d.strokes.length)
+      .forEach((d) => {
+        if ("strokeWeight" in d) {
+          if (d.strokeAlign === "OUTSIDE") {
+            if (nodeWidth < d.width + d.strokeWeight * 2) {
+              nodeWidth += d.strokeWeight * 2;
+            }
+            if (nodeHeight < d.height + d.strokeWeight * 2) {
+              nodeHeight += d.strokeWeight * 2;
+            }
+          } else if (d.strokeAlign === "CENTER") {
+            if (nodeWidth < d.width + d.strokeWeight * 1.5) {
+              nodeWidth += d.strokeWeight * 2;
+            }
+            if (nodeHeight < d.height + d.strokeWeight * 1.5) {
+              nodeHeight += d.strokeWeight * 1.5;
+            }
+          }
+        }
+      });
+  }
+
+  return [nodeWidth, nodeHeight];
 };

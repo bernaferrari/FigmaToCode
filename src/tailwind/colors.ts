@@ -1,6 +1,5 @@
 import * as nearestColor from "nearest-color";
-import { rgbTohex } from "./../flutter/flutter_helpers";
-import { nearestValue } from "./tailwind_wrappers";
+import { nearestValue } from "./conversion_tables";
 
 // retrieve the SOLID color for tailwind
 export const tailwindColor = (
@@ -8,13 +7,11 @@ export const tailwindColor = (
   kind: string
 ): string => {
   // kind can be text, bg, border...
-  if (fills !== figma.mixed && fills.length > 0) {
+  // [when testing] fills can be undefined
+  if (fills && fills !== figma.mixed && fills.length > 0) {
     let fill = fills[0];
     if (fill.type === "SOLID") {
-      const hex =
-        ((fill.color.r * 255) | (1 << 8)).toString(16).slice(1) +
-        ((fill.color.g * 255) | (1 << 8)).toString(16).slice(1) +
-        ((fill.color.b * 255) | (1 << 8)).toString(16).slice(1);
+      const hex = rgbTo6hex(fill.color);
 
       let opacity = fill.opacity ?? 1.0;
 
@@ -25,14 +22,14 @@ export const tailwindColor = (
       // ignore the 100. If opacity was changed, let it be visible.
       const opacityProp =
         opacity !== 1.0
-          ? `${kind}-opacity-${nearestValue(opacity, [0, 0.25, 0.50, 0.75])} `
+          ? `${kind}-opacity-${nearestValue(opacity, [0, 0.25, 0.5, 0.75])} `
           : "";
 
       // example: text-red-500
       const colorProp = `${kind}-${getTailwindColor(hex)} `;
 
       // if fill isn't visible, it shouldn't be painted.
-      return fill.visible ? `${colorProp}${opacityProp}` : "";
+      return fill.visible !== false ? `${colorProp}${opacityProp}` : "";
     }
   }
 
@@ -58,9 +55,16 @@ export const vectorColor = (
   return "";
 };
 
-// Convert RGB (r,g,b: [0, 1]) + alpha [0, 1] to 8 digit hex
-// Convert RGBA (r,g,b,a: [0, 1]) to 8 digit hex
-export const rgbTohexNoAlpha = (
+export const rgbTo6hex = (color: RGB | RGBA): string => {
+  const hex =
+    ((color.r * 255) | (1 << 8)).toString(16).slice(1) +
+    ((color.g * 255) | (1 << 8)).toString(16).slice(1) +
+    ((color.b * 255) | (1 << 8)).toString(16).slice(1);
+
+  return hex;
+};
+
+export const rgbTo8hex = (
   color: RGB | RGBA,
   alpha: number = "a" in color ? color.a : 1.0
 ): string => {
@@ -207,9 +211,9 @@ export const tailwindColors: Record<string, string> = {
   "#702459": "pink-900",
 };
 
-export const tailwindColorsKeys = Object.keys(tailwindColors);
-
-export const tailwindNearestColor = nearestColor.from(tailwindColorsKeys);
+export const tailwindNearestColor = nearestColor.from(
+  Object.keys(tailwindColors)
+);
 
 export const getTailwindColor = (color: string): string => {
   return tailwindColors[tailwindNearestColor(color)];
