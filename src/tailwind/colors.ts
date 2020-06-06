@@ -43,16 +43,26 @@ export const vectorColor = (
   if (fills !== figma.mixed && fills.length > 0) {
     let fill = fills[0];
     if (fill.type === "SOLID") {
-      const hex =
-        ((fill.color.r * 255) | (1 << 8)).toString(16).slice(1) +
-        ((fill.color.g * 255) | (1 << 8)).toString(16).slice(1) +
-        ((fill.color.b * 255) | (1 << 8)).toString(16).slice(1);
-
+      const hex = rgbTo6hex(fill.color);
       return fill.visible ? `${hex}` : "";
     }
   }
 
   return "";
+};
+
+export const vectorOpacity = (
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+): number => {
+  // kind can be text, bg, border...
+  if (fills !== figma.mixed && fills.length > 0) {
+    let fill = fills[0];
+    if (fill.opacity !== undefined) {
+      return fill.opacity;
+    }
+  }
+
+  return 1;
 };
 
 export const rgbTo6hex = (color: RGB | RGBA): string => {

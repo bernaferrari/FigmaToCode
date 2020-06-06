@@ -40,29 +40,36 @@ const paddingFromCenter = (node: SceneNode): string => {
   return "";
 };
 
-const flexSelfFromCenter = (node: SceneNode): string => {
-  if (!node.parent) {
+const flexSelfFromCenter = (
+  node: SceneNode,
+  parentNode:
+    | FrameNode
+    | ComponentNode
+    | InstanceNode
+    | RectangleNode
+    | undefined,
+  layoutDirection: "sd-y" | "sd-x" | "false"
+): string => {
+  if (!parentNode) {
     return "";
   }
 
-  const parent = CustomNodeMap[node.parent.id].largestNode;
-
-  if (parent && "width" in parent) {
+  if (parentNode && "width" in parentNode) {
     let comp = "";
 
-    if (CustomNodeMap[node.parent.id].customAutoLayoutDirection === "sd-y") {
+    if (layoutDirection === "sd-y") {
       const nodeCenteredPosX = node.x + node.width / 2;
 
       // if parent is Frame, X should be 0.
       const parentCenteredPosX =
-        ("layoutMode" in parent ? 0 : parent.x) + parent.width / 2;
+        ("layoutMode" in parentNode ? 0 : parentNode.x) + parentNode.width / 2;
 
       const marginX = nodeCenteredPosX - parentCenteredPosX;
 
-      // allow a small threshold as rounding error
-      if (marginX > 2) {
+      // allow a small threshold
+      if (marginX > 4) {
         comp += `self-end `;
-      } else if (marginX < -2) {
+      } else if (marginX < -4) {
         // abs is necessary because [pxToLayoutSize] only receives a positive number
         comp += `self-start `;
       }
@@ -71,19 +78,14 @@ const flexSelfFromCenter = (node: SceneNode): string => {
 
       // if parent is Frame, X should be 0.
       const parentCenteredPosY =
-        ("layoutMode" in node.parent ? 0 : parent.y) + parent.height / 2;
+        ("layoutMode" in parentNode ? 0 : parentNode.y) + parentNode.height / 2;
 
       const marginY = nodeCenteredPosY - parentCenteredPosY;
 
-      console.log("nodeY: ", node.y, " -- nodeH: ", node.height);
-      console.log("parentY: ", parent.y, " -- parentH: ", parent.height);
-      console.log(AffectedByCustomAutoLayout);
-      console.log(CustomNodeMap);
-
-      // allow a small threshold as rounding error
-      if (marginY > 2) {
+      // allow a small threshold
+      if (marginY > 4) {
         comp += `self-start `;
-      } else if (marginY < -2) {
+      } else if (marginY < -4) {
         // abs is necessary because [pxToLayoutSize] only receives a positive number
         comp += `self-end `;
       }
@@ -98,19 +100,17 @@ export const retrieveContainerPosition = (
   node: SceneNode,
   parentId: string
 ): string => {
-  const parent = node.parent;
-
   // avoid adding Positioned() when parent is not a Stack(), which can happen at the beggining
-  if (parent === null || parentId === parent.id) {
+  if (node.parent === null || parentId === node.parent.id) {
     return "";
   }
 
   // if node is a Group and has only one child, ignore it; child will set the size
   if (
-    parent.type === "GROUP" &&
-    parent.children.length === 1 &&
-    parent.width === node.width &&
-    parent.height === node.height
+    node.parent.type === "GROUP" &&
+    node.parent.children.length === 1 &&
+    node.parent.width === node.width &&
+    node.parent.height === node.height
   ) {
     return "";
   }
@@ -122,20 +122,30 @@ export const retrieveContainerPosition = (
   }
 
   if (AffectedByCustomAutoLayout[node.id] === "child") {
-    return flexSelfFromCenter(node);
+    const direction = CustomNodeMap[node.parent.id].customAutoLayoutDirection;
+    const parent = CustomNodeMap[node.parent.id].largestNode;
+
+    return flexSelfFromCenter(node, parent, direction);
   }
 
   // if parent and node are same size
   // but what if it needs to center the child?
   if (
-    "width" in parent &&
-    parent.width === node.width &&
-    parent.height === node.height
+    "width" in node.parent &&
+    node.parent.width === node.width &&
+    node.parent.height === node.height
   ) {
     return "";
   }
 
   if (node.parent && CustomNodeMap[node.parent?.id]?.isCustomAutoLayout) {
+    const parentNode = node.parent;
+
+    if (parentNode.type === "RECTANGLE" || "layoutMode" in parentNode) {
+      const direction = CustomNodeMap[node.parent.id].customAutoLayoutDirection;
+      return flexSelfFromCenter(node, parentNode, direction);
+    }
+
     // when in AutoAutoLayout, it is inside a Flex, therefore the position doesn't matter
     return "";
   }
@@ -154,18 +164,18 @@ export const retrieveContainerPosition = (
     return "";
   }
 
-  if (AffectedByCustomAutoLayout[parent.id]) {
+  if (AffectedByCustomAutoLayout[node.parent.id]) {
     // todo first thing tomorrow
-    return "";
+    return " ";
   }
 
   if (
-    parent.type === "GROUP" ||
-    ("layoutMode" in parent &&
-      parent.layoutMode === "NONE" &&
-      parent.children.length > 1) ||
+    node.parent.type === "GROUP" ||
+    ("layoutMode" in node.parent &&
+      node.parent.layoutMode === "NONE" &&
+      node.parent.children.length > 1) ||
     ("children" in node &&
-      "width" in parent &&
+      "width" in node.parent &&
       node.children.every((d) => d.type === "VECTOR"))
   ) {
     // when parent is GROUP or FRAME, try to position the node in it
@@ -175,14 +185,14 @@ export const retrieveContainerPosition = (
 
     // this is needed for Groups, where node.x is not relative to zero. This is ignored for Frame.
     // todo transform these into a helper function
-    const parentX = "layoutMode" in parent ? 0 : parent.x;
-    const parentY = "layoutMode" in parent ? 0 : parent.y;
+    const parentX = "layoutMode" in node.parent ? 0 : node.parent.x;
+    const parentY = "layoutMode" in node.parent ? 0 : node.parent.y;
 
     // < 4 is a threshold. If === is used, there can be rounding errors (28.002 !== 28)
     const centerX =
-      Math.abs(2 * (node.x - parentX) + node.width - parent.width) < 4;
+      Math.abs(2 * (node.x - parentX) + node.width - node.parent.width) < 4;
     const centerY =
-      Math.abs(2 * (node.y - parentY) + node.height - parent.height) < 4;
+      Math.abs(2 * (node.y - parentY) + node.height - node.parent.height) < 4;
 
     // if (centerY) {
     //   // this was the only I could manage to center a div with absolute
@@ -199,7 +209,7 @@ export const retrieveContainerPosition = (
       if (node.y === 0) {
         // y = top, x = center
         return "mt-0 mb-auto mx-auto ";
-      } else if (node.y === parent.height) {
+      } else if (node.y === node.parent.height) {
         // y = bottom, x = center
         return "mt-auto mb-0 mx-auto ";
       }
@@ -210,7 +220,7 @@ export const retrieveContainerPosition = (
       if (node.x === 0) {
         // y = center, x = left
         return "my-auto ml-0 mr-auto ";
-      } else if (node.x === parent.width) {
+      } else if (node.x === node.parent.width) {
         // y = center, x = right
         return "my-auto ml-auto mr-0 ";
       }
@@ -220,7 +230,7 @@ export const retrieveContainerPosition = (
 
     // set the width to max if the view is near the corner
     // that will be complemented with margins from [retrieveContainerPosition]
-    if (parent.type === "GROUP" || "layoutMode" in parent) {
+    if (node.parent.type === "GROUP" || "layoutMode" in node.parent) {
       const sizeConverter = (attr: string, num: number): string => {
         const result = pxToLayoutSize(num);
         if (+result > 0) {

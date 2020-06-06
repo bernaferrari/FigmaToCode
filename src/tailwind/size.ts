@@ -1,6 +1,3 @@
-let shouldOptimize: boolean;
-shouldOptimize = true;
-
 import { pxToLayoutSize } from "./conversion_tables";
 import { AffectedByCustomAutoLayout, CustomNodeMap } from "./custom_node";
 
@@ -14,11 +11,12 @@ export const getContainerSizeProp = (node: SceneNode): string => {
   //   return "";
   // }
 
-  if (!node.parent || !("width" in node.parent)) {
+  if (!node.parent) {
     return "";
   }
 
   // when parent is HORIZONTAL and node is HORIZONTAL, let the child define the size
+  // todo try to take in consideration the custom Auto Layout too?
   if ("layoutMode" in node.parent && "layoutMode" in node) {
     if (
       node.layoutMode !== "NONE" &&
@@ -48,10 +46,39 @@ export const getContainerSizeProp = (node: SceneNode): string => {
 
   // experimental, set size to auto, like in the real autolayout
   if (AffectedByCustomAutoLayout[node.id] === "changed") {
-    return "";
+    let returnHere = true;
+
+    // imagine a Rect, Text and Frame. Rect will be changed to become the Frame.
+    // The parent of Rect is the Frame, and the parent of Text will be Rect.
+    // But we need the parent of the parent of the Rect, if exists, to get the sizing correctly
+    if (
+      "width" in node &&
+      node.parent.parent &&
+      "width" in node.parent.parent
+    ) {
+      // retrieve the children (get the parent, look at children and ignore the node)
+      const children = node.parent.children.filter((d) => d !== node);
+
+      // type checker fails inside the every if this is not done
+      const nodeParent = node.parent.parent;
+
+      // look if any children has a responsive width
+      const isResp = children.every((d) =>
+        calculateResponsiveW(d, nodeParent, d.width, d.height)
+      );
+
+      // if it has, don't return empty. Width needs to be set manually.
+      if (isResp) {
+        returnHere = false;
+      }
+    }
+
+    if (returnHere) {
+      return "";
+    }
   }
 
-  const [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
+  let [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
 
   const hRem = pxToLayoutSize(nodeHeight);
   const wRem = pxToLayoutSize(nodeWidth);
@@ -59,26 +86,23 @@ export const getContainerSizeProp = (node: SceneNode): string => {
   let propHeight = `h-${hRem} `;
   let propWidth = `w-${wRem} `;
 
-  // if FRAME is too big for tailwind to handle, just let it be w-full or h-auto
-  // if its width is larger than 256 or the sum of its children
-  if (
-    node.width > 256 ||
-    ("children" in node &&
-      node.children.filter((d) => d.width + d.x - node.x > 256).length > 0)
-  ) {
-    propWidth = "w-full ";
+  // if layer is a child from AutoAutoLayout, the parent was changed;
+  // therefore, it must be updated
+  let updatedParent: SceneNode | undefined = undefined;
+  if (AffectedByCustomAutoLayout[node.id] === "child") {
+    updatedParent = node.parent.children.find(
+      (d) => AffectedByCustomAutoLayout[d.id] === "changed"
+    );
+  }
+  if (!updatedParent || !("width" in updatedParent)) {
+    if ("width" in node.parent) {
+      updatedParent = node.parent;
+    }
   }
 
-  // compare if width is same as parent, with a small threshold
-  // parent must be a frame (gets weird in groups)
-  if ("layoutMode" in node.parent && node.parent.width - node.width < 2) {
-    propWidth = "w-full ";
-  }
-
-  // 799 / 400 - 2 = -0,0025
-  // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
-  if (Math.abs(node.parent.width / node.width - 2) < 0.01) {
-    propWidth = "w-1/2 ";
+  const rW = calculateResponsiveW(node, updatedParent, nodeWidth, nodeHeight);
+  if (rW) {
+    propWidth = rW;
   }
 
   // compare if height is same as parent, with a small threshold
@@ -91,62 +115,21 @@ export const getContainerSizeProp = (node: SceneNode): string => {
     ("layoutMode" in node && node.counterAxisSizingMode !== "FIXED") ||
     !("layoutMode" in node);
 
-  if (node.type !== "RECTANGLE" && autoHeight) {
+  if ("height" in node.parent && node.type !== "RECTANGLE" && autoHeight) {
     if (
       // todo Secondary button has issues with this
-      node.parent.height - node.height < 2 ||
-      node.height > 256 ||
+      node.parent.height - nodeHeight < 2 ||
+      nodeHeight > 256 ||
       ("children" in node &&
         node.children.filter((d) => d.height + d.y - node.y > 256).length > 0)
     ) {
       // propHeight = "h-full ";
-      propHeight = "AAAAA";
+      propHeight = "";
     }
   }
 
-  // when the child has the same size as the parent, don't set the size of the parent (twice)
-  // exception: when it is 1/2
-  if (
-    "children" in node &&
-    node.children.length === 1 &&
-    propWidth !== "w-1/2 "
-  ) {
-    const child = node.children[0];
-    if (child.width === node.width && child.height === node.height) {
-      return "";
-    }
-  } else {
-    // if (!("strokes" in node)) {
-    //   // ignore Group
-    //   return "";
-    // }
-  }
-
-  if (node.parent !== null && "width" in node.parent) {
-    // set the width to max if the view is near the corner
-    // that will be complemented with margins from [retrieveContainerPosition]
-    // the third check [parentWidth - nodeWidth >= 2 * magicMargin]
-    // was made to avoid setting h-full when parent is almost the same size as children
-
-    // nodeWidth / node.parent.width >= 0.8: this means only when it covers 80% of the frame
-    if (
-      node.x - node.parent.x <= magicMargin &&
-      nodeWidth / node.parent.width >= 0.8 &&
-      nodeWidth + 2 * magicMargin >= node.parent.width &&
-      node.parent.width - nodeWidth >= 2 * magicMargin
-    ) {
-      propWidth = "w-full ";
-    }
-
-    if (
-      node.y - node.parent.y <= magicMargin &&
-      nodeHeight / node.parent.height >= 0.8 &&
-      nodeHeight + 2 * magicMargin >= node.parent.height &&
-      node.parent.height - nodeHeight >= 2 * magicMargin
-    ) {
-      propHeight = "h-full ";
-    }
-  }
+  // if FRAME is too big for tailwind to handle, just let it be w-full or h-auto
+  // if its width is larger than 256 or the sum of its children
 
   if ("layoutMode" in node) {
     // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
@@ -221,4 +204,100 @@ const getNodeSizeWithStrokes = (node: SceneNode): Array<number> => {
   }
 
   return [nodeWidth, nodeHeight];
+};
+
+const calculateResponsiveW = (
+  node: SceneNode,
+  parent: SceneNode | undefined,
+  nodeWidth: number,
+  nodeHeight: number
+): string => {
+  let propWidth = "";
+
+  // verifies if size > 256 or any child has size > 256
+  // todo improve to verify if the sum of children is also not larger than 256
+  if (
+    nodeWidth > 256 ||
+    ("children" in node &&
+      node.children.filter((d) => d.width + d.x - node.x > 256).length > 0)
+  ) {
+    propWidth = "w-full ";
+  }
+
+  if (!parent) {
+    return propWidth;
+  }
+
+  // if width is same as parent, with a small threshold, w is 100%
+  // parent must be a frame (gets weird in groups)
+  if ("layoutMode" in parent && parent.width - nodeWidth < 2) {
+    propWidth = "w-full ";
+  }
+
+  if ("width" in parent) {
+    // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
+    const dividedWidth = nodeWidth / parent.width;
+
+    // todo what if the element is ~1/2 but there is a margin? This won't detect it
+    if (Math.abs(dividedWidth - 1) < 0.01) {
+      propWidth = "w-full ";
+    } else if (Math.abs(dividedWidth - 1 / 2) < 0.01) {
+      propWidth = "w-1/2 ";
+    } else if (Math.abs(dividedWidth - 1 / 3) < 0.01) {
+      propWidth = "w-1/3 ";
+    } else if (Math.abs(dividedWidth - 2 / 3) < 0.01) {
+      propWidth = "w-2/3 ";
+    } else if (Math.abs(dividedWidth - 1 / 4) < 0.01) {
+      propWidth = "w-1/4 ";
+    } else if (Math.abs(dividedWidth - 3 / 4) < 0.01) {
+      propWidth = "w-3/4 ";
+    } else if (Math.abs(dividedWidth - 1 / 5) < 0.01) {
+      propWidth = "w-1/5 ";
+    } else if (Math.abs(dividedWidth - 1 / 6) < 0.01) {
+      propWidth = "w-1/6 ";
+    } else if (Math.abs(dividedWidth - 5 / 6) < 0.01) {
+      propWidth = "w-5/6 ";
+    } else if (Math.abs(dividedWidth - 1 / 12) < 0.01) {
+      propWidth = "w-1/12 ";
+    } else if (Math.abs(dividedWidth - 5 / 12) < 0.01) {
+      propWidth = "w-5/12 ";
+    } else if (Math.abs(dividedWidth - 7 / 12) < 0.01) {
+      propWidth = "w-7/12 ";
+    } else if (Math.abs(dividedWidth - 11 / 12) < 0.01) {
+      propWidth = "w-11/12 ";
+    }
+  }
+
+  // when the child has the same size as the parent, don't set the size of the parent (twice)
+  // exception: when it is 1/2
+  if ("children" in node && node.children.length === 1 && !propWidth) {
+    const child = node.children[0];
+    if (child.width === nodeWidth && child.height === nodeHeight) {
+      return "ABABAA";
+    }
+  } else {
+    // if (!("strokes" in node)) {
+    //   // ignore Group
+    //   return "";
+    // }
+  }
+
+  if ("width" in parent) {
+    // set the width to max if the view is near the corner
+    // that will be complemented with margins from [retrieveContainerPosition]
+    // the third check [parentWidth - nodeWidth >= 2 * magicMargin]
+    // was made to avoid setting h-full when parent is almost the same size as children
+
+    // nodeWidth / node.parent.width >= 0.8: this means only when it covers 80% of the frame
+    if (
+      node.x - parent.x <= magicMargin &&
+      nodeWidth / parent.width >= 0.8 &&
+      nodeWidth + 2 * magicMargin >= parent.width &&
+      parent.width - nodeWidth >= 2 * magicMargin
+    ) {
+      propWidth = "w-full ";
+    }
+  }
+
+  return propWidth;
 };

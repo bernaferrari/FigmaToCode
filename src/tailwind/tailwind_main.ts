@@ -1,4 +1,4 @@
-import { vectorColor } from "./colors";
+import { vectorColor, vectorOpacity } from "./colors";
 import { tailwindAttributesBuilder } from "./tailwind_builder";
 import { pxToLayoutSize } from "./conversion_tables";
 import { CustomNode } from "./custom_node";
@@ -32,8 +32,6 @@ const tailwindWidgetGenerator = (
       // ignore when node is invisible
     } else if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += tailwindContainer(node, "");
-    } else if (node.type === "VECTOR") {
-      comp += tailwindVector(node);
     } else if (node.type === "GROUP") {
       comp += tailwindGroup(node);
     } else if (
@@ -85,6 +83,11 @@ const tailwindGroup = (node: GroupNode): string => {
     return "";
   }
 
+  const vectorIfExists = tailwindVector(node);
+  if (vectorIfExists) {
+    return vectorIfExists;
+  }
+
   const customNode = new CustomNode(node);
   let childrenStr = tailwindWidgetGenerator(customNode.orderedChildren);
   let attr = customNode.attributes;
@@ -103,8 +106,8 @@ const tailwindGroup = (node: GroupNode): string => {
   // this needs to be called after CustomNode because widthHeight depends on it
   const builder = new tailwindAttributesBuilder("", isJsx)
     .visibility(node)
-    .widthHeight(node)
     .containerPosition(node, parentId)
+    .widthHeight(node)
     .layoutAlign(node, parentId);
 
   // if [attributes] is "relative" and builder contains "absolute", ignore the "relative"
@@ -125,14 +128,6 @@ const tailwindGroup = (node: GroupNode): string => {
   }
 
   return tailwindWidgetGenerator(children);
-
-  // if (node.children.length === 1) {
-  //   // ignore group if possible
-  //   return tailwindWidgetGenerator(node.children);
-  // }
-
-  // // don't generate size for group because its size is derived from children
-  // const size = getContainerSizeProp(node);
 };
 
 const tailwindText = (node: TextNode): string => {
@@ -168,6 +163,11 @@ const tailwindText = (node: TextNode): string => {
 const tailwindFrame = (
   node: FrameNode | ComponentNode | InstanceNode
 ): string => {
+  const vectorIfExists = tailwindVector(node);
+  if (vectorIfExists) {
+    return vectorIfExists;
+  }
+
   if (node.layoutMode === "NONE" && node.children.length > 1) {
     // sort, so that layers don't get weird (i.e. bottom layer on top or vice-versa)
     const customNode = new CustomNode(node);
@@ -200,35 +200,70 @@ const tailwindFrame = (
   }
 };
 
-const tailwindVector = (node: VectorNode) => {
-  // ignore when invisible
-  if (node.visible === false) {
+const tailwindVector = (group: ChildrenMixin) => {
+  // todo improve this, positioning is wrong
+  // todo support for ungroup vectors. This was reused because 80% of people are going
+  // to use Vectors in groups (like icons)
+
+  // if every children is a VECTOR, no children have a child
+  if (!group.children.every((d) => d.type === "VECTOR")) {
     return "";
   }
 
-  const builder = new tailwindAttributesBuilder("", isJsx)
-    .widthHeight(node)
-    .autoLayoutPadding(node)
-    .containerPosition(node, parentId)
-    .opacity(node)
-    .rotation(node)
-    .shadow(node)
-    .layoutAlign(node, parentId)
-    .customColor(node.strokes, "border")
-    .borderWidth(node)
-    .buildAttributes();
+  const node = group.children[0] as VectorNode;
 
-  return `<div ${builder}><svg viewBox="0 0 ${node.width} ${
-    node.height
-  }" xmlns="http://www.w3.org/2000/svg">
-    ${node.vectorPaths.map(
-      (d) => `<path
-            fill-rule="${d.windingRule}"
-            stroke="${vectorColor(node.fills)}"
-            d="${d.data}"
-          />`
-    )}
-    </svg></div>`;
+  const strokeOpacity = vectorOpacity(node.strokes);
+  const strokeOpacityAttr =
+    strokeOpacity < 1
+      ? `${isJsx ? "strokeOpacity" : "stroke-opacity"}=${
+          isJsx ? `{${strokeOpacity}}` : `"${strokeOpacity}"`
+        }\n`
+      : "";
+
+  const strokeWidthAttr = `${isJsx ? "strokeWidth" : "stroke-width"}=${
+    isJsx ? `{${node.strokeWeight}}` : `"${node.strokeWeight}"`
+  }\n`;
+
+  const strokeLineCapAttr =
+    node.strokeCap === "ROUND"
+      ? `${isJsx ? "strokeLinecap" : "stroke-linecap"}="round"\n`
+      : "";
+
+  const strokeLineJoinAttr =
+    node.strokeJoin !== "MITER"
+      ? `${
+          isJsx ? "strokeLinejoin" : "stroke-linejoin"
+        }="${node.strokeJoin.toString().toLowerCase()}"\n`
+      : "";
+
+  const strokeAttr =
+    node.strokes.length > 0 ? `stroke="#${vectorColor(node.strokes)}"\n` : "";
+
+  const sizeAttr = isJsx
+    ? `height={${node.height}} width={${node.width}}`
+    : `height="${node.height}" width="${node.width}"`;
+
+  // reduce everything into a single string
+  const paths = group.children.reduce(
+    (acc, n) =>
+      acc +
+      (n as VectorNode).vectorPaths.reduce((acc, d) => {
+        const fillRuleAttr =
+          d.windingRule !== "NONE"
+            ? `${isJsx ? "fillRule" : "fill-rule"}="${d.windingRule}"\n`
+            : "";
+
+        return (
+          acc +
+          `<path\n${fillRuleAttr}${strokeAttr}${strokeOpacityAttr}${strokeWidthAttr}${strokeLineCapAttr}${strokeLineJoinAttr}d="${d.data}"/>\n`
+        );
+      }, ""),
+    ""
+  );
+
+  return `<svg ${sizeAttr} fill="none">
+    ${paths}
+    </svg>`;
 
   // return `<div height=\"${node.height}\" width=\"${node.width}\"></div>`;
   // return `<svg height="${node.height}" width="${node.width}">
@@ -258,9 +293,9 @@ export const tailwindContainer = (
 
   const builder = new tailwindAttributesBuilder("", isJsx)
     .visibility(node)
-    .widthHeight(node)
     .autoLayoutPadding(node)
     .containerPosition(node, parentId)
+    .widthHeight(node)
     .layoutAlign(node, parentId)
     .customColor(node.fills, "bg")
     // TODO image and gradient support

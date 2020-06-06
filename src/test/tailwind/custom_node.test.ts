@@ -1,7 +1,8 @@
 import { CustomNode } from "../../tailwind/custom_node";
 import { createFigma } from "figma-api-stub";
+import { getContainerSizeProp } from "../../tailwind/size";
 
-describe("Tailwind Custom AutoLayout", () => {
+describe("Tailwind Custom Node", () => {
   const figma = createFigma({
     simulateErrors: true,
     isWithoutTimeout: false,
@@ -53,7 +54,9 @@ describe("Tailwind Custom AutoLayout", () => {
       frame.appendChild(node1);
 
       const customNode = new CustomNode(frame);
-      expect(customNode.attributes).toEqual("inline-flex flex-col items-center ");
+      expect(customNode.attributes).toEqual(
+        "inline-flex flex-col items-center justify-center "
+      );
     });
 
     it("frame two children horizontal", () => {
@@ -74,7 +77,9 @@ describe("Tailwind Custom AutoLayout", () => {
       frame.appendChild(node1);
 
       const customNode = new CustomNode(frame);
-      expect(customNode.attributes).toEqual("inline-flex items-center ");
+      expect(customNode.attributes).toEqual(
+        "inline-flex items-center justify-center "
+      );
     });
 
     it("frame three children relative", () => {
@@ -101,7 +106,9 @@ describe("Tailwind Custom AutoLayout", () => {
       frame.appendChild(node2);
 
       const customNode = new CustomNode(frame);
-      expect(customNode.attributes).toEqual("relative ");
+      expect(customNode.attributes).toEqual(
+        "inline-flex space-x-1 items-center justify-center "
+      );
     });
   });
 
@@ -134,7 +141,9 @@ describe("Tailwind Custom AutoLayout", () => {
       node1.y = 16;
 
       const customNode = new CustomNode(figma.group([node0, node1], frame));
-      expect(customNode.attributes).toEqual("inline-flex flex-col items-center ");
+      expect(customNode.attributes).toEqual(
+        "inline-flex flex-col items-center justify-center "
+      );
     });
 
     it("group two children horizontal", () => {
@@ -152,7 +161,7 @@ describe("Tailwind Custom AutoLayout", () => {
       node1.y = 0;
 
       const customNode = new CustomNode(figma.group([node0, node1], frame));
-      expect(customNode.attributes).toEqual("inline-flex items-center ");
+      expect(customNode.attributes).toEqual("inline-flex items-center justify-center ");
     });
 
     it("group three children relative", () => {
@@ -178,7 +187,76 @@ describe("Tailwind Custom AutoLayout", () => {
       const customNode = new CustomNode(
         figma.group([node0, node1, node2], frame)
       );
-      expect(customNode.attributes).toEqual("relative ");
+      expect(customNode.attributes).toEqual(
+        "inline-flex space-x-1 items-center justify-center "
+      );
+    });
+  });
+
+  describe("complex layouts for autoautolayout", () => {
+    it("if width is too large", () => {
+      const node = figma.createFrame();
+      node.resize(500, 64);
+      node.layoutMode = "NONE";
+      node.counterAxisSizingMode = "FIXED";
+
+      expect(getContainerSizeProp(node)).toEqual("w-full h-16 ");
+    });
+
+    it("if height is too large without children", () => {
+      const node = figma.createFrame();
+      node.resize(64, 500);
+      node.layoutMode = "NONE";
+      node.counterAxisSizingMode = "FIXED";
+
+      // max of h-64
+      expect(getContainerSizeProp(node)).toEqual("w-16 h-64 ");
+    });
+
+    it("if height is too large with children", () => {
+      const node = figma.createFrame();
+      node.resize(64, 500);
+      node.layoutMode = "NONE";
+      node.counterAxisSizingMode = "FIXED";
+
+      const subnode = figma.createFrame();
+      subnode.resize(64, 250);
+      subnode.layoutMode = "NONE";
+      node.appendChild(subnode);
+
+      // h-auto
+      expect(getContainerSizeProp(node)).toEqual("w-16 h-64 ");
+    });
+    // todo improve this. Try to set the parent height to be the same as children before h-auto
+    it("children are higher than node", () => {
+      const node = figma.createFrame();
+      node.resize(16, 16);
+      node.layoutMode = "NONE";
+      node.counterAxisSizingMode = "FIXED";
+
+      const subnode = figma.createFrame();
+      subnode.resize(32, 32);
+      subnode.layoutMode = "NONE";
+      node.appendChild(subnode);
+
+      // h-auto
+      expect(getContainerSizeProp(node)).toEqual("w-4 h-4 ");
+    });
+
+    it("child is way larger than node", () => {
+      const node = figma.createFrame();
+      node.resize(16, 16);
+      node.layoutMode = "NONE";
+      node.counterAxisSizingMode = "FIXED";
+
+      const subnode = figma.createFrame();
+      subnode.resize(257, 257);
+      subnode.layoutMode = "NONE";
+      node.appendChild(subnode);
+
+      // todo this seems wrong
+      // h-auto
+      expect(getContainerSizeProp(node)).toEqual("w-4 h-4 ");
     });
   });
 });

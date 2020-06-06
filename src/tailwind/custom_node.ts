@@ -56,7 +56,8 @@ export class CustomNode {
       return (
         child.x >= node.x &&
         child.y >= node.y &&
-        child.x + child.width - node.x <= node.width
+        child.x + child.width - node.x <= node.width &&
+        child.y + child.height - node.y <= node.height
       );
     });
   }
@@ -107,8 +108,6 @@ export class CustomNode {
       node.type === "GROUP" ||
       ("layoutMode" in node && node.layoutMode === "NONE")
     ) {
-      console.log("children are ", node.children);
-
       const rect = this.rectAsBg(node);
 
       let children = node.children.filter((d) => d.visible !== false);
@@ -124,7 +123,6 @@ export class CustomNode {
       }
 
       this.orderedChildren = this.retrieveCustomAutoLayoutChildren(children);
-      console.log("orderedChildren are ", children);
 
       const detectedAutoLayout = this.retrieveCustomAutoLayout();
       console.log("detectedLayout ", detectedAutoLayout);
@@ -377,24 +375,23 @@ export class CustomNode {
   ] {
     const intervalY = this.calculateInterval(this.orderedChildren, "y");
 
+    console.log(intervalY);
     if (intervalY.length === 0) {
       return ["false", []];
     }
 
-    console.log("intervalY is ", intervalY);
-
     // use 1 instead of 0 to avoid rounding errors (-0.00235 should be valid)
-    if (intervalY.every((d) => d < 1)) {
-      const intervalX = this.calculateInterval(this.orderedChildren, "x");
-      // const standardDeviation = this.sd(intervalX);
-      // if (standardDeviation < this.autoLayoutTolerance) {
-      return ["sd-x", intervalX];
-      // }
-    } else if (intervalY.every((d) => d >= -1)) {
+    if (intervalY.every((d) => d >= -1)) {
       // todo re-enable the standardDeviation calculation? This was used to test if layout elements have the same spacing
       // const standardDeviation = this.sd(intervalY);
       // if (standardDeviation < this.autoLayoutTolerance) {
       return ["sd-y", intervalY];
+      // }
+    } else if (intervalY.every((d) => d < 1)) {
+      const intervalX = this.calculateInterval(this.orderedChildren, "x");
+      // const standardDeviation = this.sd(intervalX);
+      // if (standardDeviation < this.autoLayoutTolerance) {
+      return ["sd-x", intervalX];
       // }
     }
 
