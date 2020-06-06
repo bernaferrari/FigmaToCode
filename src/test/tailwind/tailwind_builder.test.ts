@@ -22,6 +22,8 @@ describe("Tailwind Builder", () => {
   // .borderRadius(node);
 
   it("visibility", () => {
+    builder.reset();
+
     node.visible = true;
     builder.visibility(node);
     expect(builder.attributes).toEqual("");
@@ -34,6 +36,8 @@ describe("Tailwind Builder", () => {
   });
 
   it("width", () => {
+    builder.reset();
+
     node.resize(16, 16);
     builder.widthHeight(node);
     expect(builder.attributes).toEqual("w-4 h-4 ");
@@ -46,11 +50,13 @@ describe("Tailwind Builder", () => {
 
     node.resize(300, 300);
     builder.widthHeight(node);
-    expect(builder.attributes).toEqual("w-64 h-64 ");
+    expect(builder.attributes).toEqual("w-full h-64 ");
     builder.reset();
   });
 
   it("opacity", () => {
+    builder.reset();
+
     node.opacity = 0.1;
     builder.opacity(node);
     expect(builder.attributes).toEqual("opacity-0 ");
@@ -78,6 +84,8 @@ describe("Tailwind Builder", () => {
   });
 
   it("rotation", () => {
+    builder.reset();
+
     node.rotation = 45;
     builder.rotation(node);
     expect(builder.attributes).toEqual("rotate-45 ");

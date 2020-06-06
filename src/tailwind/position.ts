@@ -1,5 +1,98 @@
-import { CustomNodeMap } from "./tailwind_main";
 import { pxToLayoutSize } from "./conversion_tables";
+import { CustomNodeMap, AffectedByCustomAutoLayout } from "./custom_node";
+
+const paddingFromCenter = (node: SceneNode): string => {
+  if (node.parent && "width" in node.parent) {
+    let comp = "";
+
+    const nodeCenteredPosX = node.x + node.width / 2;
+
+    // if parent is Frame, X should be 0.
+    const parentCenteredPosX =
+      ("layoutMode" in node.parent ? 0 : node.parent.x) + node.parent.width / 2;
+
+    const marginX = nodeCenteredPosX - parentCenteredPosX;
+
+    if (marginX > 0) {
+      comp += `ml-${pxToLayoutSize(marginX)} `;
+    } else if (marginX < 0) {
+      // abs is necessary because [pxToLayoutSize] only receives a positive number
+      comp += `mr-${pxToLayoutSize(Math.abs(marginX))} `;
+    }
+
+    const nodeCenteredPosY = node.y + node.height / 2;
+
+    // if parent is Frame, X should be 0.
+    const parentCenteredPosY =
+      ("layoutMode" in node.parent ? 0 : node.parent.y) +
+      node.parent.height / 2;
+
+    const marginY = nodeCenteredPosY - parentCenteredPosY;
+    if (marginY > 0) {
+      comp += `mt-${pxToLayoutSize(marginY)} `;
+    } else if (marginY < 0) {
+      // abs is necessary because [pxToLayoutSize] only receives a positive number
+      comp += `mb-${pxToLayoutSize(Math.abs(marginY))} `;
+    }
+
+    return comp;
+  }
+  return "";
+};
+
+const flexSelfFromCenter = (node: SceneNode): string => {
+  if (!node.parent) {
+    return "";
+  }
+
+  const parent = CustomNodeMap[node.parent.id].largestNode;
+
+  if (parent && "width" in parent) {
+    let comp = "";
+
+    if (CustomNodeMap[node.parent.id].customAutoLayoutDirection === "sd-y") {
+      const nodeCenteredPosX = node.x + node.width / 2;
+
+      // if parent is Frame, X should be 0.
+      const parentCenteredPosX =
+        ("layoutMode" in parent ? 0 : parent.x) + parent.width / 2;
+
+      const marginX = nodeCenteredPosX - parentCenteredPosX;
+
+      // allow a small threshold as rounding error
+      if (marginX > 2) {
+        comp += `self-end `;
+      } else if (marginX < -2) {
+        // abs is necessary because [pxToLayoutSize] only receives a positive number
+        comp += `self-start `;
+      }
+    } else {
+      const nodeCenteredPosY = node.y + node.height / 2;
+
+      // if parent is Frame, X should be 0.
+      const parentCenteredPosY =
+        ("layoutMode" in node.parent ? 0 : parent.y) + parent.height / 2;
+
+      const marginY = nodeCenteredPosY - parentCenteredPosY;
+
+      console.log("nodeY: ", node.y, " -- nodeH: ", node.height);
+      console.log("parentY: ", parent.y, " -- parentH: ", parent.height);
+      console.log(AffectedByCustomAutoLayout);
+      console.log(CustomNodeMap);
+
+      // allow a small threshold as rounding error
+      if (marginY > 2) {
+        comp += `self-start `;
+      } else if (marginY < -2) {
+        // abs is necessary because [pxToLayoutSize] only receives a positive number
+        comp += `self-end `;
+      }
+    }
+
+    return comp;
+  }
+  return "";
+};
 
 export const retrieveContainerPosition = (
   node: SceneNode,
@@ -22,6 +115,18 @@ export const retrieveContainerPosition = (
     return "";
   }
 
+  if (AffectedByCustomAutoLayout[node.id] === "changed") {
+    const customPadding = paddingFromCenter(node);
+    return customPadding;
+    // return `inline-flex items-center justify-center ${customPadding}`;
+  }
+
+  if (AffectedByCustomAutoLayout[node.id] === "child") {
+    return flexSelfFromCenter(node);
+  }
+
+  // if parent and node are same size
+  // but what if it needs to center the child?
   if (
     "width" in parent &&
     parent.width === node.width &&
@@ -32,6 +137,25 @@ export const retrieveContainerPosition = (
 
   if (node.parent && CustomNodeMap[node.parent?.id]?.isCustomAutoLayout) {
     // when in AutoAutoLayout, it is inside a Flex, therefore the position doesn't matter
+    return "";
+  }
+
+  if (AffectedByCustomAutoLayout[node.id] === "parent") {
+    const customPadding = paddingFromCenter(node);
+    // center child
+    return `inline-flex items-center justify-center ${customPadding}`;
+  }
+
+  console.log("isAffected: ", AffectedByCustomAutoLayout[node.id]);
+
+  // if node was a Rect and now is a Frame containing other items
+  // or if node is a child of that rect
+  if (AffectedByCustomAutoLayout[node.id]) {
+    return "";
+  }
+
+  if (AffectedByCustomAutoLayout[parent.id]) {
+    // todo first thing tomorrow
     return "";
   }
 

@@ -10,7 +10,7 @@ describe("Tailwind Custom AutoLayout", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = figma;
 
-  describe("frames", () => {
+  describe("frame custom autolayout", () => {
     it("frame zero children", () => {
       const frame = figma.createFrame();
       frame.resize(32, 32);
@@ -32,7 +32,7 @@ describe("Tailwind Custom AutoLayout", () => {
       frame.appendChild(node0);
 
       const customNode = new CustomNode(frame);
-      expect(customNode.attributes).toEqual("relative");
+      expect(customNode.attributes).toEqual("");
     });
 
     it("frame two children vertical", () => {
@@ -53,7 +53,7 @@ describe("Tailwind Custom AutoLayout", () => {
       frame.appendChild(node1);
 
       const customNode = new CustomNode(frame);
-      expect(customNode.attributes).toEqual("flex flex-col items-center");
+      expect(customNode.attributes).toEqual("inline-flex flex-col items-center ");
     });
 
     it("frame two children horizontal", () => {
@@ -74,7 +74,7 @@ describe("Tailwind Custom AutoLayout", () => {
       frame.appendChild(node1);
 
       const customNode = new CustomNode(frame);
-      expect(customNode.attributes).toEqual("flex flex-row items-center");
+      expect(customNode.attributes).toEqual("inline-flex items-center ");
     });
 
     it("frame three children relative", () => {
@@ -101,11 +101,11 @@ describe("Tailwind Custom AutoLayout", () => {
       frame.appendChild(node2);
 
       const customNode = new CustomNode(frame);
-      expect(customNode.attributes).toEqual("relative");
+      expect(customNode.attributes).toEqual("relative ");
     });
   });
 
-  describe("groups", () => {
+  describe("group custom autolayout", () => {
     it("group one children", () => {
       const frame = figma.createFrame();
       frame.resize(32, 32);
@@ -116,7 +116,7 @@ describe("Tailwind Custom AutoLayout", () => {
       node0.y = 0;
 
       const customNode = new CustomNode(figma.group([node0], frame));
-      expect(customNode.attributes).toEqual("relative");
+      expect(customNode.attributes).toEqual("");
     });
 
     it("group two children vertical", () => {
@@ -134,7 +134,7 @@ describe("Tailwind Custom AutoLayout", () => {
       node1.y = 16;
 
       const customNode = new CustomNode(figma.group([node0, node1], frame));
-      expect(customNode.attributes).toEqual("flex flex-col items-center");
+      expect(customNode.attributes).toEqual("inline-flex flex-col items-center ");
     });
 
     it("group two children horizontal", () => {
@@ -152,7 +152,7 @@ describe("Tailwind Custom AutoLayout", () => {
       node1.y = 0;
 
       const customNode = new CustomNode(figma.group([node0, node1], frame));
-      expect(customNode.attributes).toEqual("flex flex-row items-center");
+      expect(customNode.attributes).toEqual("inline-flex items-center ");
     });
 
     it("group three children relative", () => {
@@ -178,7 +178,7 @@ describe("Tailwind Custom AutoLayout", () => {
       const customNode = new CustomNode(
         figma.group([node0, node1, node2], frame)
       );
-      expect(customNode.attributes).toEqual("relative");
+      expect(customNode.attributes).toEqual("relative ");
     });
   });
 });

@@ -412,12 +412,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    * https://tailwindcss.com/docs/height/
    * example: w-64 h-16
    */
-  widthHeight(
-    node:
-      | DefaultFrameMixin
-      | (BaseNodeMixin & LayoutMixin & ChildrenMixin)
-      | DefaultShapeMixin
-  ): this {
+  widthHeight(node: SceneNode): this {
     this.attributes += getContainerSizeProp(node);
     return this;
   }
@@ -430,7 +425,7 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   }
 
   buildAttributes(additionalAttr: string = ""): string {
-    this.attributes += additionalAttr;
+    this.attributes = additionalAttr + this.attributes;
     this.removeTrailingSpace();
     if (this.style.length < 12) {
       this.style = "";

@@ -7,9 +7,6 @@ let parentId = "";
 
 const isJsx = true;
 
-// this is a global map containg all the AutoLayout information.
-export const CustomNodeMap: Record<string, CustomNode> = {};
-
 export const tailwindMain = (
   parentId_src: string,
   sceneNode: ReadonlyArray<SceneNode>
@@ -88,27 +85,43 @@ const tailwindGroup = (node: GroupNode): string => {
     return "";
   }
 
+  const customNode = new CustomNode(node);
+  let childrenStr = tailwindWidgetGenerator(customNode.orderedChildren);
+  let attr = customNode.attributes;
+
+  if (customNode.largestNode) {
+    // override it with a parent
+    childrenStr = tailwindContainer(customNode.largestNode, childrenStr, attr);
+
+    // if there was a largestNode, no attributes
+    attr = "";
+  }
+
+  // return tailwindContainer(node, childrenStr, attr);
+  const children = customNode.orderedChildren;
+
+  // this needs to be called after CustomNode because widthHeight depends on it
   const builder = new tailwindAttributesBuilder("", isJsx)
     .visibility(node)
     .widthHeight(node)
     .containerPosition(node, parentId)
     .layoutAlign(node, parentId);
 
-  const customNode = new CustomNode(node);
-  const children = customNode.orderedChildren;
-
   // if [attributes] is "relative" and builder contains "absolute", ignore the "relative"
   // https://stackoverflow.com/a/39691113
-  let attributes = customNode.attributes;
   if (builder.attributes.includes("absolute")) {
-    attributes = "";
+    attr = "";
+  }
+
+  if (!builder.attributes) {
+    return childrenStr;
   }
 
   if (builder.attributes) {
     // todo include autoAutoLayout here
-    return `\n<div ${builder.buildAttributes(
-      attributes
-    )}>${tailwindWidgetGenerator(children)}</div>`;
+    return `\n<div ${builder.buildAttributes(attr)}>${tailwindWidgetGenerator(
+      children
+    )}</div>`;
   }
 
   return tailwindWidgetGenerator(children);
@@ -158,9 +171,22 @@ const tailwindFrame = (
   if (node.layoutMode === "NONE" && node.children.length > 1) {
     // sort, so that layers don't get weird (i.e. bottom layer on top or vice-versa)
     const customNode = new CustomNode(node);
-    const childrenStr = tailwindWidgetGenerator(customNode.orderedChildren);
+    let childrenStr = tailwindWidgetGenerator(customNode.orderedChildren);
+    let attr = customNode.attributes;
 
-    return tailwindContainer(node, childrenStr, customNode.attributes);
+    if (customNode.largestNode) {
+      // override it with a parent
+      childrenStr = tailwindContainer(
+        customNode.largestNode,
+        childrenStr,
+        attr
+      );
+
+      // if there was a largestNode, no attributes
+      attr = "";
+    }
+
+    return tailwindContainer(node, childrenStr, attr);
   } else if (node.layoutMode !== "NONE") {
     const children = tailwindWidgetGenerator(node.children);
     const rowColumn = rowColumnProps(node);

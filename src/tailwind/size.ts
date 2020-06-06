@@ -2,40 +2,53 @@ let shouldOptimize: boolean;
 shouldOptimize = true;
 
 import { pxToLayoutSize } from "./conversion_tables";
+import { AffectedByCustomAutoLayout, CustomNodeMap } from "./custom_node";
 
 export const magicMargin = 32;
 
-export const getContainerSizeProp = (
-  node:
-    | DefaultFrameMixin // Frame
-    | (BaseNodeMixin & LayoutMixin & ChildrenMixin) // Group
-    | DefaultShapeMixin // Shapes
-): string => {
+export const getContainerSizeProp = (node: SceneNode): string => {
   /// WIDTH AND HEIGHT
 
   // if parent is a page, width can't get past w-64, therefore let it be free
-  // h-screen is necessary
-  if (node.parent?.type === "PAGE" && node.width > 400) {
+  // if (node.parent?.type === "PAGE" && node.width > 256) {
+  //   return "";
+  // }
+
+  if (!node.parent || !("width" in node.parent)) {
     return "";
   }
 
-  // if layoutAlign is STRETCH, w/h should be full
-  if (node.layoutAlign === "STRETCH") {
-    if (node.parent && "layoutMode" in node.parent && "layoutMode" in node) {
-      if (node.parent.layoutMode === node.layoutMode) {
-        return "";
-      }
-    }
-  }
-
-  // when parent is HORIZONTAL and child is HORIZONTAL, let the child define the size
-  if (node.parent && "layoutMode" in node.parent && "layoutMode" in node) {
+  // when parent is HORIZONTAL and node is HORIZONTAL, let the child define the size
+  if ("layoutMode" in node.parent && "layoutMode" in node) {
     if (
       node.layoutMode !== "NONE" &&
       node.parent.layoutMode === node.layoutMode
     ) {
       return "";
     }
+  }
+
+  // if layoutAlign is STRETCH, w/h should be full
+  if (node.layoutAlign === "STRETCH" && "layoutMode" in node.parent) {
+    if (node.parent.layoutMode === "HORIZONTAL") {
+      return "w-full ";
+    } else if (node.parent.layoutMode === "VERTICAL") {
+      // TODO. h-full? It isn't always reliable, but it is inside a Frame anyway..
+    }
+  }
+
+  // if currentFrame has a rect that became a frame, let it define the size
+  if (
+    CustomNodeMap[node.id] &&
+    CustomNodeMap[node.id].largestNode &&
+    CustomNodeMap[node.id].orderedChildren.length === 1
+  ) {
+    return "";
+  }
+
+  // experimental, set size to auto, like in the real autolayout
+  if (AffectedByCustomAutoLayout[node.id] === "changed") {
+    return "";
   }
 
   const [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
@@ -46,39 +59,48 @@ export const getContainerSizeProp = (
   let propHeight = `h-${hRem} `;
   let propWidth = `w-${wRem} `;
 
-  // if node is too big for tailwind to handle, just let it be full
+  // if FRAME is too big for tailwind to handle, just let it be w-full or h-auto
   // if its width is larger than 256 or the sum of its children
   if (
-    node.width > 256 &&
-    "children" in node &&
-    node.children.reduce((acc, d) => acc + d.width, 0) > 256
+    node.width > 256 ||
+    ("children" in node &&
+      node.children.filter((d) => d.width + d.x - node.x > 256).length > 0)
   ) {
     propWidth = "w-full ";
   }
 
-  if (node.parent && "width" in node.parent) {
-    // compare if width is same as parent, with a small threshold
-    if (node.parent.width - node.width < 2) {
-      propWidth = "w-full ";
-    }
+  // compare if width is same as parent, with a small threshold
+  // parent must be a frame (gets weird in groups)
+  if ("layoutMode" in node.parent && node.parent.width - node.width < 2) {
+    propWidth = "w-full ";
+  }
 
-    // compare if height is same as parent, with a small threshold
-    // commented because h-auto is better than h-full most of the time on responsiviness
-    // todo improve this. Buggy in small layouts, good in big.
+  // 799 / 400 - 2 = -0,0025
+  // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
+  if (Math.abs(node.parent.width / node.width - 2) < 0.01) {
+    propWidth = "w-1/2 ";
+  }
+
+  // compare if height is same as parent, with a small threshold
+  // commented because h-auto is better than h-full most of the time on responsiviness
+  // todo improve this. Buggy in small layouts, good in big.
+  // RECTANGLE can't have relative height
+
+  // don't want to set the height to auto when autolayout is FIXED
+  const autoHeight =
+    ("layoutMode" in node && node.counterAxisSizingMode !== "FIXED") ||
+    !("layoutMode" in node);
+
+  if (node.type !== "RECTANGLE" && autoHeight) {
     if (
+      // todo Secondary button has issues with this
       node.parent.height - node.height < 2 ||
       node.height > 256 ||
       ("children" in node &&
-        node.children.reduce((acc, d) => acc + d.height, 0) > 256)
+        node.children.filter((d) => d.height + d.y - node.y > 256).length > 0)
     ) {
       // propHeight = "h-full ";
-      propHeight = "";
-    }
-
-    // 799 / 400 - 2 = -0,0025
-    // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
-    if (Math.abs(node.parent.width / node.width - 2) < 0.01) {
-      propWidth = "w-1/2 ";
+      propHeight = "AAAAA";
     }
   }
 
@@ -151,12 +173,7 @@ export const getContainerSizeProp = (
 };
 
 // makes the view size bigger when there is a stroke
-const getNodeSizeWithStrokes = (
-  node:
-    | DefaultFrameMixin // Frame
-    | (BaseNodeMixin & LayoutMixin & ChildrenMixin) // Group
-    | DefaultShapeMixin // Shapes
-): Array<number> => {
+const getNodeSizeWithStrokes = (node: SceneNode): Array<number> => {
   let nodeHeight = node.height;
   let nodeWidth = node.width;
 

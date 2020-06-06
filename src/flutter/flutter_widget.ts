@@ -1,11 +1,9 @@
-import { mapWidthHeightSize } from "./../tailwind/tailwind_wrappers";
 import {
   rgbTohex,
   convertFontWeight,
   flutterColor,
   mostFrequentString,
 } from "./flutter_helpers";
-import { convertPxToTailwindAttr } from "../tailwind/tailwind_wrappers";
 
 export const makeTextComponent = (node: TextNode): string => {
   let alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
