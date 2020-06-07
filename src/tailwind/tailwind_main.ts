@@ -51,7 +51,7 @@ const tailwindWidgetGenerator = (
 };
 
 const tailwindLine = (node: LineNode): string => {
-  const builder = new tailwindAttributesBuilder("", isJsx)
+  const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
     .visibility(node)
     .widthHeight(node)
     .containerPosition(node, parentId)
@@ -79,7 +79,8 @@ const tailwindGroup = (node: GroupNode): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
-  if (node.width <= 0 || node.height <= 0) {
+  // also ignore if there are no children inside, which makes no sense
+  if (node.width <= 0 || node.height <= 0 || node.children.length === 0) {
     return "";
   }
 
@@ -104,7 +105,7 @@ const tailwindGroup = (node: GroupNode): string => {
   const children = customNode.orderedChildren;
 
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new tailwindAttributesBuilder("", isJsx)
+  const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
     .visibility(node)
     .containerPosition(node, parentId)
     .widthHeight(node)
@@ -132,7 +133,7 @@ const tailwindGroup = (node: GroupNode): string => {
 
 const tailwindText = (node: TextNode): string => {
   // follow the website order, to make it easier
-  const builderResult = new tailwindAttributesBuilder("", isJsx)
+  const builderResult = new tailwindAttributesBuilder("", isJsx, node.visible)
     .visibility(node)
     .containerPosition(node, parentId)
     .rotation(node)
@@ -206,7 +207,10 @@ const tailwindVector = (group: ChildrenMixin) => {
   // to use Vectors in groups (like icons)
 
   // if every children is a VECTOR, no children have a child
-  if (!group.children.every((d) => d.type === "VECTOR")) {
+  if (
+    group.children.length === 0 ||
+    !group.children.every((d) => d.type === "VECTOR")
+  ) {
     return "";
   }
 
@@ -291,14 +295,14 @@ export const tailwindContainer = (
     return children;
   }
 
-  const builder = new tailwindAttributesBuilder("", isJsx)
+  const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
     .visibility(node)
     .autoLayoutPadding(node)
     .containerPosition(node, parentId)
     .widthHeight(node)
     .layoutAlign(node, parentId)
     .customColor(node.fills, "bg")
-    // TODO image and gradient support
+    // TODO image and gradient support (tailwind does not support gradients)
     .opacity(node)
     .rotation(node)
     .shadow(node)

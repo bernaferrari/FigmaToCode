@@ -210,7 +210,7 @@ describe("Tailwind Custom Node", () => {
       node.counterAxisSizingMode = "FIXED";
 
       // max of h-64
-      expect(getContainerSizeProp(node)).toEqual("w-16 h-64 ");
+      expect(getContainerSizeProp(node)).toEqual("w-16 ");
     });
 
     it("if height is too large with children", () => {
@@ -225,7 +225,7 @@ describe("Tailwind Custom Node", () => {
       node.appendChild(subnode);
 
       // h-auto
-      expect(getContainerSizeProp(node)).toEqual("w-16 h-64 ");
+      expect(getContainerSizeProp(node)).toEqual("w-16 ");
     });
     // todo improve this. Try to set the parent height to be the same as children before h-auto
     it("children are higher than node", () => {

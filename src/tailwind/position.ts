@@ -96,6 +96,99 @@ const flexSelfFromCenter = (
   return "";
 };
 
+// function tailwindMargin(node: SceneNode): string {
+//   const padding = findMargin(node);
+//   if (padding === undefined) {
+//     return "";
+//   }
+
+//   const { top, left, right, bottom } = padding;
+
+//   if (top === bottom && top === left && top === right) {
+//     return `m-${pxToLayoutSize(top)} `;
+//   }
+
+//   // is there a less verbose way of writing this?
+//   let comp = "";
+
+//   if (top === bottom && right === left) {
+//     return `mx-${pxToLayoutSize(left)} py-${pxToLayoutSize(top)} `;
+//   }
+
+//   // py
+//   if (top === bottom) {
+//     comp += `my-${pxToLayoutSize(top)} `;
+//     if (left > 0) {
+//       comp += `ml-${pxToLayoutSize(left)} `;
+//     }
+//     if (right > 0) {
+//       comp += `mr-${pxToLayoutSize(right)} `;
+//     }
+
+//     return comp;
+//   }
+
+//   // px
+//   if (left === right) {
+//     comp += `mx-${pxToLayoutSize(left)} `;
+//     if (top > 0) {
+//       comp += `mt-${pxToLayoutSize(top)} `;
+//     }
+//     if (bottom > 0) {
+//       comp += `mb-${pxToLayoutSize(bottom)} `;
+//     }
+//     return comp;
+//   }
+
+//   // independent
+//   if (top > 0) {
+//     comp += `mt-${pxToLayoutSize(top)} `;
+//   }
+//   if (bottom > 0) {
+//     comp += `mb-${pxToLayoutSize(bottom)} `;
+//   }
+//   if (left > 0) {
+//     comp += `ml-${pxToLayoutSize(left)} `;
+//   }
+//   if (right > 0) {
+//     comp += `mr-${pxToLayoutSize(right)} `;
+//   }
+
+//   return comp;
+// }
+
+// function findMargin(
+//   node: SceneNode
+// ):
+//   | undefined
+//   | {
+//       top: number;
+//       left: number;
+//       right: number;
+//       bottom: number;
+//     } {
+//   if (!node.parent || !("width" in node.parent)) {
+//     return undefined;
+//   }
+
+//   const parentX = "layoutMode" in node.parent ? 0 : node.parent.x;
+//   const parentY = "layoutMode" in node.parent ? 0 : node.parent.y;
+
+//   if (CustomNodeMap[node.id].customAutoLayoutDirection === "sd-y") {
+//     const left = node.x - parentX;
+//     const right = node.parent.width - (node.width + node.x - parentX);
+//     return { top: 0, left: left, right: right, bottom: 0 };
+//   }
+
+//   if (CustomNodeMap[node.id].customAutoLayoutDirection === "sd-x") {
+//     const top = node.y - parentY;
+//     const bottom = node.parent.height - (node.height + node.y - parentY);
+//     return { top: top, left: 0, right: 0, bottom: bottom };
+//   }
+
+//   return undefined;
+// }
+
 export const retrieveContainerPosition = (
   node: SceneNode,
   parentId: string
@@ -107,7 +200,17 @@ export const retrieveContainerPosition = (
 
   // if node is a Group and has only one child, ignore it; child will set the size
   if (
-    node.parent.type === "GROUP" &&
+    "children" in node &&
+    node.children.length === 1 &&
+    node.width === node.children[0].width &&
+    node.height === node.children[0].height
+  ) {
+    return "";
+  }
+
+  // if parent is a Group and has only one child, ignore it; child will set the size
+  if (
+    "width" in node.parent &&
     node.parent.children.length === 1 &&
     node.parent.width === node.width &&
     node.parent.height === node.height
@@ -156,17 +259,24 @@ export const retrieveContainerPosition = (
     return `inline-flex items-center justify-center ${customPadding}`;
   }
 
-  console.log("isAffected: ", AffectedByCustomAutoLayout[node.id]);
+  if (
+    CustomNodeMap[node.parent.id] &&
+    CustomNodeMap[node.parent.id].orderedChildren.length > 0 &&
+    CustomNodeMap[node.parent.id].customAutoLayoutDirection === "false"
+  ) {
+    // this will be triggered in Group with Text and Empty Rectangle case
+    return "";
+  }
 
-  // if node was a Rect and now is a Frame containing other items
-  // or if node is a child of that rect
   if (AffectedByCustomAutoLayout[node.id]) {
+    // if node was a Rect and now is a Frame containing other items
+    // or if node is a child of that rect
     return "";
   }
 
   if (AffectedByCustomAutoLayout[node.parent.id]) {
     // todo first thing tomorrow
-    return " ";
+    return "";
   }
 
   if (
@@ -204,29 +314,30 @@ export const retrieveContainerPosition = (
 
     if (centerX && centerY) {
       const size = node.type === "TEXT" ? "w-full h-full " : "";
-      return `${size}absolute inset-0 m-auto `;
-    } else if (centerX) {
-      if (node.y === 0) {
-        // y = top, x = center
-        return "mt-0 mb-auto mx-auto ";
-      } else if (node.y === node.parent.height) {
-        // y = bottom, x = center
-        return "mt-auto mb-0 mx-auto ";
-      }
-      // y = any, x = center
-      // there is no Alignment for this, therefore it goes to manual mode.
-      // since we are using return, manual mode will be calculated at the end
-    } else if (centerY) {
-      if (node.x === 0) {
-        // y = center, x = left
-        return "my-auto ml-0 mr-auto ";
-      } else if (node.x === node.parent.width) {
-        // y = center, x = right
-        return "my-auto ml-auto mr-0 ";
-      }
-      // y = center, x = any
-      // there is no Alignment for this, therefore it goes to manual mode.
+      return `${size}m-auto `;
     }
+    // else if (centerX) {
+    //   if (node.y === 0) {
+    //     // y = top, x = center
+    //     return "mt-0 mb-auto mx-auto ";
+    //   } else if (node.y === node.parent.height) {
+    //     // y = bottom, x = center
+    //     return "mt-auto mb-0 mx-auto ";
+    //   }
+    //   // y = any, x = center
+    //   // there is no Alignment for this, therefore it goes to manual mode.
+    //   // since we are using return, manual mode will be calculated at the end
+    // } else if (centerY) {
+    //   if (node.x === 0) {
+    //     // y = center, x = left
+    //     return "my-auto ml-0 mr-auto ";
+    //   } else if (node.x === node.parent.width) {
+    //     // y = center, x = right
+    //     return "my-auto ml-auto mr-0 ";
+    //   }
+    //   // y = center, x = any
+    //   // there is no Alignment for this, therefore it goes to manual mode.
+    // }
 
     // set the width to max if the view is near the corner
     // that will be complemented with margins from [retrieveContainerPosition]
@@ -292,7 +403,7 @@ export const retrieveContainerPosition = (
     }
 
     // manual mode, just use the position.
-    return "absoluteManualLayout";
+    return "";
   }
 
   return "";

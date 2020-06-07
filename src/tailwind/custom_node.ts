@@ -63,19 +63,19 @@ export class CustomNode {
   }
 
   private rectAsBg(
-    node: ChildrenMixin
+    children: ReadonlyArray<SceneNode>
   ): [
     boolean,
     FrameNode | RectangleNode | InstanceNode | ComponentNode | undefined
   ] {
     // needs at least two items (rect in bg and something else in fg)
-    if (node.children.length < 2) {
+    if (children.length < 2) {
       return [false, undefined];
     }
 
-    const maxH = Math.max(...node.children.map((d) => d.height));
-    const maxW = Math.max(...node.children.map((d) => d.width));
-    const largestChild = node.children.find(
+    const maxH = Math.max(...children.map((d) => d.height));
+    const maxW = Math.max(...children.map((d) => d.width));
+    const largestChild = children.find(
       (d) => d.width === maxW && d.height === maxH
     );
 
@@ -83,10 +83,7 @@ export class CustomNode {
       return [false, undefined];
     }
 
-    const childrenInside = this.isChildInsideNodeArea(
-      largestChild,
-      node.children
-    );
+    const childrenInside = this.isChildInsideNodeArea(largestChild, children);
 
     if (
       childrenInside &&
@@ -108,9 +105,9 @@ export class CustomNode {
       node.type === "GROUP" ||
       ("layoutMode" in node && node.layoutMode === "NONE")
     ) {
-      const rect = this.rectAsBg(node);
+      let children = node.children;
 
-      let children = node.children.filter((d) => d.visible !== false);
+      const rect = this.rectAsBg(children);
 
       // if a Rect with elements inside were identified, extract this Rect
       // outer methods are going to use it.
@@ -139,12 +136,12 @@ export class CustomNode {
       ) {
         // this.attributes = "";
       } else {
-        this.attributes = this.tailwindCustomAutoLayoutAttr();
+        this.attributes = this.tailwindCustomAutoLayoutAttr(node);
       }
     }
   }
 
-  private tailwindCustomAutoLayoutAttr(): string {
+  private tailwindCustomAutoLayoutAttr(node: SceneNode): string {
     if (this.orderedChildren.length === 0) {
       return "";
     } else if (!this.isCustomAutoLayout && !this.largestNode) {
@@ -153,8 +150,6 @@ export class CustomNode {
       }
       return "relative ";
     }
-
-    console.log("this.largestNode ", this.largestNode);
 
     // https://tailwindcss.com/docs/space/
     // space between items, if necessary. Use the minimum amount.
@@ -187,7 +182,8 @@ export class CustomNode {
     const isCentered = firstElement[spaceDirection] * 2 + totalArea < 2;
     const contentAlign = isCentered ? "content-center " : "";
 
-    const padding = this.tailwindPadding();
+    const padding = this.tailwindPadding(node);
+    console.log("padding is ", padding);
 
     // align according to the most frequent way the children are aligned.
     // const layoutAlign =
@@ -209,27 +205,27 @@ export class CustomNode {
     return `${flex}${rowOrColumn}${space}${contentAlign}items-center justify-center ${padding}`;
   }
 
-  tailwindPadding(): string {
-    const padding = this.findPadding();
+  tailwindPadding(node: SceneNode): string {
+    const padding = this.findPadding(node);
     if (padding === undefined) {
       return "";
     }
 
     const { top, left, right, bottom } = padding;
 
-    if (top === bottom && top === left && top === right) {
-      return `m-${pxToLayoutSize(top)} `;
+    if (top > 0 && top === bottom && top === left && top === right) {
+      return `p-${pxToLayoutSize(top)} `;
     }
 
     // is there a less verbose way of writing this?
     let comp = "";
 
-    if (top === bottom && right === left) {
+    if (top > 0 && top === bottom && right > 0 && right === left) {
       return `px-${pxToLayoutSize(left)} py-${pxToLayoutSize(top)} `;
     }
 
     // py
-    if (top === bottom) {
+    if (top > 0 && top === bottom) {
       comp += `py-${pxToLayoutSize(top)} `;
       if (left > 0) {
         comp += `pl-${pxToLayoutSize(left)} `;
@@ -242,7 +238,7 @@ export class CustomNode {
     }
 
     // px
-    if (left === right) {
+    if (left > 0 && left === right) {
       comp += `px-${pxToLayoutSize(left)} `;
       if (top > 0) {
         comp += `pt-${pxToLayoutSize(top)} `;
@@ -270,7 +266,9 @@ export class CustomNode {
     return comp;
   }
 
-  findPadding():
+  findPadding(
+    node: SceneNode
+  ):
     | undefined
     | {
         top: number;
@@ -281,11 +279,74 @@ export class CustomNode {
     const spaceDirection: "x" | "y" =
       this.customAutoLayoutDirection === "sd-x" ? "x" : "y";
 
-    const parent = this.largestNode;
+    let parent = this.largestNode;
+
+    // if largestMode is unavaiable, get the padding using node
+    if (!parent && "width" in node) {
+      const nodeX = "layoutMode" in node ? 0 : node.x;
+      const nodeY = "layoutMode" in node ? 0 : node.y;
+
+      // if spaceDirection is Y, get padding for X axis
+      if (spaceDirection === "y") {
+        // the closest value to the left border
+        const left = Math.min(...this.orderedChildren.map((d) => d.x - nodeX));
+
+        // the closets value to the right border
+        const right = Math.min(
+          ...this.orderedChildren.map(
+            (d) => node.width - (d.width + d.x - nodeX)
+          )
+        );
+        // only a single value is going to be returned, so the view can be less disrupted
+        if (left < right) {
+          return {
+            top: 0,
+            left: left,
+            right: left,
+            bottom: 0,
+          };
+        } else {
+          return {
+            top: 0,
+            left: right,
+            right: right,
+            bottom: 0,
+          };
+        }
+      }
+      // if spaceDirection is X, get padding for Y axis
+      if (spaceDirection === "x") {
+        // the closest value to the left border
+        const top = this.orderedChildren[0].y - nodeY;
+
+        // last element Y margin
+        const last = this.orderedChildren[this.orderedChildren.length - 1];
+
+        // full height - last element + last position - parent position
+        const bottom = node.height - (last.height + last.y - nodeY);
+
+        // only a single value is going to be returned, so the view can be less disrupted
+        if (top < bottom) {
+          return {
+            top: top,
+            left: 0,
+            right: 0,
+            bottom: top,
+          };
+        } else {
+          return {
+            top: bottom,
+            left: 0,
+            right: 0,
+            bottom: bottom,
+          };
+        }
+      }
+    }
 
     // CustomNodeMap[this.orderedChildren[0].parent?.id];
 
-    if (!parent || !("width" in parent)) {
+    if (parent === undefined || !("width" in parent)) {
       return undefined;
     }
 
@@ -308,6 +369,7 @@ export class CustomNode {
       // the closets value to the right border
       const right = Math.min(
         ...this.orderedChildren.map(
+          // @ts-ignore it is already checked
           (d) => parent.width - (d.width + d.x - parentX)
         )
       );
@@ -325,6 +387,7 @@ export class CustomNode {
       // full height - last element + last position - parent position
       const bottom = Math.min(
         ...this.orderedChildren.map(
+          // @ts-ignore it is already checked
           (d) => parent.height - (d.height + d.y - parentY)
         )
       );
@@ -375,7 +438,7 @@ export class CustomNode {
   ] {
     const intervalY = this.calculateInterval(this.orderedChildren, "y");
 
-    console.log(intervalY);
+    console.log("intervalY is ", intervalY);
     if (intervalY.length === 0) {
       return ["false", []];
     }
@@ -414,11 +477,10 @@ export class CustomNode {
     children: ReadonlyArray<SceneNode>,
     x_or_y: "x" | "y"
   ): Array<number> {
-    const orderedChildren: Array<SceneNode> = [...children];
     const h_or_w: "width" | "height" = x_or_y === "x" ? "width" : "height";
 
     // sort children based on X or Y values
-    const sorted: Array<SceneNode> = orderedChildren.sort(
+    const sorted: Array<SceneNode> = [...children].sort(
       (a, b) => a[x_or_y] - b[x_or_y]
     );
 

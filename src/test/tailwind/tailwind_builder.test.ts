@@ -31,7 +31,7 @@ describe("Tailwind Builder", () => {
 
     node.visible = false;
     builder.visibility(node);
-    expect(builder.attributes).toEqual("invisible ");
+    expect(builder.attributes).toEqual("");
     builder.reset();
   });
 

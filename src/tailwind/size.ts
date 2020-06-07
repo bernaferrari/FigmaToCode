@@ -35,6 +35,37 @@ export const getContainerSizeProp = (node: SceneNode): string => {
     }
   }
 
+  // if layer is a child from AutoAutoLayout, the parent was changed;
+  // therefore, we need to find the correct parent
+  let nodeParent: SceneNode | undefined = undefined;
+  if (AffectedByCustomAutoLayout[node.id] === "child") {
+    nodeParent = node.parent.children.find(
+      (d) => AffectedByCustomAutoLayout[d.id] === "changed"
+    );
+  } else if (AffectedByCustomAutoLayout[node.id] === "changed") {
+    // imagine a Rect, Text and Frame. Rect will be changed to become the Frame.
+    // The parent of Rect is the Frame, and the parent of Text will be Rect.
+    // But we need the parent of the parent of the Rect, if exists, to get the sizing correctly
+
+    // retrieve the children (get the parent, look at children and ignore the node)
+    if (node.parent.parent && "width" in node.parent.parent) {
+      nodeParent = node.parent.parent;
+    }
+  }
+  if (!nodeParent) {
+    if ("width" in node.parent) {
+      nodeParent = node.parent;
+    }
+  }
+
+  // console.log(
+  //   "!nodeParent || ",
+  //   AffectedByCustomAutoLayout[node.id],
+  //   " - ",
+  //   AffectedByCustomAutoLayout[node.parent.id]
+  // );
+  // console.log("node: ", node.name, "parent: ", nodeParent?.name);
+
   // if currentFrame has a rect that became a frame, let it define the size
   if (
     CustomNodeMap[node.id] &&
@@ -44,38 +75,40 @@ export const getContainerSizeProp = (node: SceneNode): string => {
     return "";
   }
 
-  // experimental, set size to auto, like in the real autolayout
+  let changedChildren;
   if (AffectedByCustomAutoLayout[node.id] === "changed") {
-    let returnHere = true;
-
-    // imagine a Rect, Text and Frame. Rect will be changed to become the Frame.
-    // The parent of Rect is the Frame, and the parent of Text will be Rect.
-    // But we need the parent of the parent of the Rect, if exists, to get the sizing correctly
-    if (
-      "width" in node &&
-      node.parent.parent &&
-      "width" in node.parent.parent
-    ) {
-      // retrieve the children (get the parent, look at children and ignore the node)
-      const children = node.parent.children.filter((d) => d !== node);
-
-      // type checker fails inside the every if this is not done
-      const nodeParent = node.parent.parent;
-
-      // look if any children has a responsive width
-      const isResp = children.every((d) =>
-        calculateResponsiveW(d, nodeParent, d.width, d.height)
-      );
-
-      // if it has, don't return empty. Width needs to be set manually.
-      if (isResp) {
-        returnHere = false;
-      }
+    // retrieve the children (get the parent, look at children and ignore the current node)
+    changedChildren = node.parent.children.filter((d) => d !== node);
+  } else {
+    if ("children" in node) {
+      changedChildren = node.children;
     }
+  }
 
-    if (returnHere) {
-      return "";
-    }
+  if (AffectedByCustomAutoLayout[node.id] === "changed") {
+    // experimental, set size to auto, like in the real autolayout
+    // the issue is text, which changes the width from component to component and can trigger this
+    // let returnHere = true;
+    // if (
+    //   "width" in node &&
+    //   nodeParent &&
+    //   "width" in nodeParent &&
+    //   changedChildren
+    // ) {
+    //   console.log("entrando1");
+    //   // look if any children has a responsive width
+    //   const isResp = changedChildren.every((d) =>
+    //     calculateResponsiveW(d, node, d.width)
+    //   );
+    //   // if it has, don't return empty. Width needs to be set manually.
+    //   if (isResp) {
+    //     returnHere = false;
+    //   }
+    // }
+    // console.log("changed will return here?! ", returnHere);
+    // if (returnHere) {
+    //   return "";
+    // }
   }
 
   let [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
@@ -86,23 +119,24 @@ export const getContainerSizeProp = (node: SceneNode): string => {
   let propHeight = `h-${hRem} `;
   let propWidth = `w-${wRem} `;
 
-  // if layer is a child from AutoAutoLayout, the parent was changed;
-  // therefore, it must be updated
-  let updatedParent: SceneNode | undefined = undefined;
-  if (AffectedByCustomAutoLayout[node.id] === "child") {
-    updatedParent = node.parent.children.find(
-      (d) => AffectedByCustomAutoLayout[d.id] === "changed"
-    );
-  }
-  if (!updatedParent || !("width" in updatedParent)) {
-    if ("width" in node.parent) {
-      updatedParent = node.parent;
-    }
-  }
-
-  const rW = calculateResponsiveW(node, updatedParent, nodeWidth, nodeHeight);
+  // calculate the responsivness using the correct parent
+  const rW = calculateResponsiveW(node, nodeParent, nodeWidth);
   if (rW) {
     propWidth = rW;
+  }
+
+  // when the child has the same size as the parent, don't set the size of the parent (twice)
+  // exception: when it is responsive 1/2
+  if ("children" in node && node.children.length === 1 && !rW) {
+    const child = node.children[0];
+    if (child.width === nodeWidth && child.height === nodeHeight) {
+      return "";
+    }
+  } else {
+    // if (!("strokes" in node)) {
+    //   // ignore Group
+    //   return "";
+    // }
   }
 
   // compare if height is same as parent, with a small threshold
@@ -112,16 +146,22 @@ export const getContainerSizeProp = (node: SceneNode): string => {
 
   // don't want to set the height to auto when autolayout is FIXED
   const autoHeight =
-    ("layoutMode" in node && node.counterAxisSizingMode !== "FIXED") ||
+    ("layoutMode" in node &&
+      ((node.layoutMode !== "NONE" && node.counterAxisSizingMode === "AUTO") ||
+        node.layoutMode === "NONE")) ||
     !("layoutMode" in node);
 
-  if ("height" in node.parent && node.type !== "RECTANGLE" && autoHeight) {
+  // Rectangle must have precise width/height, except if it just became a Frame
+  if (
+    (node.type !== "RECTANGLE" ||
+      AffectedByCustomAutoLayout[node.id] === "changed") &&
+    autoHeight
+  ) {
     if (
       // todo Secondary button has issues with this
-      node.parent.height - nodeHeight < 2 ||
       nodeHeight > 256 ||
-      ("children" in node &&
-        node.children.filter((d) => d.height + d.y - node.y > 256).length > 0)
+      (changedChildren &&
+        changedChildren.filter((d) => d.height + d.y - node.y > 256).length > 0)
     ) {
       // propHeight = "h-full ";
       propHeight = "";
@@ -209,8 +249,7 @@ const getNodeSizeWithStrokes = (node: SceneNode): Array<number> => {
 const calculateResponsiveW = (
   node: SceneNode,
   parent: SceneNode | undefined,
-  nodeWidth: number,
-  nodeHeight: number
+  nodeWidth: number
 ): string => {
   let propWidth = "";
 
@@ -266,20 +305,6 @@ const calculateResponsiveW = (
     } else if (Math.abs(dividedWidth - 11 / 12) < 0.01) {
       propWidth = "w-11/12 ";
     }
-  }
-
-  // when the child has the same size as the parent, don't set the size of the parent (twice)
-  // exception: when it is 1/2
-  if ("children" in node && node.children.length === 1 && !propWidth) {
-    const child = node.children[0];
-    if (child.width === nodeWidth && child.height === nodeHeight) {
-      return "ABABAA";
-    }
-  } else {
-    // if (!("strokes" in node)) {
-    //   // ignore Group
-    //   return "";
-    // }
   }
 
   if ("width" in parent) {

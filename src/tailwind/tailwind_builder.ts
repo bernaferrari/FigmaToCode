@@ -16,12 +16,18 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   style: string = "";
   styleSeparator: string = "";
   isJSX: boolean = false;
+  visible: boolean = true;
 
-  constructor(optAttribute: string = "", optIsJSX: boolean) {
+  constructor(
+    optAttribute: string = "",
+    optIsJSX: boolean,
+    visible: boolean = true
+  ) {
     this.attributes = optAttribute;
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = this.isJSX ? " style={{" : ' style="';
+    this.visible = visible;
   }
 
   createText(node: TextNode): this {
@@ -61,9 +67,13 @@ export class tailwindAttributesBuilder implements CodeBuilder {
    */
   visibility(node: SceneNode): this {
     // [when testing] node.visible can be undefined
-    if (node.visible !== undefined && !node.visible) {
-      this.attributes += "invisible ";
-    }
+
+    // When something is invisible in Figma, it isn't gone. Groups can make use of it.
+    // Therefore, instead of changing the visibility (which causes bugs in nested divs),
+    // this plugin is going to ignore color and stroke
+    // if (node.visible !== undefined && !node.visible) {
+    //   this.attributes += "invisible ";
+    // }
     return this;
   }
 
@@ -90,10 +100,6 @@ export class tailwindAttributesBuilder implements CodeBuilder {
   }
 
   containerPosition(node: SceneNode, parentId: string): this {
-    if (node.parent?.id === parentId) {
-      return this;
-    }
-
     const position = retrieveContainerPosition(node, parentId);
     if (
       position === "absoluteManualLayout" &&
@@ -292,7 +298,9 @@ export class tailwindAttributesBuilder implements CodeBuilder {
     paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
     kind: string
   ): this {
-    this.attributes += tailwindColor(paint, kind);
+    if (this.visible) {
+      this.attributes += tailwindColor(paint, kind);
+    }
     return this;
   }
 
