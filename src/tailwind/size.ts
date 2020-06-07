@@ -67,11 +67,7 @@ export const getContainerSizeProp = (node: SceneNode): string => {
   // console.log("node: ", node.name, "parent: ", nodeParent?.name);
 
   // if currentFrame has a rect that became a frame, let it define the size
-  if (
-    CustomNodeMap[node.id] &&
-    CustomNodeMap[node.id].largestNode &&
-    CustomNodeMap[node.id].orderedChildren.length === 1
-  ) {
+  if (CustomNodeMap[node.id] && CustomNodeMap[node.id].largestNode) {
     return "";
   }
 
@@ -127,8 +123,10 @@ export const getContainerSizeProp = (node: SceneNode): string => {
 
   // when the child has the same size as the parent, don't set the size of the parent (twice)
   // exception: when it is responsive 1/2
-  if ("children" in node && node.children.length === 1 && !rW) {
-    const child = node.children[0];
+
+  if (changedChildren && changedChildren.length === 1 && !rW) {
+    console.log("aASIUAUHASHUSUHSHUS");
+    const child = changedChildren[0];
     if (child.width === nodeWidth && child.height === nodeHeight) {
       return "";
     }
@@ -281,6 +279,7 @@ const calculateResponsiveW = (
     if (Math.abs(dividedWidth - 1) < 0.01) {
       propWidth = "w-full ";
     } else if (Math.abs(dividedWidth - 1 / 2) < 0.01) {
+      console.log("node is: ", node.name);
       propWidth = "w-1/2 ";
     } else if (Math.abs(dividedWidth - 1 / 3) < 0.01) {
       propWidth = "w-1/3 ";
