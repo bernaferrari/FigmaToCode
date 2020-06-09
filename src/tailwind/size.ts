@@ -81,7 +81,61 @@ export const getContainerSizeProp = (node: SceneNode): string => {
     }
   }
 
+  let [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
+
+  const hRem = pxToLayoutSize(nodeHeight);
+  const wRem = pxToLayoutSize(nodeWidth);
+
+  let propHeight = `h-${hRem} `;
+  let propWidth = `w-${wRem} `;
+
+  // calculate the responsivness using the correct parent
+  const rW = calculateResponsiveW(node, nodeParent, nodeWidth);
+  if (rW) {
+    if (rW === "w-full " && nodeParent?.height === nodeHeight) {
+      // ignore this responsiviness when container is exactly the same width and height
+    } else {
+      propWidth = rW;
+    }
+  }
+
+  // if parent is responsive, child can't be exact, or it will break the responsivess
+  // todo should it be full or auto? What about when parent of parent is relative?
+  // Should it calculate the width, check if it will be larger than responsiviness factor (like 1/3 of screen which is 200) and return full/auto?
+  if (
+    CustomNodeMap[node.parent.id] &&
+    CustomNodeMap[node.parent.id].customAutoLayoutDirection !== "false"
+  ) {
+    // if node isn't a RECTANGLE and doesn't have relative width, return nothing.
+    // todo support INSTANCE and COMPONENT
+    if (node.type !== "RECTANGLE") {
+      if (!rW) return "";
+    }
+  }
+
+  // when the child has the same size as the parent, don't set the size of the parent (twice)
+  if (changedChildren && changedChildren.length === 1) {
+    const child = changedChildren[0];
+    // set them independently, in case w is equal but h isn't
+    if (child.width === nodeWidth) {
+      propWidth = "";
+    }
+    if (child.height === nodeHeight) {
+      propHeight = "";
+    }
+  } else {
+    // if (!("strokes" in node)) {
+    //   // ignore Group
+    //   return "";
+    // }
+  }
+
   if (AffectedByCustomAutoLayout[node.id] === "changed") {
+    // PROS: Top bar with text (fig to code)
+    // CONS: 1/3 in parent (fig to code)
+    // return "";
+    propHeight = "";
+
     // experimental, set size to auto, like in the real autolayout
     // the issue is text, which changes the width from component to component and can trigger this
     // let returnHere = true;
@@ -107,36 +161,6 @@ export const getContainerSizeProp = (node: SceneNode): string => {
     // }
   }
 
-  let [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
-
-  const hRem = pxToLayoutSize(nodeHeight);
-  const wRem = pxToLayoutSize(nodeWidth);
-
-  let propHeight = `h-${hRem} `;
-  let propWidth = `w-${wRem} `;
-
-  // calculate the responsivness using the correct parent
-  const rW = calculateResponsiveW(node, nodeParent, nodeWidth);
-  if (rW) {
-    propWidth = rW;
-  }
-
-  // when the child has the same size as the parent, don't set the size of the parent (twice)
-  // exception: when it is responsive 1/2
-
-  if (changedChildren && changedChildren.length === 1 && !rW) {
-    console.log("aASIUAUHASHUSUHSHUS");
-    const child = changedChildren[0];
-    if (child.width === nodeWidth && child.height === nodeHeight) {
-      return "";
-    }
-  } else {
-    // if (!("strokes" in node)) {
-    //   // ignore Group
-    //   return "";
-    // }
-  }
-
   // compare if height is same as parent, with a small threshold
   // commented because h-auto is better than h-full most of the time on responsiviness
   // todo improve this. Buggy in small layouts, good in big.
@@ -146,21 +170,17 @@ export const getContainerSizeProp = (node: SceneNode): string => {
   const autoHeight =
     ("layoutMode" in node &&
       ((node.layoutMode !== "NONE" && node.counterAxisSizingMode === "AUTO") ||
-        node.layoutMode === "NONE")) ||
+        node.layoutMode === "NONE" ||
+        node.children.length > 0)) ||
     !("layoutMode" in node);
 
-  // Rectangle must have precise width/height, except if it just became a Frame
+  // Rectangle must have precise width/height, except if it just just became a Frame
   if (
     (node.type !== "RECTANGLE" ||
       AffectedByCustomAutoLayout[node.id] === "changed") &&
     autoHeight
   ) {
-    if (
-      // todo Secondary button has issues with this
-      nodeHeight > 256 ||
-      (changedChildren &&
-        changedChildren.filter((d) => d.height + d.y - node.y > 256).length > 0)
-    ) {
+    if (nodeHeight > 256 || childLargerThanMaxSize(node, "y")) {
       // propHeight = "h-full ";
       propHeight = "";
     }
@@ -170,8 +190,18 @@ export const getContainerSizeProp = (node: SceneNode): string => {
   // if its width is larger than 256 or the sum of its children
 
   if ("layoutMode" in node) {
-    // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
+    // if there are no children, ignore AutoLayout. Figma does the same.
+    if (node.children.length === 0) {
+      return `${propWidth}${propHeight}`;
+    }
+
+    if ((node.layoutMode !== "NONE" && rW) || CustomNodeMap[node.id]) {
+      // if responsiviness was found, let it define the size of the container, else, auto
+      return `${propWidth}`;
+    }
+
     if (node.counterAxisSizingMode === "FIXED") {
+      // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
       // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.
       if (node.layoutMode === "HORIZONTAL") {
         return `${propHeight}`;
@@ -244,6 +274,15 @@ const getNodeSizeWithStrokes = (node: SceneNode): Array<number> => {
   return [nodeWidth, nodeHeight];
 };
 
+const childLargerThanMaxSize = (node: SceneNode, axis: "x" | "y") => {
+  if ("children" in node && node.children.length > 0) {
+    const lastChild = node.children[node.children.length - 1];
+    const maxLen = lastChild[axis] + lastChild.width - node.children[0][axis];
+    return maxLen > 256;
+  }
+  return false;
+};
+
 const calculateResponsiveW = (
   node: SceneNode,
   parent: SceneNode | undefined,
@@ -253,11 +292,8 @@ const calculateResponsiveW = (
 
   // verifies if size > 256 or any child has size > 256
   // todo improve to verify if the sum of children is also not larger than 256
-  if (
-    nodeWidth > 256 ||
-    ("children" in node &&
-      node.children.filter((d) => d.width + d.x - node.x > 256).length > 0)
-  ) {
+
+  if (nodeWidth > 256 || childLargerThanMaxSize(node, "x")) {
     propWidth = "w-full ";
   }
 

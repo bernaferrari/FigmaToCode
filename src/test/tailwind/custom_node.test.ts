@@ -107,7 +107,7 @@ describe("Tailwind Custom Node", () => {
 
       const customNode = new CustomNode(frame);
       expect(customNode.attributes).toEqual(
-        "inline-flex space-x-1 items-center justify-center "
+        "inline-flex items-center justify-center "
       );
     });
   });
@@ -188,7 +188,7 @@ describe("Tailwind Custom Node", () => {
         figma.group([node0, node1, node2], frame)
       );
       expect(customNode.attributes).toEqual(
-        "inline-flex space-x-1 items-center justify-center "
+        "inline-flex items-center justify-center "
       );
     });
   });

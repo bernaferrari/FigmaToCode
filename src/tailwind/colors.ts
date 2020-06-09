@@ -1,4 +1,4 @@
-import * as nearestColor from "nearest-color";
+import { nearestColorFrom } from "./../nearest-color/nearesetColor";
 import { nearestValue } from "./conversion_tables";
 
 // retrieve the SOLID color for tailwind
@@ -34,35 +34,6 @@ export const tailwindColor = (
   }
 
   return "";
-};
-
-export const vectorColor = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): string => {
-  // kind can be text, bg, border...
-  if (fills !== figma.mixed && fills.length > 0) {
-    let fill = fills[0];
-    if (fill.type === "SOLID") {
-      const hex = rgbTo6hex(fill.color);
-      return fill.visible ? `${hex}` : "";
-    }
-  }
-
-  return "";
-};
-
-export const vectorOpacity = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): number => {
-  // kind can be text, bg, border...
-  if (fills !== figma.mixed && fills.length > 0) {
-    let fill = fills[0];
-    if (fill.opacity !== undefined) {
-      return fill.opacity;
-    }
-  }
-
-  return 1;
 };
 
 export const rgbTo6hex = (color: RGB | RGBA): string => {
@@ -221,7 +192,7 @@ export const tailwindColors: Record<string, string> = {
   "#702459": "pink-900",
 };
 
-export const tailwindNearestColor = nearestColor.from(
+export const tailwindNearestColor = nearestColorFrom(
   Object.keys(tailwindColors)
 );
 

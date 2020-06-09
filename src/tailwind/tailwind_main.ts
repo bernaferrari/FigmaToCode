@@ -1,7 +1,7 @@
-import { vectorColor, vectorOpacity } from "./colors";
 import { tailwindAttributesBuilder } from "./tailwind_builder";
 import { pxToLayoutSize } from "./conversion_tables";
 import { CustomNode } from "./custom_node";
+import { tailwindVector } from "./vector";
 
 let parentId = "";
 
@@ -51,6 +51,7 @@ const tailwindWidgetGenerator = (
 };
 
 const tailwindLine = (node: LineNode): string => {
+  // todo Height is always zero on Lines
   const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
     .visibility(node)
     .widthHeight(node)
@@ -63,8 +64,6 @@ const tailwindLine = (node: LineNode): string => {
     .borderWidth(node)
     .borderRadius(node);
 
-  // todo Height is always zero on Lines
-
   if (builder.attributes) {
     return `\n<div ${builder.buildAttributes()}></div>`;
   }
@@ -72,10 +71,6 @@ const tailwindLine = (node: LineNode): string => {
 };
 
 const tailwindGroup = (node: GroupNode): string => {
-  // TODO generate Rows or Columns instead of Stack when Group is simple enough (two or three items) and they aren't on top of one another.
-
-  // return tailwindContainer(node, retrieveAALOrderedChildren(node), "relative");
-
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -84,18 +79,36 @@ const tailwindGroup = (node: GroupNode): string => {
     return "";
   }
 
-  const vectorIfExists = tailwindVector(node);
-  if (vectorIfExists) {
-    return vectorIfExists;
-  }
+  const vectorIfExists = tailwindVector(node, isJsx);
+  if (vectorIfExists) return vectorIfExists;
 
   const customNode = new CustomNode(node);
   let childrenStr = tailwindWidgetGenerator(customNode.orderedChildren);
   let attr = customNode.attributes;
 
+  console.log(
+    "entering in node: ",
+    node.name,
+    "attr: ",
+    attr,
+    customNode.largestNode
+  );
   if (customNode.largestNode) {
+    console.log(
+      "has largest node ",
+      customNode.largestNode.name,
+      "attr:",
+      attr,
+      "childrenStr",
+      childrenStr
+    );
     // override it with a parent
     childrenStr = tailwindContainer(customNode.largestNode, childrenStr, attr);
+
+    if (childrenStr) {
+      return childrenStr;
+    }
+    // console.log("result after merger ", childrenStr);
 
     // if there was a largestNode, no attributes
     attr = "";
@@ -117,11 +130,9 @@ const tailwindGroup = (node: GroupNode): string => {
     attr = "";
   }
 
-  if (!builder.attributes) {
-    return childrenStr;
-  }
+  console.log("builder attributes ", builder.attributes);
 
-  if (builder.attributes) {
+  if (builder.attributes || attr) {
     // todo include autoAutoLayout here
     return `\n<div ${builder.buildAttributes(attr)}>${tailwindWidgetGenerator(
       children
@@ -164,10 +175,8 @@ const tailwindText = (node: TextNode): string => {
 const tailwindFrame = (
   node: FrameNode | ComponentNode | InstanceNode
 ): string => {
-  const vectorIfExists = tailwindVector(node);
-  if (vectorIfExists) {
-    return vectorIfExists;
-  }
+  const vectorIfExists = tailwindVector(node, isJsx);
+  if (vectorIfExists) return vectorIfExists;
 
   if (node.layoutMode === "NONE" && node.children.length > 1) {
     // sort, so that layers don't get weird (i.e. bottom layer on top or vice-versa)
@@ -199,80 +208,6 @@ const tailwindFrame = (
     // node.children.length === any && layoutMode === "NONE"
     return tailwindContainer(node, childrenStr, customNode.attributes);
   }
-};
-
-const tailwindVector = (group: ChildrenMixin) => {
-  // todo improve this, positioning is wrong
-  // todo support for ungroup vectors. This was reused because 80% of people are going
-  // to use Vectors in groups (like icons)
-
-  // if every children is a VECTOR, no children have a child
-  if (
-    group.children.length === 0 ||
-    !group.children.every((d) => d.type === "VECTOR")
-  ) {
-    return "";
-  }
-
-  const node = group.children[0] as VectorNode;
-
-  const strokeOpacity = vectorOpacity(node.strokes);
-  const strokeOpacityAttr =
-    strokeOpacity < 1
-      ? `${isJsx ? "strokeOpacity" : "stroke-opacity"}=${
-          isJsx ? `{${strokeOpacity}}` : `"${strokeOpacity}"`
-        }\n`
-      : "";
-
-  const strokeWidthAttr = `${isJsx ? "strokeWidth" : "stroke-width"}=${
-    isJsx ? `{${node.strokeWeight}}` : `"${node.strokeWeight}"`
-  }\n`;
-
-  const strokeLineCapAttr =
-    node.strokeCap === "ROUND"
-      ? `${isJsx ? "strokeLinecap" : "stroke-linecap"}="round"\n`
-      : "";
-
-  const strokeLineJoinAttr =
-    node.strokeJoin !== "MITER"
-      ? `${
-          isJsx ? "strokeLinejoin" : "stroke-linejoin"
-        }="${node.strokeJoin.toString().toLowerCase()}"\n`
-      : "";
-
-  const strokeAttr =
-    node.strokes.length > 0 ? `stroke="#${vectorColor(node.strokes)}"\n` : "";
-
-  const sizeAttr = isJsx
-    ? `height={${node.height}} width={${node.width}}`
-    : `height="${node.height}" width="${node.width}"`;
-
-  // reduce everything into a single string
-  const paths = group.children.reduce(
-    (acc, n) =>
-      acc +
-      (n as VectorNode).vectorPaths.reduce((acc, d) => {
-        const fillRuleAttr =
-          d.windingRule !== "NONE"
-            ? `${isJsx ? "fillRule" : "fill-rule"}="${d.windingRule}"\n`
-            : "";
-
-        return (
-          acc +
-          `<path\n${fillRuleAttr}${strokeAttr}${strokeOpacityAttr}${strokeWidthAttr}${strokeLineCapAttr}${strokeLineJoinAttr}d="${d.data}"/>\n`
-        );
-      }, ""),
-    ""
-  );
-
-  return `<svg ${sizeAttr} fill="none">
-    ${paths}
-    </svg>`;
-
-  // return `<div height=\"${node.height}\" width=\"${node.width}\"></div>`;
-  // return `<svg height="${node.height}" width="${node.width}">
-  // <path d="${node.vectorPaths[0].data}" />
-  // </svg>`;
 };
 
 // properties named propSomething always take care of ","
@@ -318,8 +253,6 @@ export const tailwindContainer = (
   return children;
 };
 
-const shouldOptimize = true;
-
 export const rowColumnProps = (
   node: FrameNode | ComponentNode | InstanceNode
 ): string => {
@@ -327,20 +260,18 @@ export const rowColumnProps = (
 
   // [optimization]
   // flex, by default, has flex-row. Therefore, it can be omitted.
-  const flexRow = shouldOptimize ? "" : "flex-row ";
-
-  let rowOrColumn = node.layoutMode === "HORIZONTAL" ? flexRow : "flex-col ";
+  let rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "flex-col ";
 
   // https://tailwindcss.com/docs/space/
   // space between items
-  const spacing = pxToLayoutSize(node.itemSpacing);
+  const spacing = node.itemSpacing > 0 ? pxToLayoutSize(node.itemSpacing) : 0;
   const spaceDirection = node.layoutMode === "HORIZONTAL" ? "x" : "y";
 
-  // space is visually ignored when there are less than two children
-  let space =
-    shouldOptimize && node.children.length < 2
-      ? ""
-      : `space-${spaceDirection}-${spacing} `;
+  // space is visually ignored when there is only one child
+  const space =
+    node.children.length === 1 || spacing > 0
+      ? `space-${spaceDirection}-${spacing} `
+      : "";
 
   // align according to the most frequent way the children are aligned.
   // todo layoutAlign should go to individual fields and this should be threated as an optimization

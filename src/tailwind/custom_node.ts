@@ -16,7 +16,7 @@ export class CustomNode {
   customAutoLayoutDirection: "false" | "sd-x" | "sd-y" = "false";
 
   // the spacing
-  customAutoLayoutSpacing: Array<number> = [];
+  itemsSpacing: Array<number> = [];
 
   // if custom layout is horizontal, they are ordered using x, else y.
   orderedChildren: ReadonlyArray<SceneNode> = [];
@@ -37,8 +37,8 @@ export class CustomNode {
     this.setCustomAutoLayout(node);
     CustomNodeMap[node.id] = this;
     if (this.largestNode) {
-      if (node.parent) {
-        AffectedByCustomAutoLayout[node.parent?.id] = "parent";
+      if (this.largestNode.parent) {
+        AffectedByCustomAutoLayout[this.largestNode.parent?.id] = "parent";
       }
       AffectedByCustomAutoLayout[this.largestNode.id] = "changed";
       this.orderedChildren.forEach(
@@ -114,6 +114,10 @@ export class CustomNode {
       if (rect[0] === true) {
         this.largestNode = rect[1];
         children = children.filter((d) => d !== this.largestNode);
+
+        console.log("children are: ", children);
+        console.log("largestChild: ", this.largestNode?.name);
+
         // if that special scenario is found, this is the end of this CustomNode.
         // It will run again to pass the attributes
         // return;
@@ -125,7 +129,7 @@ export class CustomNode {
       console.log("detectedLayout ", detectedAutoLayout);
       this.isCustomAutoLayout = detectedAutoLayout[0] !== "false";
       this.customAutoLayoutDirection = detectedAutoLayout[0];
-      this.customAutoLayoutSpacing = detectedAutoLayout[1];
+      this.itemsSpacing = detectedAutoLayout[1];
 
       // skip when there is only one child and it takes full size
       if (
@@ -156,9 +160,11 @@ export class CustomNode {
     const average = (arr: Array<number>) =>
       arr.reduce((p, c) => p + c, 0) / arr.length;
 
-    const spacing = this.customAutoLayoutSpacing.every((d) => d === 0)
-      ? 0
-      : pxToLayoutSize(average(this.customAutoLayoutSpacing));
+    const averageSpacing =
+      this.itemsSpacing.length > 0 ? average(this.itemsSpacing) : 0;
+
+    const spacing = averageSpacing < 1 ? 0 : pxToLayoutSize(averageSpacing);
+    console.log("item spacing issss ", this.itemsSpacing);
 
     const rowOrColumn =
       this.customAutoLayoutDirection === "sd-y" ? "flex-col " : "";
@@ -183,7 +189,6 @@ export class CustomNode {
     const contentAlign = isCentered ? "content-center " : "";
 
     const padding = this.tailwindPadding(node);
-    console.log("padding is ", padding);
 
     // align according to the most frequent way the children are aligned.
     // const layoutAlign =
@@ -200,7 +205,14 @@ export class CustomNode {
     //     ? "flex "
     //     : "inline-flex ";
 
-    console.log("returning flex ---> ", rowOrColumn);
+    console.log(
+      "rowOrColumn: ",
+      rowOrColumn,
+      "with spacing: ",
+      space,
+      " padding: ",
+      padding
+    );
 
     return `${flex}${rowOrColumn}${space}${contentAlign}items-center justify-center ${padding}`;
   }
@@ -213,19 +225,28 @@ export class CustomNode {
 
     const { top, left, right, bottom } = padding;
 
-    if (top > 0 && top === bottom && top === left && top === right) {
+    const rightLeftAlign = Math.abs(left - right) < 0.5;
+    const topBottomAlign = Math.abs(bottom - top) < 0.5;
+
+    // compare all with a small threshold tolerance
+    if (
+      top > 0 &&
+      topBottomAlign &&
+      Math.abs(top - left) < 0.5 &&
+      Math.abs(top - right) < 0.5
+    ) {
       return `p-${pxToLayoutSize(top)} `;
     }
 
     // is there a less verbose way of writing this?
     let comp = "";
 
-    if (top > 0 && top === bottom && right > 0 && right === left) {
+    if (top > 0 && topBottomAlign && rightLeftAlign) {
       return `px-${pxToLayoutSize(left)} py-${pxToLayoutSize(top)} `;
     }
 
-    // py
-    if (top > 0 && top === bottom) {
+    // py with a small threshold tolerance
+    if (top > 0 && topBottomAlign) {
       comp += `py-${pxToLayoutSize(top)} `;
       if (left > 0) {
         comp += `pl-${pxToLayoutSize(left)} `;
@@ -237,8 +258,8 @@ export class CustomNode {
       return comp;
     }
 
-    // px
-    if (left > 0 && left === right) {
+    // px with a small threshold tolerance
+    if (left > 0 && rightLeftAlign) {
       comp += `px-${pxToLayoutSize(left)} `;
       if (top > 0) {
         comp += `pt-${pxToLayoutSize(top)} `;
@@ -452,6 +473,7 @@ export class CustomNode {
       // }
     } else if (intervalY.every((d) => d < 1)) {
       const intervalX = this.calculateInterval(this.orderedChildren, "x");
+      console.log("intervalX is ", intervalX);
       // const standardDeviation = this.sd(intervalX);
       // if (standardDeviation < this.autoLayoutTolerance) {
       return ["sd-x", intervalX];
@@ -483,6 +505,7 @@ export class CustomNode {
     const sorted: Array<SceneNode> = [...children].sort(
       (a, b) => a[x_or_y] - b[x_or_y]
     );
+    console.log(sorted.map((d) => d[x_or_y]));
 
     // calculate the distance between values (either vertically or horizontally)
     const interval = [];

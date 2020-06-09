@@ -26,3 +26,6 @@ test/**/next-env.d.ts
 # Editors
 **/.idea
 **/.vscode
+
+public
+build

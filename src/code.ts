@@ -1,6 +1,10 @@
 import { tailwindMain } from "./tailwind/tailwind_main";
 import { flutterMain } from "./flutter/flutter_main";
+import { extractTailwindColors } from "./tailwind/colors_extractor";
+
 let parentId: string = "";
+
+figma.showUI(__html__, { width: 300, height: 300 });
 
 // check [ignoreStackParent] description
 if (figma.currentPage.selection.length > 0) {
@@ -28,11 +32,17 @@ if (mode === "flutter") {
 }
 
 console.log(result);
-figma.closePlugin();
-
-// figma.ui.onmessage = (msg) => {
-//   recur(figma.currentPage.selection);
-//   // Make sure to close the plugin when you're done. Otherwise the plugin will
-//   // keep running, which shows the cancel button at the bottom of the screen.
-//   figma.closePlugin();
-// };
+figma.ui.onmessage = (msg) => {
+  if (msg === "all") {
+    // @ts-ignore
+    if (mode === "flutter") {
+      result = flutterMain(parentId, figma.currentPage.selection);
+    } else if (mode === "tailwind") {
+      result = tailwindMain(parentId, figma.currentPage.selection);
+    }
+  } else if (msg === "colors") {
+    return extractTailwindColors(figma.currentPage.selection);
+  } else {
+    figma.closePlugin();
+  }
+};

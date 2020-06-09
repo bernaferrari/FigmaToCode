@@ -42,12 +42,7 @@ const paddingFromCenter = (node: SceneNode): string => {
 
 const flexSelfFromCenter = (
   node: SceneNode,
-  parentNode:
-    | FrameNode
-    | ComponentNode
-    | InstanceNode
-    | RectangleNode
-    | undefined,
+  parentNode: LayoutMixin | undefined,
   layoutDirection: "sd-y" | "sd-x" | "false"
 ): string => {
   if (!parentNode) {
@@ -56,6 +51,15 @@ const flexSelfFromCenter = (
 
   if (parentNode && "width" in parentNode) {
     let comp = "";
+
+    console.log(
+      "correctLayout ",
+      layoutDirection,
+      " name: ",
+      // parentNode?.name,
+      " - ",
+      node.name
+    );
 
     if (layoutDirection === "sd-y") {
       const nodeCenteredPosX = node.x + node.width / 2;
@@ -208,55 +212,82 @@ export const retrieveContainerPosition = (
     return "";
   }
 
-  // if parent is a Group and has only one child, ignore it; child will set the size
+  // // if parent is a Group and has only one child, ignore it; child will set the size
+  // if (
+  //   "width" in node.parent &&
+  //   node.parent.children.length === 1 &&
+  //   node.parent.width === node.width &&
+  //   node.parent.height === node.height
+  // ) {
+  //   return "";
+  // }
+
+  let correctParent;
+  if (AffectedByCustomAutoLayout[node.id] === "child") {
+    correctParent = CustomNodeMap[node.parent.id].largestNode;
+  } else if (AffectedByCustomAutoLayout[node.id] === "changed") {
+    correctParent = node.parent.parent;
+  } else {
+    correctParent = node.parent;
+  }
+
   if (
-    "width" in node.parent &&
-    node.parent.children.length === 1 &&
-    node.parent.width === node.width &&
-    node.parent.height === node.height
+    correctParent &&
+    "width" in correctParent &&
+    correctParent.width === node.width &&
+    correctParent.height === node.height
   ) {
+    // if parent and node are same size
+    // but what if it needs to center the child?
     return "";
   }
 
+  // Start FlexPos
+  // Detect if parent is a CustomAutoLayout. If it is, need to set the child pos relative to it
+  let flexPos = "";
+
+  if (
+    correctParent &&
+    "width" in correctParent &&
+    CustomNodeMap[correctParent.id]?.isCustomAutoLayout
+  ) {
+    const direction = CustomNodeMap[correctParent.id].customAutoLayoutDirection;
+    // when in AutoAutoLayout, it is inside a Flex, therefore the position doesn't matter
+    flexPos = flexSelfFromCenter(node, correctParent, direction);
+  }
+
+  // if it was changed, try to change
   if (AffectedByCustomAutoLayout[node.id] === "changed") {
     const customPadding = paddingFromCenter(node);
-    return customPadding;
-    // return `inline-flex items-center justify-center ${customPadding}`;
+    return `${customPadding}${flexPos} `;
+  }
+  if (flexPos) {
+    return flexPos;
   }
 
-  if (AffectedByCustomAutoLayout[node.id] === "child") {
-    const direction = CustomNodeMap[node.parent.id].customAutoLayoutDirection;
-    const parent = CustomNodeMap[node.parent.id].largestNode;
-
-    return flexSelfFromCenter(node, parent, direction);
-  }
-
-  // if parent and node are same size
-  // but what if it needs to center the child?
+  // if correctParent is an AutoLayout, get the correct self position
   if (
-    "width" in node.parent &&
-    node.parent.width === node.width &&
-    node.parent.height === node.height
+    correctParent &&
+    CustomNodeMap[correctParent.id] &&
+    CustomNodeMap[correctParent?.id ?? ""]?.isCustomAutoLayout
   ) {
-    return "";
+    // if node is a child, parent is flex, find position
+    // if parent is in CustomNodeMap, parent is flex, find position
+    const direction = CustomNodeMap[correctParent.id].customAutoLayoutDirection;
+
+    // @ts-ignore already checked before
+    return flexSelfFromCenter(node, correctParent, direction);
   }
+  // END FlexPos
 
-  if (node.parent && CustomNodeMap[node.parent?.id]?.isCustomAutoLayout) {
-    const parentNode = node.parent;
-
-    if (parentNode.type === "RECTANGLE" || "layoutMode" in parentNode) {
-      const direction = CustomNodeMap[node.parent.id].customAutoLayoutDirection;
-      return flexSelfFromCenter(node, parentNode, direction);
-    }
-
-    // when in AutoAutoLayout, it is inside a Flex, therefore the position doesn't matter
-    return "";
-  }
-
+  // if this is the parent from the rect modification, add custom Padding and Flex
   if (AffectedByCustomAutoLayout[node.id] === "parent") {
-    const customPadding = paddingFromCenter(node);
+    let margin = "";
+    if (node.parent.children.length === 1) {
+      margin = paddingFromCenter(node);
+    }
     // center child
-    return `inline-flex items-center justify-center ${customPadding}`;
+    return `inline-flex items-center justify-center ${margin}`;
   }
 
   if (
