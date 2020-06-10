@@ -5,6 +5,6 @@
     "sourceMap": true,
     "target": "es6",
     "moduleResolution": "node",
-    "typeRoots": ["./node_modules/@types", "./node_modules/@figma", "./types"]
+    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
   }
 }

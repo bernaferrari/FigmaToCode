@@ -2,6 +2,7 @@ import { tailwindAttributesBuilder } from "./tailwind_builder";
 import { pxToLayoutSize } from "./conversion_tables";
 import { CustomNode } from "./custom_node";
 import { tailwindVector } from "./vector";
+import { convertIntoAltNodes } from "../common/AltConversion";
 
 let parentId = "";
 
@@ -17,7 +18,10 @@ export const tailwindMain = (
     console.log("TODO!!");
     return "support for multiple selections coming soon";
   } else {
-    return tailwindWidgetGenerator(sceneNode);
+    console.log("ALTERNATIVEEEE ISSS ");
+    console.log(convertIntoAltNodes(sceneNode, undefined));
+    return "";
+    // return tailwindWidgetGenerator(sceneNode);
   }
 };
 

@@ -55,10 +55,10 @@ export default [
 				target: 'public/index.html',
 				inline: true
 			}),
-			production &&
-			purgecss({
-				content: ["./**/*.html", "./**/*.svelte"]
-			}),
+			// production &&
+			// purgecss({
+			// 	content: ["./**/*.html", "./**/*.svelte"]
+			// }),
 
 			// In dev mode, call `npm run start` once
 			// the bundle has been generated

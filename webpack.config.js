@@ -5,9 +5,7 @@ const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
 
 module.exports = {
-    entry: {
-        bundle: ['./src/code.ts']
-    },
+    entry: './src/code.ts',
     devtool: 'inline-source-map',
     resolve: {
         alias: {
