@@ -3,6 +3,7 @@ export type AltSceneNode =
   | AltFrameNode
   | AltGroupNode
   | AltRectangleNode
+  | AltEllipseNode
   | AltTextNode;
 
 export interface AltGeometryMixin {
@@ -62,9 +63,11 @@ export interface AltFrameMixin {
   clipsContent: boolean;
   guides: ReadonlyArray<Guide>;
 }
-
 export class AltRectangleNode {
   readonly type = "RECTANGLE";
+}
+export class AltEllipseNode {
+  readonly type = "ELLIPSE";
 }
 export class AltFrameNode {
   readonly type = "FRAME";
@@ -86,7 +89,10 @@ export interface AltDefaultShapeMixin
 
 export interface AltRectangleNode
   extends AltDefaultShapeMixin,
+    AltCornerMixin,
     AltRectangleCornerMixin {}
+
+export interface AltEllipseNode extends AltDefaultShapeMixin, AltCornerMixin {}
 
 export interface AltFrameNode
   extends AltFrameMixin,
@@ -142,9 +148,22 @@ const isInsideInstance = (node: any): boolean => {
   return node.parent.type === "INSTANCE" || isInsideInstance(node.parent);
 };
 
+export interface BaseNodeMixinStub {
+  id: string;
+  parent: (AltSceneNode & ChildrenMixinStub) | null;
+  name: string;
+  pluginData: { [key: string]: string };
+
+  setPluginData(key: string, value: string): void;
+
+  getPluginData(key: string): string;
+
+  remove(): void;
+}
+
 export class BaseNodeMixinStub {
   id: string = "missing";
-  parent: ChildrenMixinStub | null = null;
+  parent: (AltSceneNode & ChildrenMixinStub) | null = null;
   name: string = "missing";
   pluginData: { [key: string]: string } = {};
 
@@ -172,6 +191,9 @@ export class BaseNodeMixinStub {
 export class ChildrenMixinStub {
   children: Array<AltSceneNode> = [];
 
+  // this is going to be used throughout the pluglin, so children know better who their parent is
+  relativePos: boolean = false;
+
   setChildren(altChildren: Array<AltSceneNode> | AltSceneNode) {
     if ("length" in altChildren) {
       this.children = altChildren;
@@ -180,6 +202,8 @@ export class ChildrenMixinStub {
     }
   }
 
+  // this should probably not be used in the current state of things.
+  // Recursion already takes care of it.
   appendChild(item: any) {
     if (item.parent) {
       item.parent.children = item.parent.children.filter(
@@ -299,6 +323,7 @@ class AltPageNode {
 }
 
 applyMixins(AltRectangleNode, [BaseNodeMixinStub]);
+applyMixins(AltEllipseNode, [BaseNodeMixinStub]);
 applyMixins(AltFrameNode, [BaseNodeMixinStub, ChildrenMixinStub]);
 applyMixins(AltGroupNode, [BaseNodeMixinStub, ChildrenMixinStub]);
 applyMixins(AltDocumentNode, [BaseNodeMixinStub, ChildrenMixinStub]);

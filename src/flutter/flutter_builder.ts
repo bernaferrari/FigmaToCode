@@ -1,4 +1,3 @@
-import { CodeBuilder } from "../builder_interface";
 import {
   wrapOpacity,
   wrapContainerPosition,
@@ -9,7 +8,7 @@ import {
 } from "./flutter_wrappers";
 import { makeTextComponent, makeContainer } from "./flutter_widget";
 
-export class FlutterChildBuilder implements CodeBuilder {
+export class FlutterChildBuilder {
   public child: string = "";
 
   /**

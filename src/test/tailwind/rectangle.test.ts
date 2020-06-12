@@ -7,7 +7,7 @@ describe("Tailwind Rectangle", () => {
     isWithoutTimeout: false,
   });
   const node = figma.createRectangle();
-  const parentId = node.parent!.id;
+  const parentId = node.parent?.id ?? "";
 
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = figma;
@@ -26,7 +26,7 @@ describe("Tailwind Rectangle", () => {
 
   it("large size", () => {
     node.resize(300, 300);
-    expect(executeMain()).toEqual('\n<div className="w-full h-64"></div>');
+    expect(executeMain()).toEqual('\n<div className="w-64 h-64"></div>');
   });
 
   it("color orange", () => {
@@ -37,7 +37,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '\n<div className="w-full h-64 bg-orange-600"></div>'
+      '\n<div className="w-64 h-64 bg-orange-600"></div>'
     );
   });
 

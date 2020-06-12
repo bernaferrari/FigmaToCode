@@ -22,7 +22,7 @@ export const tailwindColor = (
       // ignore the 100. If opacity was changed, let it be visible.
       const opacityProp =
         opacity !== 1.0
-          ? `${kind}-opacity-${nearestValue(opacity, [0, 0.25, 0.5, 0.75])} `
+          ? `${kind}-opacity-${nearestValue(opacity * 100, [0, 25, 50, 75])} `
           : "";
 
       // example: text-red-500

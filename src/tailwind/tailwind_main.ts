@@ -1,8 +1,16 @@
+import {
+  AltFrameNode,
+  AltSceneNode,
+  AltRectangleNode,
+  AltEllipseNode,
+  AltTextNode,
+  AltGroupNode,
+} from "./../common/altMixins";
 import { tailwindAttributesBuilder } from "./tailwind_builder";
 import { pxToLayoutSize } from "./conversion_tables";
-import { CustomNode } from "./custom_node";
 import { tailwindVector } from "./vector";
-import { convertIntoAltNodes } from "../common/AltConversion";
+import { convertIntoAltNodes } from "../common/altConversion";
+import { tailwindTextNodeBuilder } from "./tailwind_text_builder";
 
 let parentId = "";
 
@@ -14,67 +22,67 @@ export const tailwindMain = (
 ): string => {
   parentId = parentId_src;
 
-  if (sceneNode.length > 1) {
-    console.log("TODO!!");
-    return "support for multiple selections coming soon";
-  } else {
-    console.log("ALTERNATIVEEEE ISSS ");
-    console.log(convertIntoAltNodes(sceneNode, undefined));
-    return "";
-    // return tailwindWidgetGenerator(sceneNode);
-  }
+  return tailwindWidgetGenerator(convertIntoAltNodes(sceneNode, undefined));
+
+  // if (sceneNode.length > 1) {
+  //   console.log("TODO!!");
+  //   return "support for multiple selections coming soon";
+  // } else {
+  //   console.log("ALTERNATIVEEEE ISSS ");
+  //   console.log(convertIntoAltNodes(sceneNode, undefined));
+  //   // return tailwindWidgetGenerator(sceneNode);
+  // }
 };
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const tailwindWidgetGenerator = (
-  sceneNode: ReadonlyArray<SceneNode>
+  sceneNode: ReadonlyArray<AltSceneNode>
 ): string => {
   let comp = "";
 
   sceneNode.forEach((node) => {
-    if (node.visible === false) {
-      // ignore when node is invisible
-    } else if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
+    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += tailwindContainer(node, "");
     } else if (node.type === "GROUP") {
       comp += tailwindGroup(node);
     } else if (
-      node.type === "FRAME" ||
-      node.type === "INSTANCE" ||
-      node.type === "COMPONENT"
+      node.type === "FRAME"
+      //  || node.type === "INSTANCE" ||
+      // node.type === "COMPONENT"
     ) {
       comp += tailwindFrame(node);
     } else if (node.type === "TEXT") {
       comp += tailwindText(node);
-    } else if (node.type === "LINE") {
-      comp += tailwindLine(node);
     }
+    // else if (node.type === "LINE") {
+    // comp += tailwindLine(node);
+    // }
   });
 
   return comp;
 };
 
-const tailwindLine = (node: LineNode): string => {
-  // todo Height is always zero on Lines
-  const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
-    .visibility(node)
-    .widthHeight(node)
-    .containerPosition(node, parentId)
-    .layoutAlign(node, parentId)
-    .opacity(node)
-    .rotation(node)
-    .shadow(node)
-    .customColor(node.strokes, "border")
-    .borderWidth(node)
-    .borderRadius(node);
+// const tailwindLine = (node: LineNode): string => {
+//   // todo Height is always zero on Lines
+//   const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
+//     .visibility(node)
+//     .widthHeight(node)
+//     .containerPosition(node, parentId)
+//     .layoutAlign(node, parentId)
+//     .opacity(node)
+//     .rotation(node)
+//     .shadow(node)
+//     .customColor(node.strokes, "border")
+//     .borderWidth(node)
+//     .borderRadius(node);
 
-  if (builder.attributes) {
-    return `\n<div ${builder.buildAttributes()}></div>`;
-  }
-  return "";
-};
+//   if (builder.attributes) {
+//     return `\n<div ${builder.buildAttributes()}></div>`;
+//   }
+//   return "";
+// };
 
-const tailwindGroup = (node: GroupNode): string => {
+const tailwindGroup = (node: AltGroupNode): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -86,73 +94,34 @@ const tailwindGroup = (node: GroupNode): string => {
   const vectorIfExists = tailwindVector(node, isJsx);
   if (vectorIfExists) return vectorIfExists;
 
-  const customNode = new CustomNode(node);
-  let childrenStr = tailwindWidgetGenerator(customNode.orderedChildren);
-  let attr = customNode.attributes;
-
-  console.log(
-    "entering in node: ",
-    node.name,
-    "attr: ",
-    attr,
-    customNode.largestNode
-  );
-  if (customNode.largestNode) {
-    console.log(
-      "has largest node ",
-      customNode.largestNode.name,
-      "attr:",
-      attr,
-      "childrenStr",
-      childrenStr
-    );
-    // override it with a parent
-    childrenStr = tailwindContainer(customNode.largestNode, childrenStr, attr);
-
-    if (childrenStr) {
-      return childrenStr;
-    }
-    // console.log("result after merger ", childrenStr);
-
-    // if there was a largestNode, no attributes
-    attr = "";
-  }
-
-  // return tailwindContainer(node, childrenStr, attr);
-  const children = customNode.orderedChildren;
-
+  let attr = "GROUP relative ";
   // this needs to be called after CustomNode because widthHeight depends on it
   const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
     .visibility(node)
     .containerPosition(node, parentId)
-    .widthHeight(node)
-    .layoutAlign(node, parentId);
+    .widthHeight(node);
 
   // if [attributes] is "relative" and builder contains "absolute", ignore the "relative"
   // https://stackoverflow.com/a/39691113
-  if (builder.attributes.includes("absolute")) {
-    attr = "";
-  }
+  // if (builder.attributes.includes("absolute")) {
+  //   attributes = "";
+  // }
 
-  console.log("builder attributes ", builder.attributes);
-
-  if (builder.attributes || attr) {
+  if (builder.attributes) {
     // todo include autoAutoLayout here
     return `\n<div ${builder.buildAttributes(attr)}>${tailwindWidgetGenerator(
-      children
+      node.children
     )}</div>`;
   }
 
-  return tailwindWidgetGenerator(children);
+  return tailwindWidgetGenerator(node.children);
 };
 
-const tailwindText = (node: TextNode): string => {
+const tailwindText = (node: AltTextNode): string => {
   // follow the website order, to make it easier
-  const builderResult = new tailwindAttributesBuilder("", isJsx, node.visible)
-    .visibility(node)
+  const builderResult = new tailwindTextNodeBuilder("", isJsx, node.visible)
+    .blendAttr(node)
     .containerPosition(node, parentId)
-    .rotation(node)
-    .opacity(node)
     .textAutoSize(node)
     // todo fontFamily (via node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}`)
     // todo font smoothing
@@ -162,7 +131,6 @@ const tailwindText = (node: TextNode): string => {
     .lineHeight(node)
     // todo text lists (<li>)
     .textAlign(node)
-    .layoutAlign(node, parentId)
     .customColor(node.fills, "text")
     .textTransform(node)
     .buildAttributes();
@@ -170,60 +138,39 @@ const tailwindText = (node: TextNode): string => {
   const splittedChars = node.characters.split("\n");
   const charsWithLineBreak =
     splittedChars.length > 1
-      ? `${node.characters.split("\n").join("<br></br>")}`
+      ? node.characters.split("\n").join("<br></br>")
       : node.characters;
 
-  return `<p ${builderResult}> ${charsWithLineBreak} </p>`;
+  return `<p ${builderResult}>${charsWithLineBreak}</p>`;
 };
 
-const tailwindFrame = (
-  node: FrameNode | ComponentNode | InstanceNode
-): string => {
+const tailwindFrame = (node: AltFrameNode): string => {
   const vectorIfExists = tailwindVector(node, isJsx);
   if (vectorIfExists) return vectorIfExists;
 
-  if (node.layoutMode === "NONE" && node.children.length > 1) {
-    // sort, so that layers don't get weird (i.e. bottom layer on top or vice-versa)
-    const customNode = new CustomNode(node);
-    let childrenStr = tailwindWidgetGenerator(customNode.orderedChildren);
-    let attr = customNode.attributes;
-
-    if (customNode.largestNode) {
-      // override it with a parent
-      childrenStr = tailwindContainer(
-        customNode.largestNode,
-        childrenStr,
-        attr
-      );
-
-      // if there was a largestNode, no attributes
-      attr = "";
-    }
-
-    return tailwindContainer(node, childrenStr, attr);
-  } else if (node.layoutMode !== "NONE") {
+  if (node.layoutMode !== "NONE") {
     const children = tailwindWidgetGenerator(node.children);
     const rowColumn = rowColumnProps(node);
     return tailwindContainer(node, children, rowColumn);
+  } else if (node.layoutMode === "NONE" && node.children.length > 1) {
+    // children will need to be absolute
+    const childrenStr = tailwindWidgetGenerator(node.children);
+    return tailwindContainer(node, childrenStr, "FRAME relative ");
   } else {
-    const customNode = new CustomNode(node);
-    const childrenStr = tailwindWidgetGenerator(customNode.orderedChildren);
-
-    // node.children.length === any && layoutMode === "NONE"
-    return tailwindContainer(node, childrenStr, customNode.attributes);
+    // node.layoutMode === "NONE" && node.children.length === 1
+    // children doesn't need to be absolute, but might need to be positioned
+    // TODO add a flex here?!
+    // TODO 2 maybe just add margin right/left/top/bottom can solve?
+    const childrenStr = tailwindWidgetGenerator(node.children);
+    return tailwindContainer(node, childrenStr, "FRAME3 ");
   }
 };
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const tailwindContainer = (
-  node:
-    | FrameNode
-    | RectangleNode
-    | InstanceNode
-    | ComponentNode
-    | EllipseNode
-    | LineNode,
+  node: AltFrameNode | AltRectangleNode | AltEllipseNode,
+  // | LineNode,
   children: string,
   additionalAttr: string = ""
 ) => {
@@ -234,16 +181,14 @@ export const tailwindContainer = (
     return children;
   }
 
+  // todo deal with visilibity .visibility(node)
   const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
-    .visibility(node)
+    .blendAttr(node)
     .autoLayoutPadding(node)
     .containerPosition(node, parentId)
     .widthHeight(node)
-    .layoutAlign(node, parentId)
     .customColor(node.fills, "bg")
     // TODO image and gradient support (tailwind does not support gradients)
-    .opacity(node)
-    .rotation(node)
     .shadow(node)
     .customColor(node.strokes, "border")
     .borderWidth(node)
@@ -257,9 +202,7 @@ export const tailwindContainer = (
   return children;
 };
 
-export const rowColumnProps = (
-  node: FrameNode | ComponentNode | InstanceNode
-): string => {
+export const rowColumnProps = (node: AltFrameNode): string => {
   // ROW or COLUMN
 
   // [optimization]
@@ -271,9 +214,9 @@ export const rowColumnProps = (
   const spacing = node.itemSpacing > 0 ? pxToLayoutSize(node.itemSpacing) : 0;
   const spaceDirection = node.layoutMode === "HORIZONTAL" ? "x" : "y";
 
-  // space is visually ignored when there is only one child
+  // space is visually ignored when there is only one child or spacing is zero
   const space =
-    node.children.length === 1 || spacing > 0
+    node.children.length > 1 && spacing > 0
       ? `space-${spaceDirection}-${spacing} `
       : "";
 
@@ -290,7 +233,7 @@ export const rowColumnProps = (
     node.layoutMode === "VERTICAL" &&
     node.children.every((d) => d.layoutAlign === "STRETCH")
       ? ""
-      : "items-center ";
+      : "items-center justify-center ";
 
   // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
   const flex =

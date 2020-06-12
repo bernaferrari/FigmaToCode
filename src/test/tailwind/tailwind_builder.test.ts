@@ -1,6 +1,10 @@
 import { createFigma } from "figma-api-stub";
 import { tailwindMain } from "../../tailwind/tailwind_main";
 import { tailwindAttributesBuilder } from "../../tailwind/tailwind_builder";
+import {
+  frameNodeToAlt,
+  convertSingleNodeToAlt,
+} from "../../common/altConversion";
 
 describe("Tailwind Builder", () => {
   const figma = createFigma({
@@ -21,35 +25,21 @@ describe("Tailwind Builder", () => {
   // .borderWidth(node)
   // .borderRadius(node);
 
-  it("visibility", () => {
-    builder.reset();
-
-    node.visible = true;
-    builder.visibility(node);
-    expect(builder.attributes).toEqual("");
-    builder.reset();
-
-    node.visible = false;
-    builder.visibility(node);
-    expect(builder.attributes).toEqual("");
-    builder.reset();
-  });
-
-  it("width", () => {
+  it("size for rectangle", () => {
     builder.reset();
 
     node.resize(16, 16);
-    builder.widthHeight(node);
+    builder.widthHeight(convertSingleNodeToAlt(node));
     expect(builder.attributes).toEqual("w-4 h-4 ");
     builder.reset();
 
     node.resize(100, 200);
-    builder.widthHeight(node);
+    builder.widthHeight(convertSingleNodeToAlt(node));
     expect(builder.attributes).toEqual("w-24 h-48 ");
     builder.reset();
 
     node.resize(300, 300);
-    builder.widthHeight(node);
+    builder.widthHeight(convertSingleNodeToAlt(node));
     expect(builder.attributes).toEqual("w-full h-64 ");
     builder.reset();
   });

@@ -11,67 +11,119 @@ import {
   AltCornerMixin,
   AltRectangleCornerMixin,
   AltDefaultShapeMixin,
-} from "./AltMixins";
+  AltEllipseNode,
+} from "./altMixins";
+import { mergeNodeIfChildIsBigRect } from "./convertNodeIfChildIsBigRect";
+import { convertToAutoLayout } from "./convertToAutoLayout";
+
+export const convertSingleNodeToAlt = (
+  node: SceneNode,
+  parent: AltFrameNode | AltGroupNode | undefined = undefined
+): AltSceneNode => {
+  return convertIntoAltNodes([node], parent)[0];
+};
+
+export const frameNodeToAlt = (
+  node: FrameNode | InstanceNode | ComponentNode,
+  altParent: AltFrameNode | AltGroupNode | undefined
+) => {
+  if (node.children.length === 0) {
+    // if it has no children, convert frame to rectangle
+    return frameToRectangleNode(node, altParent);
+  }
+
+  const altNode = new AltFrameNode();
+
+  altNode.id = node.id;
+  altNode.name = node.name;
+
+  if (altParent) altNode.parent = altParent;
+
+  convertDefaultShape(altNode, node);
+  convertFrame(altNode, node);
+  convertCorner(altNode, node);
+  convertRectangleCorner(altNode, node);
+
+  altNode.setChildren(convertIntoAltNodes(node.children, altNode));
+
+  return convertToAutoLayout(mergeNodeIfChildIsBigRect(altNode));
+};
+
+// auto convert Frame to Rectangle when Frame has no Children
+const frameToRectangleNode = (
+  node: FrameNode | InstanceNode | ComponentNode,
+  altParent: AltFrameNode | AltGroupNode | undefined
+): AltRectangleNode => {
+  const newNode = new AltRectangleNode();
+
+  newNode.id = node.id;
+  newNode.name = node.name;
+
+  if (altParent) newNode.parent = altParent;
+
+  convertRectangleCorner(newNode, node);
+  convertDefaultShape(newNode, node);
+  convertCorner(newNode, node);
+  return newNode;
+};
 
 export const convertIntoAltNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
-  parent: AltSceneNode | undefined
-): AltSceneNode | Array<AltSceneNode> => {
+  altParent: AltFrameNode | AltGroupNode | undefined
+): Array<AltSceneNode> => {
   const mapped: Array<AltSceneNode | undefined> = sceneNode.map(
     (node: SceneNode) => {
-      console.log("node type is ", node.type);
-      if (node.type === "RECTANGLE") {
-        const altNode = new AltRectangleNode();
+      if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
+        let altNode;
+        if (node.type === "RECTANGLE") {
+          altNode = new AltRectangleNode();
+          convertRectangleCorner(altNode, node);
+        } else {
+          altNode = new AltEllipseNode();
+        }
 
         altNode.id = node.id;
         altNode.name = node.name;
 
-        if (parent && "children" in parent) altNode.parent = parent;
+        if (altParent) altNode.parent = altParent;
 
         convertDefaultShape(altNode, node);
         convertCorner(altNode, node);
-        convertRectangleCorner(altNode, node);
 
         return altNode;
-      } else if (node.type === "FRAME") {
-        const altNode = new AltFrameNode();
-
-        altNode.id = node.id;
-        altNode.name = node.name;
-
-        if (parent && "children" in parent) altNode.parent = parent;
-
-        convertDefaultShape(altNode, node);
-        convertFrame(altNode, node);
-        convertCorner(altNode, node);
-        convertRectangleCorner(altNode, node);
-
-        altNode.setChildren(convertIntoAltNodes(node.children, altNode));
-
-        return altNode;
+      } else if (
+        node.type === "FRAME" ||
+        node.type === "INSTANCE" ||
+        node.type === "COMPONENT"
+      ) {
+        return frameNodeToAlt(node, altParent);
       } else if (node.type === "GROUP") {
         const altNode = new AltGroupNode();
 
         altNode.id = node.id;
         altNode.name = node.name;
 
-        if (parent && "children" in parent) altNode.parent = parent;
+        if (altParent) altNode.parent = altParent;
 
         convertLayout(altNode, node);
         convertBlend(altNode, node);
 
         altNode.setChildren(convertIntoAltNodes(node.children, altNode));
-        return altNode;
+
+        // try to find big rect and regardless of that result, also try to convert to autolayout.
+        // There is a big chance this will be returned as a FRAME
+        return convertToAutoLayout(mergeNodeIfChildIsBigRect(altNode));
       } else if (node.type === "TEXT") {
         const altNode = new AltTextNode();
 
         altNode.id = node.id;
         altNode.name = node.name;
 
-        if (parent && "children" in parent) altNode.parent = parent;
+        if (altParent) altNode.parent = altParent;
 
         convertLayout(altNode, node);
         convertBlend(altNode, node);
+        convertGeometry(altNode, node);
         convertIntoAltText(altNode, node);
         return altNode;
       }
@@ -80,13 +132,7 @@ export const convertIntoAltNodes = (
     }
   );
 
-  console.log("mapped ", mapped);
-  const nonNull: Array<AltSceneNode> = mapped.filter(notEmpty);
-  if (nonNull.length === 1) {
-    return nonNull[0];
-  } else {
-    return nonNull;
-  }
+  return mapped.filter(notEmpty);
 };
 
 const convertLayout = (altNode: AltLayoutMixin, node: LayoutMixin) => {
@@ -95,6 +141,7 @@ const convertLayout = (altNode: AltLayoutMixin, node: LayoutMixin) => {
   altNode.width = node.width;
   altNode.height = node.height;
   altNode.rotation = node.rotation;
+  altNode.layoutAlign = node.layoutAlign;
 };
 
 const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
@@ -171,9 +218,13 @@ const convertIntoAltText = (altNode: AltTextNode, node: TextNode) => {
   altNode.paragraphIndent = node.paragraphIndent;
   altNode.paragraphSpacing = node.paragraphSpacing;
   altNode.fontSize = node.fontSize;
+  altNode.fontName = node.fontName;
+  altNode.textCase = node.textCase;
   altNode.textDecoration = node.textDecoration;
   altNode.letterSpacing = node.letterSpacing;
+  altNode.textAutoResize = node.textAutoResize;
   altNode.characters = node.characters;
+  altNode.lineHeight = node.lineHeight;
 };
 
 function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
