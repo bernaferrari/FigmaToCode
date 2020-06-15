@@ -7,12 +7,20 @@ import { convertIntoAltNodes } from "./common/altConversion";
 let parentId: string = "";
 let isJsx = false;
 
-figma.showUI(__html__, { width: 500, height: 400 });
+figma.showUI(__html__, { width: 450, height: 550 });
 
 const run = (
   mode: "flutter" | "swiftui" | "html" | "tailwind" | "bootstrap" | "material",
   isJSX: boolean = false
 ) => {
+  // ignore when nothing was selected
+  if (figma.currentPage.selection.length === 0) {
+    figma.ui.postMessage({
+      type: "empty",
+    });
+    return;
+  }
+
   // check [ignoreStackParent] description
   if (figma.currentPage.selection.length > 0) {
     parentId = figma.currentPage.selection[0].parent?.id ?? "";
@@ -48,37 +56,26 @@ const run = (
     type: "text",
     data: extractTailwindText(convertedSelection),
   });
-
-  // figma.ui.onmessage = (msg) => {
-  //   console.log("onMessage: ", msg);
-  //   console.log(msg);
-  //   if (msg === "all") {
-  //     // @ts-ignore
-  //     if (mode === "flutter") {
-  //       result = flutterMain(parentId, figma.currentPage.selection);
-  //     } else if (mode === "tailwind") {
-  //       result = tailwindMain(parentId, figma.currentPage.selection);
-  //     }
-  //   } else if (msg === "colors") {
-  //     figma.ui.postMessage({
-  //       type: "colors",
-  //       data: extractTailwindColors(figma.currentPage.selection),
-  //     });
-  //   } else {
-  //     figma.closePlugin();
-  //   }
-  // };
-};
-
-figma.ui.onmessage = (msg) => {
-  console.log("onMessage: ", msg);
-  console.log(msg);
-  run(msg, isJsx);
 };
 
 figma.on("selectionchange", () => {
   run("tailwind", isJsx);
 });
+
+figma.ui.onmessage = (msg) => {
+  if (msg.type === "jsx-true") {
+    if (!isJsx) {
+      isJsx = true;
+      console.log("running.. ");
+      run("tailwind", isJsx);
+    }
+  } else if (msg.type === "jsx-false") {
+    if (isJsx) {
+      isJsx = false;
+      run("tailwind", isJsx);
+    }
+  }
+};
 
 // first run
 run("tailwind", isJsx);

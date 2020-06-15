@@ -6,6 +6,8 @@
   //import some Svelte Figma UI components
   import { Button, Input, Label, SelectMenu } from "figma-plugin-ds-svelte";
 
+  import { fade, fly } from "svelte/transition";
+
   import ItemColor from "./ItemColor.svelte";
   import ItemText from "./ItemText.svelte";
 
@@ -14,21 +16,32 @@
 
   import copy from "clipboard-copy";
 
-  function updateClipboard(text) {
-    copy(text);
+  import { tweened } from "svelte/motion";
+
+  let visible = false;
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  function cancel() {
-    parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+  function updateClipboard(text) {
+    copy(text);
+
+    visible = true;
+    delay(1000).then(() => {
+      visible = false;
+    });
   }
 
   let colorData = [];
   let textData = [];
   let codeData = "";
+  let emptySelection = false;
 
   $: colorObservable = colorData;
   $: textObservable = textData;
   $: codeObservable = codeData;
+  $: emptyObservable = emptySelection;
 
   if (false) {
     // DEBUG
@@ -63,6 +76,11 @@
     if (!event.data.pluginMessage) {
       return;
     }
+
+    if (emptySelection !== (event.data.pluginMessage.type === "empty")) {
+      emptySelection = event.data.pluginMessage.type === "empty";
+    }
+
     if (event.data.pluginMessage.type === "colors") {
       colorData = event.data.pluginMessage.data;
     } else if (event.data.pluginMessage.type === "text") {
@@ -72,8 +90,14 @@
     }
   };
 
-  function fetchText() {
-    parent.postMessage({ pluginMessage: { type: "text" } }, "*");
+  import Switch from "./Switch.svelte";
+
+  let jsx = false;
+  $: if (jsx) {
+    parent.postMessage({ pluginMessage: { type: "jsx-true" } }, "*");
+  }
+  $: if (!jsx) {
+    parent.postMessage({ pluginMessage: { type: "jsx-false" } }, "*");
   }
 </script>
 
@@ -84,88 +108,96 @@
 </style>
 
 <div class="p-2">
-  <!-- <SelectMenu bind:menuItems bind:value={selectedShape} class="mb-xxsmall" /> -->
 
-  <!-- <Label>Count</Label>
-  <Input iconText="#" bind:value={count} class="mb-xxsmall" />
-
-  <div class="flex p-xxsmall mb-xsmall">
-    <Button on:click={cancel} variant="secondary" class="mr-xsmall">
-      Cancel
-    </Button>
-    <Button on:click={fetchColors}>Color</Button>
-    <Button on:click={createShapes}>Run</Button>
-  </div> -->
-
-  <div class="border-2 rounded-lg w-full pt-2">
-    <p class="text-lg font-medium text-center">Code</p>
-    <Prism language="html" source={codeObservable} />
-
-    <div class="flex justify-center content-center mb-2">
-      <button
-        class="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2
-        px-4 border border-blue-700 rounded"
-        on:click={updateClipboard(codeObservable)}>
-        Copy to Clipboard
-      </button>
-    </div>
-  </div>
-  <div class="h-2" />
-  <!-- <div class="flex space-x-2 w-full p-2 border-2 rounded-lg"> -->
-  <!-- <div class="flex flex-col space-y-2 items-center w-1/2">
-      <p class="text-lg font-medium">Color</p>
-      {#each colorObservable as item}
-        <ItemColor {...item} />
-      {/each}
-    </div>
-
-    <div class="flex flex-col space-y-2 items-center w-1/2">
-      <p class="text-lg font-medium">Text</p>
-      {#each textObservable as item}
-        <ItemText {...item} />
-      {/each}
-    </div>
-  </div> -->
-
-  {#if colorObservable.length > 0}
+  {#if emptySelection}
     <div
-      class="flex flex-col space-y-2 items-center w-full p-2 border-2 rounded-lg">
-      <div class="flex flex-wrap w-full">
-        <div class="p-1 w-1/3">
-          <div
-            class="flex w-full h-full items-center justify-center bg-gray-300
-            rounded-lg">
-            <p class="text-xl font-semibold">Colors</p>
-          </div>
-        </div>
+      class="flex flex-col space-y-2 m-auto items-center justify-center p-4
+      border-2 rounded-lg">
+      <p class="text-lg font-bold">Nothing is selected</p>
+      <p class="text-xs">Try selecting any layer</p>
+    </div>
+  {:else}
+    <div class="border-2 rounded-lg w-full pt-2">
+      <div class="flex items-center px-2 space-x-2 justify-between">
+        <p
+          class="text-lg font-medium text-center bg-gray-300 py-2 px-4
+          rounded-lg">
+          Code
+        </p>
+        <button
+          class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold
+          hover:text-white py-2 px-4 border border-blue-500
+          hover:border-transparent rounded"
+          on:click={updateClipboard(codeObservable)}>
+          Copy to Clipboard
+        </button>
+      </div>
 
-        {#each colorObservable as item}
-          <div class="w-1/3 p-1">
-            <ItemColor {...item} />
-          </div>
-        {/each}
+      <Prism language="html" source={codeObservable} />
+
+      <div
+        class="flex justify-end space-x-2 content-center items-center mb-2 mx-2">
+
+        <Switch bind:checked={jsx} id="jsx" text="JSX" />
+
       </div>
     </div>
+    <div class="h-2" />
+
+    {#if colorObservable.length > 0}
+      <div
+        class="flex flex-col space-y-2 items-center w-full p-2 border-2
+        rounded-lg">
+        <div class="flex flex-wrap w-full">
+          <div class="p-1 w-1/3">
+            <div
+              class="flex w-full h-full items-center justify-center bg-gray-300
+              rounded-lg">
+              <p class="text-xl font-semibold">Colors</p>
+            </div>
+          </div>
+
+          {#each colorObservable as item}
+            <div class="w-1/3 p-1">
+              <ItemColor {...item} on:submit={updateClipboard(item.hex)} />
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
+
+    <div class="h-2" />
+
+    {#if textObservable.length > 0}
+      <div
+        class="flex flex-col space-y-2 items-center w-full p-2 border-2
+        rounded-lg">
+        <div class="flex flex-wrap w-full">
+          <div class="p-1 w-1/2">
+            <div
+              class="flex w-full h-full items-center justify-center bg-gray-300
+              rounded-lg">
+              <p class="text-xl font-semibold">Texts</p>
+            </div>
+          </div>
+          {#each textObservable as item}
+            <div class="w-1/2 p-1">
+              <ItemText {...item} on:submit={updateClipboard(item.full)} />
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
   {/if}
 
-  <div class="h-2" />
-
-  {#if textObservable.length > 0}
-    <div
-      class="flex flex-col space-y-2 items-center w-full p-2 border-2 rounded-lg">
-      <div class="flex flex-wrap w-full">
-        <div class="p-1 w-1/2">
-          <div
-            class="flex w-full h-full items-center justify-center bg-gray-300
-            rounded-lg">
-            <p class="text-xl font-semibold">Texts</p>
-          </div>
-        </div>
-        {#each textObservable as item}
-          <div class="w-1/2 p-1">
-            <ItemText {...item} />
-          </div>
-        {/each}
+  {#if visible}
+    <div class="fixed bottom-0 left-0 w-full px-2 mb-2">
+      <div
+        class="h-8 w-full flex items-center justify-center bg-green-600
+        rounded-lg"
+        in:fly={{ y: 20, duration: 800 }}
+        out:fade>
+        <p class="text-white">Copied!</p>
       </div>
     </div>
   {/if}

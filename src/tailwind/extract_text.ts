@@ -1,5 +1,6 @@
 import { AltSceneNode } from "./../common/altMixins";
 import { tailwindTextNodeBuilder } from "./tailwind_text_builder";
+import { rgbTo6hex, tailwindNearestColor } from "./colors";
 
 export const extractTailwindText = (
   sceneNode: Array<AltSceneNode>
@@ -35,6 +36,7 @@ export const extractTailwindText = (
         name: node.name,
         attr: attr.attributes,
         full: `<p ${attr}>${charsWithLineBreak}</p>`,
+        color: convertColor(node.fills) ?? "",
       });
     }
   });
@@ -46,6 +48,7 @@ type namedText = {
   name: string;
   attr: string;
   full: string;
+  color: string;
 };
 
 function deepFlatten(arr: Array<AltSceneNode>): Array<AltSceneNode> {
@@ -63,3 +66,18 @@ function deepFlatten(arr: Array<AltSceneNode>): Array<AltSceneNode> {
 
   return result;
 }
+
+const convertColor = (
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+): string | undefined => {
+  // kind can be text, bg, border...
+  // [when testing] fills can be undefined
+  if (fills && fills !== figma.mixed && fills.length > 0) {
+    let fill = fills[0];
+    if (fill.type === "SOLID") {
+      return tailwindNearestColor(rgbTo6hex(fill.color));
+    }
+  }
+
+  return undefined;
+};

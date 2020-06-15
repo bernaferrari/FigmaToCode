@@ -13,7 +13,7 @@ export const tailwindColor = (
     if (fill.type === "SOLID") {
       // don't set text color when color is black (default) and opacity is 100%
       if (
-        kind === "TEXT" &&
+        kind === "text" &&
         fill.color.r === 0 &&
         fill.color.g === 0 &&
         fill.color.b === 0 &&

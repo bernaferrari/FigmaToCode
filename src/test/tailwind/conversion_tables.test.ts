@@ -28,8 +28,8 @@ describe("Tailwind Conversion Table", () => {
     expect(pxToFontSize(14)).toEqual("sm");
     expect(pxToFontSize(18)).toEqual("lg");
 
-    expect(pxToBorderRadius(2)).toEqual("sm");
-    expect(pxToBorderRadius(8)).toEqual("lg");
+    expect(pxToBorderRadius(2)).toEqual("-sm");
+    expect(pxToBorderRadius(8)).toEqual("-lg");
 
     expect(pxToLayoutSize(4)).toEqual("1");
     expect(pxToLayoutSize(256)).toEqual("64");

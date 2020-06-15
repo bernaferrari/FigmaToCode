@@ -23,17 +23,17 @@ describe("Tailwind Rectangle", () => {
 
   it("small size", () => {
     node.resize(16, 16);
-    expect(executeMain()).toEqual('\n<div className="w-4 h-4"></div>');
+    expect(executeMain()).toEqual('<div className="w-4 h-4"></div>');
   });
 
   it("medium size", () => {
     node.resize(100, 200);
-    expect(executeMain()).toEqual('\n<div className="w-24 h-48"></div>');
+    expect(executeMain()).toEqual('<div className="w-24 h-48"></div>');
   });
 
   it("large size", () => {
     node.resize(300, 300);
-    expect(executeMain()).toEqual('\n<div className="w-full h-64"></div>');
+    expect(executeMain()).toEqual('<div className="w-full h-64"></div>');
   });
 
   it("color orange", () => {
@@ -44,7 +44,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '\n<div className="w-full h-64 bg-orange-600"></div>'
+      '<div className="w-full h-64 bg-orange-600"></div>'
     );
   });
 
@@ -56,7 +56,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '\n<div className="w-full h-64 bg-gray-800"></div>'
+      '<div className="w-full h-64 bg-gray-800"></div>'
     );
   });
 
@@ -68,7 +68,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '\n<div className="w-full h-64 bg-gray-800"></div>'
+      '<div className="w-full h-64 bg-gray-800"></div>'
     );
   });
 
@@ -82,7 +82,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '\n<div className="w-full h-64 border-gray-800 border-4"></div>'
+      '<div className="w-full h-64 border-gray-800 border-4"></div>'
     );
   });
 
@@ -91,7 +91,7 @@ describe("Tailwind Rectangle", () => {
     node.strokes = [];
     node.cornerRadius = 8;
     expect(executeMain()).toEqual(
-      '\n<div className="w-full h-64 rounded-lg"></div>'
+      '<div className="w-full h-64 rounded-lg"></div>'
     );
   });
 
@@ -99,7 +99,7 @@ describe("Tailwind Rectangle", () => {
     node.cornerRadius = figma.mixed;
     node.opacity = 0.4;
     expect(executeMain()).toEqual(
-      '\n<div className="opacity-50 w-full h-64"></div>'
+      '<div className="opacity-50 w-full h-64"></div>'
     );
   });
 
@@ -107,7 +107,7 @@ describe("Tailwind Rectangle", () => {
     node.opacity = 1;
     node.visible = false;
     expect(executeMain()).toEqual(
-      '\n<div className="invisible w-full h-64"></div>'
+      '<div className="invisible w-full h-64"></div>'
     );
   });
 });

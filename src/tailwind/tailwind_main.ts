@@ -27,7 +27,7 @@ export const tailwindMain = (
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.slice(0, 1) === "\n") {
-    result = result.slice(1, result.length - 1);
+    result = result.slice(1, result.length);
   }
 
   return result;
