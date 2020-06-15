@@ -19,7 +19,7 @@ describe("Tailwind Conversion Table", () => {
   });
 
   it("convert pixels to tailwind values", () => {
-    expect(pxToAbsoluteLineHeight(16)).toEqual("4");
+    expect(pxToAbsoluteLineHeight(16)).toEqual("none");
     expect(pxToAbsoluteLineHeight(40)).toEqual("10");
 
     expect(pxToMapLetterSpacing(-0.4)).toEqual("tight");

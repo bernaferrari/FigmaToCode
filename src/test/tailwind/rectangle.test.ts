@@ -1,5 +1,9 @@
 import { createFigma } from "figma-api-stub";
 import { tailwindMain } from "../../tailwind/tailwind_main";
+import {
+  convertIntoAltNodes,
+  convertSingleNodeToAlt,
+} from "../../common/altConversion";
 
 describe("Tailwind Rectangle", () => {
   const figma = createFigma({
@@ -12,7 +16,10 @@ describe("Tailwind Rectangle", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = figma;
 
-  const executeMain = () => tailwindMain(parentId, [node]);
+  const executeMain = () => {
+    const converted = convertSingleNodeToAlt(node);
+    return tailwindMain(parentId, [converted], true);
+  };
 
   it("small size", () => {
     node.resize(16, 16);
@@ -26,7 +33,7 @@ describe("Tailwind Rectangle", () => {
 
   it("large size", () => {
     node.resize(300, 300);
-    expect(executeMain()).toEqual('\n<div className="w-64 h-64"></div>');
+    expect(executeMain()).toEqual('\n<div className="w-full h-64"></div>');
   });
 
   it("color orange", () => {
@@ -37,7 +44,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '\n<div className="w-64 h-64 bg-orange-600"></div>'
+      '\n<div className="w-full h-64 bg-orange-600"></div>'
     );
   });
 
@@ -92,13 +99,15 @@ describe("Tailwind Rectangle", () => {
     node.cornerRadius = figma.mixed;
     node.opacity = 0.4;
     expect(executeMain()).toEqual(
-      '\n<div className="w-full h-64 opacity-50"></div>'
+      '\n<div className="opacity-50 w-full h-64"></div>'
     );
   });
 
   it("visible", () => {
     node.opacity = 1;
     node.visible = false;
-    expect(executeMain()).toEqual("");
+    expect(executeMain()).toEqual(
+      '\n<div className="invisible w-full h-64"></div>'
+    );
   });
 });

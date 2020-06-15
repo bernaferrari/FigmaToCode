@@ -23,7 +23,6 @@ export default [
 		output: {
 			file: 'src/build/bundle.js',
 			format: 'iife',
-			sourcemap: true,
 			name: 'ui'
 		},
 		plugins: [
@@ -55,10 +54,6 @@ export default [
 				target: 'public/index.html',
 				inline: true
 			}),
-			// production &&
-			// purgecss({
-			// 	content: ["./**/*.html", "./**/*.svelte"]
-			// }),
 
 			// In dev mode, call `npm run start` once
 			// the bundle has been generated
@@ -83,7 +78,6 @@ export default [
 			format: 'cjs',
 			sourcemap: true,
 		},
-		external: ['nearest-color'],
 		plugins: [
 			typescript(),
 			commonjs(),

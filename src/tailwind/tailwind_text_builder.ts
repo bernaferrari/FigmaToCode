@@ -5,6 +5,7 @@ import {
   pxToAbsoluteLineHeight,
   pxToLayoutSize,
   pxToFontSize,
+  percentToAbsoluteLineHeight,
 } from "./conversion_tables";
 import { tailwindAttributesBuilder } from "./tailwind_builder";
 
@@ -25,7 +26,6 @@ export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
     //   }
     // }
 
-    console.log(node.textAutoResize);
     if (node.textAutoResize === "NONE") {
       const hRem = pxToLayoutSize(node.height);
       const wRem = pxToLayoutSize(node.width);
@@ -134,8 +134,14 @@ export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
         this.attributes += `tracking-${pxToMapLetterSpacing(
           node.letterSpacing.value
         )} `;
-      } else if (node.letterSpacing.unit === "PERCENT") {
-        // todo PERCENT
+      } else if (
+        node.letterSpacing.unit === "PERCENT" &&
+        node.letterSpacing.value !== 0
+      ) {
+        // divide by 10 so it works as expected visually.
+        this.attributes += `tracking-${pxToMapLetterSpacing(
+          node.letterSpacing.value / 10
+        )} `;
       }
     }
     return this;
@@ -147,15 +153,18 @@ export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
    */
   lineHeight(node: AltTextNode): this {
     if (node.lineHeight !== figma.mixed) {
-      if (node.lineHeight.unit === "AUTO") {
-        // default, ignore
-      } else if (node.lineHeight.unit === "PIXELS") {
+      if (node.lineHeight.unit === "PIXELS") {
         this.attributes += `leading-${pxToAbsoluteLineHeight(
           node.lineHeight.value
         )} `;
       } else if (node.lineHeight.unit === "PERCENT") {
-        // todo add support for relative line height (normal, relaxed, loose, snug, tight).
+        this.attributes += `leading-${percentToAbsoluteLineHeight(
+          node.lineHeight.value
+        )} `;
       }
+      // else if (node.lineHeight.unit === "AUTO") {
+      // default, ignore
+      // }
     }
 
     return this;
@@ -193,6 +202,20 @@ export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
       this.attributes += "uppercase ";
     } else if (node.textCase === "ORIGINAL") {
       // default, ignore
+    }
+
+    return this;
+  }
+
+  /**
+   * https://tailwindcss.com/docs/text-decoration/
+   * example: underline
+   */
+  textDecoration(node: AltTextNode): this {
+    if (node.textDecoration === "UNDERLINE") {
+      this.attributes += "underline ";
+    } else if (node.textDecoration === "STRIKETHROUGH") {
+      this.attributes += "line-through ";
     }
 
     return this;

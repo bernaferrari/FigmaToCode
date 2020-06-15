@@ -8,6 +8,7 @@ const autoprefixer = require('autoprefixer');
 const purgecss = require('@fullhuman/postcss-purgecss')({
     content: ['./src/**/*.svelte', './src/**/*.html'],
     whitelistPatterns: [/svelte-/],
+    whitelistPatternsChildren: [/^token/, /^Prism/, /^code/, /^pre/],
     defaultExtractor: content => content.match(/[A-Za-z0-9-_:/]+/g) || []
 })
 

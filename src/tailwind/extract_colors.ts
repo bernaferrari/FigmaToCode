@@ -1,14 +1,20 @@
-import { rgbTo6hex, getTailwindColor } from "./colors";
+import {
+  rgbTo6hex,
+  getTailwindColor,
+  tailwindNearestColor,
+  tailwindColors,
+} from "./colors";
+import { AltSceneNode } from "../common/altMixins";
 
 export const extractTailwindColors = (
-  sceneNode: ReadonlyArray<SceneNode>
+  sceneNode: Array<AltSceneNode>
 ): Array<namedColor> => {
-  const selectedChildren = deepFlatten([...sceneNode]);
+  const selectedChildren = deepFlatten(sceneNode);
 
   let colorStr: Array<namedColor> = [];
 
   // collect all fill[0] and stroke[0] SOLID colors
-  selectedChildren.reduce((r, d) => {
+  selectedChildren.forEach((d) => {
     if ("fills" in d) {
       const fills = convertColor(d.fills);
       if (fills) {
@@ -21,10 +27,20 @@ export const extractTailwindColors = (
         colorStr.push(strokes);
       }
     }
-    return r;
-  }, []);
+  });
 
-  return colorStr;
+  // retrieve only unique colors
+  // from https://stackoverflow.com/a/18923480/4418073
+  let unique: Record<string, boolean> = {};
+  let distinct: Array<namedColor> = [];
+  colorStr.forEach(function (x) {
+    if (!unique[x.hex]) {
+      distinct.push(x);
+      unique[x.hex] = true;
+    }
+  });
+
+  return distinct.sort((a, b) => a.name.localeCompare(b.name));
 };
 
 type namedColor = {
@@ -41,9 +57,11 @@ const convertColor = (
     let fill = fills[0];
     if (fill.type === "SOLID") {
       const hex = rgbTo6hex(fill.color);
+      const tailColor = tailwindNearestColor(hex);
+      const nameTailwind = tailwindColors[tailColor];
       return {
-        name: getTailwindColor(hex),
-        hex: hex,
+        name: nameTailwind,
+        hex: tailColor,
       };
     }
   }
@@ -51,12 +69,13 @@ const convertColor = (
   return undefined;
 };
 
-function deepFlatten(arr: Array<SceneNode>): Array<SceneNode> {
-  let result: Array<SceneNode> = [];
+function deepFlatten(arr: Array<AltSceneNode>): Array<AltSceneNode> {
+  let result: Array<AltSceneNode> = [];
 
   arr.forEach((d) => {
     if ("children" in d) {
-      result = result.concat(deepFlatten([...d.children]));
+      result.push(d);
+      result = result.concat(deepFlatten(d.children));
     } else {
       result.push(d);
     }

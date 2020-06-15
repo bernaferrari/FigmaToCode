@@ -9,20 +9,28 @@ import {
 import { tailwindAttributesBuilder } from "./tailwind_builder";
 import { pxToLayoutSize } from "./conversion_tables";
 import { tailwindVector } from "./vector";
-import { convertIntoAltNodes } from "../common/altConversion";
 import { tailwindTextNodeBuilder } from "./tailwind_text_builder";
 
 let parentId = "";
 
-const isJsx = true;
+let isJsx = false;
 
 export const tailwindMain = (
   parentId_src: string,
-  sceneNode: ReadonlyArray<SceneNode>
+  sceneNode: Array<AltSceneNode>,
+  jsx: boolean
 ): string => {
   parentId = parentId_src;
+  isJsx = jsx;
 
-  return tailwindWidgetGenerator(convertIntoAltNodes(sceneNode, undefined));
+  let result = tailwindWidgetGenerator(sceneNode);
+
+  // remove the initial \n that is made in Container.
+  if (result.length > 0 && result.slice(0, 1) === "\n") {
+    result = result.slice(1, result.length - 1);
+  }
+
+  return result;
 
   // if (sceneNode.length > 1) {
   //   console.log("TODO!!");
@@ -129,6 +137,7 @@ const tailwindText = (node: AltTextNode): string => {
     .fontStyle(node)
     .letterSpacing(node)
     .lineHeight(node)
+    .textDecoration(node)
     // todo text lists (<li>)
     .textAlign(node)
     .customColor(node.fills, "text")
@@ -155,7 +164,7 @@ const tailwindFrame = (node: AltFrameNode): string => {
   } else if (node.layoutMode === "NONE" && node.children.length > 1) {
     // children will need to be absolute
     const childrenStr = tailwindWidgetGenerator(node.children);
-    return tailwindContainer(node, childrenStr, "FRAME relative ");
+    return tailwindContainer(node, childrenStr, "FRAME2 relative ");
   } else {
     // node.layoutMode === "NONE" && node.children.length === 1
     // children doesn't need to be absolute, but might need to be positioned
@@ -181,7 +190,6 @@ export const tailwindContainer = (
     return children;
   }
 
-  // todo deal with visilibity .visibility(node)
   const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
     .blendAttr(node)
     .autoLayoutPadding(node)
@@ -204,6 +212,23 @@ export const tailwindContainer = (
 
 export const rowColumnProps = (node: AltFrameNode): string => {
   // ROW or COLUMN
+
+  // if children is a child that is a FRAME without AutoLayout, ignore and return here
+  if (
+    node.children.length === 1 &&
+    "layoutMode" in node.children[0] &&
+    node.children[0].layoutMode !== "NONE"
+  ) {
+    return "";
+  }
+
+  // if children is a child with STRETCH, ignore and return here
+  if (
+    node.children.length === 1 &&
+    node.children[0].layoutAlign === "STRETCH"
+  ) {
+    return "";
+  }
 
   // [optimization]
   // flex, by default, has flex-row. Therefore, it can be omitted.
@@ -228,7 +253,7 @@ export const rowColumnProps = (node: AltFrameNode): string => {
   //     : "items-center ";
 
   // [optimization]
-  // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, item-center.
+  // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, center it.
   const layoutAlign =
     node.layoutMode === "VERTICAL" &&
     node.children.every((d) => d.layoutAlign === "STRETCH")
@@ -242,21 +267,6 @@ export const rowColumnProps = (node: AltFrameNode): string => {
     node.parent.layoutMode === node.layoutMode
       ? "flex "
       : "inline-flex ";
-
-  if (
-    node.children.length === 1 &&
-    "layoutMode" in node.children[0] &&
-    node.children[0].layoutMode !== "NONE"
-  ) {
-    return "";
-  }
-
-  if (
-    node.children.length === 1 &&
-    node.children[0].layoutAlign === "STRETCH"
-  ) {
-    return "";
-  }
 
   return `${flex}${rowOrColumn}${space}${layoutAlign}`;
 };

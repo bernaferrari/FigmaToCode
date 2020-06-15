@@ -177,8 +177,14 @@ export class tailwindAttributesBuilder {
     // [node.strokeWeight] can have a value even when there are no strokes
     // [when testing] node.effects can be undefined
     if (node.strokes && node.strokes.length > 0 && node.strokeWeight > 0) {
-      const array = [2, 4, 8];
-      this.attributes += `border-${nearestValue(node.strokeWeight, array)} `;
+      const array = [1, 2, 4, 8];
+      const nearest = nearestValue(node.strokeWeight, array);
+      if (nearest === 1) {
+        // special case
+        this.attributes += `border `;
+      } else {
+        this.attributes += `border-${nearest} `;
+      }
     }
     return this;
   }
@@ -210,20 +216,20 @@ export class tailwindAttributesBuilder {
     let comp = "";
 
     if (node.cornerRadius !== figma.mixed) {
-      comp += `rounded-${pxToBorderRadius(node.cornerRadius)} `;
+      comp += `rounded${pxToBorderRadius(node.cornerRadius)} `;
     } else {
       // todo optimize for tr/tl/br/bl instead of t/r/l/b
       if (node.topLeftRadius !== 0) {
-        comp += `rounded-tl-${pxToBorderRadius(node.topLeftRadius)} `;
+        comp += `rounded-tl${pxToBorderRadius(node.topLeftRadius)} `;
       }
       if (node.topRightRadius !== 0) {
-        comp += `rounded-tr-${pxToBorderRadius(node.topRightRadius)} `;
+        comp += `rounded-tr${pxToBorderRadius(node.topRightRadius)} `;
       }
       if (node.bottomLeftRadius !== 0) {
-        comp += `rounded-bl-${pxToBorderRadius(node.bottomLeftRadius)} `;
+        comp += `rounded-bl${pxToBorderRadius(node.bottomLeftRadius)} `;
       }
       if (node.bottomLeftRadius !== 0) {
-        comp += `rounded-br-${pxToBorderRadius(node.bottomRightRadius)} `;
+        comp += `rounded-br${pxToBorderRadius(node.bottomRightRadius)} `;
       }
     }
 
@@ -269,12 +275,16 @@ export class tailwindAttributesBuilder {
     // todo get padding also for not-auto-layout
     // [horizontalPadding] and [verticalPadding] can have values even when AutoLayout is off
     if ("layoutMode" in node && node.layoutMode !== "NONE") {
-      if (node.horizontalPadding > 0) {
-        this.attributes += `px-${pxToLayoutSize(node.horizontalPadding)} `;
-      }
+      if (node.horizontalPadding === node.verticalPadding) {
+        this.attributes += `p-${pxToLayoutSize(node.horizontalPadding)} `;
+      } else {
+        if (node.horizontalPadding > 0) {
+          this.attributes += `px-${pxToLayoutSize(node.horizontalPadding)} `;
+        }
 
-      if (node.verticalPadding > 0) {
-        this.attributes += `py-${pxToLayoutSize(node.verticalPadding)} `;
+        if (node.verticalPadding > 0) {
+          this.attributes += `py-${pxToLayoutSize(node.verticalPadding)} `;
+        }
       }
     }
     return this;
