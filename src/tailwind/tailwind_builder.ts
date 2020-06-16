@@ -275,7 +275,10 @@ export class tailwindAttributesBuilder {
     // todo get padding also for not-auto-layout
     // [horizontalPadding] and [verticalPadding] can have values even when AutoLayout is off
     if ("layoutMode" in node && node.layoutMode !== "NONE") {
-      if (node.horizontalPadding === node.verticalPadding) {
+      if (
+        node.horizontalPadding > 0 &&
+        node.horizontalPadding === node.verticalPadding
+      ) {
         this.attributes += `p-${pxToLayoutSize(node.horizontalPadding)} `;
       } else {
         if (node.horizontalPadding > 0) {
