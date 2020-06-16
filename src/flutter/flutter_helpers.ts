@@ -9,7 +9,7 @@ export const flutterColor = (
 
       // if fill isn't visible, it shouldn't be painted.
       return fill.visible
-        ? `color: Color(0x${rgbTohex(fill.color, opacity)}),`
+        ? `color: Color(0x${rgbaTohex(fill.color, opacity)}),`
         : ``;
     }
   }
@@ -19,7 +19,7 @@ export const flutterColor = (
 
 // Convert RGB (r,g,b: [0, 1]) + alpha [0, 1] to 8 digit hex
 // Convert RGBA (r,g,b,a: [0, 1]) to 8 digit hex
-export const rgbTohex = (
+export const rgbaTohex = (
   color: RGB | RGBA,
   alpha: number = "a" in color ? color.a : 1.0
 ): string => {

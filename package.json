@@ -19,6 +19,7 @@
     "prism-theme-night-owl": "^1.4.0",
     "sirv-cli": "^0.4.4",
     "svelte-prism": "^1.1.2",
+    "svelte-tabs": "^1.1.0",
     "tailwindcss": "^1.4.6"
   },
   "devDependencies": {
@@ -38,10 +39,7 @@
     "css-loader": "^3.6.0",
     "cssnano": "^4.1.10",
     "figma-api-stub": "0.0.41",
-    "figma-plugin-ds-svelte": "^1.0.4",
     "file-loader": "^6.0.0",
-    "html-webpack-inline-source-plugin": "0.0.10",
-    "html-webpack-plugin": "^4.3.0",
     "jest": "^26.0.1",
     "mini-css-extract-plugin": "^0.9.0",
     "postcss": "^7.0.32",
@@ -59,7 +57,6 @@
     "svelte": "^3.23.2",
     "svelte-loader": "^2.13.6",
     "svelte-preprocess": "^3.9.7",
-    "svg-inline-loader": "^0.8.2",
     "ts-loader": "^7.0.5",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5",

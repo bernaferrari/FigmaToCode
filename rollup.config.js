@@ -10,7 +10,6 @@ import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
 import tailwind from 'tailwindcss';
 import cssnano from 'cssnano';
-import purgecss from 'rollup-plugin-purgecss';
 
 /* Inline to single html */
 import htmlBundle from 'rollup-plugin-html-bundle';
