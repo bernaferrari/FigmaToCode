@@ -34,16 +34,16 @@ export const percentToAbsoluteLineHeight = (value: number) =>
     )
   ];
 
-export const pxToAbsoluteLineHeight = (value: number) =>
+export const pxToAbsoluteLineHeight = (value: number): string =>
   pixelToTailwindValue(value, mapAbsoluteLineHeight);
 
-export const pxToFontSize = (value: number) =>
+export const pxToFontSize = (value: number): string =>
   pixelToTailwindValue(value, mapFontSize);
 
-export const pxToBorderRadius = (value: number) =>
+export const pxToBorderRadius = (value: number): string =>
   pixelToTailwindValue(value, mapBorderRadius);
 
-export const pxToLayoutSize = (value: number) =>
+export const pxToLayoutSize = (value: number): string =>
   pixelToTailwindValue(value, mapWidthHeightSize);
 
 const mapLetterSpacing: Record<number, string> = {

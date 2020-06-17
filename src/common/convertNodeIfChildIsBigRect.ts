@@ -30,14 +30,23 @@ export const mergeNodeIfChildIsBigRect = (
     // ignore fill if it isn't visible
     if (rect.visible) {
       updatedNode.fills = rect.fills;
+      updatedNode.fillStyleId = rect.fillStyleId;
+
+      updatedNode.strokes = rect.strokes;
+      updatedNode.strokeStyleId = rect.strokeStyleId;
+
+      updatedNode.effects = rect.effects;
+      updatedNode.effectStyleId = rect.effectStyleId;
     }
 
-    updatedNode.fillStyleId = rect.fillStyleId;
+    updatedNode.strokeAlign = rect.strokeAlign;
+    updatedNode.strokeCap = rect.strokeCap;
+    updatedNode.strokeJoin = rect.strokeJoin;
+    updatedNode.strokeMiterLimit = rect.strokeMiterLimit;
+    updatedNode.strokeWeight = rect.strokeWeight;
+
     updatedNode.cornerRadius = rect.cornerRadius;
     updatedNode.cornerSmoothing = rect.cornerSmoothing;
-    updatedNode.effects = rect.effects;
-    updatedNode.effectStyleId = rect.effectStyleId;
-
     updatedNode.topLeftRadius = rect.topLeftRadius;
     updatedNode.topRightRadius = rect.topRightRadius;
     updatedNode.bottomLeftRadius = rect.bottomLeftRadius;

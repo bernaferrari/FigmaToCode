@@ -1,71 +1,14 @@
 import {
-  rgbTohex,
-  convertFontWeight,
-  flutterColor,
-  mostFrequentString,
-} from "./flutter_helpers";
-
-export const makeTextComponent = (node: TextNode): string => {
-  let alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
-  alignHorizontal =
-    alignHorizontal === "justify" ? "justified" : alignHorizontal;
-
-  // if layoutAlign !== MIN, Text will be wrapped by Align
-  // if alignHorizontal is LEFT, don't do anything because that is native
-  const textAlign =
-    node.layoutAlign === "MIN" && alignHorizontal !== "left"
-      ? `textAlign: TextAlign.${alignHorizontal},`
-      : ``;
-
-  const fontSize =
-    node.fontSize !== figma.mixed ? `fontSize: ${node.fontSize}` : ``;
-
-  const fontFamily =
-    node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}` : ``;
-
-  const fontWeight =
-    node.fontName !== figma.mixed
-      ? `fontWeight: FontWeight.w${convertFontWeight(node.fontName.style)}`
-      : ``;
-
-  const color = flutterColor(node.fills);
-
-  return `
-      Text(
-        "${node.characters}",
-        ${textAlign}
-        style: TextStyle(
-          ${fontSize},
-          //${fontFamily},
-          ${fontWeight},
-          ${color}
-        ),
-      ),`;
-};
-
-export const makeRowColumn = (
-  node: FrameNode | ComponentNode | InstanceNode,
-  children: string
-): string => {
-  // ROW or COLUMN
-  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "Row" : "Column";
-  const mostFrequent = mostFrequentString(
-    node.children.map((d) => d.layoutAlign)
-  );
-
-  const layoutAlign = mostFrequent === "MIN" ? "start" : "center";
-  const crossAxisColumn =
-    rowOrColumn === "Column"
-      ? `crossAxisAlignment: CrossAxisAlignment.${layoutAlign},`
-      : "";
-  const mainAxisSize = "mainAxisSize: MainAxisSize.min,";
-  return `${rowOrColumn}(${mainAxisSize}${crossAxisColumn}children:[${children}],),`;
-};
+  AltRectangleNode,
+  AltEllipseNode,
+  AltFrameNode,
+} from "../common/altMixins";
+import { rgbaTohex, flutterColor } from "./flutter_helpers";
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const makeContainer = (
-  node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode,
+  node: AltRectangleNode | AltEllipseNode | AltFrameNode,
   child: string
 ) => {
   // ignore the view when size is zero or less
@@ -89,15 +32,11 @@ export const makeContainer = (
 
   /// CONTAINER
   /// Put everything together
-  const propChild: string = child ? `child: ${child}` : ``;
+  const propChild: string = child ? `child: ${child}` : "";
 
   // [propPadding] will be "padding: const EdgeInsets.symmetric(...)" or ""
-  let propPadding: string = ``;
-  if (
-    node.type === "FRAME" ||
-    node.type === "COMPONENT" ||
-    node.type === "INSTANCE"
-  ) {
+  let propPadding: string = "";
+  if (node.type === "FRAME") {
     propPadding = getPaddingProp(node);
   }
 
@@ -113,7 +52,7 @@ export const makeContainer = (
 };
 
 const getContainerDecoration = (
-  node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode
+  node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ): string => {
   /// DECORATION
   /// This is the code that will generate the BoxDecoration for the Container
@@ -125,7 +64,7 @@ const getContainerDecoration = (
   const propStrokeColor = flutterColor(node.strokes);
 
   // only add strokeWidth when there is a strokeColor (returns "" otherwise)
-  const propStrokeWidth = propStrokeColor ? `width: ${node.strokeWeight},` : ``;
+  const propStrokeWidth = propStrokeColor ? `width: ${node.strokeWeight},` : "";
 
   // modify the circle's shape when type is ellipse
   const propShape = node.type === "ELLIPSE" ? "shape: BoxShape.circle," : "";
@@ -134,7 +73,7 @@ const getContainerDecoration = (
   const propBorder =
     propStrokeColor || propStrokeWidth
       ? `border: Border.all(${propStrokeColor}${propStrokeWidth}),`
-      : ``;
+      : "";
 
   let propBoxShadow = "";
   if (node.effects.length > 0) {
@@ -144,20 +83,27 @@ const getContainerDecoration = (
     let boxShadow = "";
     if (drop_shadow) {
       drop_shadow.forEach((d: ShadowEffect) => {
-        d.radius;
-        boxShadow += `BoxShadow(
-          color: ${rgbTohex(d.color)},
-          blurRadius: ${d.radius},
-          offset: Offset(${d.offset.x}, ${d.offset.y}),
-        ), `;
+        const color = `color: Color(0x${rgbaTohex(d.color)}, `;
+        const radius = `blurRadius: ${d.radius}, `;
+        const offset = `offset: Offset(${d.offset.x}, ${d.offset.y}), `;
+        boxShadow += `BoxShadow(${color}${radius}${offset}),),`;
       });
     }
     // TODO inner shadow, layer blur
-    propBoxShadow = `boxShadow: [ ${boxShadow} ]`;
+    propBoxShadow = `boxShadow: [ ${boxShadow} ],`;
   }
 
   // retrieve the borderRadius, when existent (returns "" for EllipseNode)
   const propBorderRadius = getCornerRadiusProp(node);
+
+  console.log(
+    "node.corner: ",
+    node.cornerRadius,
+    "propStroke ",
+    propStrokeColor,
+    "propShape ",
+    propShape
+  );
 
   // generate the decoration, or just the backgroundColor
   return node.cornerRadius !== 0 || propStrokeColor || propShape
@@ -166,9 +112,13 @@ const getContainerDecoration = (
 };
 
 const getCornerRadiusProp = (
-  node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode
+  node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ) => {
   if (node.type === "ELLIPSE") return "";
+
+  if (node.cornerRadius === 0 || node.cornerRadius === undefined) {
+    return "";
+  }
 
   return node.cornerRadius !== figma.mixed
     ? `borderRadius: BorderRadius.circular(${node.cornerRadius}), `
@@ -176,17 +126,13 @@ const getCornerRadiusProp = (
 };
 
 const getContainerSizeProp = (
-  node: RectangleNode | FrameNode | InstanceNode | ComponentNode | EllipseNode
+  node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ): string => {
   /// WIDTH AND HEIGHT
   /// Will the width and height be necessary?
 
   // when the child has the same size as the parent, don't set the size twice
-  if (
-    node.type === "FRAME" ||
-    node.type === "INSTANCE" ||
-    node.type === "COMPONENT"
-  ) {
+  if (node.type === "FRAME") {
     if (node.children.length === 1) {
       const child = node.children[0];
       if (child.width === node.width && child.height && node.height) {
@@ -206,19 +152,15 @@ const getContainerSizeProp = (
       nodeHeight += node.strokeWeight * 2;
       nodeWidth += node.strokeWeight * 2;
     } else if (node.strokeAlign === "CENTER") {
-      nodeHeight += node.strokeWeight;
-      nodeWidth += node.strokeWeight;
+      nodeHeight += node.strokeWeight * 0.5;
+      nodeWidth += node.strokeWeight * 0.5;
     }
   }
 
   const propHeight = `height: ${nodeHeight}, `;
   const propWidth = `width: ${nodeWidth}, `;
 
-  if (
-    node.type === "FRAME" ||
-    node.type === "INSTANCE" ||
-    node.type === "COMPONENT"
-  ) {
+  if (node.type === "FRAME") {
     // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
     if (node.counterAxisSizingMode === "FIXED") {
       // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.
@@ -237,24 +179,24 @@ const getContainerSizeProp = (
   return "";
 };
 
-const getPaddingProp = (node: DefaultFrameMixin): string => {
+const getPaddingProp = (node: AltFrameNode): string => {
   // Add padding if necessary!
   // This must happen before Stack or after the Positioned, but not before.
 
   // padding is only valid for auto layout.
   // [horizontalPadding] and [verticalPadding] can have values even when AutoLayout is off
-  if (node.layoutMode === "NONE") return ``;
+  if (node.layoutMode === "NONE") return "";
 
   if (node.horizontalPadding > 0 || node.verticalPadding > 0) {
     const propHorizontalPadding =
       node.horizontalPadding > 0
         ? `horizontal: ${node.horizontalPadding}, `
-        : ``;
+        : "";
 
     const propVerticalPadding =
-      node.verticalPadding > 0 ? `vertical: ${node.verticalPadding}, ` : ``;
+      node.verticalPadding > 0 ? `vertical: ${node.verticalPadding}, ` : "";
 
     return `padding: const EdgeInsets.symmetric(${propVerticalPadding}${propHorizontalPadding}),`;
   }
-  return ``;
+  return "";
 };

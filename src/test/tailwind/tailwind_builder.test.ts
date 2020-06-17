@@ -17,7 +17,11 @@ describe("Tailwind Builder", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = figma;
 
-  const builder = new tailwindAttributesBuilder("", true);
+  const builder = new tailwindAttributesBuilder(
+    true,
+    convertSingleNodeToAlt(node),
+    false
+  );
   // .containerPosition(node, parentId)
   // .layoutAlign(node, parentId)
   // .shadow(node)

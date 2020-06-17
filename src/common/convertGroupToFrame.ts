@@ -12,6 +12,11 @@ export const convertGroupToFrame = (node: AltGroupNode): AltFrameNode => {
   newNode.height = node.height;
   newNode.rotation = node.rotation;
 
+  newNode.fills = [];
+  newNode.strokes = [];
+  newNode.effects = [];
+  newNode.cornerRadius = 0;
+
   newNode.layoutMode = "NONE";
   newNode.counterAxisSizingMode = "AUTO";
 

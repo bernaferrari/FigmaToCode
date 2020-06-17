@@ -15,13 +15,17 @@ let parentId = "";
 
 let isJsx = false;
 
+let showLayerName = false;
+
 export const tailwindMain = (
   parentId_src: string,
   sceneNode: Array<AltSceneNode>,
-  jsx: boolean
+  jsx: boolean,
+  layerName: boolean
 ): string => {
   parentId = parentId_src;
   isJsx = jsx;
+  showLayerName = layerName;
 
   let result = tailwindWidgetGenerator(sceneNode);
 
@@ -31,15 +35,6 @@ export const tailwindMain = (
   }
 
   return result;
-
-  // if (sceneNode.length > 1) {
-  //   console.log("TODO!!");
-  //   return "support for multiple selections coming soon";
-  // } else {
-  //   console.log("ALTERNATIVEEEE ISSS ");
-  //   console.log(convertIntoAltNodes(sceneNode, undefined));
-  //   // return tailwindWidgetGenerator(sceneNode);
-  // }
 };
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
@@ -102,10 +97,9 @@ const tailwindGroup = (node: AltGroupNode): string => {
   const vectorIfExists = tailwindVector(node, isJsx);
   if (vectorIfExists) return vectorIfExists;
 
-  let attr = "GROUP relative ";
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
-    .visibility(node)
+  const builder = new tailwindAttributesBuilder(isJsx, node, showLayerName)
+    .blendAttr(node)
     .containerPosition(node, parentId)
     .widthHeight(node);
 
@@ -117,9 +111,8 @@ const tailwindGroup = (node: AltGroupNode): string => {
 
   if (builder.attributes) {
     // todo include autoAutoLayout here
-    return `\n<div ${builder.buildAttributes(attr)}>${tailwindWidgetGenerator(
-      node.children
-    )}</div>`;
+    const attr = builder.buildAttributes("relative ");
+    return `\n<div ${attr}>${tailwindWidgetGenerator(node.children)}</div>`;
   }
 
   return tailwindWidgetGenerator(node.children);
@@ -127,7 +120,8 @@ const tailwindGroup = (node: AltGroupNode): string => {
 
 const tailwindText = (node: AltTextNode): string => {
   // follow the website order, to make it easier
-  const builderResult = new tailwindTextNodeBuilder("", isJsx, node.visible)
+
+  const builderResult = new tailwindTextNodeBuilder(isJsx, node, showLayerName)
     .blendAttr(node)
     .containerPosition(node, parentId)
     .textAutoSize(node)
@@ -157,20 +151,19 @@ const tailwindFrame = (node: AltFrameNode): string => {
   const vectorIfExists = tailwindVector(node, isJsx);
   if (vectorIfExists) return vectorIfExists;
 
+  const childrenStr = tailwindWidgetGenerator(node.children);
+
   if (node.layoutMode !== "NONE") {
-    const children = tailwindWidgetGenerator(node.children);
     const rowColumn = rowColumnProps(node);
-    return tailwindContainer(node, children, rowColumn);
+    return tailwindContainer(node, childrenStr, rowColumn);
   } else if (node.layoutMode === "NONE" && node.children.length > 1) {
     // children will need to be absolute
-    const childrenStr = tailwindWidgetGenerator(node.children);
     return tailwindContainer(node, childrenStr, "FRAME2 relative ");
   } else {
     // node.layoutMode === "NONE" && node.children.length === 1
     // children doesn't need to be absolute, but might need to be positioned
     // TODO add a flex here?!
     // TODO 2 maybe just add margin right/left/top/bottom can solve?
-    const childrenStr = tailwindWidgetGenerator(node.children);
     return tailwindContainer(node, childrenStr, "FRAME3 ");
   }
 };
@@ -190,7 +183,7 @@ export const tailwindContainer = (
     return children;
   }
 
-  const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
+  const builder = new tailwindAttributesBuilder(isJsx, node, showLayerName)
     .blendAttr(node)
     .autoLayoutPadding(node)
     .containerPosition(node, parentId)

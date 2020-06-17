@@ -12,7 +12,7 @@ export const extractTailwindText = (
 
   selectedText.forEach((node) => {
     if (node.type === "TEXT") {
-      const attr = new tailwindTextNodeBuilder("", false, node.visible)
+      const attr = new tailwindTextNodeBuilder(false, node, false)
         .blendAttr(node)
         .containerPosition(node, node.parent?.id ?? "")
         .textAutoSize(node)
@@ -35,7 +35,7 @@ export const extractTailwindText = (
       textStr.push({
         name: node.name,
         attr: attr.attributes,
-        full: `<p ${attr}>${charsWithLineBreak}</p>`,
+        full: `<p ${attr.attributes}>${charsWithLineBreak}</p>`,
         color: convertColor(node.fills) ?? "",
       });
     }

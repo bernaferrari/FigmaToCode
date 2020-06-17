@@ -1,5 +1,12 @@
-export const wrapOpacity = (node: BlendMixin, child: string): string => {
-  if (node.opacity !== 1) {
+import {
+  AltLayoutMixin,
+  AltSceneNode,
+  AltBlendMixin,
+  AltTextNode,
+} from "../common/altMixins";
+
+export const wrapOpacity = (node: AltBlendMixin, child: string): string => {
+  if (node.opacity !== undefined && node.opacity !== 1) {
     return `Opacity(
       opacity: ${node.opacity},
       child: ${child}
@@ -8,8 +15,8 @@ export const wrapOpacity = (node: BlendMixin, child: string): string => {
   return child;
 };
 
-export const wrapVisibility = (node: SceneNode, child: string): string => {
-  if (!node.visible) {
+export const wrapVisibility = (node: AltSceneNode, child: string): string => {
+  if (node.visible !== undefined && node.visible === false) {
     return `Visibility(
       visible: ${node.visible},
       child: ${child}
@@ -20,8 +27,8 @@ export const wrapVisibility = (node: SceneNode, child: string): string => {
 
 // that's how you convert angles to clockwise radians: angle * -pi/180
 // using 3.14159 as Pi for enough precision and to avoid importing math lib.
-export const wrapRotation = (node: LayoutMixin, child: string): string => {
-  if (node.rotation > 0) {
+export const wrapRotation = (node: AltLayoutMixin, child: string): string => {
+  if (node.rotation !== undefined && node.rotation > 0) {
     return `Transform.rotate(angle: ${
       node.rotation * (-3.14159 / 180)
     }, child: ${child})`;
@@ -30,30 +37,26 @@ export const wrapRotation = (node: LayoutMixin, child: string): string => {
 };
 
 export const wrapContainerPosition = (
-  node: SceneNode,
+  node: AltSceneNode,
   child: string,
   parentId: string
 ): string => {
-  const parent = node.parent;
-
   // avoid adding Positioned() when parent is not a Stack(), which can happen at the beggining
-  if (parent === null || parentId === parent.id) {
+  if (!node.parent || parentId === node.parent.id) {
     return child;
   }
 
   // check if view is in a stack. Group and Frames must have more than 1 element
   if (
-    (parent.type === "GROUP" && parent.children.length > 1) ||
-    ((parent.type === "FRAME" ||
-      parent.type === "INSTANCE" ||
-      parent.type === "COMPONENT") &&
-      parent.layoutMode === "NONE" &&
-      parent.children.length > 1)
+    (node.parent.type === "GROUP" && node.parent.children.length > 1) ||
+    (node.parent.type === "FRAME" &&
+      node.parent.layoutMode === "NONE" &&
+      node.parent.children.length > 1)
   ) {
     // [--x--][-width-][--x--]
     // that's how the formula below works, to see if view is centered
-    const centerX = 2 * node.x + node.width === parent.width;
-    const centerY = 2 * node.y + node.height === parent.height;
+    const centerX = 2 * node.x + node.width === node.parent.width;
+    const centerY = 2 * node.y + node.height === node.parent.height;
 
     const positionedAlign = (align: string) =>
       `Positioned.fill(child: Align(alingment: Alingment.${align}, child: ${child}),),`;
@@ -64,7 +67,7 @@ export const wrapContainerPosition = (
       if (node.y === 0) {
         // y = top, x = center
         return positionedAlign(`topCenter`);
-      } else if (node.y === parent.height) {
+      } else if (node.y === node.parent.height) {
         // y = bottom, x = center
         return positionedAlign(`bottomCenter`);
       }
@@ -75,7 +78,7 @@ export const wrapContainerPosition = (
       if (node.x === 0) {
         // y = center, x = left
         return positionedAlign(`centerLeft`);
-      } else if (node.x === parent.width) {
+      } else if (node.x === node.parent.width) {
         // y = center, x = right
         return positionedAlign(`centerRight`);
       }
@@ -90,31 +93,26 @@ export const wrapContainerPosition = (
   return child;
 };
 
-export const wrapTextAutoResize = (node: TextNode, child: string): string => {
+export const wrapTextAutoResize = (
+  node: AltTextNode,
+  child: string
+): string => {
   if (node.textAutoResize === "NONE") {
     // = instead of += because we want to replace it
-    return `
-        SizedBox(
-          width: ${node.width},
-          height: ${node.height},
-          child: ${child}
-        ),
-        `;
+    return `SizedBox(width: ${node.width}, height: ${node.height}, child: ${child}),`;
   } else if (node.textAutoResize === "HEIGHT") {
     // if HEIGHT is set, it means HEIGHT will be calculated automatically, but width won't
     // = instead of += because we want to replace it
-    return `
-        SizedBox(
-          width: ${node.width},
-          child: ${child}
-        ),
-        `;
+    return `SizedBox(width: ${node.width}, child: ${child}),`;
   }
 
   return child;
 };
 
-export const wrapTextInsideAlign = (node: TextNode, child: string): string => {
+export const wrapTextInsideAlign = (
+  node: AltTextNode,
+  child: string
+): string => {
   let alignment;
   if (node.layoutAlign === "CENTER") {
     if (node.textAlignHorizontal === "LEFT") alignment = "centerLeft";
@@ -138,11 +136,7 @@ export const wrapTextInsideAlign = (node: TextNode, child: string): string => {
     node.layoutAlign !== "MIN" ||
     (node.textAlignVertical === "BOTTOM" && node.textAutoResize === "NONE")
   ) {
-    return `
-      Align(
-        alignment: Alignment.${alignment},
-        child: ${child}
-      ),`;
+    return `Align(alignment: Alignment.${alignment}, child: ${child}),`;
   }
   return child;
 };

@@ -1,3 +1,4 @@
+import { extractFlutterColors } from "./flutter/extract_colors";
 import { tailwindMain } from "./tailwind/tailwind_main";
 import { flutterMain } from "./flutter/flutter_main";
 import { extractTailwindColors } from "./tailwind/extract_colors";
@@ -6,13 +7,19 @@ import { convertIntoAltNodes } from "./common/altConversion";
 
 let parentId: string = "";
 let isJsx = false;
+let layerName = false;
+
+let mode:
+  | "flutter"
+  | "swiftui"
+  | "html"
+  | "tailwind"
+  | "bootstrap"
+  | "material";
 
 figma.showUI(__html__, { width: 450, height: 550 });
 
-const run = (
-  mode: "flutter" | "swiftui" | "html" | "tailwind" | "bootstrap" | "material",
-  isJSX: boolean = false
-) => {
+const run = () => {
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
@@ -33,11 +40,12 @@ const run = (
     undefined
   );
 
+  console.log("mode is ", mode);
   // @ts-ignore
   if (mode === "flutter") {
-    result = flutterMain(parentId, figma.currentPage.selection);
+    result = flutterMain(parentId, convertedSelection);
   } else if (mode === "tailwind") {
-    result = tailwindMain(parentId, convertedSelection, isJSX);
+    result = tailwindMain(parentId, convertedSelection, isJsx, layerName);
   }
 
   console.log(result);
@@ -47,35 +55,57 @@ const run = (
     data: result,
   });
 
-  figma.ui.postMessage({
-    type: "colors",
-    data: extractTailwindColors(convertedSelection),
-  });
+  if (mode === "tailwind") {
+    figma.ui.postMessage({
+      type: "colors",
+      data: extractTailwindColors(convertedSelection),
+    });
+  } else if (mode === "flutter") {
+    figma.ui.postMessage({
+      type: "colors",
+      data: extractFlutterColors(convertedSelection),
+    });
+  }
 
-  figma.ui.postMessage({
-    type: "text",
-    data: extractTailwindText(convertedSelection),
-  });
+  if (mode === "tailwind") {
+    figma.ui.postMessage({
+      type: "text",
+      data: extractTailwindText(convertedSelection),
+    });
+  }
 };
 
 figma.on("selectionchange", () => {
-  run("tailwind", isJsx);
+  run();
 });
 
 figma.ui.onmessage = (msg) => {
-  if (msg.type === "jsx-true") {
+  console.log("msg is ", msg);
+  if (msg.type === "tailwind") {
+    mode = "tailwind";
+    run();
+  } else if (msg.type === "flutter") {
+    mode = "flutter";
+    run();
+  } else if (msg.type === "jsx-true") {
     if (!isJsx) {
       isJsx = true;
-      console.log("running.. ");
-      run("tailwind", isJsx);
+      run();
     }
   } else if (msg.type === "jsx-false") {
     if (isJsx) {
       isJsx = false;
-      run("tailwind", isJsx);
+      run();
+    }
+  } else if (msg.type === "layerName-true") {
+    if (!layerName) {
+      layerName = true;
+      run();
+    }
+  } else if (msg.type === "layerName-false") {
+    if (layerName) {
+      layerName = false;
+      run();
     }
   }
 };
-
-// first run
-run("tailwind", isJsx);

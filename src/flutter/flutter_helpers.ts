@@ -2,7 +2,7 @@
 export const flutterColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ) => {
-  if (fills !== figma.mixed && fills.length > 0) {
+  if (fills && fills !== figma.mixed && fills.length > 0) {
     let fill = fills[0];
     if (fill.type === "SOLID") {
       let opacity = fill.opacity ?? 1.0;
@@ -10,11 +10,11 @@ export const flutterColor = (
       // if fill isn't visible, it shouldn't be painted.
       return fill.visible
         ? `color: Color(0x${rgbaTohex(fill.color, opacity)}),`
-        : ``;
+        : "";
     }
   }
 
-  return ``;
+  return "";
 };
 
 // Convert RGB (r,g,b: [0, 1]) + alpha [0, 1] to 8 digit hex
@@ -61,7 +61,7 @@ export const convertFontWeight = (weight: string) => {
 };
 
 // https://stackoverflow.com/a/20762713
-export const mostFrequentString = (arr: Array<string>) => {
+export const mostFrequent = (arr: Array<any>) => {
   return arr
     .sort(
       (a, b) =>

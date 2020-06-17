@@ -1,8 +1,6 @@
 <script>
-  import { fade, fly } from "svelte/transition";
-
-  import ItemColor from "./ItemColor.svelte";
-  import ItemText from "./ItemText.svelte";
+  import ItemColor from "./TailwindItemColor.svelte";
+  import ItemText from "./TailwindItemText.svelte";
 
   import Prism from "svelte-prism";
   import "prism-theme-night-owl";
@@ -17,7 +15,7 @@
   $: codeObservable = codeData;
   $: emptyObservable = emptySelection;
 
-  if (true) {
+  if (false) {
     // DEBUG
     colorData = [
       { name: "orange-400", hex: "#f2994a" },
@@ -74,19 +72,33 @@
     parent.postMessage({ pluginMessage: { type: "jsx-false" } }, "*");
   }
 
+  let layerName = false;
+  $: if (layerName) {
+    parent.postMessage({ pluginMessage: { type: "layerName-true" } }, "*");
+  }
+  $: if (!layerName) {
+    parent.postMessage({ pluginMessage: { type: "layerName-false" } }, "*");
+  }
+
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
   const clipboard = data => dispatch("clipboard", { text: data });
+
+  // INIT
+  import { onMount } from "svelte";
+  onMount(() => {
+    parent.postMessage({ pluginMessage: { type: "tailwind" } }, "*");
+  });
 </script>
 
-<div class="p-2">
+<div class="px-2">
 
   {#if emptySelection}
     <div
       class="flex flex-col space-y-2 m-auto items-center justify-center p-4
       border-2 rounded-lg">
       <p class="text-lg font-bold">Nothing is selected</p>
-      <p class="text-xs">Try selecting any layer</p>
+      <p class="text-xs">Try selecting a layer, any layer</p>
     </div>
   {:else}
     <div class="border-2 rounded-lg w-full pt-2">
@@ -108,7 +120,9 @@
       <Prism language="html" source={codeObservable} />
 
       <div
-        class="flex justify-end space-x-2 content-center items-center mb-2 mx-2">
+        class="flex justify-end space-x-8 content-center items-center mb-2 mx-2">
+
+        <Switch bind:checked={layerName} id="layerName" text="LayerName" />
 
         <Switch bind:checked={jsx} id="jsx" text="JSX" />
 

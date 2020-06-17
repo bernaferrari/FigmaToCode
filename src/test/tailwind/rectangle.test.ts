@@ -18,7 +18,7 @@ describe("Tailwind Rectangle", () => {
 
   const executeMain = () => {
     const converted = convertSingleNodeToAlt(node);
-    return tailwindMain(parentId, [converted], true);
+    return tailwindMain(parentId, [converted], true, false);
   };
 
   it("small size", () => {

@@ -1,15 +1,22 @@
 import {
+  AltSceneNode,
+  AltBlendMixin,
+  AltLayoutMixin,
+  AltRectangleNode,
+  AltEllipseNode,
+  AltFrameNode,
+} from "./../common/altMixins";
+
+import {
   wrapOpacity,
   wrapContainerPosition,
-  wrapTextInsideAlign,
-  wrapTextAutoResize,
   wrapRotation,
   wrapVisibility,
 } from "./flutter_wrappers";
-import { makeTextComponent, makeContainer } from "./flutter_widget";
+import { makeContainer } from "./make_container";
 
 export class FlutterChildBuilder {
-  public child: string = "";
+  child: string = "";
 
   /**
    * A fresh builder instance should contain a blank product object, which is
@@ -19,55 +26,42 @@ export class FlutterChildBuilder {
     this.child = optChild ?? "";
   }
 
-  public reset(): void {
+  reset(): void {
     this.child = "";
   }
 
-  public createText(node: TextNode): this {
-    this.child = makeTextComponent(node);
-    return this;
-  }
-
-  public createContainer(
-    node:
-      | RectangleNode
-      | FrameNode
-      | InstanceNode
-      | ComponentNode
-      | EllipseNode,
-    child: string
+  createContainer(
+    node: AltRectangleNode | AltEllipseNode | AltFrameNode
   ): this {
-    this.child = makeContainer(node, child);
+    this.child = makeContainer(node, this.child);
     return this;
   }
 
-  public opacity(node: BlendMixin): this {
+  blendAttr(node: AltSceneNode): this {
+    this.visibility(node);
+    this.rotation(node);
+    this.opacity(node);
+
+    return this;
+  }
+
+  opacity(node: AltBlendMixin): this {
     this.child = wrapOpacity(node, this.child);
     return this;
   }
 
-  public visibility(node: SceneNode): this {
+  visibility(node: AltSceneNode): this {
     this.child = wrapVisibility(node, this.child);
     return this;
   }
 
-  public rotation(node: LayoutMixin): this {
+  rotation(node: AltLayoutMixin): this {
     this.child = wrapRotation(node, this.child);
     return this;
   }
 
-  public containerPosition(node: SceneNode, parentId: string): this {
+  containerPosition(node: AltSceneNode, parentId: string): this {
     this.child = wrapContainerPosition(node, this.child, parentId);
-    return this;
-  }
-
-  public textInAlign(node: TextNode): this {
-    this.child = wrapTextInsideAlign(node, this.child);
-    return this;
-  }
-
-  public textAutoSize(node: TextNode): this {
-    this.child = wrapTextAutoResize(node, this.child);
     return this;
   }
 }

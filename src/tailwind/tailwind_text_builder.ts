@@ -10,12 +10,8 @@ import {
 import { tailwindAttributesBuilder } from "./tailwind_builder";
 
 export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
-  constructor(
-    optAttribute: string = "",
-    optIsJSX: boolean,
-    visible: boolean = true
-  ) {
-    super(optAttribute, optIsJSX, visible);
+  constructor(optIsJSX: boolean, node: AltTextNode, showLayerName: boolean) {
+    super(optIsJSX, node, showLayerName);
   }
 
   textAutoSize(node: AltTextNode): this {
@@ -89,7 +85,8 @@ export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
   fontSize(node: AltTextNode): this {
     // example: text-md
     if (node.fontSize !== figma.mixed) {
-      this.attributes += `text-${pxToFontSize(node.fontSize)} `;
+      const value = pxToFontSize(node.fontSize);
+      this.attributes += `text-${value} `;
     }
 
     return this;
@@ -113,10 +110,12 @@ export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
         return this;
       }
 
-      this.attributes += `font-${node.fontName.style
+      const value = node.fontName.style
         .replace("italic", "")
         .replace(" ", "")
-        .toLowerCase()} `;
+        .toLowerCase();
+
+      this.attributes += `font-${value} `;
     }
     return this;
   };
@@ -131,17 +130,15 @@ export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
         node.letterSpacing.unit === "PIXELS" &&
         node.letterSpacing.value !== 0
       ) {
-        this.attributes += `tracking-${pxToMapLetterSpacing(
-          node.letterSpacing.value
-        )} `;
+        const value = pxToMapLetterSpacing(node.letterSpacing.value);
+        this.attributes += `tracking-${value} `;
       } else if (
         node.letterSpacing.unit === "PERCENT" &&
         node.letterSpacing.value !== 0
       ) {
         // divide by 10 so it works as expected visually.
-        this.attributes += `tracking-${pxToMapLetterSpacing(
-          node.letterSpacing.value / 10
-        )} `;
+        const value = pxToMapLetterSpacing(node.letterSpacing.value / 10);
+        this.attributes += `tracking-${value} `;
       }
     }
     return this;
@@ -154,13 +151,12 @@ export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
   lineHeight(node: AltTextNode): this {
     if (node.lineHeight !== figma.mixed) {
       if (node.lineHeight.unit === "PIXELS") {
-        this.attributes += `leading-${pxToAbsoluteLineHeight(
-          node.lineHeight.value
-        )} `;
+        // rollup has issues when ` ${method(\n...\n)} `, so this value declaration is necessary
+        const value = pxToAbsoluteLineHeight(node.lineHeight.value);
+        this.attributes += `leading-${value} `;
       } else if (node.lineHeight.unit === "PERCENT") {
-        this.attributes += `leading-${percentToAbsoluteLineHeight(
-          node.lineHeight.value
-        )} `;
+        const value = percentToAbsoluteLineHeight(node.lineHeight.value);
+        this.attributes += `leading-${value} `;
       }
       // else if (node.lineHeight.unit === "AUTO") {
       // default, ignore

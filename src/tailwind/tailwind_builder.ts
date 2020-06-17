@@ -17,21 +17,21 @@ import { retrieveContainerPosition } from "./position";
 
 export class tailwindAttributesBuilder {
   attributes: string = "";
-  style: string = "";
+  style: string;
   styleSeparator: string = "";
-  isJSX: boolean = false;
-  visible: boolean = true;
+  isJSX: boolean;
+  visible: boolean;
+  name: string = "";
 
-  constructor(
-    optAttribute: string = "",
-    optIsJSX: boolean,
-    visible: boolean = true
-  ) {
-    this.attributes = optAttribute;
+  constructor(optIsJSX: boolean, node: AltSceneNode, showLayerName: boolean) {
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = this.isJSX ? " style={{" : ' style="';
-    this.visible = visible;
+    this.visible = node.visible;
+
+    if (showLayerName) {
+      this.name = node.name.replace(" ", "") + " ";
+    }
   }
 
   /**
@@ -254,16 +254,20 @@ export class tailwindAttributesBuilder {
   }
 
   buildAttributes(additionalAttr: string = ""): string {
-    this.attributes = additionalAttr + this.attributes;
+    this.attributes = this.name + additionalAttr + this.attributes;
     this.removeTrailingSpace();
+
     if (this.style.length < 12) {
       this.style = "";
     } else {
-      this.style += this.isJSX ? `}}` : ';"';
+      if (this.isJSX) {
+        this.style = `${this.style}}}`;
+      } else {
+        this.style = `${this.style};"`;
+      }
     }
-
     const classOrClassName = this.isJSX ? "className" : "class";
-    return `${classOrClassName}=\"${this.attributes}\"${this.style}`;
+    return `${classOrClassName}="${this.attributes}"`;
   }
   /**
    * https://tailwindcss.com/docs/padding/

@@ -211,12 +211,4 @@ export const getTailwindColor = (color: string): string => {
   return tailwindColors[tailwindNearestColor(color)];
 };
 
-// https://stackoverflow.com/a/20762713
-export const mostFrequentString = (arr: Array<any>) => {
-  return arr
-    .sort(
-      (a, b) =>
-        arr.filter((v) => v === a).length - arr.filter((v) => v === b).length
-    )
-    .pop();
-};
+
