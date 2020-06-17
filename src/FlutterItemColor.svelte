@@ -15,6 +15,17 @@
     textColor = "white";
   }
 
+  // avoid undeterministic scenarios, where toFixed can't be called in undefined
+  let fixedBlack = "";
+  if (contrastBlack) {
+    fixedBlack = contrastBlack.toFixed(2);
+  }
+
+  let fixedWhite = "";
+  if (contrastWhite) {
+    fixedWhite = contrastWhite.toFixed(2);
+  }
+
   function calculateLetter(ratio) {
     if (ratio < 3) {
       return "FAIL";
@@ -42,12 +53,12 @@
     <div class="flex space-x-2 items-center py-1">
       <div class="flex items-center justify-center p-1 bg-white rounded-lg">
         <p class="text-xs" style="color:{hex}">
-          {calculateLetter(contrastWhite)} {contrastWhite.toFixed(2)}
+          {calculateLetter(contrastWhite)} {fixedWhite}
         </p>
       </div>
       <div class="flex items-center justify-center p-1 bg-black rounded-lg">
         <p class="text-xs" style="color:{hex}">
-          {calculateLetter(contrastBlack)} {contrastBlack.toFixed(2)}
+          {calculateLetter(contrastBlack)} {fixedBlack}
         </p>
       </div>
     </div>

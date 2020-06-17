@@ -65,12 +65,12 @@
 
   import Switch from "./Switch.svelte";
 
-  let jsx = false;
-  $: if (jsx) {
-    parent.postMessage({ pluginMessage: { type: "jsx-true" } }, "*");
+  let material = false;
+  $: if (material) {
+    parent.postMessage({ pluginMessage: { type: "material-true" } }, "*");
   }
-  $: if (!jsx) {
-    parent.postMessage({ pluginMessage: { type: "jsx-false" } }, "*");
+  $: if (!material) {
+    parent.postMessage({ pluginMessage: { type: "material-false" } }, "*");
   }
 
   import { createEventDispatcher } from "svelte";
@@ -111,6 +111,13 @@
       </div>
 
       <Prism language="dart" source={codeObservable} />
+
+      <div
+        class="flex justify-end space-x-8 content-center items-center mb-2 mx-2">
+
+        <Switch bind:checked={material} id="material" text="Material" />
+
+      </div>
     </div>
     <div class="h-2" />
 

@@ -11,12 +11,15 @@ import { mostFrequent } from "./flutter_helpers";
 import { FlutterTextBuilder } from "./flutter_text_methods";
 
 let parentId = "";
+let material = true;
 
 export const flutterMain = (
   parentId_src: string,
-  sceneNode: Array<AltSceneNode>
+  sceneNode: Array<AltSceneNode>,
+  isMaterial: boolean
 ): string => {
   parentId = parentId_src;
+  material = isMaterial;
 
   let result = flutterWidgetGenerator(sceneNode);
 
@@ -87,7 +90,7 @@ const flutterContainer = (
   const builder = new FlutterChildBuilder(child);
 
   builder
-    .createContainer(node)
+    .createContainer(node, material)
     .blendAttr(node)
     .containerPosition(node, parentId);
 

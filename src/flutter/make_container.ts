@@ -96,15 +96,6 @@ const getContainerDecoration = (
   // retrieve the borderRadius, when existent (returns "" for EllipseNode)
   const propBorderRadius = getCornerRadiusProp(node);
 
-  console.log(
-    "node.corner: ",
-    node.cornerRadius,
-    "propStroke ",
-    propStrokeColor,
-    "propShape ",
-    propShape
-  );
-
   // generate the decoration, or just the backgroundColor
   return node.cornerRadius !== 0 || propStrokeColor || propShape
     ? `decoration: BoxDecoration(${propBorderRadius}${propShape}${propBorder}${propBoxShadow}${propBackgroundColor}),`
@@ -125,7 +116,7 @@ const getCornerRadiusProp = (
     : `borderRadius: BorderRadius.only(topLeft: ${node.topLeftRadius}, topRight: ${node.topRightRadius}, bottomLeft: ${node.bottomLeftRadius}, bottomRight: ${node.bottomRightRadius}), `;
 };
 
-const getContainerSizeProp = (
+export const getContainerSizeProp = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ): string => {
   /// WIDTH AND HEIGHT
@@ -146,7 +137,7 @@ const getContainerSizeProp = (
 
   // Flutter doesn't support OUTSIDE or CENTER, only INSIDE.
   // Therefore, to give the same feeling, the height and width will be slighly increased.
-  // node.strokes.lenght is necessary because [strokeWeight] can exist even without strokes.
+  // node.strokes.length is necessary because [strokeWeight] can exist even without strokes.
   if (node.strokes.length) {
     if (node.strokeAlign === "OUTSIDE") {
       nodeHeight += node.strokeWeight * 2;
@@ -163,8 +154,8 @@ const getContainerSizeProp = (
   if (node.type === "FRAME") {
     // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
     if (node.counterAxisSizingMode === "FIXED") {
-      // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.
       if (node.layoutMode === "HORIZONTAL") {
+        // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.
         return propHeight;
       } else if (node.layoutMode === "VERTICAL") {
         // when AutoLayout is VERTICAL, height is set by Figma and width is auto.

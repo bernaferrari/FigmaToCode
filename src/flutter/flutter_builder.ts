@@ -14,6 +14,7 @@ import {
   wrapVisibility,
 } from "./flutter_wrappers";
 import { makeContainer } from "./make_container";
+import { makeMaterial } from "./make_material";
 
 export class FlutterChildBuilder {
   child: string = "";
@@ -31,9 +32,19 @@ export class FlutterChildBuilder {
   }
 
   createContainer(
-    node: AltRectangleNode | AltEllipseNode | AltFrameNode
+    node: AltRectangleNode | AltEllipseNode | AltFrameNode,
+    material: boolean
   ): this {
-    this.child = makeContainer(node, this.child);
+    if (
+      material &&
+      node.fills !== figma.mixed &&
+      node.fills.length > 0 &&
+      node.fills[0].visible === true
+    ) {
+      this.child = makeMaterial(node, this.child);
+    } else {
+      this.child = makeContainer(node, this.child);
+    }
     return this;
   }
 

@@ -8,6 +8,7 @@ import { convertIntoAltNodes } from "./common/altConversion";
 let parentId: string = "";
 let isJsx = false;
 let layerName = false;
+let material = true;
 
 let mode:
   | "flutter"
@@ -43,7 +44,7 @@ const run = () => {
   console.log("mode is ", mode);
   // @ts-ignore
   if (mode === "flutter") {
-    result = flutterMain(parentId, convertedSelection);
+    result = flutterMain(parentId, convertedSelection, material);
   } else if (mode === "tailwind") {
     result = tailwindMain(parentId, convertedSelection, isJsx, layerName);
   }
@@ -105,6 +106,16 @@ figma.ui.onmessage = (msg) => {
   } else if (msg.type === "layerName-false") {
     if (layerName) {
       layerName = false;
+      run();
+    }
+  } else if (msg.type === "material-true") {
+    if (!material) {
+      material = true;
+      run();
+    }
+  } else if (msg.type === "material-false") {
+    if (material) {
+      material = false;
       run();
     }
   }
