@@ -75,9 +75,9 @@
 
   <p class="text-center text-base">
     I have tried to think what would make sense for
-    <span class="font-bold">80% of people</span>
-    . Still, bugs can and will happen; ideas will appear. Your mission, should
-    you choose to accept, is to share them with me.
+    <span class="font-bold">80% of people.</span>
+    Still, bugs can and will happen; ideas will appear. Your mission, should you
+    choose to accept, is to share them with me.
   </p>
 
 </div>
