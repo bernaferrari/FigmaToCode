@@ -25,7 +25,7 @@ export const convertSingleNodeToAlt = (
 
 export const frameNodeToAlt = (
   node: FrameNode | InstanceNode | ComponentNode,
-  altParent: AltFrameNode | AltGroupNode | undefined
+  altParent: AltFrameNode | AltGroupNode | undefined = undefined
 ) => {
   if (node.children.length === 0) {
     // if it has no children, convert frame to rectangle

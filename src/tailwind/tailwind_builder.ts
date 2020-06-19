@@ -97,11 +97,8 @@ export class tailwindAttributesBuilder {
 
   containerPosition(node: AltSceneNode, parentId: string): this {
     const position = retrieveContainerPosition(node, parentId);
-    if (
-      position === "absoluteManualLayout" &&
-      node.parent &&
-      "width" in node.parent
-    ) {
+
+    if (position === "absoluteManualLayout" && node.parent) {
       // tailwind can't deal with absolute layouts.
 
       const parentX = "layoutMode" in node.parent ? 0 : node.parent.x;
@@ -129,7 +126,8 @@ export class tailwindAttributesBuilder {
     paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
     kind: string
   ): this {
-    if (this.visible) {
+    // visible is true or undefinied (tests)
+    if (this.visible !== false) {
       this.attributes += tailwindColor(paint, kind);
     }
     return this;
@@ -267,7 +265,7 @@ export class tailwindAttributesBuilder {
       }
     }
     const classOrClassName = this.isJSX ? "className" : "class";
-    return `${classOrClassName}="${this.attributes}"`;
+    return `${classOrClassName}="${this.attributes}"${this.style}`;
   }
   /**
    * https://tailwindcss.com/docs/padding/
@@ -279,18 +277,21 @@ export class tailwindAttributesBuilder {
     // todo get padding also for not-auto-layout
     // [horizontalPadding] and [verticalPadding] can have values even when AutoLayout is off
     if ("layoutMode" in node && node.layoutMode !== "NONE") {
-      if (
-        node.horizontalPadding > 0 &&
-        node.horizontalPadding === node.verticalPadding
-      ) {
-        this.attributes += `p-${pxToLayoutSize(node.horizontalPadding)} `;
+      // calculate before. This is less effective than calculating in the if/elses,
+      // however, node.horizontalPadding might be different than node.verticalPadding
+      // and still have the same pxToLayoutSize result. Therefore, this guarantees an optimal layout.
+      const horizontal = pxToLayoutSize(node.horizontalPadding);
+      const vertical = pxToLayoutSize(node.verticalPadding);
+
+      if (node.horizontalPadding > 0 && horizontal === vertical) {
+        this.attributes += `p-${horizontal} `;
       } else {
         if (node.horizontalPadding > 0) {
-          this.attributes += `px-${pxToLayoutSize(node.horizontalPadding)} `;
+          this.attributes += `px-${horizontal} `;
         }
 
         if (node.verticalPadding > 0) {
-          this.attributes += `py-${pxToLayoutSize(node.verticalPadding)} `;
+          this.attributes += `py-${vertical} `;
         }
       }
     }

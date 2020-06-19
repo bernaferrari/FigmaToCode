@@ -73,7 +73,7 @@ export const rgbTo8hex = (
 
 // Convert generic named weights to numbers, which is the way tailwind understands
 export const convertFontWeight = (weight: string) => {
-  // todo italic
+  weight = weight.toLowerCase();
   switch (weight) {
     case "Thin":
       return "100";
@@ -210,5 +210,3 @@ export const tailwindNearestColor = nearestColorFrom(
 export const getTailwindColor = (color: string): string => {
   return tailwindColors[tailwindNearestColor(color)];
 };
-
-

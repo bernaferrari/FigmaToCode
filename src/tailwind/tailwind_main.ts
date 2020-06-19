@@ -57,6 +57,7 @@ const tailwindWidgetGenerator = (
     } else if (node.type === "TEXT") {
       comp += tailwindText(node);
     }
+    // todo support Line
     // else if (node.type === "LINE") {
     // comp += tailwindLine(node);
     // }
@@ -158,13 +159,12 @@ const tailwindFrame = (node: AltFrameNode): string => {
     return tailwindContainer(node, childrenStr, rowColumn);
   } else if (node.layoutMode === "NONE" && node.children.length > 1) {
     // children will need to be absolute
-    return tailwindContainer(node, childrenStr, "FRAME2 relative ");
+    return tailwindContainer(node, childrenStr, "relative ");
   } else {
     // node.layoutMode === "NONE" && node.children.length === 1
     // children doesn't need to be absolute, but might need to be positioned
-    // TODO add a flex here?!
-    // TODO 2 maybe just add margin right/left/top/bottom can solve?
-    return tailwindContainer(node, childrenStr, "FRAME3 ");
+    // TODO maybe just add margin right/left/top/bottom can solve?
+    return tailwindContainer(node, childrenStr, "");
   }
 };
 

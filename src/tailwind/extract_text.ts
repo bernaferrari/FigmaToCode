@@ -1,6 +1,7 @@
-import { AltSceneNode } from "./../common/altMixins";
+import { AltSceneNode, AltTextNode } from "./../common/altMixins";
 import { tailwindTextNodeBuilder } from "./tailwind_text_builder";
-import { rgbTo6hex, tailwindNearestColor } from "./colors";
+import { rgbTo6hex, tailwindNearestColor, convertFontWeight } from "./colors";
+import { pxToFontSize } from "./conversion_tables";
 
 export const extractTailwindText = (
   sceneNode: Array<AltSceneNode>
@@ -36,19 +37,65 @@ export const extractTailwindText = (
         name: node.name,
         attr: attr.attributes,
         full: `<p ${attr.attributes}>${charsWithLineBreak}</p>`,
-        color: convertColor(node.fills) ?? "",
+        style: style(node),
       });
     }
   });
 
-  return textStr;
+  // retrieve only unique texts (attr + name)
+  // from https://stackoverflow.com/a/18923480/4418073
+  let unique: Record<string, boolean> = {};
+  let distinct: Array<namedText> = [];
+  textStr.forEach(function (x) {
+    if (!unique[x.attr + x.name]) {
+      distinct.push(x);
+      unique[x.attr + x.name] = true;
+    }
+  });
+
+  return distinct;
 };
 
 type namedText = {
   name: string;
   attr: string;
   full: string;
-  color: string;
+  style: string;
+};
+
+const style = (node: AltTextNode): string => {
+  let comp = "";
+
+  if (node.fontName !== figma.mixed) {
+    const lowercaseStyle = node.fontName.style.toLowerCase();
+
+    if (lowercaseStyle.match("italic")) {
+      comp += "font-style: italic; ";
+    }
+
+    if (lowercaseStyle.match("regular")) {
+      // ignore the font-style when regular (default)
+      return "";
+    }
+
+    const value = node.fontName.style
+      .replace("italic", "")
+      .replace(" ", "")
+      .toLowerCase();
+
+    comp += `font-weight: ${convertFontWeight(value)}; `;
+  }
+
+  if (node.fontSize !== figma.mixed) {
+    comp += `font-size: ${Math.min(node.fontSize, 24)}; `;
+  }
+
+  const color = convertColor(node.fills);
+  if (color) {
+    comp += `color: ${color}; `;
+  }
+
+  return comp;
 };
 
 function deepFlatten(arr: Array<AltSceneNode>): Array<AltSceneNode> {

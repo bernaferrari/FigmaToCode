@@ -41,7 +41,6 @@ const run = () => {
     undefined
   );
 
-  console.log("mode is ", mode);
   // @ts-ignore
   if (mode === "flutter") {
     result = flutterMain(parentId, convertedSelection, material);
@@ -80,8 +79,9 @@ figma.on("selectionchange", () => {
   run();
 });
 
+// efficient? No. Works? Yes.
+// todo pass data instead of relying in types
 figma.ui.onmessage = (msg) => {
-  console.log("msg is ", msg);
   if (msg.type === "tailwind") {
     mode = "tailwind";
     run();

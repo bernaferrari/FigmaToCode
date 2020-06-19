@@ -9,20 +9,19 @@
   const clipboard = () => dispatch("clipboard");
 
   let textColor;
-  if (contrastBlack > contrastWhite) {
-    textColor = "black";
-  } else {
-    textColor = "white";
-  }
 
   // avoid undeterministic scenarios, where toFixed can't be called in undefined
   let fixedBlack = "";
-  if (contrastBlack) {
-    fixedBlack = contrastBlack.toFixed(2);
-  }
-
   let fixedWhite = "";
-  if (contrastWhite) {
+
+  $: if (contrastBlack || contrastWhite) {
+    if (contrastBlack > contrastWhite) {
+      textColor = "black";
+    } else {
+      textColor = "white";
+    }
+
+    fixedBlack = contrastBlack.toFixed(2);
     fixedWhite = contrastWhite.toFixed(2);
   }
 

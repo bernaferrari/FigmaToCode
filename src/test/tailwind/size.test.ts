@@ -1,145 +1,147 @@
-// import { frameNodeToAlt } from "../../common/altConversion";
-// import { createFigma } from "figma-api-stub";
-// import { tailwindMain } from "../../tailwind/tailwind_main";
-// import { getContainerSizeProp } from "../../tailwind/size";
-// import { convertSingleNodeToAlt } from "../../common/altConversion";
+import { frameNodeToAlt } from "../../common/altConversion";
+import { createFigma } from "figma-api-stub";
+import { tailwindMain } from "../../tailwind/tailwind_main";
+import { getContainerSizeProp } from "../../tailwind/size";
+import { convertSingleNodeToAlt } from "../../common/altConversion";
 
-// describe("Tailwind Size", () => {
-//   const figma = createFigma({
-//     simulateErrors: true,
-//     isWithoutTimeout: false,
-//   });
+describe("Tailwind Size", () => {
+  const figma = createFigma({
+    simulateErrors: true,
+    isWithoutTimeout: false,
+  });
 
-//   // @ts-ignore for some reason, need to override this for figma.mixed to work
-//   global.figma = figma;
+  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  global.figma = figma;
 
-//   it("rect", () => {
-//     const node = figma.createRectangle();
-//     node.resize(16, 16);
-//     const updatedNode = convertSingleNodeToAlt(node);
-//     expect(getContainerSizeProp(updatedNode)).toEqual("w-4 h-4 ");
-//   });
+  it("rect", () => {
+    const node = figma.createRectangle();
+    node.resize(16, 16);
+    const updatedNode = convertSingleNodeToAlt(node);
+    expect(getContainerSizeProp(updatedNode)).toEqual("w-4 h-4 ");
+  });
 
-//   it("frame", () => {
-//     const node = figma.createFrame();
-//     node.resize(16, 16);
-//     expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("w-4 h-4 ");
-//   });
+  it("frame", () => {
+    const node = figma.createFrame();
+    node.resize(16, 16);
+    expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("w-4 h-4 ");
+  });
 
-//   it("frame inside frame", () => {
-//     const node = figma.createFrame();
-//     node.resize(16, 16);
+  it("frame inside frame", () => {
+    const node = figma.createFrame();
+    node.resize(16, 16);
 
-//     const subnode = figma.createFrame();
-//     subnode.resize(16, 16);
+    const subnode = figma.createFrame();
+    subnode.resize(16, 16);
 
-//     node.appendChild(subnode);
+    node.appendChild(subnode);
 
-//     expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
-//     expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual("w-4 h-4 ");
-//   });
+    expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
+    expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual("w-4 h-4 ");
+  });
 
-//   it("frame inside frame (1/2)", () => {
-//     const node = figma.createFrame();
-//     node.resize(8, 8);
+  it("frame inside frame (1/2)", () => {
+    const node = figma.createFrame();
+    node.resize(8, 8);
 
-//     const subnode = figma.createFrame();
-//     subnode.resize(8, 8);
+    const subnode = figma.createFrame();
+    subnode.resize(8, 8);
 
-//     node.appendChild(subnode);
+    node.appendChild(subnode);
 
-//     expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
-//     expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
-//   });
+    expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
+    expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
+  });
 
-//   it("small frame inside large frame", () => {
-//     const node = figma.createFrame();
-//     node.resize(500, 500);
+  it("small frame inside large frame", () => {
+    const node = figma.createFrame();
+    node.resize(500, 500);
 
-//     const subnode = figma.createFrame();
-//     subnode.resize(8, 8);
+    const subnode = figma.createFrame();
+    subnode.resize(8, 8);
 
-//     node.appendChild(subnode);
+    node.appendChild(subnode);
 
-//     expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
-//     expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
-//   });
+    expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("w-full ");
+    expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
+  });
 
-//   describe("when layoutAlign is STRETCH", () => {
-//     it("autolayout is horizontal, width should be full", () => {
-//       const node = figma.createFrame();
-//       node.resize(500, 500);
-//       node.layoutMode = "HORIZONTAL";
+  describe("when layoutAlign is STRETCH", () => {
+    it("autolayout is horizontal, width should be full", () => {
+      const node = figma.createFrame();
+      node.resize(500, 500);
+      node.layoutMode = "HORIZONTAL";
 
-//       const subnode = figma.createRectangle();
-//       subnode.resize(25, 25);
-//       subnode.layoutAlign = "STRETCH";
-//       // todo is this correct? Maybe it should be w-full
-//       node.appendChild(subnode);
+      const subnode = figma.createRectangle();
+      subnode.resize(25, 25);
+      subnode.layoutAlign = "STRETCH";
+      // todo is this correct? Maybe it should be w-full
+      node.appendChild(subnode);
 
-//       expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
-//       expect(getContainerSizeProp(convertSingleNodeToAlt(subnode))).toEqual(
-//         "w-6 h-6 "
-//       );
-//     });
+      expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("w-full ");
+      expect(getContainerSizeProp(convertSingleNodeToAlt(subnode))).toEqual(
+        "w-6 h-6 "
+      );
+    });
 
-//     it("autolayout is vertical, height should be ???", () => {
-//       const node = figma.createFrame();
-//       node.resize(500, 500);
-//       node.layoutMode = "VERTICAL";
+    it("autolayout is vertical, height should be ???", () => {
+      const node = figma.createFrame();
+      node.resize(500, 500);
+      node.layoutMode = "VERTICAL";
 
-//       const subnode = figma.createRectangle();
-//       subnode.resize(25, 25);
-//       subnode.layoutAlign = "STRETCH";
-//       // todo is this correct? Maybe it should be w-full
-//       node.appendChild(subnode);
+      const subnode = figma.createRectangle();
+      subnode.resize(25, 25);
+      subnode.layoutAlign = "STRETCH";
+      // todo is this correct? Maybe it should be w-full
+      node.appendChild(subnode);
 
-//       expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
-//       expect(getContainerSizeProp(convertSingleNodeToAlt(subnode))).toEqual(
-//         "w-6 h-6 "
-//       );
-//     });
-//   });
+      expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("w-full ");
+      expect(getContainerSizeProp(convertSingleNodeToAlt(subnode))).toEqual(
+        "w-6 h-6 "
+      );
+    });
+  });
 
-//   describe("parent is frame, node is frame, both the same layoutMode", () => {
-//     it("when parent is horizontal and node is horizontal, child defines the size", () => {
-//       const node = figma.createFrame();
-//       node.resize(500, 500);
-//       node.layoutMode = "HORIZONTAL";
+  describe("parent is frame, node is frame, both the same layoutMode", () => {
+    it("when parent is horizontal and node is horizontal, child defines the size", () => {
+      const node = figma.createFrame();
+      node.resize(500, 500);
+      node.layoutMode = "HORIZONTAL";
 
-//       const subnode = figma.createFrame();
-//       subnode.resize(500, 250);
-//       subnode.layoutMode = "HORIZONTAL";
+      const subnode = figma.createFrame();
+      subnode.resize(500, 250);
+      subnode.layoutMode = "HORIZONTAL";
 
-//       const child = figma.createFrame();
-//       child.resize(16, 16);
-//       subnode.appendChild(child);
-//       node.appendChild(subnode);
+      const child = figma.createFrame();
+      child.resize(16, 16);
+      subnode.appendChild(child);
+      node.appendChild(subnode);
 
-//       expect(getContainerSizeProp(node)).toEqual("");
-//       expect(getContainerSizeProp(subnode)).toEqual("");
-//       expect(getContainerSizeProp(child)).toEqual("w-4 h-4 ");
-//     });
+      expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
+      expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual(
+        "w-full h-64 "
+      );
+      expect(getContainerSizeProp(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
+    });
 
-//     it("when parent is vertical and node is vertical, child defines the size", () => {
-//       const node = figma.createFrame();
-//       node.resize(500, 500);
-//       node.layoutMode = "VERTICAL";
+    it("when parent is vertical and node is vertical, child defines the size", () => {
+      const node = figma.createFrame();
+      node.resize(500, 500);
+      node.layoutMode = "VERTICAL";
 
-//       const subnode = figma.createFrame();
-//       subnode.resize(500, 250);
-//       subnode.layoutMode = "VERTICAL";
+      const subnode = figma.createFrame();
+      subnode.resize(500, 250);
+      subnode.layoutMode = "VERTICAL";
 
-//       const child = figma.createFrame();
-//       child.resize(16, 16);
-//       subnode.appendChild(child);
-//       node.appendChild(subnode);
+      const child = figma.createFrame();
+      child.resize(16, 16);
+      subnode.appendChild(child);
+      node.appendChild(subnode);
 
-//       expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
-//       expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual("");
-//       expect(getContainerSizeProp(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
-//     });
-//   });
+      expect(getContainerSizeProp(frameNodeToAlt(node))).toEqual("");
+      expect(getContainerSizeProp(frameNodeToAlt(subnode))).toEqual("w-full ");
+      expect(getContainerSizeProp(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
+    });
+  });
 
 //   describe("frame is too large for Tailwind to handle", () => {
 //     it("frame with no children becomes a rectangle (too large width)", () => {
@@ -291,7 +293,7 @@
 
 //     node.appendChild(blueSmallRect);
 
-//     expect(tailwindMain(node.id, [node])).toEqual(
+//     expect(tailwindMain(node.id, [frameNodeToAlt(node)], false, false)).toEqual(
 //       `\n<div className="inline-flex flex-col space-y-4 items-center w-48 h-48 bg-black">
 // <div className="w-3/4 h-40 bg-gray-800"></div>
 // <div className="w-1/2 h-12 bg-red-700"></div>
@@ -402,4 +404,4 @@
 // <div className="self-start w-12 h-5 bg-indigo-700"></div></div>`
 //     );
 //   });
-// });
+});

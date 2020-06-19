@@ -79,20 +79,20 @@ export const getContainerSizeProp = (node: AltSceneNode): string => {
 
   if (rW) {
     // if (rW === "full" && node.parent?.height === nodeHeight) {
-      // ignore this responsiviness when container is exactly the same width and height
+    // ignore this responsiviness when container is exactly the same width and height
     // } else {
-      // avoid relative width when parent is relative (therefore, child is probably absolute)
-      if (!node.parent?.relativePos) {
-        propWidth = `w-${rW} `;
-      }
+    // avoid relative width when parent is relative (therefore, child is probably absolute)
+    if (!node.parent?.relativePos) {
+      propWidth = `w-${rW} `;
+    }
 
-      // if (
-      //   node.type === "FRAME" ||
-      //   node.type === "GROUP" ||
-      //   node.type === "TEXT"
-      // ) {
-      //   propWidth = `w-${rW} `;
-      // }
+    // if (
+    //   node.type === "FRAME" ||
+    //   node.type === "GROUP" ||
+    //   node.type === "TEXT"
+    // ) {
+    //   propWidth = `w-${rW} `;
+    // }
     // }
   }
 
@@ -242,8 +242,8 @@ const getNodeSizeWithStrokes = (node: AltSceneNode): Array<number> => {
       nodeHeight += node.strokeWeight * 2;
       nodeWidth += node.strokeWeight * 2;
     } else if (node.strokeAlign === "CENTER") {
-      nodeHeight += node.strokeWeight * 1.5;
-      nodeWidth += node.strokeWeight * 1.5;
+      nodeHeight += node.strokeWeight * 0.5;
+      nodeWidth += node.strokeWeight * 0.5;
     }
   }
 
@@ -262,11 +262,11 @@ const getNodeSizeWithStrokes = (node: AltSceneNode): Array<number> => {
               nodeHeight += d.strokeWeight * 2;
             }
           } else if (d.strokeAlign === "CENTER") {
-            if (nodeWidth < d.width + d.strokeWeight * 1.5) {
-              nodeWidth += d.strokeWeight * 2;
+            if (nodeWidth < d.width + d.strokeWeight * 0.5) {
+              nodeWidth += d.strokeWeight * 0.5;
             }
-            if (nodeHeight < d.height + d.strokeWeight * 1.5) {
-              nodeHeight += d.strokeWeight * 1.5;
+            if (nodeHeight < d.height + d.strokeWeight * 0.5) {
+              nodeHeight += d.strokeWeight * 0.5;
             }
           }
         }
@@ -299,10 +299,8 @@ type responsive =
   | "1/5"
   | "1/6"
   | "5/6"
-  | "1/12"
-  | "5/12"
-  | "7/12"
-  | "11/12";
+  | "1/12";
+// removed 5/12, 7/12 and 11/12 because they were disrupting more than helping.
 
 const calculateResponsiveW = (
   node: AltSceneNode,
@@ -352,9 +350,6 @@ const calculateResponsiveW = (
     } else if (calculateResp(1 / 6, "1/6")) {
     } else if (calculateResp(5 / 6, "5/6")) {
     } else if (calculateResp(1 / 12, "1/12")) {
-    } else if (calculateResp(5 / 12, "5/12")) {
-    } else if (calculateResp(7 / 12, "7/12")) {
-    } else if (calculateResp(11 / 12, "11/12")) {
     }
   }
 

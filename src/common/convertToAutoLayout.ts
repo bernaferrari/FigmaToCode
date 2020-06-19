@@ -226,6 +226,7 @@ const detectChildrenAlign = (
     const parentCenteredPosX = parentNode.width / 2;
 
     const marginX = nodeCenteredPosX - parentCenteredPosX;
+    console.log("marginX is", marginX);
 
     // allow a small threshold
     if (marginX < -4) {

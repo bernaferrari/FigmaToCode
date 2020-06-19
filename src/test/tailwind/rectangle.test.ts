@@ -37,6 +37,7 @@ describe("Tailwind Rectangle", () => {
   });
 
   it("color orange", () => {
+    node.visible = true;
     node.fills = [
       {
         type: "SOLID",

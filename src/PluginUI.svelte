@@ -22,6 +22,7 @@
 
   import ScreenTailwind from "./ScreenTailwind.svelte";
   import ScreenFlutter from "./ScreenFlutter.svelte";
+  import ScreenAbout from "./ScreenAbout.svelte";
 </script>
 
 <style lang="postcss">
@@ -35,6 +36,7 @@
   <TabList>
     <Tab>Tailwind</Tab>
     <Tab>Flutter</Tab>
+    <Tab>About</Tab>
   </TabList>
 
   <TabPanel>
@@ -43,6 +45,10 @@
 
   <TabPanel>
     <ScreenFlutter on:clipboard={updateClipboard} />
+  </TabPanel>
+
+  <TabPanel>
+    <ScreenAbout />
   </TabPanel>
 
 </Tabs>
