@@ -85,10 +85,18 @@
   <p class="text-center font-bold text-xl text-white">Figma to Code</p>
   <div class="h-2" />
   <p class="text-center font-semibold text-md text-white">
-    Designed and developed by Bernardo Ferrari
+    Designed and developed by Bernardo Ferrari.
   </p>
-  <div class="h-4" />
-  <div class="flex content-center justify-center space-x-4">
+  <p class="text-center text-sm text-white">
+    <span class="font-bold">@bernaferrari</span>
+    on Twitter/Reddit/GitHub.
+  </p>
+
+  <p class="text-center text-xs mt-2 text-white">
+    This project is open source and has no tracking.
+  </p>
+  <div class="h-2" />
+  <!-- <div class="flex content-center justify-center space-x-4">
     <a href="https://twitter.com/@bernaferrari">
       <button
         class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
@@ -204,12 +212,12 @@
         </svg>
       </button>
     </a>
-  </div>
-  <div class="flex justify-center mt-1">
-    <a
+  </div> -->
+  <!-- <div class="flex justify-center mt-2 text-white"> -->
+  <!-- <a
       class="text-center text-white text-xs py-2 px-4"
       href="https://github.com/bernaferrari">
       This project is open source and has no tracking.
-    </a>
-  </div>
+    </a> -->
+  <!-- </div> -->
 </div>

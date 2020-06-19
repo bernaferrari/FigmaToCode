@@ -33,11 +33,26 @@ export const extractTailwindText = (
           ? node.characters.split("\n").join("<br></br>")
           : node.characters;
 
+      const black = {
+        r: 0,
+        g: 0,
+        b: 0,
+      };
+
+      let contrastBlack = 21;
+      if (node.fills && node.fills !== figma.mixed && node.fills.length > 0) {
+        let fill = node.fills[0];
+        if (fill.type === "SOLID") {
+          contrastBlack = calculateContrastRatio(fill.color, black);
+        }
+      }
+
       textStr.push({
         name: node.name,
         attr: attr.attributes,
         full: `<p ${attr.attributes}>${charsWithLineBreak}</p>`,
         style: style(node),
+        contrastBlack: contrastBlack,
       });
     }
   });
@@ -61,6 +76,7 @@ type namedText = {
   attr: string;
   full: string;
   style: string;
+  contrastBlack: number;
 };
 
 const style = (node: AltTextNode): string => {
@@ -71,11 +87,6 @@ const style = (node: AltTextNode): string => {
 
     if (lowercaseStyle.match("italic")) {
       comp += "font-style: italic; ";
-    }
-
-    if (lowercaseStyle.match("regular")) {
-      // ignore the font-style when regular (default)
-      return "";
     }
 
     const value = node.fontName.style
@@ -119,6 +130,7 @@ const convertColor = (
 ): string | undefined => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
+
   if (fills && fills !== figma.mixed && fills.length > 0) {
     let fill = fills[0];
     if (fill.type === "SOLID") {
@@ -128,3 +140,24 @@ const convertColor = (
 
   return undefined;
 };
+
+// from https://dev.to/alvaromontoro/building-your-own-color-contrast-checker-4j7o
+function calculateContrastRatio(color1: RGB, color2: RGB) {
+  const color1luminance = luminance(color1);
+  const color2luminance = luminance(color2);
+
+  const contrast =
+    color1luminance > color2luminance
+      ? (color2luminance + 0.05) / (color1luminance + 0.05)
+      : (color1luminance + 0.05) / (color2luminance + 0.05);
+
+  return 1 / contrast;
+}
+
+function luminance(color: RGB) {
+  var a = [color.r * 255, color.g * 255, color.b * 255].map(function (v) {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+}

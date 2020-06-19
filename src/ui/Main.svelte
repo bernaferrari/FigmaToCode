@@ -53,8 +53,8 @@
 
 </Tabs>
 
-<div class="p-2">
-  {#if visible}
+{#if visible}
+  <div class="p-2">
     <div class="fixed bottom-0 left-0 w-full px-2 mb-2">
       <div
         class="h-8 w-full flex items-center justify-center bg-green-600
@@ -64,5 +64,5 @@
         <p class="text-white">Copied!</p>
       </div>
     </div>
-  {/if}
-</div>
+  </div>
+{/if}
