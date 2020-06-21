@@ -87,17 +87,9 @@
   <p class="text-center font-semibold text-md text-white">
     Designed and developed by Bernardo Ferrari.
   </p>
-  <p class="text-center text-sm text-white">
-    <span class="font-bold">@bernaferrari</span>
-    on Twitter/Reddit/GitHub.
-  </p>
-
-  <p class="text-center text-xs mt-2 text-white">
-    This project is open source and has no tracking.
-  </p>
-  <div class="h-2" />
-  <!-- <div class="flex content-center justify-center space-x-4">
-    <a href="https://twitter.com/@bernaferrari">
+  <div class="h-4" />
+  <div class="flex content-center justify-center space-x-4">
+    <a href="https://twitter.com/@bernaferrari" target="_blank">
       <button
         class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
         border-gray-400 rounded-lg shadow">
@@ -126,7 +118,7 @@
         </svg>
       </button>
     </a>
-    <a href="https://reddit.com/u/bernaferrari">
+    <a href="https://reddit.com/u/bernaferrari" target="_blank">
       <button
         class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
         border-gray-400 rounded-lg shadow">
@@ -161,7 +153,7 @@
 
       </button>
     </a>
-    <a href="mailto:bernaferrari2@gmail.com">
+    <a href="mailto:bernaferrari2@gmail.com" target="_blank">
       <button
         class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
         border-gray-400 rounded-lg shadow">
@@ -183,7 +175,7 @@
         </svg>
       </button>
     </a>
-    <a href="https://github.com/bernaferrari">
+    <a href="https://github.com/bernaferrari" target="_blank">
       <button
         class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
         border-gray-400 rounded-lg shadow">
@@ -212,12 +204,13 @@
         </svg>
       </button>
     </a>
-  </div> -->
-  <!-- <div class="flex justify-center mt-2 text-white"> -->
-  <!-- <a
+  </div>
+  <div class="flex justify-center mt-2 text-white">
+    <a
       class="text-center text-white text-xs py-2 px-4"
-      href="https://github.com/bernaferrari">
+      href="https://github.com/bernaferrari/FigmaToCode"
+      target="_blank">
       This project is open source and has no tracking.
-    </a> -->
-  <!-- </div> -->
+    </a>
+  </div>
 </div>
