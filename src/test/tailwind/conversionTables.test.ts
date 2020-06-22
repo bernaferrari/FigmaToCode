@@ -5,7 +5,8 @@ import {
   pxToFontSize,
   pxToBorderRadius,
   pxToLayoutSize,
-} from "./../../tailwind/conversion_tables";
+  percentToAbsoluteLineHeight,
+} from "../../tailwind/conversionTables";
 
 describe("Tailwind Conversion Table", () => {
   it("test nearestValue", () => {
@@ -33,5 +34,10 @@ describe("Tailwind Conversion Table", () => {
 
     expect(pxToLayoutSize(4)).toEqual("1");
     expect(pxToLayoutSize(256)).toEqual("64");
+
+    // todo check if they correspond to reality
+    expect(percentToAbsoluteLineHeight(108)).toEqual("none");
+    expect(percentToAbsoluteLineHeight(150)).toEqual("normal");
+    expect(percentToAbsoluteLineHeight(200)).toEqual("loose");
   });
 });

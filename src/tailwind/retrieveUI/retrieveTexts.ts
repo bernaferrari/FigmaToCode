@@ -1,9 +1,8 @@
-import { AltSceneNode, AltTextNode } from "./../common/altMixins";
-import { tailwindTextNodeBuilder } from "./tailwind_text_builder";
-import { rgbTo6hex, tailwindNearestColor, convertFontWeight } from "./colors";
-import { pxToFontSize } from "./conversion_tables";
+import { AltSceneNode, AltTextNode } from "../../common/altMixins";
+import { rgbTo6hex, tailwindNearestColor, convertFontWeight } from "../colors";
+import { tailwindTextNodeBuilder } from "../builderText";
 
-export const extractTailwindText = (
+export const retrieveTailwindText = (
   sceneNode: Array<AltSceneNode>
 ): Array<namedText> => {
   // convert to AltNode and then flatten it. Conversion is necessary because of [tailwindText]
@@ -14,8 +13,8 @@ export const extractTailwindText = (
   selectedText.forEach((node) => {
     if (node.type === "TEXT") {
       const attr = new tailwindTextNodeBuilder(false, node, false)
-        .blendAttr(node)
-        .containerPosition(node, node.parent?.id ?? "")
+        .blend(node)
+        .position(node, node.parent?.id ?? "")
         .textAutoSize(node)
         .fontSize(node)
         .fontStyle(node)

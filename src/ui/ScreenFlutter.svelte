@@ -37,10 +37,16 @@
 
   let material = false;
   $: if (material) {
-    parent.postMessage({ pluginMessage: { type: "material-true" } }, "*");
+    parent.postMessage(
+      { pluginMessage: { type: "material", data: true } },
+      "*"
+    );
   }
   $: if (!material) {
-    parent.postMessage({ pluginMessage: { type: "material-false" } }, "*");
+    parent.postMessage(
+      { pluginMessage: { type: "material", data: false } },
+      "*"
+    );
   }
 
   import { createEventDispatcher } from "svelte";

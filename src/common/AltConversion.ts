@@ -13,7 +13,7 @@ import {
   AltDefaultShapeMixin,
   AltEllipseNode,
 } from "./altMixins";
-import { mergeNodeIfChildIsBigRect } from "./convertNodeIfChildIsBigRect";
+import { convertNodeIfChildIsBigRect } from "./convertNodeIfChildIsBigRect";
 import { convertToAutoLayout } from "./convertToAutoLayout";
 
 export const convertSingleNodeToAlt = (
@@ -46,7 +46,7 @@ export const frameNodeToAlt = (
 
   altNode.setChildren(convertIntoAltNodes(node.children, altNode));
 
-  return convertToAutoLayout(mergeNodeIfChildIsBigRect(altNode));
+  return convertToAutoLayout(convertNodeIfChildIsBigRect(altNode));
 };
 
 // auto convert Frame to Rectangle when Frame has no Children
@@ -112,7 +112,7 @@ export const convertIntoAltNodes = (
 
         // try to find big rect and regardless of that result, also try to convert to autolayout.
         // There is a big chance this will be returned as a FRAME
-        return convertToAutoLayout(mergeNodeIfChildIsBigRect(altNode));
+        return convertToAutoLayout(convertNodeIfChildIsBigRect(altNode));
       } else if (node.type === "TEXT") {
         const altNode = new AltTextNode();
 

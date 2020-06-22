@@ -1,15 +1,15 @@
-import { AltTextNode } from "./../common/altMixins";
-import { magicMargin } from "./size";
+import { AltTextNode } from "../common/altMixins";
+import { magicMargin } from "./builderImpl/tailwindSize";
 import {
   pxToMapLetterSpacing,
   pxToAbsoluteLineHeight,
   pxToLayoutSize,
   pxToFontSize,
   percentToAbsoluteLineHeight,
-} from "./conversion_tables";
-import { tailwindAttributesBuilder } from "./tailwind_builder";
+} from "./conversionTables";
+import { tailwindDefaultBuilder } from "./builderDefault";
 
-export class tailwindTextNodeBuilder extends tailwindAttributesBuilder {
+export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
   constructor(optIsJSX: boolean, node: AltTextNode, showLayerName: boolean) {
     super(optIsJSX, node, showLayerName);
   }

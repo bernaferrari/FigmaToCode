@@ -7,7 +7,7 @@ import {
 import { convertGroupToFrame } from "./convertGroupToFrame";
 
 // Return the updated node
-export const mergeNodeIfChildIsBigRect = (
+export const convertNodeIfChildIsBigRect = (
   node: AltFrameNode | AltGroupNode
 ): AltFrameNode | AltGroupNode => {
   const rect = identifyRectAsBackground(node.children);
@@ -28,7 +28,8 @@ export const mergeNodeIfChildIsBigRect = (
     updatedNode.children = node.children.filter((d) => d !== rect);
 
     // ignore fill if it isn't visible
-    if (rect.visible) {
+    // visible can be undefinied in tests
+    if (rect.visible !== false) {
       updatedNode.fills = rect.fills;
       updatedNode.fillStyleId = rect.fillStyleId;
 

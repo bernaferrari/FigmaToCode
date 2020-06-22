@@ -1,8 +1,8 @@
-import { extractFlutterColors } from "./flutter/extract_colors";
-import { tailwindMain } from "./tailwind/tailwind_main";
+import { tailwindMain } from "./tailwind/tailwindMain";
 import { flutterMain } from "./flutter/flutter_main";
-import { extractTailwindColors } from "./tailwind/extract_colors";
-import { extractTailwindText } from "./tailwind/extract_text";
+import { retrieveFlutterColors } from "./flutter/retrieveUI/retrieveColors";
+import { retrieveTailwindColors } from "./tailwind/retrieveUI/retrieveColors";
+import { retrieveTailwindText } from "./tailwind/retrieveUI/retrieveTexts";
 import { convertIntoAltNodes } from "./common/altConversion";
 
 let parentId: string = "";
@@ -58,19 +58,19 @@ const run = () => {
   if (mode === "tailwind") {
     figma.ui.postMessage({
       type: "colors",
-      data: extractTailwindColors(convertedSelection),
+      data: retrieveTailwindColors(convertedSelection),
     });
   } else if (mode === "flutter") {
     figma.ui.postMessage({
       type: "colors",
-      data: extractFlutterColors(convertedSelection),
+      data: retrieveFlutterColors(convertedSelection),
     });
   }
 
   if (mode === "tailwind") {
     figma.ui.postMessage({
       type: "text",
-      data: extractTailwindText(convertedSelection),
+      data: retrieveTailwindText(convertedSelection),
     });
   }
 };
@@ -108,13 +108,12 @@ figma.ui.onmessage = (msg) => {
       layerName = false;
       run();
     }
-  } else if (msg.type === "material-true") {
-    if (!material) {
+  } else if (msg.type === "material") {
+    console.log("data is ", msg.data);
+    if (msg.data === true && !material) {
       material = true;
       run();
-    }
-  } else if (msg.type === "material-false") {
-    if (material) {
+    } else if (msg.data === false && material) {
       material = false;
       run();
     }

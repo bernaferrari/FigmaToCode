@@ -5,11 +5,11 @@ import {
   AltEllipseNode,
   AltTextNode,
   AltGroupNode,
-} from "./../common/altMixins";
-import { tailwindAttributesBuilder } from "./tailwind_builder";
-import { pxToLayoutSize } from "./conversion_tables";
+} from "../common/altMixins";
+import { pxToLayoutSize } from "./conversionTables";
 import { tailwindVector } from "./vector";
-import { tailwindTextNodeBuilder } from "./tailwind_text_builder";
+import { tailwindTextNodeBuilder } from "./builderText";
+import { tailwindDefaultBuilder } from "./builderDefault";
 
 let parentId = "";
 
@@ -99,9 +99,9 @@ const tailwindGroup = (node: AltGroupNode): string => {
   if (vectorIfExists) return vectorIfExists;
 
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new tailwindAttributesBuilder(isJsx, node, showLayerName)
-    .blendAttr(node)
-    .containerPosition(node, parentId)
+  const builder = new tailwindDefaultBuilder(isJsx, node, showLayerName)
+    .blend(node)
+    .position(node, parentId)
     .widthHeight(node);
 
   // if [attributes] is "relative" and builder contains "absolute", ignore the "relative"
@@ -112,7 +112,7 @@ const tailwindGroup = (node: AltGroupNode): string => {
 
   if (builder.attributes) {
     // todo include autoAutoLayout here
-    const attr = builder.buildAttributes("relative ");
+    const attr = builder.build("relative ");
     return `\n<div ${attr}>${tailwindWidgetGenerator(node.children)}</div>`;
   }
 
@@ -123,8 +123,8 @@ const tailwindText = (node: AltTextNode): string => {
   // follow the website order, to make it easier
 
   const builderResult = new tailwindTextNodeBuilder(isJsx, node, showLayerName)
-    .blendAttr(node)
-    .containerPosition(node, parentId)
+    .blend(node)
+    .position(node, parentId)
     .textAutoSize(node)
     // todo fontFamily (via node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}`)
     // todo font smoothing
@@ -137,7 +137,7 @@ const tailwindText = (node: AltTextNode): string => {
     .textAlign(node)
     .customColor(node.fills, "text")
     .textTransform(node)
-    .buildAttributes();
+    .build();
 
   const splittedChars = node.characters.split("\n");
   const charsWithLineBreak =
@@ -161,6 +161,7 @@ const tailwindFrame = (node: AltFrameNode): string => {
     // children will need to be absolute
     return tailwindContainer(node, childrenStr, "relative ");
   } else {
+    // todo is this still used? I think Auto AutoLayout has deprecated it.
     // node.layoutMode === "NONE" && node.children.length === 1
     // children doesn't need to be absolute, but might need to be positioned
     // TODO maybe just add margin right/left/top/bottom can solve?
@@ -183,22 +184,18 @@ export const tailwindContainer = (
     return children;
   }
 
-  const builder = new tailwindAttributesBuilder(isJsx, node, showLayerName)
-    .blendAttr(node)
+  const builder = new tailwindDefaultBuilder(isJsx, node, showLayerName)
+    .blend(node)
     .autoLayoutPadding(node)
-    .containerPosition(node, parentId)
+    .position(node, parentId)
     .widthHeight(node)
     .customColor(node.fills, "bg")
     // TODO image and gradient support (tailwind does not support gradients)
     .shadow(node)
-    .customColor(node.strokes, "border")
-    .borderWidth(node)
-    .borderRadius(node);
+    .border(node);
 
   if (builder.attributes || additionalAttr) {
-    return `\n<div ${builder.buildAttributes(
-      additionalAttr
-    )}>${children}</div>`;
+    return `\n<div ${builder.build(additionalAttr)}>${children}</div>`;
   }
   return children;
 };

@@ -1,0 +1,4 @@
+  Invalid testPattern /Users/bernardoferrari/Documents/figma_to_code/src/test/tailwind/builderImpl/tailwindSize.test.ts|size|+|stroke|sizecd /Users/bernardoferrari/Documents/figma_to_code
+node /Users/bernardoferrari/Documents/figma_to_code/node_modules/.bin/jest /Users/bernardoferrari/Documents/figma_to_code/src/test/tailwind/builderImpl/tailwindSize.test.ts -t Tailwind|Builder|adjust|parent|if|childrens size \+ stroke > parent size supplied. Running all tests instead.
+  Invalid testPattern /Users/bernardoferrari/Documents/figma_to_code/src/test/tailwind/builderImpl/tailwindSize.test.ts|size|+|stroke|sizecd /Users/bernardoferrari/Documents/figma_to_code
+node /Users/bernardoferrari/Documents/figma_to_code/node_modules/.bin/jest /Users/bernardoferrari/Documents/figma_to_code/src/test/tailwind/builderImpl/tailwindSize.test.ts -t Tailwind|Builder|adjust|parent|if|childrens size \+ stroke > parent size supplied. Running all tests instead.

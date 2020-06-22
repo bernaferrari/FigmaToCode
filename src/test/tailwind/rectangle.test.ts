@@ -1,5 +1,6 @@
+import { AltRectangleNode } from "./../../common/altMixins";
 import { createFigma } from "figma-api-stub";
-import { tailwindMain } from "../../tailwind/tailwind_main";
+import { tailwindMain } from "../../tailwind/tailwindMain";
 import {
   convertIntoAltNodes,
   convertSingleNodeToAlt,
@@ -10,29 +11,35 @@ describe("Tailwind Rectangle", () => {
     simulateErrors: true,
     isWithoutTimeout: false,
   });
-  const node = figma.createRectangle();
+  const node = new AltRectangleNode();
+  node.width = 300;
+  node.height = 300;
+
   const parentId = node.parent?.id ?? "";
 
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = figma;
 
   const executeMain = () => {
-    const converted = convertSingleNodeToAlt(node);
-    return tailwindMain(parentId, [converted], true, false);
+    return tailwindMain(parentId, [node], true, false);
   };
 
   it("small size", () => {
-    node.resize(16, 16);
+    node.width = 16;
+    node.height = 16;
     expect(executeMain()).toEqual('<div className="w-4 h-4"></div>');
   });
 
   it("medium size", () => {
-    node.resize(100, 200);
+    node.width = 100;
+    node.height = 200;
+
     expect(executeMain()).toEqual('<div className="w-24 h-48"></div>');
   });
 
   it("large size", () => {
-    node.resize(300, 300);
+    node.width = 300;
+    node.height = 300;
     expect(executeMain()).toEqual('<div className="w-full h-64"></div>');
   });
 
@@ -83,7 +90,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '<div className="w-full h-64 border-gray-800 border-4"></div>'
+      '<div className="w-full h-64 border-4 border-gray-800"></div>'
     );
   });
 

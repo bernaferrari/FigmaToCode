@@ -1,9 +1,9 @@
-import { AltSceneNode } from "./../common/altMixins";
-import { pxToLayoutSize } from "./conversion_tables";
+import { AltSceneNode } from "../../common/altMixins";
+import { pxToLayoutSize } from "../conversionTables";
 
 export const magicMargin = 32;
 
-export const getContainerSizeProp = (node: AltSceneNode): string => {
+export const tailwindSize = (node: AltSceneNode): string => {
   /// WIDTH AND HEIGHT
 
   // if parent is a page, width can't get past w-64, therefore let it be free
@@ -30,33 +30,11 @@ export const getContainerSizeProp = (node: AltSceneNode): string => {
   ) {
     if (node.parent.layoutMode === "HORIZONTAL") {
       return "w-full ";
-    } else if (node.parent.layoutMode === "VERTICAL") {
-      // TODO. h-full? It isn't always reliable, but it is inside a Frame anyway..
     }
+    // else if (node.parent.layoutMode === "VERTICAL") {
+    //   // TODO. h-full? It isn't always reliable, but it is inside a Frame anyway..
+    // }
   }
-
-  // console.log(
-  //   "!nodeParent || ",
-  //   AffectedByCustomAutoLayout[node.id],
-  //   " - ",
-  //   AffectedByCustomAutoLayout[node.parent.id]
-  // );
-  // console.log("node: ", node.name, "parent: ", nodeParent?.name);
-
-  // if currentFrame has a rect that became a frame, let it define the size
-  // if (CustomNodeMap[node.id] && CustomNodeMap[node.id].largestNode) {
-  //   return "";
-  // }
-
-  // let changedChildren;
-  // if (AffectedByCustomAutoLayout[node.id] === "changed") {
-  //   // retrieve the children (get the parent, look at children and ignore the current node)
-  //   changedChildren = node.parent.children.filter((d) => d !== node);
-  // } else {
-  //   if ("children" in node) {
-  //     changedChildren = node.children;
-  //   }
-  // }
 
   let [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
 
@@ -85,31 +63,7 @@ export const getContainerSizeProp = (node: AltSceneNode): string => {
     if (!node.parent?.relativePos) {
       propWidth = `w-${rW} `;
     }
-
-    // if (
-    //   node.type === "FRAME" ||
-    //   node.type === "GROUP" ||
-    //   node.type === "TEXT"
-    // ) {
-    //   propWidth = `w-${rW} `;
-    // }
-    // }
   }
-
-  // if parent is responsive, child can't be exact, or it will break the responsivess
-  // todo should it be full or auto? What about when parent of parent is relative?
-  // Should it calculate the width, check if it will be larger than responsiviness factor (like 1/3 of screen which is 200) and return full/auto?
-  // if (
-  //  TODO solve this
-  //   // CustomNodeMap[node.parent.id] &&
-  //   // CustomNodeMap[node.parent.id].customAutoLayoutDirection !== "false"
-  // ) {
-  //   // if node isn't a RECTANGLE and doesn't have relative width, return nothing.
-  //   // todo support INSTANCE and COMPONENT
-  //   if (node.type !== "RECTANGLE") {
-  //     if (!rW) return "";
-  //   }
-  // }
 
   // when the child has the same size as the parent, don't set the size of the parent (twice)
   if ("children" in node && node.children && node.children.length === 1) {
@@ -121,56 +75,7 @@ export const getContainerSizeProp = (node: AltSceneNode): string => {
     if (child.height === nodeHeight) {
       propHeight = "";
     }
-  } else {
-    // if (!("strokes" in node)) {
-    //   // ignore Group
-    //   return "";
-    // }
   }
-
-  // TODO fix again
-  // if (AffectedByCustomAutoLayout[node.id] === "changed") {
-  // PROS: Top bar with text (fig to code)
-  // CONS: 1/3 in parent (fig to code)
-  // return "";
-  // propHeight = "";
-
-  // experimental, set size to auto, like in the real autolayout
-  // the issue is text, which changes the width from component to component and can trigger this
-  // let returnHere = true;
-  // if (
-  //   "width" in node &&
-  //   nodeParent &&
-  //   "width" in nodeParent &&
-  //   changedChildren
-  // ) {
-  //   console.log("entrando1");
-  //   // look if any children has a responsive width
-  //   const isResp = changedChildren.every((d) =>
-  //     calculateResponsiveW(d, node, d.width)
-  //   );
-  //   // if it has, don't return empty. Width needs to be set manually.
-  //   if (isResp) {
-  //     returnHere = false;
-  //   }
-  // }
-  // console.log("changed will return here?! ", returnHere);
-  // if (returnHere) {
-  //   return "";
-  // }
-  // }
-
-  // compare if height is same as parent, with a small threshold
-  // commented because h-auto is better than h-full most of the time on responsiviness
-  // todo improve this. Buggy in small layouts, good in big.
-  // RECTANGLE can't have relative height
-
-  // don't want to set the height to auto when autolayout is FIXED
-  // const autoHeight = !(
-  //   "layoutMode" in node && node.layoutMode === "HORIZONTAL"
-  // );
-
-  // Rectangle must have precise width/height, except if it just just became a Frame
 
   if (
     ("layoutMode" in node && node.layoutMode === "VERTICAL") ||
@@ -187,21 +92,11 @@ export const getContainerSizeProp = (node: AltSceneNode): string => {
   // if FRAME is too big for tailwind to handle, just let it be w-full or h-auto
   // if its width is larger than 256 or the sum of its children
 
-  if (rW !== "") {
-    return `${propWidth}${propHeight}`;
-  }
+  // if (rW !== "") {
+  //   return `${propWidth}${propHeight}`;
+  // }
 
   if ("layoutMode" in node) {
-    // if there are no children, ignore AutoLayout. Figma does the same.
-    if (node.children.length === 0) {
-      return `${propWidth}${propHeight}`;
-    }
-
-    // if ((node.layoutMode !== "NONE" && rW) || CustomNodeMap[node.id]) {
-    //   // if responsiviness was found, let it define the size of the container, else, auto
-    //   return `${propWidth}`;
-    // }
-
     if (node.counterAxisSizingMode === "FIXED") {
       // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
       // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.
@@ -211,7 +106,9 @@ export const getContainerSizeProp = (node: AltSceneNode): string => {
         // when AutoLayout is VERTICAL, height is set by Figma and width is auto.
         return `${propWidth}`;
       }
-      return `${propWidth}${propHeight}`;
+      // node.layoutMode === "NONE" won't reach here
+      // if node.children.length === 1, it will be converted to HORIZONTAL AutoLayout
+      // if node.children.length > 1, it will be taken care before.
     } else {
       // exception, override it when this is detected
       if (rW) {
@@ -230,47 +127,41 @@ const getNodeSizeWithStrokes = (node: AltSceneNode): Array<number> => {
   let nodeHeight = node.height;
   let nodeWidth = node.width;
 
-  if (!("strokes" in node)) {
-    return [nodeWidth, nodeHeight];
-  }
-
   // tailwind doesn't support OUTSIDE or CENTER, only INSIDE.
   // Therefore, to give the same feeling, the height and width will be slighly increased.
   // node.strokes.lenght is necessary because [strokeWeight] can exist even without strokes.
-  if (node.strokes && node.strokes.length) {
+  if ("strokes" in node && node.strokes && node.strokes.length) {
     if (node.strokeAlign === "OUTSIDE") {
       nodeHeight += node.strokeWeight * 2;
       nodeWidth += node.strokeWeight * 2;
     } else if (node.strokeAlign === "CENTER") {
-      nodeHeight += node.strokeWeight * 0.5;
-      nodeWidth += node.strokeWeight * 0.5;
+      nodeHeight += node.strokeWeight;
+      nodeWidth += node.strokeWeight;
     }
   }
 
   if ("children" in node) {
     // if any children has an OUTSIDE or CENTER stroke and, with that stroke,
     // the child gets a size bigger than parent, adjust parent to be larger
-    node.children
-      .filter((d) => "strokeWeight" in d && d.strokes?.length > 0)
-      .forEach((d) => {
-        if ("strokeWeight" in d) {
-          if (d.strokeAlign === "OUTSIDE") {
-            if (nodeWidth < d.width + d.strokeWeight * 2) {
-              nodeWidth += d.strokeWeight * 2;
-            }
-            if (nodeHeight < d.height + d.strokeWeight * 2) {
-              nodeHeight += d.strokeWeight * 2;
-            }
-          } else if (d.strokeAlign === "CENTER") {
-            if (nodeWidth < d.width + d.strokeWeight * 0.5) {
-              nodeWidth += d.strokeWeight * 0.5;
-            }
-            if (nodeHeight < d.height + d.strokeWeight * 0.5) {
-              nodeHeight += d.strokeWeight * 0.5;
-            }
+    node.children.forEach((d) => {
+      if ("strokeWeight" in d && d.strokes?.length > 0) {
+        if (d.strokeAlign === "OUTSIDE") {
+          if (nodeWidth < d.width + d.strokeWeight * 2) {
+            nodeWidth += d.strokeWeight * 2;
+          }
+          if (nodeHeight < d.height + d.strokeWeight * 2) {
+            nodeHeight += d.strokeWeight * 2;
+          }
+        } else if (d.strokeAlign === "CENTER") {
+          if (nodeWidth < d.width + d.strokeWeight * 0.5) {
+            nodeWidth += d.strokeWeight * 0.5;
+          }
+          if (nodeHeight < d.height + d.strokeWeight * 0.5) {
+            nodeHeight += d.strokeWeight * 0.5;
           }
         }
-      });
+      }
+    });
   }
 
   return [nodeWidth, nodeHeight];

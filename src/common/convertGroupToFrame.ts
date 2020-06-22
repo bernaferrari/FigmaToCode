@@ -32,19 +32,9 @@ export const convertGroupToFrame = (node: AltGroupNode): AltFrameNode => {
     d.parent = newNode;
   });
 
-  const updatedNode = updateChildrenXY(node);
-
   // don't need to take care of newNode.parent.children because method is recursive.
-  // node is hopefully going to be eliminated from the memory here.
-  //
   // .children =... calls convertGroupToFrame() which returns the correct node
-
-  // this condition should always be true
-  if (updatedNode.type === "FRAME") {
-    return updatedNode;
-  }
-
-  return newNode;
+  return updateChildrenXY(newNode) as AltFrameNode;
 };
 
 /**

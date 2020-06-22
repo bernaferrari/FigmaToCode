@@ -1,7 +1,7 @@
-import { rgbTo6hex } from "./../tailwind/colors";
-import { AltSceneNode } from "../common/altMixins";
+import { rgbTo6hex } from "../../tailwind/colors";
+import { AltSceneNode } from "../../common/altMixins";
 
-export const extractFlutterColors = (
+export const retrieveFlutterColors = (
   sceneNode: Array<AltSceneNode>
 ): Array<contrastedColor> => {
   const selectedChildren = deepFlatten(sceneNode);

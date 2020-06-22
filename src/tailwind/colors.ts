@@ -1,5 +1,5 @@
-import { nearestColorFrom } from "./../nearest-color/nearesetColor";
-import { nearestValue } from "./conversion_tables";
+import { nearestColorFrom } from "../nearest-color/nearesetColor";
+import { nearestValue } from "./conversionTables";
 
 // retrieve the SOLID color for tailwind
 export const tailwindColor = (

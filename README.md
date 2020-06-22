@@ -2,7 +2,7 @@
 
 # Figma to Code
 
-Most *design to code* plugins are bad. This project aims to solve, or at least improve, the situation. This plugin generates responsive layouts in [Tailwind](https://tailwindcss.com/) and [Flutter](https://flutter.github.io/). The plan is to eventually add support for [Jetpack Compose](https://developer.android.com/jetpack/compose) and possibly standard HTML or other frameworks like [SwiftUI](https://developer.apple.com/xcode/swiftui/), [Bootstrap](https://getbootstrap.com/), [Material](https://material.io/develop/web/), [Fluent](https://www.microsoft.com/design/fluent/), etc. Feedback and partnerships are appreciated!
+Most *design to code* plugins are bad. This project aims to solve, or at least improve, the situation. This plugin generates responsive layouts in [Tailwind](https://tailwindcss.com/) and [Flutter](https://flutter.github.io/). The plan is to eventually add support for [Jetpack Compose](https://developer.android.com/jetpack/compose) and possibly standard HTML or other frameworks like [React Native](https://reactnative.dev/), [SwiftUI](https://developer.apple.com/xcode/swiftui/), [Bootstrap](https://getbootstrap.com/), [Material](https://material.io/develop/web/) or [Fluent](https://www.microsoft.com/design/fluent/). Feedback and partnerships are appreciated!
 
 ![Gif showing the conversion](assets/lossy_gif.gif)
 
@@ -44,10 +44,6 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 The project is configured to be built with Webpack or Rollup. The author couldn't find how to correctly configure Svelte in Webpack, so Rollup was added. But Rollup is a lot buggier than Webpack and crashes regularly in watch mode for Typescript files. So, if you are going to edit only Typescript, I reccommend sticking with Webpack. If you are going to make changes in the UI, you **need** to use Rollup for now.
 
-### Architecture
-
-There is, unfortunately, not a defined architecture pattern in the project. Builders are used, but the result was worse than expected. Ideally, I thought it would help to have a group of interfaces (position, size, opacity, and so on), where each language/framework could implement it, but there were too many changes. For example, Tailwind appends attributes to a string, while Flutter replaces the string as attributes get nested. If you have ideas or would like to discuss further, feel free to contact me.
-
 ## Issue Tracking
 
-Found a bug? Have an idea for an improvement? Feel free to [add an issue](../../issues). Pull requests are also more than welcome.
+It is hard to work alone. I took decisions thinking how it would benefit the majority of people, but I can, and probably will, be wrong, many times. Found a bug? Have an idea for an improvement? Feel free to [add an issue](../../issues). Pull requests are also more than welcome.
