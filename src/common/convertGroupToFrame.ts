@@ -25,6 +25,9 @@ export const convertGroupToFrame = (node: AltGroupNode): AltFrameNode => {
   newNode.guides = [];
 
   newNode.parent = node.parent;
+
+  // update the children's x and y position. Modify the 'original' node, then pass them.
+  updateChildrenXY(node) as AltFrameNode;
   newNode.children = node.children;
 
   newNode.children.forEach((d) => {
@@ -34,7 +37,8 @@ export const convertGroupToFrame = (node: AltGroupNode): AltFrameNode => {
 
   // don't need to take care of newNode.parent.children because method is recursive.
   // .children =... calls convertGroupToFrame() which returns the correct node
-  return updateChildrenXY(newNode) as AltFrameNode;
+
+  return newNode;
 };
 
 /**
@@ -45,6 +49,7 @@ export const convertGroupToFrame = (node: AltGroupNode): AltFrameNode => {
  * Result of a Group with x,y = (250, 250) and child at (260, 260) must be child at (10, 10)
  */
 const updateChildrenXY = (node: AltSceneNode): AltSceneNode => {
+  // the second condition is necessary, so it can convert the root
   if (node.type === "GROUP") {
     node.children.forEach((d) => {
       d.x = d.x - node.x;
