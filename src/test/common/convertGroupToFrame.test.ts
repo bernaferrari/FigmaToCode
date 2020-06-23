@@ -28,4 +28,42 @@ describe("Convert Group to Frame", () => {
       tailwindMain("", [convertGroupToFrame(group)], false, false)
     ).toEqual('<div class="w-full h-5"></div>');
   });
+
+  it("Correctly position the children", () => {
+    const rect0 = new AltRectangleNode();
+    rect0.x = 200;
+    rect0.y = 200;
+    rect0.width = 20;
+    rect0.height = 20;
+
+    const rect1 = new AltRectangleNode();
+    rect1.x = 220;
+    rect1.y = 220;
+    rect1.width = 20;
+    rect1.height = 20;
+
+    const rect2 = new AltRectangleNode();
+    rect2.x = 240;
+    rect2.y = 240;
+    rect2.width = 20;
+    rect2.height = 20;
+
+    const group = new AltGroupNode();
+    group.x = 200;
+    group.y = 200;
+    group.width = 260;
+    group.height = 260;
+    group.children = [rect0, rect1, rect2];
+
+    const newFrame = convertGroupToFrame(group);
+
+    expect(newFrame.children[0].x).toEqual(0);
+    expect(newFrame.children[0].y).toEqual(0);
+
+    expect(newFrame.children[1].x).toEqual(20);
+    expect(newFrame.children[1].x).toEqual(20);
+
+    expect(newFrame.children[2].x).toEqual(40);
+    expect(newFrame.children[2].x).toEqual(40);
+  });
 });

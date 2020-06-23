@@ -40,6 +40,9 @@ export const convertNodeIfChildIsBigRect = (
       updatedNode.effectStyleId = rect.effectStyleId;
     }
 
+    // inner Rectangle shall get a FIXED size
+    updatedNode.counterAxisSizingMode = "FIXED";
+
     updatedNode.strokeAlign = rect.strokeAlign;
     updatedNode.strokeCap = rect.strokeCap;
     updatedNode.strokeJoin = rect.strokeJoin;

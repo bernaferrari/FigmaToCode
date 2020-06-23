@@ -44,6 +44,7 @@ export const tailwindSize = (node: AltSceneNode): string => {
   let propHeight = `h-${hRem} `;
   let propWidth = `w-${wRem} `;
 
+  // todo can a relative container be w-full? I don't think so.
   if (
     (("layoutMode" in node && node.layoutMode === "NONE") ||
       node.type === "GROUP") &&
@@ -109,11 +110,6 @@ export const tailwindSize = (node: AltSceneNode): string => {
       // node.layoutMode === "NONE" won't reach here
       // if node.children.length === 1, it will be converted to HORIZONTAL AutoLayout
       // if node.children.length > 1, it will be taken care before.
-    } else {
-      // exception, override it when this is detected
-      if (rW) {
-        return `${propWidth}`;
-      }
     }
   } else {
     return `${propWidth}${propHeight}`;
