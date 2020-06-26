@@ -1,7 +1,7 @@
+import { tailwindSize } from "./../../../tailwind/builderImpl/tailwindSize";
 import { tailwindRotation } from "./../../../tailwind/builderImpl/tailwindBlend";
 import { convertSingleNodeToAlt } from "../../../common/altConversion";
 import { AltRectangleNode } from "../../../common/altMixins";
-import { tailwindSize } from "../../../tailwind/builderImpl/tailwindSize";
 import { tailwindOpacity } from "../../../tailwind/builderImpl/tailwindBlend";
 
 describe("Tailwind Blend", () => {

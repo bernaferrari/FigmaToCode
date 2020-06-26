@@ -1,7 +1,6 @@
 import { frameNodeToAlt } from "../../common/altConversion";
 import { createFigma } from "figma-api-stub";
-import { tailwindMain } from "../../tailwind/tailwindMain";
-import { tailwindSize } from "../../tailwind/builderImpl/tailwindSize";
+import { tailwindSize } from "./../../tailwind/builderImpl/tailwindSize";
 import { convertSingleNodeToAlt } from "../../common/altConversion";
 
 describe("Tailwind Size", () => {
@@ -77,7 +76,7 @@ describe("Tailwind Size", () => {
       // todo is this correct? Maybe it should be w-full
       node.appendChild(subnode);
 
-      expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-full ");
+      expect(tailwindSize(frameNodeToAlt(node))).toEqual("");
       expect(tailwindSize(convertSingleNodeToAlt(subnode))).toEqual("w-6 h-6 ");
     });
 
@@ -92,7 +91,7 @@ describe("Tailwind Size", () => {
       // todo is this correct? Maybe it should be w-full
       node.appendChild(subnode);
 
-      expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-full ");
+      expect(tailwindSize(frameNodeToAlt(node))).toEqual("");
       expect(tailwindSize(convertSingleNodeToAlt(subnode))).toEqual("w-6 h-6 ");
     });
   });
@@ -113,16 +112,18 @@ describe("Tailwind Size", () => {
       node.appendChild(subnode);
 
       expect(tailwindSize(frameNodeToAlt(node))).toEqual("");
-      expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-full ");
+      expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("");
       expect(tailwindSize(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
     });
 
     it("when parent is vertical and node is vertical, child defines the size", () => {
       const node = figma.createFrame();
       node.resize(500, 500);
+      node.counterAxisSizingMode = "FIXED";
       node.layoutMode = "VERTICAL";
 
       const subnode = figma.createFrame();
+      subnode.counterAxisSizingMode = "FIXED";
       subnode.resize(500, 250);
       subnode.layoutMode = "VERTICAL";
 
