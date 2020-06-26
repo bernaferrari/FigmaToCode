@@ -1,5 +1,5 @@
 import { AltTextNode } from "../common/altMixins";
-import { magicMargin } from "./builderImpl/tailwindSize";
+import { magicMargin } from "../common/nodeWidthHeight";
 import {
   pxToMapLetterSpacing,
   pxToAbsoluteLineHeight,

@@ -129,7 +129,7 @@ describe("convert node if child is big rect ", () => {
     // todo should it keep that way?
 
     expect(tailwindMain("", [converted], false, false)).toEqual(
-      `<div class="bg-black">
+      `<div class="w-5 h-5 bg-black">
 <div class="absolute m-auto inset-0 w-1/2 h-2 bg-white"></div></div>`
     );
   });

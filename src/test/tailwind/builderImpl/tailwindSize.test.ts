@@ -1,20 +1,6 @@
-import { tailwindBorderRadius } from "../../../tailwind/builderImpl/tailwindBorder";
-import {
-  AltRectangleNode,
-  AltEllipseNode,
-  AltTextNode,
-  AltFrameNode,
-  AltGroupNode,
-} from "../../../common/altMixins";
+import { AltRectangleNode, AltFrameNode } from "../../../common/altMixins";
 import { createFigma } from "figma-api-stub";
-import { convertSingleNodeToAlt } from "../../../common/altConversion";
-import {
-  tailwindRotation,
-  tailwindOpacity,
-} from "../../../tailwind/builderImpl/tailwindBlend";
-import { tailwindSize } from "../../../tailwind/builderImpl/tailwindSize";
-import { tailwindBorderWidth } from "../../../tailwind/builderImpl/tailwindBorder";
-import { tailwindPosition } from "../../../tailwind/builderImpl/tailwindPosition";
+import { tailwindSize } from "./../../../tailwind/builderImpl/tailwindSize";
 
 describe("Tailwind Builder", () => {
   const figma = createFigma({
@@ -92,13 +78,15 @@ describe("Tailwind Builder", () => {
 
     // responsive
     const parentNode = new AltFrameNode();
+    parentNode.counterAxisSizingMode = "FIXED";
     parentNode.x = 0;
     parentNode.y = 0;
     parentNode.width = 48;
     parentNode.height = 48;
     parentNode.children = [node];
     node.parent = parentNode;
-    expect(tailwindSize(node)).toEqual("w-full ");
+    expect(tailwindSize(node)).toEqual("");
+    expect(tailwindSize(parentNode)).toEqual("");
   });
 
   it("width changes when there are strokes", () => {

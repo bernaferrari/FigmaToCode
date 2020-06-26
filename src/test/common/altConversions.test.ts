@@ -1,5 +1,4 @@
 import { tailwindMain } from "../../tailwind/tailwindMain";
-import { AltGroupNode, AltRectangleNode } from "../../common/altMixins";
 import { createFigma } from "figma-api-stub";
 import { convertIntoAltNodes } from "../../common/altConversion";
 
@@ -40,13 +39,11 @@ describe("AltConversions", () => {
 
     figma.group([figma.createRectangle()], node);
 
-    console.log(node);
-
     expect(
       tailwindMain("", convertIntoAltNodes([node], undefined), false, false)
     ).toEqual(
-      `<div class="inline-flex items-center justify-center">
-<div class="w-4 h-4"></div></div>`
+      `<div class="w-5 h-5">
+<div class="inline-flex items-center justify-center"></div></div>`
     );
   });
 });

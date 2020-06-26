@@ -33,7 +33,6 @@ export const convertToAutoLayout = (
     node.itemSpacing = interval.length > 0 ? average(interval) : 0;
 
     const padding = detectAutoLayoutPadding(node);
-    console.log("padding is ", padding);
 
     node.verticalPadding = padding?.vertical ?? 0;
     node.horizontalPadding = padding?.horizontal ?? 0;
