@@ -1,10 +1,6 @@
 import { AltRectangleNode } from "./../../common/altMixins";
 import { createFigma } from "figma-api-stub";
 import { tailwindMain } from "../../tailwind/tailwindMain";
-import {
-  convertIntoAltNodes,
-  convertSingleNodeToAlt,
-} from "../../common/altConversion";
 
 describe("Tailwind Rectangle", () => {
   const figma = createFigma({
