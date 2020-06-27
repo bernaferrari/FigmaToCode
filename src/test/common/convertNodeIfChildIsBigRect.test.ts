@@ -1,9 +1,7 @@
-import { tailwindSize } from "./../../tailwind/builderImpl/tailwindSize";
 import { AltFrameNode } from "./../../common/altMixins";
 import { tailwindMain } from "../../tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "../../common/altMixins";
 import { createFigma } from "figma-api-stub";
-import { convertIntoAltNodes } from "../../common/altConversion";
 import { convertNodeIfChildIsBigRect } from "../../common/convertNodeIfChildIsBigRect";
 
 describe("convert node if child is big rect ", () => {

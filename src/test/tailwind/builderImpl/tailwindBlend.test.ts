@@ -1,6 +1,5 @@
 import { tailwindSize } from "./../../../tailwind/builderImpl/tailwindSize";
 import { tailwindRotation } from "./../../../tailwind/builderImpl/tailwindBlend";
-import { convertSingleNodeToAlt } from "../../../common/altConversion";
 import { AltRectangleNode } from "../../../common/altMixins";
 import { tailwindOpacity } from "../../../tailwind/builderImpl/tailwindBlend";
 
