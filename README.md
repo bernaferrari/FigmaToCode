@@ -25,25 +25,26 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 - Gradients (unsupported by Tailwind, todo in Flutter)
 - Line/Star/Polygon (todo. Rectangle and Ellipse were prioritized and are more common)
 - Identify buttons
-- The source code is fully commented and there are about 30 "todo"s there
+- The source code is fully commented and there are around 30 "todo"s there
 
 ### Tailwind limitations
 
-- **Width:** Tailwind has a maximum width of 256px. If an item passes this, the width will be set to `w-full` (unless it is `w-1/2`, `w-1/3`, etc because of the parent). This is usually a feature, but be careful: if everything in your project is huge, the plugin's result might be less than optimal.
-- **Height:** The plugin avoids setting the height whatever possible, because width and height work differently in CSS. `h-full` means get the full height of the parent, but the parent **must** have it, while `w-full` doesn't require it. During experiments, avoiding a fixed height, in most cases, brought an improved responsiveness.
+- **Width:** Tailwind has a maximum width of 256px. If an item passes this, the width will be set to `w-full` (unless it is already relative like `w-1/2`, `w-1/3`, etc). This is usually a feature, but be careful: if most layers in your project are larger than 256px, the plugin's result might be less than optimal.
+- **Height:** The plugin avoids setting the height whenever possible, because width and height work differently in CSS. `h-full` means get the full height of the parent, but the parent **must** have it, while `w-full` doesn't require it. During experiments, avoiding a fixed height, in most cases, brought improved responsiveness and avoided nondeterministic scenarios.
 
 ### Flutter limits and ideas
 
 - **Align:** currently items are aligned inside a Row/Column according to their average position. Todo: find a way to improve this.
-- **Unreadable code:** code is not formatted, but even [dartpad](https://dartpad.dev/) offers a format button.
-- **Stack:** in some cases, a `Stack` could be replaced with `Container` and `BoxDecoration`. Find these cases and optimize them.
-- **Material Styles**: possible optimization, find if current text size, color, and weight match any material text style.
-- **Identify FlatButtons**: instead of outputting `Container` or `Material`, it could identify specific buttons and help the user.
+- **Unreadable code:** output code is not formatted, but even [dartpad](https://dartpad.dev/) offers a format button.
+- **Stack:** in some simpler cases, a `Stack` could be replaced with a `Container` and a `BoxDecoration`. Discover those cases and optimize them.
+- **Material Styles**: texts could be matched to existing Material styles (like outputting `Headline6` when text size is 20).
+- **Identify FlatButtons**: the plugin could identify specific buttons and output them instead of always using `Container` or `Material`.
 
-### Webpack vs Rollup
+### How to build the project
 
-The project is configured to be built with Webpack or Rollup. The author couldn't find how to correctly configure Svelte in Webpack, so Rollup was added. But Rollup is a lot buggier than Webpack and crashes regularly in watch mode for Typescript files. So, if you are going to edit only Typescript, I reccommend sticking with Webpack. If you are going to make changes in the UI, you **need** to use Rollup for now.
+The project is configured to be built with Webpack or Rollup. The author couldn't find a way to correctly configure Svelte in Webpack, so Rollup was added. But Rollup is a lot less stable than Webpack and crashes regularly in watch mode when editing Typescript files. So, if you are going to work only Typescript, I reccommend sticking with Webpack. If you are going to make changes in the UI, you **need** to use Rollup for now.
 
-## Issue Tracking
+## Issues
 
-It is hard to work alone. I took decisions thinking how it would benefit the majority of people, but I can, and probably will, be wrong, many times. Found a bug? Have an idea for an improvement? Feel free to [add an issue](../../issues). Pull requests are also more than welcome.
+The Figma file for this README and icon is also open! [Check it here](https://www.figma.com/file/8buWpm6Mpq4yK9MhbkcdJB/Figma-to-Code).
+It is hard to work alone. I took decisions thinking about how it would benefit the majority of people, but I can (and probably will!) be wrong many times. Found a bug? Have an idea for an improvement? Feel free to [add an issue](../../issues) or email me. Pull requests are also more than welcome.
