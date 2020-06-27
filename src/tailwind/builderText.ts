@@ -97,7 +97,7 @@ export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
    * example: font-extrabold
    * example: italic
    */
-  fontStyle = (node: AltTextNode): this => {
+  fontStyle(node: AltTextNode): this {
     if (node.fontName !== figma.mixed) {
       const lowercaseStyle = node.fontName.style.toLowerCase();
 
@@ -118,13 +118,13 @@ export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
       this.attributes += `font-${value} `;
     }
     return this;
-  };
+  }
 
   /**
    * https://tailwindcss.com/docs/letter-spacing/
    * example: tracking-widest
    */
-  letterSpacing = (node: AltTextNode): this => {
+  letterSpacing(node: AltTextNode): this {
     if (node.letterSpacing !== figma.mixed) {
       if (
         node.letterSpacing.unit === "PIXELS" &&
@@ -142,7 +142,7 @@ export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
       }
     }
     return this;
-  };
+  }
 
   /**
    * https://tailwindcss.com/docs/line-height/

@@ -27,5 +27,4 @@ test/**/next-env.d.ts
 **/.idea
 **/.vscode
 
-public
 build

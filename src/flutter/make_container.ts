@@ -24,7 +24,7 @@ export const makeContainer = (
   const size = nodeWidthHeight(node, false);
   let propWidth = size.width ? `width: ${size.width}, ` : "";
   let propHeight = size.height ? `height: ${size.height}, ` : "";
-  const propWidthHeight: string = `SizedBox(${propWidth}${propHeight})`;
+  const propWidthHeight: string = `${propWidth}${propHeight}`;
 
   if (node.fills !== figma.mixed && node.fills.length > 0) {
     let fill = node.fills[0];

@@ -4,7 +4,7 @@ import {
   AltFrameNode,
 } from "../common/altMixins";
 import { rgbaTohex, flutterColor } from "./flutter_helpers";
-import { getContainerSizeProp } from "./make_container";
+import { nodeWidthHeight } from "../common/nodeWidthHeight";
 
 // https://api.flutter.dev/flutter/material/Material-class.html
 export const makeMaterial = (
@@ -61,7 +61,11 @@ export const makeMaterial = (
 
   const material = `\nMaterial(${color}${elevation}${shadowColor}${shape}${clipContent}${padChild}),`;
 
-  const propWidthHeight: string = getContainerSizeProp(node);
+  const size = nodeWidthHeight(node, false);
+  let propWidth = size.width ? `width: ${size.width}, ` : "";
+  let propHeight = size.height ? `height: ${size.height}, ` : "";
+  const propWidthHeight: string = `${propWidth}${propHeight}`;
+
   if (propWidthHeight) {
     return `SizedBox(${propWidthHeight}child: ${material}),`;
   }
