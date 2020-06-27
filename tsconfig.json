@@ -4,7 +4,6 @@
     "module": "es6",
     "sourceMap": true,
     "target": "es6",
-    "moduleResolution": "node",
     "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
   }
 }

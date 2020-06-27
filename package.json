@@ -8,7 +8,7 @@
     "watch": "rollup -c -w",
     "release": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
     "postbuild": "purgecss -c purgecss.config.js -o public",
-    "wp": "npx webpack --mode=development --watch",
+    "wp": "webpack --mode=development --watch",
     "test": "jest",
     "coverage": "jest --coverage",
     "start": "sirv public"
@@ -25,9 +25,6 @@
     "tailwindcss": "^1.4.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.3",
-    "@babel/preset-env": "^7.10.3",
-    "@babel/preset-typescript": "^7.10.1",
     "@fullhuman/postcss-purgecss": "^2.3.0",
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-image": "^2.0.4",
