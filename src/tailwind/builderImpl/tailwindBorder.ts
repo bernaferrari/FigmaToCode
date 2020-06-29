@@ -1,6 +1,6 @@
-import { AltSceneNode } from "../../common/altMixins";
+import { AltSceneNode } from "../../altNodes/altMixins";
 import { nearestValue, pxToBorderRadius } from "../conversionTables";
-import { AltGeometryMixin } from "../../common/altMixins";
+import { AltGeometryMixin } from "../../altNodes/altMixins";
 
 /**
  * https://tailwindcss.com/docs/border-width/

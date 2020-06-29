@@ -1,6 +1,6 @@
 import { tailwindMain } from "../../tailwind/tailwindMain";
 import { createFigma } from "figma-api-stub";
-import { convertIntoAltNodes } from "../../common/altConversion";
+import { convertIntoAltNodes } from "../../altNodes/altConversion";
 
 describe("AltConversions", () => {
   const figma = createFigma({

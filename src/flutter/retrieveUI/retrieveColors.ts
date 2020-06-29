@@ -1,5 +1,5 @@
-import { rgbTo6hex } from "../../tailwind/colors";
-import { AltSceneNode } from "../../common/altMixins";
+import { AltSceneNode } from "../../altNodes/altMixins";
+import { rgbTo6hex } from "../../common/rgbToHex";
 
 export const retrieveFlutterColors = (
   sceneNode: Array<AltSceneNode>

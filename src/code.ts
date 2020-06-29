@@ -3,7 +3,7 @@ import { flutterMain } from "./flutter/flutterMain";
 import { retrieveFlutterColors } from "./flutter/retrieveUI/retrieveColors";
 import { retrieveTailwindColors } from "./tailwind/retrieveUI/retrieveColors";
 import { retrieveTailwindText } from "./tailwind/retrieveUI/retrieveTexts";
-import { convertIntoAltNodes } from "./common/altConversion";
+import { convertIntoAltNodes } from "./altNodes/altConversion";
 
 let parentId: string = "";
 let isJsx = false;
@@ -88,20 +88,14 @@ figma.ui.onmessage = (msg) => {
   } else if (msg.type === "flutter") {
     mode = "flutter";
     run();
-  } else if (msg.type === "jsx") {
-    if (msg.data !== isJsx) {
-      isJsx = msg.data;
-      run();
-    }
-  } else if (msg.type === "layerName") {
-    if (msg.data !== layerName) {
-      layerName = msg.data;
-      run();
-    }
-  } else if (msg.type === "material") {
-    if (msg.data !== material) {
-      material = msg.data;
-      run();
-    }
+  } else if (msg.type === "jsx" && msg.data !== isJsx) {
+    isJsx = msg.data;
+    run();
+  } else if (msg.type === "layerName" && msg.data !== layerName) {
+    layerName = msg.data;
+    run();
+  } else if (msg.type === "material" && msg.data !== material) {
+    material = msg.data;
+    run();
   }
 };

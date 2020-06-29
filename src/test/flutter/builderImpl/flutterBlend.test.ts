@@ -1,6 +1,6 @@
 import { tailwindSize } from "../../../tailwind/builderImpl/tailwindSize";
 import { tailwindRotation } from "../../../tailwind/builderImpl/tailwindBlend";
-import { AltRectangleNode } from "../../../common/altMixins";
+import { AltRectangleNode } from "../../../altNodes/altMixins";
 import { tailwindOpacity } from "../../../tailwind/builderImpl/tailwindBlend";
 
 describe("Tailwind Blend", () => {

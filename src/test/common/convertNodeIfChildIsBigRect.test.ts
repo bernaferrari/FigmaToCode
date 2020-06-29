@@ -1,7 +1,8 @@
-import { AltFrameNode } from "./../../common/altMixins";
+import { convertToAutoLayout } from "./../../altNodes/convertToAutoLayout";
+import { AltFrameNode } from "../../altNodes/altMixins";
 import { tailwindMain } from "../../tailwind/tailwindMain";
-import { AltGroupNode, AltRectangleNode } from "../../common/altMixins";
-import { convertNodeIfChildIsBigRect } from "../../common/convertNodeIfChildIsBigRect";
+import { AltGroupNode, AltRectangleNode } from "../../altNodes/altMixins";
+import { convertNodeIfChildIsBigRect } from "../../altNodes/convertNodeIfChildIsBigRect";
 
 describe("convert node if child is big rect ", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -95,6 +96,33 @@ describe("convert node if child is big rect ", () => {
     );
   });
 
+  it("Fail", () => {
+    const rect1 = new AltRectangleNode();
+    rect1.x = 0;
+    rect1.y = 0;
+    rect1.width = 100;
+    rect1.height = 100;
+
+    const rect2 = new AltRectangleNode();
+    rect2.x = 0;
+    rect2.y = 0;
+    rect2.width = 20;
+    rect2.height = 120;
+
+    const group = new AltGroupNode();
+    group.x = 0;
+    group.y = 0;
+    group.width = 120;
+    group.height = 20;
+    group.children = [rect1, rect2];
+    rect1.parent = group;
+    rect2.parent = group;
+
+    expect(tailwindMain("", [convertNodeIfChildIsBigRect(group)], false, false))
+      .toEqual(`<div class="relative w-32 h-5">
+<div class="absolute left-0 top-0 w-24 h-24"></div>
+<div class="absolute left-0 top-0 w-5 h-32"></div></div>`);
+  });
   it("group with 2 children", () => {
     const group = new AltGroupNode();
     group.width = 20;

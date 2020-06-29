@@ -1,5 +1,5 @@
 import { flutterSize } from "./../../../flutter/builderImpl/flutterSize";
-import { AltRectangleNode, AltFrameNode } from "../../../common/altMixins";
+import { AltRectangleNode, AltFrameNode } from "../../../altNodes/altMixins";
 
 describe("Flutter Size", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work

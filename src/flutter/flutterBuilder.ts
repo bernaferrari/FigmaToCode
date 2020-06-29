@@ -9,7 +9,7 @@ import {
   AltRectangleNode,
   AltEllipseNode,
   AltFrameNode,
-} from "../common/altMixins";
+} from "../altNodes/altMixins";
 
 import { makeContainer } from "./flutterContainer";
 import { makeMaterial } from "./flutterMaterial";

@@ -7,10 +7,10 @@ import {
   AltRectangleNode,
   AltEllipseNode,
   AltFrameNode,
-} from "../common/altMixins";
-import { flutterColor } from "./flutter_helpers";
+} from "../altNodes/altMixins";
 import { flutterPadding } from "./builderImpl/flutterPadding";
 import { flutterBoxShadow } from "./builderImpl/flutterShadow";
+import { flutterColor } from "./builderImpl/flutterColor";
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","

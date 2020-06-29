@@ -192,9 +192,6 @@ export class BaseNodeMixinStub {
 export class ChildrenMixinStub {
   children: Array<AltSceneNode> = [];
 
-  // this is going to be used throughout the pluglin, so children know better who their parent is
-  relativePos: boolean = false;
-
   setChildren(altChildren: Array<AltSceneNode> | AltSceneNode) {
     if ("length" in altChildren) {
       this.children = altChildren;

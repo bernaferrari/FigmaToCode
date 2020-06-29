@@ -1,42 +1,43 @@
-import { AltSceneNode } from "../../common/altMixins";
-import { rgbTo6hex, tailwindNearestColor, tailwindColors } from "../colors";
+import { AltSceneNode } from "../../altNodes/altMixins";
+import { tailwindNearestColor, tailwindColors } from "../builderImpl/tailwindColor";
+import { rgbTo6hex } from "../../common/rgbToHex";
 
 export const retrieveTailwindColors = (
-         sceneNode: Array<AltSceneNode>
-       ): Array<namedColor> => {
-         const selectedChildren = deepFlatten(sceneNode);
+  sceneNode: Array<AltSceneNode>
+): Array<namedColor> => {
+  const selectedChildren = deepFlatten(sceneNode);
 
-         let colorStr: Array<namedColor> = [];
+  let colorStr: Array<namedColor> = [];
 
-         // collect all fill[0] and stroke[0] SOLID colors
-         selectedChildren.forEach((d) => {
-           if ("fills" in d) {
-             const fills = convertColor(d.fills);
-             if (fills) {
-               colorStr.push(fills);
-             }
-           }
-           if ("strokes" in d) {
-             const strokes = convertColor(d.strokes);
-             if (strokes) {
-               colorStr.push(strokes);
-             }
-           }
-         });
+  // collect all fill[0] and stroke[0] SOLID colors
+  selectedChildren.forEach((d) => {
+    if ("fills" in d) {
+      const fills = convertColor(d.fills);
+      if (fills) {
+        colorStr.push(fills);
+      }
+    }
+    if ("strokes" in d) {
+      const strokes = convertColor(d.strokes);
+      if (strokes) {
+        colorStr.push(strokes);
+      }
+    }
+  });
 
-         // retrieve only unique colors
-         // from https://stackoverflow.com/a/18923480/4418073
-         let unique: Record<string, boolean> = {};
-         let distinct: Array<namedColor> = [];
-         colorStr.forEach(function (x) {
-           if (!unique[x.hex]) {
-             distinct.push(x);
-             unique[x.hex] = true;
-           }
-         });
+  // retrieve only unique colors
+  // from https://stackoverflow.com/a/18923480/4418073
+  let unique: Record<string, boolean> = {};
+  let distinct: Array<namedColor> = [];
+  colorStr.forEach(function (x) {
+    if (!unique[x.hex]) {
+      distinct.push(x);
+      unique[x.hex] = true;
+    }
+  });
 
-         return distinct.sort((a, b) => a.name.localeCompare(b.name));
-       };
+  return distinct.sort((a, b) => a.name.localeCompare(b.name));
+};
 
 type namedColor = {
   name: string;

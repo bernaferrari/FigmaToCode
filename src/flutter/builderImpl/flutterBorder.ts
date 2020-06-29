@@ -1,6 +1,6 @@
-import { AltEllipseNode, AltFrameNode } from "./../../common/altMixins";
-import { AltSceneNode, AltRectangleNode } from "../../common/altMixins";
-import { flutterColor } from "../flutter_helpers";
+import { AltEllipseNode, AltFrameNode } from "../../altNodes/altMixins";
+import { AltSceneNode, AltRectangleNode } from "../../altNodes/altMixins";
+import { flutterColor } from "./flutterColor";
 
 // generate the border, when it exists
 export const flutterBorder = (node: AltSceneNode): string => {

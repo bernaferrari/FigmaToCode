@@ -1,11 +1,11 @@
-import { AltSceneNode } from "../../common/altMixins";
+import { AltSceneNode } from "../../altNodes/altMixins";
 
 export const tailwindPosition = (
   node: AltSceneNode,
   parentId: string
 ): string => {
   // don't add position to the first (highest) node in the tree
-  if (!node.parent || parentId === node.parent?.id) {
+  if (!node.parent || parentId === node.parent.id) {
     return "";
   }
 

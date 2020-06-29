@@ -1,4 +1,4 @@
-import { AltFrameNode, AltGroupNode } from "../common/altMixins";
+import { AltFrameNode, AltGroupNode } from "../altNodes/altMixins";
 
 export const tailwindVector = (
   group: AltFrameNode | AltGroupNode,

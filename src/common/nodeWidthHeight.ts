@@ -1,4 +1,4 @@
-import { AltSceneNode } from "./altMixins";
+import { AltSceneNode } from "../altNodes/altMixins";
 
 export const magicMargin = 32;
 
@@ -72,7 +72,12 @@ export const nodeWidthHeight = (
       // ignore this responsiviness when container is exactly the same width and height
       // } else {
       // avoid relative width when parent is relative (therefore, child is probably absolute)
-      if (!node.parent?.relativePos) {
+      const relativePos =
+        node.parent &&
+        node.parent.children.length > 1 &&
+        (node.parent.type === "GROUP" ||
+          ("layoutMode" in node.parent && node.parent.layoutMode === "NONE"));
+      if (!relativePos) {
         propWidth = rW;
       }
     }

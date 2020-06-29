@@ -1,20 +1,31 @@
 import { AltFrameNode, AltGroupNode, AltSceneNode } from "./altMixins";
 import { convertGroupToFrame } from "./convertGroupToFrame";
+import { assert } from "console";
 
-// if FRAME doesn't have an AutoLayout, try to detect it.
+/**
+ * Add AutoLayout attributes if layout has items aligned (either vertically or horizontally).
+ * To make the calculation, the average position of every child, ordered, needs to pass a threshold.
+ * If it fails for both X and Y axis, there is no AutoLayout and return it unchanged.
+ * If it finds, add the correct attributes. When original node is a Group,
+ * convert it to Frame before adding the attributes. Group doesn't have AutoLayout properties.
+ */
 export const convertToAutoLayout = (
   node: AltFrameNode | AltGroupNode
 ): AltFrameNode | AltGroupNode => {
-  // if node is GROUP or FRAME without AutoLayout, try to detect it.
+  // only go inside when AutoLayout is not already set.
   if (
-    ("layoutMode" in node && node.layoutMode === "NONE") ||
+    ("layoutMode" in node &&
+      node.layoutMode === "NONE" &&
+      node.children.length > 0) ||
     node.type === "GROUP"
   ) {
+    // [reorderChildrenIfAligned] and [detectAutoLayoutDirection] are very similar,
+    // but merging them together would result in too much nesting.
     node.children = reorderChildrenIfAligned(node.children);
-    const [direction, interval] = detectAutoLayoutDirection(node.children);
+    const [direction, itemSpacing] = detectAutoLayoutDirection(node.children);
 
+    // if no direction was found, add an attribute that helps children know they should be have absolute position.
     if (direction === "NONE" && node.children.length > 1) {
-      node.relativePos = true;
       return node;
     }
 
@@ -24,40 +35,47 @@ export const convertToAutoLayout = (
     }
 
     if (direction === "NONE" && node.children.length === 1) {
-      // Add fake AutoLayout when there is a single item. We want the Padding.
+      // Add fake AutoLayout when there is a single item. This is done for the Padding.
       node.layoutMode = "HORIZONTAL";
     } else {
       node.layoutMode = direction;
     }
 
-    node.itemSpacing = interval.length > 0 ? average(interval) : 0;
+    node.itemSpacing = itemSpacing > 0 ? itemSpacing : 0;
 
+    // todo while this is similar to Figma, verify if this is good enough or if padding should be allowed in all four directions.
     const padding = detectAutoLayoutPadding(node);
-
-    node.verticalPadding = padding?.vertical ?? 0;
-    node.horizontalPadding = padding?.horizontal ?? 0;
+    node.verticalPadding = padding.vertical;
+    node.horizontalPadding = padding.horizontal;
 
     // update the layoutAlign attribute for every child
     node.children = node.children.map((d) => {
-      // re-cast, else typechecker fails
-      d.layoutAlign = detectChildrenAlign(d, node as AltFrameNode);
+      // @ts-ignore current node can't be AltGroupNode because it was converted into AltFrameNode
+      d.layoutAlign = layoutAlignInChild(d, node);
       return d;
     });
 
-    node.relativePos = false;
-
-    // counterAxisSizingMode = ??? auto when autolayout? auto when it was a group?
-  } else {
-    // if node already is AutoLayout, keep relativePos as off
-    node.relativePos = false;
+    // todo counterAxisSizingMode = ??? auto when autolayout? auto when it was a group?
   }
 
   return node;
 };
 
+/**
+ * Standard average calculation. Length must be > 0
+ */
 const average = (arr: Array<number>) =>
   arr.reduce((p, c) => p + c, 0) / arr.length;
 
+/**
+ * Check the average of children positions against this threshold;
+ * This allows a small tolerance, which is useful when items are slightly overlayed.
+ */
+const threshold = -8;
+
+/**
+ * Verify if children are sorted by their relative position and return them sorted, if identified.
+ */
 const reorderChildrenIfAligned = (
   children: ReadonlyArray<AltSceneNode>
 ): Array<AltSceneNode> => {
@@ -67,22 +85,17 @@ const reorderChildrenIfAligned = (
 
   const intervalY = calculateInterval(children, "y");
 
-  if (intervalY.length === 0) {
-    // this should never happen if node.children > 1
-    return [];
-  }
-
   const updateChildren = [...children];
 
-  // use 1 instead of 0 to avoid rounding errors (-0.00235 should be valid)
-  if (average(intervalY) > -8) {
-    // if all elements are horizontally layered
+  // check against a threshold
+  if (average(intervalY) > threshold) {
+    // if all elements are horizontally aligned
     return updateChildren.sort((a, b) => a.y - b.y);
   } else {
     const intervalX = calculateInterval(children, "x");
 
-    if (average(intervalX) > -8) {
-      // if all elements are vertically layered
+    if (average(intervalX) > threshold) {
+      // if all elements are vertically aligned
       return updateChildren.sort((a, b) => a.x - b.x);
     }
   }
@@ -90,41 +103,44 @@ const reorderChildrenIfAligned = (
   return updateChildren;
 };
 
-// todo improve this to try harder
+// todo improve this method to try harder. Idea: maybe use k-means or hierarchical cluster?
+/**
+ * The method to detect the direction.
+ * Currently, it uses the average position of children's position.
+ * In a previous version, it used a "standard deviation", but "average" performed better.
+ */
 const detectAutoLayoutDirection = (
   children: ReadonlyArray<AltSceneNode>
-): ["NONE" | "HORIZONTAL" | "VERTICAL", Array<number>] => {
+): ["NONE" | "HORIZONTAL" | "VERTICAL", number] => {
   // check if elements are vertically aligned
   const intervalY = calculateInterval(children, "y");
 
   // console.log("intervalY:", intervalY);
   if (intervalY.length === 0) {
-    return ["NONE", []];
+    return ["NONE", 0];
   }
 
-  // use 1 instead of 0 to avoid rounding errors (-0.00235 should be valid)
-  if (average(intervalY) >= -8) {
-    // todo re-enable the standardDeviation calculation? This was used to test if layout elements have the same spacing
-    // const standardDeviation = this.sd(intervalY);
-    // if (standardDeviation < this.autoLayoutTolerance) {
-    return ["VERTICAL", intervalY];
-    // }
+  // check if elements are vertically aligned
+  const avgY = average(intervalY);
+  if (avgY >= threshold) {
+    return ["VERTICAL", avgY];
   } else {
     // check if elements are horizontally aligned
     const intervalX = calculateInterval(children, "x");
-    // console.log("intervalX:", intervalX);
+    const avgX = average(intervalX);
 
-    if (average(intervalX) >= -8) {
-      // const standardDeviation = this.sd(intervalX);
-      // if (standardDeviation < this.autoLayoutTolerance) {
-      return ["HORIZONTAL", intervalX];
-      // }
+    if (avgX >= threshold) {
+      return ["HORIZONTAL", avgX];
     }
   }
 
-  return ["NONE", []];
+  return ["NONE", 0];
 };
 
+/**
+ * This function calculates the distance (interval) between items.
+ * Example: for [item]--8--[item]--8--[item], the result is [8, 8]
+ */
 const calculateInterval = (
   children: ReadonlyArray<AltSceneNode>,
   x_or_y: "x" | "y"
@@ -146,15 +162,16 @@ const calculateInterval = (
   return interval;
 };
 
-// this is more verbose than I wanted, but is also more performant than calculating them independently.
+/**
+ * Calculate the Padding.
+ * This is very verbose, but also more performant than calculating them independently.
+ */
 const detectAutoLayoutPadding = (
   node: AltFrameNode
-):
-  | undefined
-  | {
-      horizontal: number;
-      vertical: number;
-    } => {
+): {
+  horizontal: number;
+  vertical: number;
+} => {
   // this need to be run before VERTICAL or HORIZONTAL
   if (node.children.length === 1) {
     // left padding is first element's y value
@@ -192,7 +209,9 @@ const detectAutoLayoutPadding = (
       horizontal: Math.min(left, right),
       vertical: Math.min(top, bottom),
     };
-  } else if (node.layoutMode === "HORIZONTAL") {
+  } else {
+    // node.layoutMode === "HORIZONTAL"
+
     // left padding is first element's y value
     const left = node.children[0].x;
 
@@ -216,11 +235,15 @@ const detectAutoLayoutPadding = (
   }
 };
 
-// calculate the LayoutAlign for each children of the AutoLayout
-const detectChildrenAlign = (
+/**
+ * Detect if children are aligned at the start, end or center of parent.
+ * Result is the layoutAlign attribute
+ */
+const layoutAlignInChild = (
   node: AltSceneNode,
   parentNode: AltFrameNode
 ): "MIN" | "CENTER" | "MAX" | "STRETCH" => {
+  // parentNode.layoutMode can't be NONE.
   if (parentNode.layoutMode === "VERTICAL") {
     const nodeCenteredPosX = node.x + node.width / 2;
     const parentCenteredPosX = parentNode.width / 2;
@@ -235,7 +258,9 @@ const detectChildrenAlign = (
     } else {
       return "CENTER";
     }
-  } else if (parentNode.layoutMode === "HORIZONTAL") {
+  } else {
+    // parentNode.layoutMode === "HORIZONTAL"
+
     const nodeCenteredPosY = node.y + node.height / 2;
     const parentCenteredPosY = parentNode.height / 2;
 
@@ -250,7 +275,4 @@ const detectChildrenAlign = (
       return "CENTER";
     }
   }
-
-  // this should never be returned
-  return "CENTER";
 };
