@@ -1,6 +1,6 @@
 import { tailwindMain } from "./../../tailwind/tailwindMain";
-import { AltGroupNode, AltRectangleNode } from "./../../common/altMixins";
-import { convertGroupToFrame } from "./../../common/convertGroupToFrame";
+import { AltGroupNode, AltRectangleNode } from "../../altNodes/altMixins";
+import { convertGroupToFrame } from "../../altNodes/convertGroupToFrame";
 
 describe("Convert Group to Frame", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work

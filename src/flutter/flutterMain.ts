@@ -4,9 +4,9 @@ import {
   AltRectangleNode,
   AltGroupNode,
   AltTextNode,
-} from "../common/altMixins";
+} from "../altNodes/altMixins";
 import { FlutterDefaultBuilder } from "./flutterBuilder";
-import { AltSceneNode } from "../common/altMixins";
+import { AltSceneNode } from "../altNodes/altMixins";
 import { mostFrequent } from "./flutter_helpers";
 import { FlutterTextBuilder } from "./flutter_text_methods";
 

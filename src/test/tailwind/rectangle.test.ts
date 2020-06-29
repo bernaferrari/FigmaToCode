@@ -1,4 +1,4 @@
-import { AltRectangleNode } from "./../../common/altMixins";
+import { AltRectangleNode } from "../../altNodes/altMixins";
 import { tailwindMain } from "../../tailwind/tailwindMain";
 
 describe("Tailwind Rectangle", () => {

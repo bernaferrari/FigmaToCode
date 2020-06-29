@@ -5,7 +5,7 @@ import {
   AltEllipseNode,
   AltTextNode,
   AltGroupNode,
-} from "../common/altMixins";
+} from "../altNodes/altMixins";
 import { pxToLayoutSize } from "./conversionTables";
 import { tailwindVector } from "./vector";
 import { tailwindTextNodeBuilder } from "./builderText";
@@ -104,16 +104,9 @@ const tailwindGroup = (node: AltGroupNode): string => {
     .position(node, parentId)
     .widthHeight(node);
 
-  // if [attributes] is "relative" and builder contains "absolute", ignore the "relative"
-  // https://stackoverflow.com/a/39691113
-  // if (builder.attributes.includes("absolute")) {
-  //   attributes = "";
-  // }
-
   if (builder.attributes) {
-    // todo include autoAutoLayout here
     const attr = builder.build("relative ");
-    return `\n<div ${attr}>${tailwindWidgetGenerator(node.children)}</div>`;
+    return `\n<div${attr}>${tailwindWidgetGenerator(node.children)}</div>`;
   }
 
   return tailwindWidgetGenerator(node.children);

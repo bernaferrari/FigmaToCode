@@ -1,4 +1,4 @@
-import { AltTextNode } from "../common/altMixins";
+import { AltTextNode } from "../altNodes/altMixins";
 import { magicMargin } from "../common/nodeWidthHeight";
 import {
   pxToMapLetterSpacing,

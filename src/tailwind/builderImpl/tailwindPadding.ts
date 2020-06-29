@@ -1,4 +1,4 @@
-import { AltFrameMixin, AltDefaultShapeMixin } from "../../common/altMixins";
+import { AltFrameMixin, AltDefaultShapeMixin } from "../../altNodes/altMixins";
 import { pxToLayoutSize } from "../conversionTables";
 
 /**

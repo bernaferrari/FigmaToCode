@@ -4,7 +4,7 @@ import {
   AltBlendMixin,
   AltFrameMixin,
   AltDefaultShapeMixin,
-} from "../common/altMixins";
+} from "../altNodes/altMixins";
 import {
   tailwindVisibility,
   tailwindRotation,
@@ -15,7 +15,7 @@ import {
   tailwindBorderRadius,
 } from "./builderImpl/tailwindBorder";
 import { tailwindPosition } from "./builderImpl/tailwindPosition";
-import { tailwindColor } from "./colors";
+import { tailwindColor } from "./builderImpl/tailwindColor";
 import { pxToLayoutSize } from "./conversionTables";
 import { tailwindSize } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";

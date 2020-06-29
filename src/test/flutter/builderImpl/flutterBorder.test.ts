@@ -2,7 +2,7 @@ import {
   AltRectangleNode,
   AltEllipseNode,
   AltGroupNode,
-} from "./../../../common/altMixins";
+} from "../../../altNodes/altMixins";
 import {
   flutterBorderRadius,
   flutterBorder,

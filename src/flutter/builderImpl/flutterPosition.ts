@@ -1,7 +1,7 @@
 import {
   AltSceneNode,
   AltTextNode,
-} from "../../common/altMixins";
+} from "../../altNodes/altMixins";
 
 export const flutterPosition = (
   node: AltSceneNode,

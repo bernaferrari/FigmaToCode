@@ -1,4 +1,4 @@
-import { AltSceneNode } from "./../../common/altMixins";
+import { AltSceneNode } from "../../altNodes/altMixins";
 
 // Add padding if necessary!
 // This must happen before Stack or after the Positioned, but not before.

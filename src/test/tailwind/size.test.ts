@@ -1,7 +1,7 @@
-import { frameNodeToAlt } from "../../common/altConversion";
+import { frameNodeToAlt } from "../../altNodes/altConversion";
 import { createFigma } from "figma-api-stub";
 import { tailwindSize } from "./../../tailwind/builderImpl/tailwindSize";
-import { convertSingleNodeToAlt } from "../../common/altConversion";
+import { convertSingleNodeToAlt } from "../../altNodes/altConversion";
 
 describe("Tailwind Size", () => {
   const figma = createFigma({

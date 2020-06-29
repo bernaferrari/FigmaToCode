@@ -1,4 +1,4 @@
-import { AltSceneNode } from "../../common/altMixins";
+import { AltSceneNode } from "../../altNodes/altMixins";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
 
 export const flutterSize = (node: AltSceneNode): string => {

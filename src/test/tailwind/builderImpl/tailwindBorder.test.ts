@@ -2,7 +2,7 @@ import {
   AltRectangleNode,
   AltTextNode,
   AltEllipseNode,
-} from "./../../../common/altMixins";
+} from "../../../altNodes/altMixins";
 import {
   tailwindBorderWidth,
   tailwindBorderRadius,

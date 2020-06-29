@@ -1,5 +1,5 @@
 import { flutterElevationAndShadowColor } from "./builderImpl/flutterShadow";
-import { AltSceneNode } from "../common/altMixins";
+import { AltSceneNode } from "../altNodes/altMixins";
 import { flutterSize } from "./builderImpl/flutterSize";
 import { flutterPadding } from "./builderImpl/flutterPadding";
 import { flutterShape, flutterBorderRadius } from "./builderImpl/flutterBorder";
@@ -7,8 +7,8 @@ import {
   AltRectangleNode,
   AltEllipseNode,
   AltFrameNode,
-} from "../common/altMixins";
-import { flutterColor } from "./flutter_helpers";
+} from "../altNodes/altMixins";
+import { flutterColor } from "./builderImpl/flutterColor";
 
 // https://api.flutter.dev/flutter/material/Material-class.html
 export const makeMaterial = (

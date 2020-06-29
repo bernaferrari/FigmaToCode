@@ -1,6 +1,6 @@
-import { convertSingleNodeToAlt } from "../../../common/altConversion";
+import { convertSingleNodeToAlt } from "../../../altNodes/altConversion";
 import { tailwindPosition } from "../../../tailwind/builderImpl/tailwindPosition";
-import { AltGroupNode, AltFrameNode } from "../../../common/altMixins";
+import { AltGroupNode, AltFrameNode } from "../../../altNodes/altMixins";
 import { createFigma } from "figma-api-stub";
 
 describe("Tailwind Position", () => {
@@ -148,5 +148,18 @@ describe("Tailwind Position", () => {
     const node = parent.children[0];
 
     expect(tailwindPosition(node, "")).toEqual("");
+  });
+
+  it("No position when parent is root", () => {
+    const node = new AltFrameNode();
+    node.layoutMode = "NONE";
+
+    const parent = new AltFrameNode();
+    parent.id = "root";
+    parent.layoutMode = "NONE";
+
+    node.parent = parent;
+
+    expect(tailwindPosition(node, parent.id)).toEqual("");
   });
 });

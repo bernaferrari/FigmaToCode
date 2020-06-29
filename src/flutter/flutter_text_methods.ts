@@ -1,7 +1,7 @@
-import { flutterColor } from "./flutter_helpers";
 import { FlutterDefaultBuilder } from "./flutterBuilder";
-import { AltTextNode } from "../common/altMixins";
+import { AltTextNode } from "../altNodes/altMixins";
 import { convertFontWeight } from "../tailwind/builderText";
+import { flutterColor } from "./builderImpl/flutterColor";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {
   /**

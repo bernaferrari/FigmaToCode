@@ -1,4 +1,4 @@
-import { AltRectangleNode, AltFrameNode } from "../../../common/altMixins";
+import { AltRectangleNode, AltFrameNode } from "../../../altNodes/altMixins";
 import { tailwindSize } from "./../../../tailwind/builderImpl/tailwindSize";
 
 describe("Tailwind Builder", () => {

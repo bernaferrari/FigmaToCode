@@ -1,4 +1,4 @@
-import { AltSceneNode } from "../../common/altMixins";
+import { AltSceneNode } from "../../altNodes/altMixins";
 import { pxToLayoutSize } from "../conversionTables";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
 

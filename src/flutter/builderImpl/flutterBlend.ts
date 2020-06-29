@@ -1,5 +1,5 @@
-import { AltBlendMixin } from "../../common/altMixins";
-import { AltLayoutMixin, AltSceneNode } from "../../common/altMixins";
+import { AltBlendMixin } from "../../altNodes/altMixins";
+import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 
 /**
  * https://api.flutter.dev/flutter/widgets/Opacity-class.html

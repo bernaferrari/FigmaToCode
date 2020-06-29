@@ -3,7 +3,7 @@ import {
   flutterRotation,
   flutterVisibility,
 } from "./../../../flutter/builderImpl/flutterBlend";
-import { AltRectangleNode } from "../../../common/altMixins";
+import { AltRectangleNode } from "../../../altNodes/altMixins";
 
 describe("Tailwind Blend", () => {
   const node = new AltRectangleNode();

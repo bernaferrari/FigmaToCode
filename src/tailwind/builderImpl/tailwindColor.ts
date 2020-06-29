@@ -1,5 +1,6 @@
-import { nearestColorFrom } from "../nearest-color/nearestColor";
-import { nearestValue } from "./conversionTables";
+import { nearestColorFrom } from "../../nearest-color/nearestColor";
+import { nearestValue } from "../conversionTables";
+import { rgbTo6hex } from "../../common/rgbToHex";
 
 // retrieve the SOLID color for tailwind
 export const tailwindColor = (
@@ -14,10 +15,10 @@ export const tailwindColor = (
       // don't set text color when color is black (default) and opacity is 100%
       if (
         kind === "text" &&
-        fill.color.r === 0 &&
-        fill.color.g === 0 &&
-        fill.color.b === 0 &&
-        fill.opacity === 1
+        fill.color.r === 0.0 &&
+        fill.color.g === 0.0 &&
+        fill.color.b === 0.0 &&
+        fill.opacity === 1.0
       ) {
         return "";
       }
@@ -45,30 +46,6 @@ export const tailwindColor = (
   }
 
   return "";
-};
-
-export const rgbTo6hex = (color: RGB | RGBA): string => {
-  const hex =
-    ((color.r * 255) | (1 << 8)).toString(16).slice(1) +
-    ((color.g * 255) | (1 << 8)).toString(16).slice(1) +
-    ((color.b * 255) | (1 << 8)).toString(16).slice(1);
-
-  return hex;
-};
-
-export const rgbTo8hex = (
-  color: RGB | RGBA,
-  alpha: number = "a" in color ? color.a : 1.0
-): string => {
-  // when color is RGBA, alpha is set automatically
-  // when color is RGB, alpha need to be set manually (default: 1.0)
-  const hex =
-    ((alpha * 255) | (1 << 8)).toString(16).slice(1) +
-    ((color.r * 255) | (1 << 8)).toString(16).slice(1) +
-    ((color.g * 255) | (1 << 8)).toString(16).slice(1) +
-    ((color.b * 255) | (1 << 8)).toString(16).slice(1);
-
-  return hex;
 };
 
 export const tailwindColors: Record<string, string> = {

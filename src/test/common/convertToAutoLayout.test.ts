@@ -1,8 +1,8 @@
-import { AltFrameNode } from "./../../common/altMixins";
+import { AltFrameNode } from "../../altNodes/altMixins";
 import { tailwindMain } from "../../tailwind/tailwindMain";
-import { AltGroupNode, AltRectangleNode } from "../../common/altMixins";
-import { convertGroupToFrame } from "../../common/convertGroupToFrame";
-import { convertToAutoLayout } from "../../common/convertToAutoLayout";
+import { AltGroupNode, AltRectangleNode } from "../../altNodes/altMixins";
+import { convertGroupToFrame } from "../../altNodes/convertGroupToFrame";
+import { convertToAutoLayout } from "../../altNodes/convertToAutoLayout";
 
 describe("Convert to AutoLayout", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -82,14 +82,14 @@ describe("Convert to AutoLayout", () => {
     node1.width = 50;
 
     node2.x = 25;
-    node2.y = 20;
+    node2.y = 25;
     frame.layoutMode = "NONE";
     frame.children = [node2, node1];
 
     expect(
       tailwindMain("", [convertToAutoLayout(frame)], false, false)
     ).toEqual(
-      `<div class="inline-flex flex-col items-center justify-center">
+      `<div class="inline-flex flex-col space-y-1 items-center justify-center">
 <div class="w-full h-5 bg-red-700"></div>
 <div class="self-end w-5 h-5 bg-green-600"></div></div>`
     );

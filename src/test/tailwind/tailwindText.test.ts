@@ -3,7 +3,8 @@ import {
   convertFontWeight,
 } from "./../../tailwind/builderText";
 import { tailwindMain } from "./../../tailwind/tailwindMain";
-import { AltTextNode } from "./../../common/altMixins";
+import { AltTextNode } from "../../altNodes/altMixins";
+import { tailwindColor } from "../../tailwind/builderImpl/tailwindColor";
 
 describe("AltText", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -200,6 +201,14 @@ describe("AltText", () => {
     expect(tailwindMain("", [node], false, false)).toEqual(
       '<p class="underline"></p>'
     );
+  });
+
+  it("lineHeight", () => {
+    const node = new AltTextNode();
+    node.characters = "";
+
+    node.textDecoration = "NONE";
+    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
   });
 
   it("weight", () => {

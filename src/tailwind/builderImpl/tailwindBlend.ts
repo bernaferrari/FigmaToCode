@@ -1,6 +1,6 @@
-import { AltBlendMixin } from './../../common/altMixins';
+import { AltBlendMixin } from '../../altNodes/altMixins';
 import { nearestValue } from '../conversionTables';
-import { AltLayoutMixin, AltSceneNode } from "../../common/altMixins";
+import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 
 /**
  * https://tailwindcss.com/docs/opacity/
