@@ -4,7 +4,8 @@
 
 <p align="center">
 <a href="https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bernaferrari/FigmaToCode&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/af3321afff1f4d078037e09111120384"/></a>
-<a href="https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bernaferrari/FigmaToCode&amp;utm_campaign=Badge_Coverage"><img src="https://app.codacy.com/project/badge/Coverage/af3321afff1f4d078037e09111120384"/></a><a href="https://github.com/bernaferrari/FigmaToCode/actions"><img src="https://github.com/bernaferrari/FigmaToCode/workflows/CI/badge.svg"/></a><a href="http://twitter.com/bernaferrari"><img src="https://img.shields.io/badge/Twitter-@bernaferrari-blue.svg?style=flat" style="max-height: 300px;" alt="Twitter"/></a>
+<a href="https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bernaferrari/FigmaToCode&amp;utm_campaign=Badge_Coverage"><img src="https://app.codacy.com/project/badge/Coverage/af3321afff1f4d078037e09111120384"/></a>
+<a href="http://twitter.com/bernaferrari"><img src="https://img.shields.io/badge/Twitter-@bernaferrari-brightgreen.svg?style=flat" style="max-height: 300px;" alt="Twitter"/></a>
 </p>
 
 
