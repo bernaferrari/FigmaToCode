@@ -81,7 +81,7 @@ export class AltTextNode {
 }
 
 export interface AltDefaultShapeMixin
-  extends BaseNodeMixinStub,
+  extends AltBaseNodeMixin,
     AltBlendMixin,
     AltGeometryMixin,
     AltRectangleCornerMixin,
@@ -97,8 +97,8 @@ export interface AltEllipseNode extends AltDefaultShapeMixin, AltCornerMixin {}
 
 export interface AltFrameNode
   extends AltFrameMixin,
-    BaseNodeMixinStub,
-    ChildrenMixinStub,
+    AltBaseNodeMixin,
+    AltChildrenMixin,
     AltGeometryMixin,
     AltCornerMixin,
     AltRectangleCornerMixin,
@@ -106,17 +106,17 @@ export interface AltFrameNode
     AltLayoutMixin {}
 
 export interface AltGroupNode
-  extends BaseNodeMixinStub,
-    ChildrenMixinStub,
+  extends AltBaseNodeMixin,
+    AltChildrenMixin,
     AltBlendMixin,
     AltLayoutMixin {}
 
 // DOCUMENT
 
-interface AltDocumentNode extends BaseNodeMixinStub, ChildrenMixinStub {}
+interface AltDocumentNode extends AltBaseNodeMixin, AltChildrenMixin {}
 
 // PAGE
-interface AltPageNode extends BaseNodeMixinStub, ChildrenMixinStub {}
+interface AltPageNode extends AltBaseNodeMixin, AltChildrenMixin {}
 
 interface AltTextMixin {
   characters: string;
@@ -139,191 +139,41 @@ interface AltTextMixin {
 export interface AltTextNode
   extends AltTextMixin,
     AltDefaultShapeMixin,
-    BaseNodeMixinStub,
+    AltBaseNodeMixin,
     AltLayoutMixin {}
 
-const isInsideInstance = (node: any): boolean => {
-  if (!node.parent) {
-    return false;
-  }
-  return node.parent.type === "INSTANCE" || isInsideInstance(node.parent);
-};
-
-export interface BaseNodeMixinStub {
+export interface AltBaseNodeMixin {
   id: string;
-  parent: (AltSceneNode & ChildrenMixinStub) | null;
+  parent: (AltSceneNode & AltChildrenMixin) | null;
   name: string;
   pluginData: { [key: string]: string };
 
-  setPluginData(key: string, value: string): void;
-
-  getPluginData(key: string): string;
-
-  remove(): void;
+  // setPluginData(key: string, value: string): void;
+  // getPluginData(key: string): string;
+  // remove(): void;
 }
 
-export class BaseNodeMixinStub {
-  id: string = "missing";
-  parent: (AltSceneNode & ChildrenMixinStub) | null = null;
-  name: string = "missing";
-  pluginData: { [key: string]: string } = {};
-
-  setPluginData(key: string, value: string) {
-    this.pluginData[key] = value;
-  }
-
-  getPluginData(key: string): string {
-    return this.pluginData[key];
-  }
-
-  remove() {
-    if (isInsideInstance(this)) {
-      throw new Error("Error: can't remove item");
-    }
-    if (this.parent) {
-      // @ts-ignore
-      this.parent.children = this.parent.children.filter(
-        (child: any) => child !== this
-      );
-    }
-  }
+export interface AltChildrenMixin {
+  children: Array<AltSceneNode>;
 }
 
-export class ChildrenMixinStub {
-  children: Array<AltSceneNode> = [];
+// // DOCUMENT
+// class AltDocumentNode {
+//   type = "DOCUMENT";
+//   children = [];
+// }
 
-  setChildren(altChildren: Array<AltSceneNode> | AltSceneNode) {
-    if ("length" in altChildren) {
-      this.children = altChildren;
-    } else {
-      this.children = [altChildren];
-    }
-  }
+// // PAGE
+// class AltPageNode {
+//   type = "PAGE";
+//   children = [];
+//   _selection: Array<SceneNode> = [];
 
-  // this should probably not be used in the current state of things.
-  // Recursion already takes care of it.
-  appendChild(item: any) {
-    if (item.parent) {
-      item.parent.children = item.parent.children.filter(
-        (child: any) => child !== item
-      );
-    }
+//   get selection() {
+//     return this._selection || [];
+//   }
 
-    if (!item) {
-      throw new Error("Error: empty child");
-    }
-
-    item.parent = this;
-    this.children.push(item);
-  }
-
-  insertChild(index: number, child: any) {
-    if (!this.children) {
-      this.children = [];
-    }
-
-    if (!child) {
-      throw new Error("Error: empty child");
-    }
-
-    // @ts-ignore
-    if (child.parent === this) {
-      throw new Error("Error: Node already inside parent");
-    }
-
-    if (
-      // @ts-ignore
-      this.type === "DOCUMENT" &&
-      child.type !== "PAGE"
-    ) {
-      throw new Error(
-        "Error: The root node cannot have children of type other than PAGE"
-      );
-    }
-    if (child.parent) {
-      child.parent.children = child.parent.children.filter(
-        (_child: any) => child !== _child
-      );
-    }
-    // @ts-ignore
-    child.parent = this;
-    this.children.splice(index, 0, child);
-  }
-
-  findAll(callback: (node: AltSceneNode) => boolean): AltSceneNode[] {
-    if (!this.children) {
-      return [];
-    }
-    return this.children.filter(callback);
-  }
-
-  findOne(callback: (node: AltSceneNode) => boolean): AltSceneNode | undefined {
-    if (!this.children) {
-      return undefined;
-    }
-    return this.children.find(callback);
-  }
-
-  findChild(
-    callback: (node: AltSceneNode) => boolean
-  ): AltSceneNode | undefined {
-    if (!this.children) {
-      return undefined;
-    }
-    return this.children.find(callback);
-  }
-
-  findChildren(
-    callback: (node: AltSceneNode) => boolean
-  ): AltSceneNode | undefined {
-    if (!this.children) {
-      return undefined;
-    }
-
-    return this.children.find(callback);
-  }
-}
-
-// Original idea from from https://github.com/react-figma/figma-api-stub/blob/master/src/stubs.ts
-
-function applyMixins(derivedCtor: any, baseCtors: any[]) {
-  baseCtors.forEach((baseCtor) => {
-    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
-      Object.defineProperty(
-        derivedCtor.prototype,
-        name,
-        // @ts-ignore
-        Object.getOwnPropertyDescriptor(baseCtor.prototype, name)
-      );
-    });
-  });
-}
-
-// DOCUMENT
-class AltDocumentNode {
-  type = "DOCUMENT";
-  children = [];
-}
-
-// PAGE
-class AltPageNode {
-  type = "PAGE";
-  children = [];
-  _selection: Array<SceneNode> = [];
-
-  get selection() {
-    return this._selection || [];
-  }
-
-  set selection(value) {
-    this._selection = value;
-  }
-}
-
-applyMixins(AltRectangleNode, [BaseNodeMixinStub]);
-applyMixins(AltEllipseNode, [BaseNodeMixinStub]);
-applyMixins(AltFrameNode, [BaseNodeMixinStub, ChildrenMixinStub]);
-applyMixins(AltGroupNode, [BaseNodeMixinStub, ChildrenMixinStub]);
-applyMixins(AltDocumentNode, [BaseNodeMixinStub, ChildrenMixinStub]);
-applyMixins(AltTextNode, [BaseNodeMixinStub]);
-applyMixins(AltPageNode, [BaseNodeMixinStub, ChildrenMixinStub]);
+//   set selection(value) {
+//     this._selection = value;
+//   }
+// }
