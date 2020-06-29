@@ -145,7 +145,7 @@ const tailwindText = (node: AltTextNode): string => {
       ? node.characters.split("\n").join("<br></br>")
       : node.characters;
 
-  return `<p ${builderResult}>${charsWithLineBreak}</p>`;
+  return `<p${builderResult}>${charsWithLineBreak}</p>`;
 };
 
 const tailwindFrame = (node: AltFrameNode): string => {
@@ -195,7 +195,7 @@ export const tailwindContainer = (
     .border(node);
 
   if (builder.attributes || additionalAttr) {
-    return `\n<div ${builder.build(additionalAttr)}>${children}</div>`;
+    return `\n<div${builder.build(additionalAttr)}>${children}</div>`;
   }
   return children;
 };
