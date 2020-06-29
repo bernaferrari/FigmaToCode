@@ -1,4 +1,3 @@
-import { convertFontWeight } from "../tailwind/colors";
 import { flutterColor } from "./flutter_helpers";
 import { FlutterDefaultBuilder } from "./flutterBuilder";
 import { AltTextNode } from "../common/altMixins";

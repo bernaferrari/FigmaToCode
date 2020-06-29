@@ -38,6 +38,7 @@ export interface AltBlendMixin {
   effects: ReadonlyArray<Effect>;
   effectStyleId: string;
   visible: boolean;
+  radius: number;
 }
 
 export interface AltLayoutMixin {

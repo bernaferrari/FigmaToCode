@@ -71,33 +71,6 @@ export const rgbTo8hex = (
   return hex;
 };
 
-// Convert generic named weights to numbers, which is the way tailwind understands
-export const convertFontWeight = (weight: string) => {
-  weight = weight.toLowerCase();
-  switch (weight) {
-    case "Thin":
-      return "100";
-    case "Extra Light":
-      return "200";
-    case "Light":
-      return "300";
-    case "Regular":
-      return "400";
-    case "Medium":
-      return "500";
-    case "Semi Bold":
-      return "600";
-    case "Bold":
-      return "700";
-    case "Extra Bold":
-      return "800";
-    case "Black":
-      return "900";
-    default:
-      return "400";
-  }
-};
-
 export const tailwindColors: Record<string, string> = {
   "#000000": "black",
   "#ffffff": "white",

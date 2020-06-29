@@ -44,7 +44,7 @@ export const tailwindBorderRadius = (node: AltSceneNode): string => {
 
   if (node.cornerRadius !== figma.mixed) {
     comp += `rounded${pxToBorderRadius(node.cornerRadius)} `;
-  } else if (node.topLeftRadius !== undefined) {
+  } else {
     // todo optimize for tr/tl/br/bl instead of t/r/l/b
     if (node.topLeftRadius !== 0) {
       comp += `rounded-tl${pxToBorderRadius(node.topLeftRadius)} `;

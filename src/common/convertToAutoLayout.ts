@@ -251,5 +251,7 @@ const detectChildrenAlign = (
       return "CENTER";
     }
   }
+
+  // this should never be returned
   return "CENTER";
 };
