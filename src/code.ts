@@ -1,5 +1,5 @@
 import { tailwindMain } from "./tailwind/tailwindMain";
-import { flutterMain } from "./flutter/flutter_main";
+import { flutterMain } from "./flutter/flutterMain";
 import { retrieveFlutterColors } from "./flutter/retrieveUI/retrieveColors";
 import { retrieveTailwindColors } from "./tailwind/retrieveUI/retrieveColors";
 import { retrieveTailwindText } from "./tailwind/retrieveUI/retrieveTexts";

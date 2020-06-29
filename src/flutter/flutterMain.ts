@@ -4,8 +4,8 @@ import {
   AltRectangleNode,
   AltGroupNode,
   AltTextNode,
-} from "./../common/altMixins";
-import { FlutterChildBuilder } from "./flutter_builder";
+} from "../common/altMixins";
+import { FlutterDefaultBuilder } from "./flutterBuilder";
 import { AltSceneNode } from "../common/altMixins";
 import { mostFrequent } from "./flutter_helpers";
 import { FlutterTextBuilder } from "./flutter_text_methods";
@@ -73,7 +73,7 @@ const flutterWidgetGenerator = (
 
 const flutterGroup = (node: AltGroupNode): string => {
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new FlutterChildBuilder(
+  const builder = new FlutterDefaultBuilder(
     `Stack(children:[${flutterWidgetGenerator(node.children)}],),`
   )
     .blendAttr(node)
@@ -87,7 +87,7 @@ const flutterContainer = (
   node: AltFrameNode | AltRectangleNode | AltEllipseNode,
   child: string
 ): string => {
-  const builder = new FlutterChildBuilder(child);
+  const builder = new FlutterDefaultBuilder(child);
 
   builder
     .createContainer(node, material)

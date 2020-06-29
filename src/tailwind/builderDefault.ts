@@ -18,6 +18,7 @@ import { tailwindPosition } from "./builderImpl/tailwindPosition";
 import { tailwindColor } from "./colors";
 import { pxToLayoutSize } from "./conversionTables";
 import { tailwindSize } from "./builderImpl/tailwindSize";
+import { tailwindPadding } from "./builderImpl/tailwindPadding";
 
 export class tailwindDefaultBuilder {
   attributes: string = "";
@@ -166,48 +167,14 @@ export class tailwindDefaultBuilder {
         this.style = `${this.style};"`;
       }
     }
+    if (!this.attributes && !this.style) {
+      return "";
+    }
     const classOrClassName = this.isJSX ? "className" : "class";
-    return `${classOrClassName}="${this.attributes}"${this.style}`;
+    return ` ${classOrClassName}="${this.attributes}"${this.style}`;
   }
 
   reset() {
     this.attributes = "";
   }
 }
-
-/**
- * https://tailwindcss.com/docs/padding/
- * example: px-2 py-8
- */
-export const tailwindPadding = (
-  node: AltFrameMixin | AltDefaultShapeMixin
-): string => {
-  // Add padding if necessary!
-  // padding is currently only valid for auto layout.
-  // [horizontalPadding] and [verticalPadding] can have values even when AutoLayout is off
-  if ("layoutMode" in node && node.layoutMode !== "NONE") {
-    // calculate before. This is less effective than calculating in the if/elses,
-    // however, node.horizontalPadding might be different than node.verticalPadding
-    // and still have the same pxToLayoutSize result. Therefore, this guarantees an optimal layout.
-    const horizontal = pxToLayoutSize(node.horizontalPadding);
-    const vertical = pxToLayoutSize(node.verticalPadding);
-
-    if (node.horizontalPadding > 0 && horizontal === vertical) {
-      return `p-${horizontal} `;
-    } else {
-      let comp = "";
-
-      if (node.horizontalPadding > 0) {
-        comp += `px-${horizontal} `;
-      }
-
-      if (node.verticalPadding > 0) {
-        comp += `py-${vertical} `;
-      }
-
-      return comp;
-    }
-  }
-
-  return "";
-};

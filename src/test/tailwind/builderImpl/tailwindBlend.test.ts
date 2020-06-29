@@ -1,59 +1,51 @@
-import { tailwindSize } from "./../../../tailwind/builderImpl/tailwindSize";
-import { tailwindRotation } from "./../../../tailwind/builderImpl/tailwindBlend";
+import {
+  flutterOpacity,
+  flutterRotation,
+  flutterVisibility,
+} from "./../../../flutter/builderImpl/flutterBlend";
 import { AltRectangleNode } from "../../../common/altMixins";
-import { tailwindOpacity } from "../../../tailwind/builderImpl/tailwindBlend";
 
 describe("Tailwind Blend", () => {
   const node = new AltRectangleNode();
 
-  it("size for rectangle", () => {
-    node.width = 16;
-    node.height = 16;
-    expect(tailwindSize(node)).toEqual("w-4 h-4 ");
+  it("opacity", () => {
+    // undefined (unitialized, only happen on tests)
+    expect(flutterOpacity(node, "")).toEqual("");
 
-    node.width = 100;
-    node.height = 200;
-    expect(tailwindSize(node)).toEqual("w-24 h-48 ");
+    node.opacity = 0.5;
+    expect(flutterOpacity(node, "test")).toEqual(
+      "Opacity(opacity: 0.5, child: test),"
+    );
 
-    node.width = 300;
-    node.height = 300;
-    expect(tailwindSize(node)).toEqual("w-full h-64 ");
+    node.opacity = 1.0;
+    expect(flutterOpacity(node, "")).toEqual("");
   });
 
-  it("opacity", () => {
-    node.opacity = 0.1;
-    expect(tailwindOpacity(node)).toEqual("opacity-0 ");
+  it("visibility", () => {
+    // undefined (unitialized, only happen on tests)
+    expect(flutterVisibility(node, "")).toEqual("");
 
-    node.opacity = 0.3;
-    expect(tailwindOpacity(node)).toEqual("opacity-25 ");
+    node.visible = false;
+    expect(flutterVisibility(node, "test")).toEqual(
+      "Visibility(visible: false, child: test),"
+    );
 
-    node.opacity = 0.45;
-    expect(tailwindOpacity(node)).toEqual("opacity-50 ");
-
-    node.opacity = 0.65;
-    expect(tailwindOpacity(node)).toEqual("opacity-75 ");
-
-    node.opacity = 0.95;
-    expect(tailwindOpacity(node)).toEqual("opacity-75 ");
+    node.visible = true;
+    expect(flutterVisibility(node, "test")).toEqual("test");
   });
 
   it("rotation", () => {
+    // undefined (unitialized, only happen on tests)
+    expect(flutterRotation(node, "")).toEqual("");
+
     node.rotation = 45;
-    expect(tailwindRotation(node)).toEqual("rotate-45 ");
+    expect(flutterRotation(node, "test")).toEqual(
+      "Transform.rotate(angle: -0.7853975, child: test)"
+    );
 
     node.rotation = 90;
-    expect(tailwindRotation(node)).toEqual("rotate-90 ");
-
-    node.rotation = 180;
-    expect(tailwindRotation(node)).toEqual("rotate-180 ");
-
-    node.rotation = -45;
-    expect(tailwindRotation(node)).toEqual("-rotate-45 ");
-
-    node.rotation = -90;
-    expect(tailwindRotation(node)).toEqual("-rotate-90 ");
-
-    node.rotation = -180;
-    expect(tailwindRotation(node)).toEqual("-rotate-180 ");
+    expect(flutterRotation(node, "test")).toEqual(
+      "Transform.rotate(angle: -1.570795, child: test)"
+    );
   });
 });

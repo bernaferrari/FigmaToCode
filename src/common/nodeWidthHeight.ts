@@ -37,7 +37,7 @@ export const nodeWidthHeight = (
   ) {
     if (node.parent.layoutMode === "HORIZONTAL") {
       return {
-        width: "full",
+        width: allowRelative ? "full" : node.width,
         height: null,
       };
     }
@@ -109,7 +109,7 @@ export const nodeWidthHeight = (
   //   return `${propWidth}${propHeight}`;
   // }
 
-  if ("layoutMode" in node && node.layoutMode &&node.layoutMode !== "NONE") {
+  if ("layoutMode" in node && node.layoutMode && node.layoutMode !== "NONE") {
     if (node.counterAxisSizingMode === "FIXED") {
       // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
       // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.

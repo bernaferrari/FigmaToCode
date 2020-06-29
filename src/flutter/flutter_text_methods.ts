@@ -1,11 +1,9 @@
 import { convertFontWeight } from "../tailwind/colors";
 import { flutterColor } from "./flutter_helpers";
-
-import { wrapTextInsideAlign, wrapTextAutoResize } from "./flutter_wrappers";
-import { FlutterChildBuilder } from "./flutter_builder";
+import { FlutterDefaultBuilder } from "./flutterBuilder";
 import { AltTextNode } from "../common/altMixins";
 
-export class FlutterTextBuilder extends FlutterChildBuilder {
+export class FlutterTextBuilder extends FlutterDefaultBuilder {
   /**
    * A fresh builder instance should contain a blank product object, which is
    * used in further assembly.
@@ -130,4 +128,52 @@ export const getTextStyle = (node: AltTextNode): string => {
   // }
 
   return styleBuilder;
+};
+
+export const wrapTextAutoResize = (
+  node: AltTextNode,
+  child: string
+): string => {
+  if (node.textAutoResize === "NONE") {
+    // = instead of += because we want to replace it
+    return `SizedBox(width: ${node.width}, height: ${node.height}, child: ${child}),`;
+  } else if (node.textAutoResize === "HEIGHT") {
+    // if HEIGHT is set, it means HEIGHT will be calculated automatically, but width won't
+    // = instead of += because we want to replace it
+    return `SizedBox(width: ${node.width}, child: ${child}),`;
+  }
+
+  return child;
+};
+
+export const wrapTextInsideAlign = (
+  node: AltTextNode,
+  child: string
+): string => {
+  let alignment;
+  if (node.layoutAlign === "CENTER") {
+    if (node.textAlignHorizontal === "LEFT") alignment = "centerLeft";
+    if (node.textAlignHorizontal === "RIGHT") alignment = "centerRight";
+    if (node.textAlignHorizontal === "CENTER") alignment = "center";
+    // no support for justified yet
+  } else if (node.layoutAlign === "MAX") {
+    if (node.textAlignHorizontal === "LEFT") alignment = "leftBottom";
+    if (node.textAlignHorizontal === "RIGHT") alignment = "rightBottom";
+    if (node.textAlignHorizontal === "CENTER") alignment = "centerBottom";
+  }
+  // [node.layoutAlign === "MIN"] is the default, so no need to specify it.
+  if (!alignment) alignment = "center";
+
+  // there are many ways to align a text
+  if (node.textAlignVertical === "BOTTOM" && node.textAutoResize === "NONE") {
+    alignment = "bottomCenter";
+  }
+
+  if (
+    node.layoutAlign !== "MIN" ||
+    (node.textAlignVertical === "BOTTOM" && node.textAutoResize === "NONE")
+  ) {
+    return `Align(alignment: Alignment.${alignment}, child: ${child}),`;
+  }
+  return child;
 };

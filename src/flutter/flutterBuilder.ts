@@ -1,22 +1,20 @@
+import { flutterPosition } from "./builderImpl/flutterPosition";
+import {
+  flutterVisibility,
+  flutterOpacity,
+  flutterRotation,
+} from "./builderImpl/flutterBlend";
 import {
   AltSceneNode,
-  AltBlendMixin,
-  AltLayoutMixin,
   AltRectangleNode,
   AltEllipseNode,
   AltFrameNode,
-} from "./../common/altMixins";
+} from "../common/altMixins";
 
-import {
-  wrapOpacity,
-  wrapContainerPosition,
-  wrapRotation,
-  wrapVisibility,
-} from "./flutter_wrappers";
-import { makeContainer } from "./make_container";
-import { makeMaterial } from "./make_material";
+import { makeContainer } from "./flutterContainer";
+import { makeMaterial } from "./flutterMaterial";
 
-export class FlutterChildBuilder {
+export class FlutterDefaultBuilder {
   child: string = "";
 
   /**
@@ -49,30 +47,15 @@ export class FlutterChildBuilder {
   }
 
   blendAttr(node: AltSceneNode): this {
-    this.visibility(node);
-    this.rotation(node);
-    this.opacity(node);
+    this.child = flutterVisibility(node, this.child);
+    this.child = flutterRotation(node, this.child);
+    this.child = flutterOpacity(node, this.child);
 
-    return this;
-  }
-
-  opacity(node: AltBlendMixin): this {
-    this.child = wrapOpacity(node, this.child);
-    return this;
-  }
-
-  visibility(node: AltSceneNode): this {
-    this.child = wrapVisibility(node, this.child);
-    return this;
-  }
-
-  rotation(node: AltLayoutMixin): this {
-    this.child = wrapRotation(node, this.child);
     return this;
   }
 
   containerPosition(node: AltSceneNode, parentId: string): this {
-    this.child = wrapContainerPosition(node, this.child, parentId);
+    this.child = flutterPosition(node, this.child, parentId);
     return this;
   }
 }

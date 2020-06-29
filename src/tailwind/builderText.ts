@@ -73,10 +73,10 @@ export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
     return this;
   }
 
-  fontFamily(node: AltTextNode): this {
-    // todo fontFamily
-    return this;
-  }
+  // todo fontFamily
+  //  fontFamily(node: AltTextNode): this {
+  //    return this;
+  //  }
 
   /**
    * https://tailwindcss.com/docs/font-size/
@@ -173,13 +173,17 @@ export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
   textAlign(node: AltTextNode): this {
     // if layoutAlign !== MIN, Text will be wrapped by Align
     // if alignHorizontal is LEFT, don't do anything because that is native
-    const alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
 
-    if (
-      node.textAlignHorizontal !== "LEFT" &&
-      node.textAutoResize !== "WIDTH_AND_HEIGHT"
-    ) {
-      this.attributes += `text-${alignHorizontal} `;
+    // only undefined in testing
+    if (node.textAlignHorizontal) {
+      const alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
+
+      if (
+        node.textAlignHorizontal !== "LEFT" &&
+        node.textAutoResize !== "WIDTH_AND_HEIGHT"
+      ) {
+        this.attributes += `text-${alignHorizontal} `;
+      }
     }
 
     return this;
