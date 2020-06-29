@@ -44,7 +44,7 @@ export const frameNodeToAlt = (
   convertCorner(altNode, node);
   convertRectangleCorner(altNode, node);
 
-  altNode.setChildren(convertIntoAltNodes(node.children, altNode));
+  altNode.children = convertIntoAltNodes(node.children, altNode);
 
   return convertToAutoLayout(convertNodeIfChildIsBigRect(altNode));
 };
@@ -108,7 +108,7 @@ export const convertIntoAltNodes = (
         convertLayout(altNode, node);
         convertBlend(altNode, node);
 
-        altNode.setChildren(convertIntoAltNodes(node.children, altNode));
+        altNode.children = convertIntoAltNodes(node.children, altNode);
 
         // try to find big rect and regardless of that result, also try to convert to autolayout.
         // There is a big chance this will be returned as a FRAME
