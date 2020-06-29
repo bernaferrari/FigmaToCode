@@ -1,4 +1,4 @@
-import { nearestColorFrom } from "../nearest-color/nearesetColor";
+import { nearestColorFrom } from "../nearest-color/nearestColor";
 import { nearestValue } from "./conversionTables";
 
 // retrieve the SOLID color for tailwind
