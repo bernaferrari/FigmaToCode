@@ -2,7 +2,7 @@ import { flutterElevationAndShadowColor } from "./builderImpl/flutterShadow";
 import { AltSceneNode } from "../common/altMixins";
 import { flutterSize } from "./builderImpl/flutterSize";
 import { flutterPadding } from "./builderImpl/flutterPadding";
-import { flutterShape, flutterRadius } from "./builderImpl/flutterBorder";
+import { flutterShape, flutterBorderRadius } from "./builderImpl/flutterBorder";
 import {
   AltRectangleNode,
   AltEllipseNode,
@@ -58,7 +58,7 @@ const materialShape = (
   if (node.type === "ELLIPSE" || node.strokes.length > 0) {
     return flutterShape(node);
   } else {
-    return flutterRadius(node);
+    return flutterBorderRadius(node);
   }
 };
 

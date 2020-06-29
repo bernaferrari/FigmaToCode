@@ -36,32 +36,6 @@ export const rgbaTohex = (
   return hex;
 };
 
-// Convert generic named weights to numbers, which is the way Flutter understands
-export const convertFontWeight = (weight: string) => {
-  switch (weight) {
-    case "Thin":
-      return "100";
-    case "Extra Light":
-      return "200";
-    case "Light":
-      return "300";
-    case "Regular":
-      return "400";
-    case "Medium":
-      return "500";
-    case "Semi Bold":
-      return "600";
-    case "Bold":
-      return "700";
-    case "Extra Bold":
-      return "800";
-    case "Black":
-      return "900";
-    default:
-      return "400";
-  }
-};
-
 // https://stackoverflow.com/a/20762713
 export const mostFrequent = (arr: Array<any>) => {
   return arr

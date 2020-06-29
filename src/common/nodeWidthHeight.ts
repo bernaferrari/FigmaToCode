@@ -130,7 +130,6 @@ export const nodeWidthHeight = (
       // if node.children.length > 1, it will be taken care before.
     } else if (node.children.length === 0) {
       // if node has no children, it can be AUTO and needs a fixed size.
-      // todo automatically convert empty Frame into a Rectangle when altConversion happens
       return {
         width: propWidth,
         height: propHeight,
