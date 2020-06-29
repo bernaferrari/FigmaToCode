@@ -83,6 +83,20 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
 }
 
 /**
+ * Given either an array or object of colors, returns an array of
+ * {@link ColorSpec} objects (with {@link RGB} values).
+ *
+ * @private
+ * @param {Array.<string>|Object} colors An array of hex-based color strings, or
+ *     an object mapping color *names* to hex values.
+ * @return {Array.<ColorSpec>} An array of {@link ColorSpec} objects
+ *     representing the same colors passed in.
+ */
+function mapColors(colors: Array<string>): Array<ColorSpec> {
+  return colors.map((color) => createColorSpec(color));
+}
+
+/**
  * Provides a matcher to find the nearest color based on the provided list of
  * available colors.
  *
@@ -136,29 +150,14 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
 export const nearestColorFrom = (
   availableColors: Array<string>
 ): ((hex: string) => string) => {
-  let colors = mapColors(availableColors);
-  var matcher = (hex: string) => nearestColor(hex, colors);
-  return matcher;
+  const colors = mapColors(availableColors);
+  return (hex: string) => nearestColor(hex, colors);
 };
 
 type ColorObject = {
   name: string;
   hex: string;
 };
-
-/**
- * Given either an array or object of colors, returns an array of
- * {@link ColorSpec} objects (with {@link RGB} values).
- *
- * @private
- * @param {Array.<string>|Object} colors An array of hex-based color strings, or
- *     an object mapping color *names* to hex values.
- * @return {Array.<ColorSpec>} An array of {@link ColorSpec} objects
- *     representing the same colors passed in.
- */
-function mapColors(colors: Array<string>): Array<ColorSpec> {
-  return colors.map((color) => createColorSpec(color));
-}
 
 /**
  * Parses a color from a string.
