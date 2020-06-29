@@ -1,16 +1,14 @@
 import { AltFrameNode } from "./../../common/altMixins";
 import { tailwindMain } from "../../tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "../../common/altMixins";
-import { createFigma } from "figma-api-stub";
 import { convertNodeIfChildIsBigRect } from "../../common/convertNodeIfChildIsBigRect";
 
 describe("convert node if child is big rect ", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
+
   it("frame with 1 child", () => {
     const frame = new AltFrameNode();
     frame.width = 100;
@@ -24,7 +22,11 @@ describe("convert node if child is big rect ", () => {
     rectangle.fills = [
       {
         type: "SOLID",
-        color: { r: 0, g: 0, b: 0 },
+        color: {
+          r: 0,
+          g: 0,
+          b: 0,
+        },
       },
     ];
 
@@ -55,7 +57,11 @@ describe("convert node if child is big rect ", () => {
     rectangle.fills = [
       {
         type: "SOLID",
-        color: { r: 0, g: 0, b: 0 },
+        color: {
+          r: 0,
+          g: 0,
+          b: 0,
+        },
       },
     ];
 
@@ -68,7 +74,11 @@ describe("convert node if child is big rect ", () => {
     miniRect.fills = [
       {
         type: "SOLID",
-        color: { r: 1, g: 1, b: 1 },
+        color: {
+          r: 1,
+          g: 1,
+          b: 1,
+        },
       },
     ];
     miniRect.parent = frame;
@@ -101,7 +111,11 @@ describe("convert node if child is big rect ", () => {
     rectangle.fills = [
       {
         type: "SOLID",
-        color: { r: 0, g: 0, b: 0 },
+        color: {
+          r: 0,
+          g: 0,
+          b: 0,
+        },
       },
     ];
 
@@ -114,7 +128,11 @@ describe("convert node if child is big rect ", () => {
     miniRect.fills = [
       {
         type: "SOLID",
-        color: { r: 1, g: 1, b: 1 },
+        color: {
+          r: 1,
+          g: 1,
+          b: 1,
+        },
       },
     ];
     miniRect.parent = group;

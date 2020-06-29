@@ -3,7 +3,6 @@ import {
   AltEllipseNode,
   AltGroupNode,
 } from "./../../../common/altMixins";
-import { createFigma } from "figma-api-stub";
 import {
   flutterBorderRadius,
   flutterBorder,
@@ -11,12 +10,10 @@ import {
 } from "../../../flutter/builderImpl/flutterBorder";
 
 describe("Flutter Border", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
 
   const node = new AltRectangleNode();
 

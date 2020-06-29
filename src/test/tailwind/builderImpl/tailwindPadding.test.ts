@@ -1,6 +1,5 @@
 import { tailwindPadding } from "./../../../tailwind/builderImpl/tailwindPadding";
 import { AltRectangleNode } from "../../../common/altMixins";
-import { flutterPadding } from "../../../flutter/builderImpl/flutterPadding";
 import { AltFrameNode } from "../../../common/altMixins";
 
 describe("Tailwind padding", () => {

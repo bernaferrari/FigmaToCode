@@ -97,7 +97,7 @@ const detectAutoLayoutDirection = (
   // check if elements are vertically aligned
   const intervalY = calculateInterval(children, "y");
 
-  console.log("intervalY:", intervalY);
+  // console.log("intervalY:", intervalY);
   if (intervalY.length === 0) {
     return ["NONE", []];
   }
@@ -112,7 +112,7 @@ const detectAutoLayoutDirection = (
   } else {
     // check if elements are horizontally aligned
     const intervalX = calculateInterval(children, "x");
-    console.log("intervalX:", intervalX);
+    // console.log("intervalX:", intervalX);
 
     if (average(intervalX) >= -8) {
       // const standardDeviation = this.sd(intervalX);
@@ -226,7 +226,6 @@ const detectChildrenAlign = (
     const parentCenteredPosX = parentNode.width / 2;
 
     const marginX = nodeCenteredPosX - parentCenteredPosX;
-    console.log("marginX is", marginX);
 
     // allow a small threshold
     if (marginX < -4) {
