@@ -46,7 +46,7 @@ export const nodeWidthHeight = (
     // }
   }
 
-  let [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
+  const [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
 
   let propWidth: responsive | number | null = nodeWidth;
   let propHeight: number | null = nodeHeight;
@@ -264,16 +264,25 @@ const calculateResponsiveW = (
 
     // they will try to set the value, and if false keep calculating
     // todo is there a better way of writing this?
-    if (calculateResp(1, "full")) {
-    } else if (calculateResp(1 / 2, "1/2")) {
-    } else if (calculateResp(1 / 3, "1/3")) {
-    } else if (calculateResp(2 / 3, "2/3")) {
-    } else if (calculateResp(1 / 4, "1/4")) {
-    } else if (calculateResp(3 / 4, "3/4")) {
-    } else if (calculateResp(1 / 5, "1/5")) {
-    } else if (calculateResp(1 / 6, "1/6")) {
-    } else if (calculateResp(5 / 6, "5/6")) {
-    } else if (calculateResp(1 / 12, "1/12")) {
+
+    const checkList: Array<[number, responsive]> = [
+      [1, "full"],
+      [1 / 2, "1/2"],
+      [1 / 3, "1/3"],
+      [2 / 3, "2/3"],
+      [1 / 4, "1/4"],
+      [3 / 4, "3/4"],
+      [1 / 5, "1/5"],
+      [1 / 6, "1/6"],
+      [5 / 6, "5/6"],
+      [1 / 12, "1/12"],
+    ];
+
+    // exit the for when result is found.
+    let resultFound = false;
+    for (let i = 0; i < checkList.length && !resultFound; i++) {
+      const [div, resp] = checkList[i];
+      resultFound = calculateResp(div, resp);
     }
   }
 

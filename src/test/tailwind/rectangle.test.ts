@@ -68,22 +68,6 @@ describe("Tailwind Rectangle", () => {
     );
   });
 
-  it("color gray", () => {
-    node.fills = [
-      {
-        type: "SOLID",
-        color: {
-          r: 0.25,
-          g: 0.25,
-          b: 0.25,
-        },
-      },
-    ];
-    expect(executeMain()).toEqual(
-      '<div className="w-full h-64 bg-gray-800"></div>'
-    );
-  });
-
   it("stroke", () => {
     node.fills = figma.mixed;
     node.strokeWeight = 4;

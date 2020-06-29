@@ -10,7 +10,7 @@ export const tailwindColor = (
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
   if (fills && fills !== figma.mixed && fills.length > 0) {
-    let fill = fills[0];
+    const fill = fills[0];
     if (fill.type === "SOLID") {
       // don't set text color when color is black (default) and opacity is 100%
       if (
@@ -25,7 +25,7 @@ export const tailwindColor = (
 
       const hex = rgbTo6hex(fill.color);
 
-      let opacity = fill.opacity ?? 1.0;
+      const opacity = fill.opacity ?? 1.0;
 
       // example: text-opacity-50
       //

@@ -6,7 +6,7 @@ export const retrieveFlutterColors = (
 ): Array<contrastedColor> => {
   const selectedChildren = deepFlatten(sceneNode);
 
-  let colorStr: Array<contrastedColor> = [];
+  const colorStr: Array<contrastedColor> = [];
 
   // collect all fill[0] and stroke[0] SOLID colors
   selectedChildren.forEach((d) => {
@@ -26,8 +26,8 @@ export const retrieveFlutterColors = (
 
   // retrieve only unique colors
   // from https://stackoverflow.com/a/18923480/4418073
-  let unique: Record<string, boolean> = {};
-  let distinct: Array<contrastedColor> = [];
+  const unique: Record<string, boolean> = {};
+  const distinct: Array<contrastedColor> = [];
   colorStr.forEach(function (x) {
     if (!unique[x.hex]) {
       distinct.push(x);
@@ -50,7 +50,7 @@ const convertColor = (
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
   if (fills && fills !== figma.mixed && fills.length > 0) {
-    let fill = fills[0];
+    const fill = fills[0];
     if (fill.type === "SOLID") {
       const hex = "#" + rgbTo6hex(fill.color);
 
@@ -93,7 +93,7 @@ function calculateContrastRatio(color1: RGB, color2: RGB) {
 }
 
 function luminance(color: RGB) {
-  var a = [color.r * 255, color.g * 255, color.b * 255].map(function (v) {
+  const a = [color.r * 255, color.g * 255, color.b * 255].map(function (v) {
     v /= 255;
     return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
   });

@@ -1,4 +1,7 @@
-import { tailwindNearestColor, getTailwindColor } from "../../tailwind/builderImpl/tailwindColor";
+import {
+  tailwindNearestColor,
+  getTailwindColor,
+} from "../../tailwind/builderImpl/tailwindColor";
 
 describe("Nearest colors", () => {
   it("can it identify nearby colors?", () => {

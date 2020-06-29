@@ -1,4 +1,3 @@
-import { convertToAutoLayout } from "./../../altNodes/convertToAutoLayout";
 import { AltFrameNode } from "../../altNodes/altMixins";
 import { tailwindMain } from "../../tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "../../altNodes/altMixins";

@@ -1,6 +1,5 @@
 import { AltFrameNode, AltGroupNode, AltSceneNode } from "./altMixins";
 import { convertGroupToFrame } from "./convertGroupToFrame";
-import { assert } from "console";
 
 /**
  * Add AutoLayout attributes if layout has items aligned (either vertically or horizontally).
@@ -154,7 +153,7 @@ const calculateInterval = (
 
   // calculate the distance between values (either vertically or horizontally)
   const interval = [];
-  for (var i = 0; i < sorted.length - 1; i++) {
+  for (let i = 0; i < sorted.length - 1; i++) {
     interval.push(
       sorted[i + 1][x_or_y] - (sorted[i][x_or_y] + sorted[i][h_or_w])
     );

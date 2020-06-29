@@ -57,12 +57,12 @@
 function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
   needle = parseColor(needle);
 
-  var distanceSq,
+  let distanceSq,
     minDistanceSq = Infinity,
     rgb,
     value;
 
-  for (var i = 0; i < colors.length; ++i) {
+  for (let i = 0; i < colors.length; ++i) {
     rgb = colors[i].rgb;
 
     distanceSq =
@@ -178,7 +178,7 @@ type ColorObject = {
  * parseColor('foo');                   // => throws
  */
 function parseColor(source: RGB | string): RGB {
-  var red, green, blue;
+  let red, green, blue;
 
   if (typeof source === "object") {
     return source;
@@ -186,7 +186,7 @@ function parseColor(source: RGB | string): RGB {
 
   let hexMatchArr = source.match(/^#?((?:[0-9a-f]{3}){1,2})$/i);
   if (hexMatchArr) {
-    let hexMatch = hexMatchArr[1];
+    const hexMatch = hexMatchArr[1];
 
     if (hexMatch.length === 3) {
       hexMatchArr = [

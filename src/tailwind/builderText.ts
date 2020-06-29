@@ -221,13 +221,13 @@ export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
     return this;
   }
 
-  reset() {
+  reset(): void {
     this.attributes = "";
   }
 }
 
 // Convert generic named weights to numbers, which is the way tailwind understands
-export const convertFontWeight = (weight: string) => {
+export const convertFontWeight = (weight: string): string => {
   weight = weight.toLowerCase();
   switch (weight) {
     case "thin":

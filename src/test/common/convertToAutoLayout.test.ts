@@ -1,7 +1,6 @@
 import { AltFrameNode } from "../../altNodes/altMixins";
 import { tailwindMain } from "../../tailwind/tailwindMain";
-import { AltGroupNode, AltRectangleNode } from "../../altNodes/altMixins";
-import { convertGroupToFrame } from "../../altNodes/convertGroupToFrame";
+import { AltRectangleNode } from "../../altNodes/altMixins";
 import { convertToAutoLayout } from "../../altNodes/convertToAutoLayout";
 
 describe("Convert to AutoLayout", () => {

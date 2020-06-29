@@ -16,7 +16,7 @@ export const tailwindSize = (node: AltSceneNode): string => {
 
   if (sizeResult.height) {
     comp += `h-${pxToLayoutSize(sizeResult.height)} `;
-   }
+  }
 
   return comp;
 };
