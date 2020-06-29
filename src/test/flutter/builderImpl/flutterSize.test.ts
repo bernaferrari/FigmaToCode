@@ -1,14 +1,11 @@
 import { flutterSize } from "./../../../flutter/builderImpl/flutterSize";
 import { AltRectangleNode, AltFrameNode } from "../../../common/altMixins";
-import { createFigma } from "figma-api-stub";
 
 describe("Flutter Size", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
 
   it("size for a rectangle", () => {
     const node = new AltRectangleNode();

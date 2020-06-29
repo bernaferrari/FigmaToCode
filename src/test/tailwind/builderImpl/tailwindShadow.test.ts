@@ -1,21 +1,10 @@
 import { tailwindShadow } from "./../../../tailwind/builderImpl/tailwindShadow";
-import {
-  AltRectangleNode,
-  AltTextNode,
-  AltEllipseNode,
-} from "../../../common/altMixins";
-import { createFigma } from "figma-api-stub";
-import {
-  tailwindBorderWidth,
-  tailwindBorderRadius,
-} from "../../../tailwind/builderImpl/tailwindBorder";
+import { AltRectangleNode } from "../../../common/altMixins";
 describe("Tailwind Shadow", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
 
   const node = new AltRectangleNode();
   node.topRightRadius = 0;

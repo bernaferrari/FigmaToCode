@@ -3,20 +3,13 @@ import {
   convertFontWeight,
 } from "./../../tailwind/builderText";
 import { tailwindMain } from "./../../tailwind/tailwindMain";
-import { flutterMain } from "./../../flutter/flutterMain";
 import { AltTextNode } from "./../../common/altMixins";
-import { convertSingleNodeToAlt } from "../../common/altConversion";
-import { tailwindPosition } from "../../tailwind/builderImpl/tailwindPosition";
-import { AltGroupNode, AltFrameNode } from "../../common/altMixins";
-import { createFigma } from "figma-api-stub";
 
 describe("AltText", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
   it("textAutoResize", () => {
     const node = new AltTextNode();
     node.characters = "";

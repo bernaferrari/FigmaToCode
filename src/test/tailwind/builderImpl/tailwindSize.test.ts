@@ -1,14 +1,11 @@
 import { AltRectangleNode, AltFrameNode } from "../../../common/altMixins";
-import { createFigma } from "figma-api-stub";
 import { tailwindSize } from "./../../../tailwind/builderImpl/tailwindSize";
 
 describe("Tailwind Builder", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
 
   it("size for a rectangle", () => {
     const node = new AltRectangleNode();

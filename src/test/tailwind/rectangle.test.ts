@@ -1,12 +1,12 @@
 import { AltRectangleNode } from "./../../common/altMixins";
-import { createFigma } from "figma-api-stub";
 import { tailwindMain } from "../../tailwind/tailwindMain";
 
 describe("Tailwind Rectangle", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
+  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  global.figma = {
+    mixed: undefined,
+  };
+
   const node = new AltRectangleNode();
   node.width = 300;
   node.height = 300;
@@ -56,7 +56,11 @@ describe("Tailwind Rectangle", () => {
     node.fills = [
       {
         type: "SOLID",
-        color: { r: 0.25, g: 0.25, b: 0.25 },
+        color: {
+          r: 0.25,
+          g: 0.25,
+          b: 0.25,
+        },
       },
     ];
     expect(executeMain()).toEqual(
@@ -68,7 +72,11 @@ describe("Tailwind Rectangle", () => {
     node.fills = [
       {
         type: "SOLID",
-        color: { r: 0.25, g: 0.25, b: 0.25 },
+        color: {
+          r: 0.25,
+          g: 0.25,
+          b: 0.25,
+        },
       },
     ];
     expect(executeMain()).toEqual(
@@ -82,7 +90,11 @@ describe("Tailwind Rectangle", () => {
     node.strokes = [
       {
         type: "SOLID",
-        color: { r: 0.25, g: 0.25, b: 0.25 },
+        color: {
+          r: 0.25,
+          g: 0.25,
+          b: 0.25,
+        },
       },
     ];
     expect(executeMain()).toEqual(

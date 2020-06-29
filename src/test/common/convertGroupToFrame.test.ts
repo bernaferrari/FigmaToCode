@@ -1,15 +1,13 @@
 import { tailwindMain } from "./../../tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "./../../common/altMixins";
 import { convertGroupToFrame } from "./../../common/convertGroupToFrame";
-import { createFigma } from "figma-api-stub";
 
 describe("Convert Group to Frame", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
+
   it("Simple conversion", () => {
     const rectangle = new AltRectangleNode();
     rectangle.x = 20;

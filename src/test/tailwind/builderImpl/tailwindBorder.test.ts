@@ -3,18 +3,15 @@ import {
   AltTextNode,
   AltEllipseNode,
 } from "./../../../common/altMixins";
-import { createFigma } from "figma-api-stub";
 import {
   tailwindBorderWidth,
   tailwindBorderRadius,
 } from "../../../tailwind/builderImpl/tailwindBorder";
 describe("Tailwind Border", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
 
   const node = new AltRectangleNode();
   node.topRightRadius = 0;
