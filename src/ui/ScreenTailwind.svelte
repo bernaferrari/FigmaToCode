@@ -65,19 +65,16 @@
   import Switch from "./Switch.svelte";
 
   let jsx = false;
-  $: if (jsx) {
-    parent.postMessage({ pluginMessage: { type: "jsx-true" } }, "*");
-  }
-  $: if (!jsx) {
-    parent.postMessage({ pluginMessage: { type: "jsx-false" } }, "*");
+  $: if (jsx || !jsx) {
+    parent.postMessage({ pluginMessage: { type: "jsx", data: jsx } }, "*");
   }
 
   let layerName = false;
-  $: if (layerName) {
-    parent.postMessage({ pluginMessage: { type: "layerName-true" } }, "*");
-  }
-  $: if (!layerName) {
-    parent.postMessage({ pluginMessage: { type: "layerName-false" } }, "*");
+  $: if (layerName || !layerName) {
+    parent.postMessage(
+      { pluginMessage: { type: "layerName", data: layerName } },
+      "*"
+    );
   }
 
   import { createEventDispatcher } from "svelte";

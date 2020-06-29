@@ -88,33 +88,19 @@ figma.ui.onmessage = (msg) => {
   } else if (msg.type === "flutter") {
     mode = "flutter";
     run();
-  } else if (msg.type === "jsx-true") {
-    if (!isJsx) {
-      isJsx = true;
+  } else if (msg.type === "jsx") {
+    if (msg.data !== isJsx) {
+      isJsx = msg.data;
       run();
     }
-  } else if (msg.type === "jsx-false") {
-    if (isJsx) {
-      isJsx = false;
-      run();
-    }
-  } else if (msg.type === "layerName-true") {
-    if (!layerName) {
-      layerName = true;
-      run();
-    }
-  } else if (msg.type === "layerName-false") {
-    if (layerName) {
-      layerName = false;
+  } else if (msg.type === "layerName") {
+    if (msg.data !== layerName) {
+      layerName = msg.data;
       run();
     }
   } else if (msg.type === "material") {
-    console.log("data is ", msg.data);
-    if (msg.data === true && !material) {
-      material = true;
-      run();
-    } else if (msg.data === false && material) {
-      material = false;
+    if (msg.data !== material) {
+      material = msg.data;
       run();
     }
   }
