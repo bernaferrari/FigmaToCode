@@ -16,7 +16,6 @@ import {
 } from "./builderImpl/tailwindBorder";
 import { tailwindPosition } from "./builderImpl/tailwindPosition";
 import { tailwindColor } from "./builderImpl/tailwindColor";
-import { pxToLayoutSize } from "./conversionTables";
 import { tailwindSize } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
 
@@ -174,7 +173,7 @@ export class tailwindDefaultBuilder {
     return ` ${classOrClassName}="${this.attributes}"${this.style}`;
   }
 
-  reset() {
+  reset(): void {
     this.attributes = "";
   }
 }

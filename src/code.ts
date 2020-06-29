@@ -5,7 +5,7 @@ import { retrieveTailwindColors } from "./tailwind/retrieveUI/retrieveColors";
 import { retrieveTailwindText } from "./tailwind/retrieveUI/retrieveTexts";
 import { convertIntoAltNodes } from "./altNodes/altConversion";
 
-let parentId: string = "";
+let parentId: string;
 let isJsx = false;
 let layerName = false;
 let material = true;

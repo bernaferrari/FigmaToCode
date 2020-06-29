@@ -169,7 +169,7 @@ export const tailwindContainer = (
   // | LineNode,
   children: string,
   additionalAttr: string = ""
-) => {
+): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -215,7 +215,7 @@ export const rowColumnProps = (node: AltFrameNode): string => {
 
   // [optimization]
   // flex, by default, has flex-row. Therefore, it can be omitted.
-  let rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "flex-col ";
+  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "flex-col ";
 
   // https://tailwindcss.com/docs/space/
   // space between items

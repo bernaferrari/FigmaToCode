@@ -14,7 +14,7 @@ import { flutterColor } from "./builderImpl/flutterColor";
 export const makeMaterial = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode,
   child: string
-) => {
+): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166

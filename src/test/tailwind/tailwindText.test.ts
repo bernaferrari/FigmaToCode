@@ -4,7 +4,6 @@ import {
 } from "./../../tailwind/builderText";
 import { tailwindMain } from "./../../tailwind/tailwindMain";
 import { AltTextNode } from "../../altNodes/altMixins";
-import { tailwindColor } from "../../tailwind/builderImpl/tailwindColor";
 
 describe("AltText", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -52,29 +51,6 @@ describe("AltText", () => {
       '<p class="h-4 w-4 text-justified"></p>'
     );
   });
-
-  it("textAlignHorizontal", () => {
-    const node = new AltTextNode();
-    node.characters = "";
-    node.width = 16;
-    node.height = 16;
-
-    node.textAutoResize = "WIDTH_AND_HEIGHT";
-    node.textAlignHorizontal = "LEFT";
-    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
-
-    node.textAutoResize = "NONE";
-    node.textAlignHorizontal = "CENTER";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="h-4 w-4 text-center"></p>'
-    );
-
-    node.textAlignHorizontal = "JUSTIFIED";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="h-4 w-4 text-justified"></p>'
-    );
-  });
-
   it("fontSize", () => {
     const node = new AltTextNode();
     node.characters = "";
@@ -185,7 +161,7 @@ describe("AltText", () => {
     expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
   });
 
-  it("lineHeight", () => {
+  it("textDecoration", () => {
     const node = new AltTextNode();
     node.characters = "";
 
@@ -201,14 +177,6 @@ describe("AltText", () => {
     expect(tailwindMain("", [node], false, false)).toEqual(
       '<p class="underline"></p>'
     );
-  });
-
-  it("lineHeight", () => {
-    const node = new AltTextNode();
-    node.characters = "";
-
-    node.textDecoration = "NONE";
-    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
   });
 
   it("weight", () => {

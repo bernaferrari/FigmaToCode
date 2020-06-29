@@ -1,7 +1,5 @@
-
-
 // https://stackoverflow.com/a/20762713
-export const mostFrequent = (arr: Array<any>) => {
+export const mostFrequent = (arr: Array<any>): any => {
   return arr
     .sort(
       (a, b) =>

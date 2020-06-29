@@ -9,7 +9,7 @@ export const retrieveTailwindText = (
   // convert to AltNode and then flatten it. Conversion is necessary because of [tailwindText]
   const selectedText = deepFlatten(sceneNode);
 
-  let textStr: Array<namedText> = [];
+  const textStr: Array<namedText> = [];
 
   selectedText.forEach((node) => {
     if (node.type === "TEXT") {
@@ -41,7 +41,7 @@ export const retrieveTailwindText = (
 
       let contrastBlack = 21;
       if (node.fills && node.fills !== figma.mixed && node.fills.length > 0) {
-        let fill = node.fills[0];
+        const fill = node.fills[0];
         if (fill.type === "SOLID") {
           contrastBlack = calculateContrastRatio(fill.color, black);
         }
@@ -59,8 +59,8 @@ export const retrieveTailwindText = (
 
   // retrieve only unique texts (attr + name)
   // from https://stackoverflow.com/a/18923480/4418073
-  let unique: Record<string, boolean> = {};
-  let distinct: Array<namedText> = [];
+  const unique: Record<string, boolean> = {};
+  const distinct: Array<namedText> = [];
   textStr.forEach(function (x) {
     if (!unique[x.attr + x.name]) {
       distinct.push(x);
@@ -132,7 +132,7 @@ const convertColor = (
   // [when testing] fills can be undefined
 
   if (fills && fills !== figma.mixed && fills.length > 0) {
-    let fill = fills[0];
+    const fill = fills[0];
     if (fill.type === "SOLID") {
       return tailwindNearestColor(rgbTo6hex(fill.color));
     }
@@ -155,7 +155,7 @@ function calculateContrastRatio(color1: RGB, color2: RGB) {
 }
 
 function luminance(color: RGB) {
-  var a = [color.r * 255, color.g * 255, color.b * 255].map(function (v) {
+  const a = [color.r * 255, color.g * 255, color.b * 255].map(function (v) {
     v /= 255;
     return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
   });

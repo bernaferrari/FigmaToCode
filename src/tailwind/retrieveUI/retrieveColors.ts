@@ -1,5 +1,8 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
-import { tailwindNearestColor, tailwindColors } from "../builderImpl/tailwindColor";
+import {
+  tailwindNearestColor,
+  tailwindColors,
+} from "../builderImpl/tailwindColor";
 import { rgbTo6hex } from "../../common/rgbToHex";
 
 export const retrieveTailwindColors = (
@@ -7,7 +10,7 @@ export const retrieveTailwindColors = (
 ): Array<namedColor> => {
   const selectedChildren = deepFlatten(sceneNode);
 
-  let colorStr: Array<namedColor> = [];
+  const colorStr: Array<namedColor> = [];
 
   // collect all fill[0] and stroke[0] SOLID colors
   selectedChildren.forEach((d) => {
@@ -27,8 +30,8 @@ export const retrieveTailwindColors = (
 
   // retrieve only unique colors
   // from https://stackoverflow.com/a/18923480/4418073
-  let unique: Record<string, boolean> = {};
-  let distinct: Array<namedColor> = [];
+  const unique: Record<string, boolean> = {};
+  const distinct: Array<namedColor> = [];
   colorStr.forEach(function (x) {
     if (!unique[x.hex]) {
       distinct.push(x);
@@ -50,7 +53,7 @@ const convertColor = (
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
   if (fills && fills !== figma.mixed && fills.length > 0) {
-    let fill = fills[0];
+    const fill = fills[0];
     if (fill.type === "SOLID") {
       const hex = rgbTo6hex(fill.color);
       const tailColor = tailwindNearestColor(hex);

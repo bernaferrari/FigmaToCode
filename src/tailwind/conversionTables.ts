@@ -1,4 +1,4 @@
-export const nearestValue = (goal: number, array: Array<number>) => {
+export const nearestValue = (goal: number, array: Array<number>): number => {
   return array.reduce(function (prev, curr) {
     return Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev;
   });
@@ -87,11 +87,11 @@ const mapWidthHeightSize: Record<number, string> = {
   16: "64",
 };
 
-export const pxToMapLetterSpacing = (value: number) =>
+export const pxToMapLetterSpacing = (value: number): string =>
   pixelToTailwindValue(value, mapLetterSpacing);
 
 // visually, percent / 100 => rem works nicely
-export const percentToAbsoluteLineHeight = (value: number) =>
+export const percentToAbsoluteLineHeight = (value: number): string =>
   mapAbsoluteLineHeight[
     nearestValue(
       value / 100,

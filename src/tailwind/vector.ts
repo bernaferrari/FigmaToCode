@@ -2,7 +2,7 @@ import { AltFrameNode, AltGroupNode } from "../altNodes/altMixins";
 
 export const tailwindVector = (
   group: AltFrameNode | AltGroupNode,
-  isJsx: Boolean
+  isJsx: boolean
 ) => {
   // TODO VECTOR
   return "";
