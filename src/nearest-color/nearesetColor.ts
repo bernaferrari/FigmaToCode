@@ -1,5 +1,6 @@
 // https://github.com/dtao/nearest-color converted to ESM and Typescript
 // It was sligtly modified to support Typescript better.
+// It was also slighly simplified because many parts weren't being used.
 /**
  * Defines an available color.
  *
@@ -56,16 +57,10 @@
 function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
   needle = parseColor(needle);
 
-  if (!needle) {
-    return "";
-  }
-
   var distanceSq,
     minDistanceSq = Infinity,
     rgb,
     value;
-
-  colors || (colors = nearestColor.DEFAULT_COLORS);
 
   for (var i = 0; i < colors.length; ++i) {
     rgb = colors[i].rgb;
@@ -79,16 +74,6 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
       minDistanceSq = distanceSq;
       value = colors[i];
     }
-  }
-
-  if (value && "name" in value) {
-    return "";
-    // return {
-    //   name: value.name ?? "",
-    //   value: value.source,
-    //   rgb: value.rgb,
-    //   distance: Math.sqrt(minDistanceSq),
-    // };
   }
 
   if (value) {
@@ -149,7 +134,7 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
  * nearestColor.from(invalidColors); // => throws
  */
 export const nearestColorFrom = (
-  availableColors: Array<string> | ColorObject
+  availableColors: Array<string>
 ): ((hex: string) => string) => {
   let colors = mapColors(availableColors);
   var matcher = (hex: string) => nearestColor(hex, colors);
@@ -171,15 +156,8 @@ type ColorObject = {
  * @return {Array.<ColorSpec>} An array of {@link ColorSpec} objects
  *     representing the same colors passed in.
  */
-function mapColors(colors: Array<string> | ColorObject): Array<ColorSpec> {
-  if (colors instanceof Array) {
-    return colors.map((color) => createColorSpec(color));
-  }
-
-  return Object.keys(colors).map((name) =>
-    // @ts-ignore ideally this will always be true
-    createColorSpec(colors[name], name)
-  );
+function mapColors(colors: Array<string>): Array<ColorSpec> {
+  return colors.map((color) => createColorSpec(color));
 }
 
 /**
@@ -207,11 +185,6 @@ function parseColor(source: RGB | string): RGB {
     return source;
   }
 
-  if (source in nearestColor.STANDARD_COLORS) {
-    // @ts-ignore already
-    return parseColor(nearestColor.STANDARD_COLORS[source]);
-  }
-
   let hexMatchArr = source.match(/^#?((?:[0-9a-f]{3}){1,2})$/i);
   if (hexMatchArr) {
     let hexMatch = hexMatchArr[1];
@@ -233,17 +206,6 @@ function parseColor(source: RGB | string): RGB {
     red = parseInt(hexMatchArr[0], 16);
     green = parseInt(hexMatchArr[1], 16);
     blue = parseInt(hexMatchArr[2], 16);
-
-    return { r: red, g: green, b: blue };
-  }
-
-  var rgbMatch = source.match(
-    /^rgb\(\s*(\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?)\s*\)$/i
-  );
-  if (rgbMatch) {
-    red = parseComponentValue(rgbMatch[1]);
-    green = parseComponentValue(rgbMatch[2]);
-    blue = parseComponentValue(rgbMatch[3]);
 
     return { r: red, g: green, b: blue };
   }
@@ -297,122 +259,9 @@ type ColorSpec = {
  *   rgb: { r: 136, g: 0, b: 0 }
  * }
  */
-function createColorSpec(
-  input: string | RGB | ColorSpec,
-  name?: string
-): ColorSpec {
-  if (typeof input === "string") {
-    return {
-      source: input,
-      rgb: parseColor(input),
-    };
-  } else {
-    // This is for if/when we're concatenating lists of colors.
-    if ("source" in input) {
-      return createColorSpec(input.source, rgbToHex(input.rgb));
-    }
-
-    return {
-      source: rgbToHex(input),
-      rgb: input,
-    };
-  }
+function createColorSpec(input: string): ColorSpec {
+  return {
+    source: input,
+    rgb: parseColor(input),
+  };
 }
-
-/**
- * Parses a value between 0-255 from a string.
- *
- * @private
- * @param {string} string
- * @return {number}
- *
- * @example
- * parseComponentValue('100');  // => 100
- * parseComponentValue('100%'); // => 255
- * parseComponentValue('50%');  // => 128
- */
-function parseComponentValue(string: string): number {
-  if (string.charAt(string.length - 1) === "%") {
-    return Math.round((parseInt(string, 10) * 255) / 100);
-  }
-
-  return Number(string);
-}
-
-/**
- * Converts an {@link RGB} color to its hex representation.
- *
- * @private
- * @param {RGB} rgb
- * @return {string}
- *
- * @example
- * rgbToHex({ r: 255, g: 128, b: 0 }); // => '#ff8000'
- */
-function rgbToHex(rgb: RGB): string {
-  return (
-    "#" +
-    leadingZero(rgb.r.toString(16)) +
-    leadingZero(rgb.g.toString(16)) +
-    leadingZero(rgb.b.toString(16))
-  );
-}
-
-/**
- * Puts a 0 in front of a numeric string if it's only one digit. Otherwise
- * nothing (just returns the value passed in).
- *
- * @private
- * @param {string} value
- * @return
- *
- * @example
- * leadingZero('1');  // => '01'
- * leadingZero('12'); // => '12'
- */
-function leadingZero(value: string) {
-  if (value.length === 1) {
-    value = "0" + value;
-  }
-  return value;
-}
-
-/**
- * A map from the names of standard CSS colors to their hex values.
- */
-nearestColor.STANDARD_COLORS = {
-  aqua: "#0ff",
-  black: "#000",
-  blue: "#00f",
-  fuchsia: "#f0f",
-  gray: "#808080",
-  green: "#008000",
-  lime: "#0f0",
-  maroon: "#800000",
-  navy: "#000080",
-  olive: "#808000",
-  orange: "#ffa500",
-  purple: "#800080",
-  red: "#f00",
-  silver: "#c0c0c0",
-  teal: "#008080",
-  white: "#fff",
-  yellow: "#ff0",
-};
-
-/**
- * Default colors. Comprises the colors of the rainbow (good ol' ROY G. BIV).
- * This list will be used for calls to {@nearestColor} that don't specify a list
- * of available colors to match.
- */
-nearestColor.DEFAULT_COLORS = mapColors([
-  "#f00", // r
-  "#f80", // o
-  "#ff0", // y
-  "#0f0", // g
-  "#00f", // b
-  "#008", // i
-  "#808", // v
-]);
-
-nearestColor.VERSION = "0.5.0";
