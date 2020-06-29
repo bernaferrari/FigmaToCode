@@ -14,3 +14,10 @@ jobs:
       run: npm install
     - name: Run tests
       run: npm test
+    - name: Run coverage
+      run: npm coverage
+    - name: Run codacy-coverage-reporter
+      uses: codacy/codacy-coverage-reporter-action@master
+      with:
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        coverage-reports: coverage/clover.xml
