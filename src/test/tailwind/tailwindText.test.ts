@@ -1,4 +1,7 @@
-import { tailwindTextNodeBuilder } from "./../../tailwind/builderText";
+import {
+  tailwindTextNodeBuilder,
+  convertFontWeight,
+} from "./../../tailwind/builderText";
 import { tailwindMain } from "./../../tailwind/tailwindMain";
 import { flutterMain } from "./../../flutter/flutterMain";
 import { AltTextNode } from "./../../common/altMixins";
@@ -31,7 +34,7 @@ describe("AltText", () => {
     );
 
     node.textAutoResize = "WIDTH_AND_HEIGHT";
-    expect(tailwindMain("", [node], false, false)).toEqual('<p></p>');
+    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
   });
 
   it("textAlignHorizontal", () => {
@@ -42,7 +45,7 @@ describe("AltText", () => {
 
     node.textAutoResize = "WIDTH_AND_HEIGHT";
     node.textAlignHorizontal = "LEFT";
-    expect(tailwindMain("", [node], false, false)).toEqual('<p></p>');
+    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
 
     node.textAutoResize = "NONE";
     node.textAlignHorizontal = "CENTER";
@@ -64,7 +67,7 @@ describe("AltText", () => {
 
     node.textAutoResize = "WIDTH_AND_HEIGHT";
     node.textAlignHorizontal = "LEFT";
-    expect(tailwindMain("", [node], false, false)).toEqual('<p></p>');
+    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
 
     node.textAutoResize = "NONE";
     node.textAlignHorizontal = "CENTER";
@@ -116,7 +119,7 @@ describe("AltText", () => {
       family: "inter",
       style: "regular",
     };
-    expect(tailwindMain("", [node], false, false)).toEqual('<p></p>');
+    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
   });
 
   it("letterSpacing", () => {
@@ -185,7 +188,7 @@ describe("AltText", () => {
     );
 
     node.textCase = "ORIGINAL";
-    expect(tailwindMain("", [node], false, false)).toEqual('<p></p>');
+    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
   });
 
   it("lineHeight", () => {
@@ -193,7 +196,7 @@ describe("AltText", () => {
     node.characters = "";
 
     node.textDecoration = "NONE";
-    expect(tailwindMain("", [node], false, false)).toEqual('<p></p>');
+    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
 
     node.textDecoration = "STRIKETHROUGH";
     expect(tailwindMain("", [node], false, false)).toEqual(
@@ -206,6 +209,20 @@ describe("AltText", () => {
     );
   });
 
+  it("weight", () => {
+    expect(convertFontWeight("tHIN")).toEqual("100");
+    expect(convertFontWeight("Default")).toEqual("400");
+
+    expect(convertFontWeight("Thin")).toEqual("100");
+    expect(convertFontWeight("Extra Light")).toEqual("200");
+    expect(convertFontWeight("Light")).toEqual("300");
+    expect(convertFontWeight("Regular")).toEqual("400");
+    expect(convertFontWeight("Medium")).toEqual("500");
+    expect(convertFontWeight("Semi Bold")).toEqual("600");
+    expect(convertFontWeight("Bold")).toEqual("700");
+    expect(convertFontWeight("Extra Bold")).toEqual("800");
+    expect(convertFontWeight("Black")).toEqual("900");
+  });
   it("reset", () => {
     const node = new AltTextNode();
     node.characters = "";

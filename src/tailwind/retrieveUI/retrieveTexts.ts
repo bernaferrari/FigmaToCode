@@ -1,6 +1,6 @@
 import { AltSceneNode, AltTextNode } from "../../common/altMixins";
-import { rgbTo6hex, tailwindNearestColor, convertFontWeight } from "../colors";
-import { tailwindTextNodeBuilder } from "../builderText";
+import { rgbTo6hex, tailwindNearestColor } from "../colors";
+import { tailwindTextNodeBuilder, convertFontWeight } from "../builderText";
 
 export const retrieveTailwindText = (
   sceneNode: Array<AltSceneNode>
