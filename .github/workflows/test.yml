@@ -15,7 +15,7 @@ jobs:
     - name: Run tests
       run: npm test
     - name: Run coverage
-      run: npm coverage
+      run: npm run coverage
     - name: Run codacy-coverage-reporter
       uses: codacy/codacy-coverage-reporter-action@master
       with:
