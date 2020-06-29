@@ -2,6 +2,13 @@
 
 # Figma to Code
 
+<p align="center">
+<a href="https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bernaferrari/FigmaToCode&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/af3321afff1f4d078037e09111120384"/></a>
+<a href="https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bernaferrari/FigmaToCode&amp;utm_campaign=Badge_Coverage"><img src="https://app.codacy.com/project/badge/Coverage/af3321afff1f4d078037e09111120384"/></a><a href="https://github.com/bernaferrari/FigmaToCode/actions"><img src="https://github.com/bernaferrari/FigmaToCode/workflows/CI/badge.svg"/></a><a href="http://twitter.com/bernaferrari"><img src="https://img.shields.io/badge/Twitter-@bernaferrari-blue.svg?style=flat" style="max-height: 300px;" alt="Twitter"/></a>
+</p>
+
+
+
 Most *design to code* plugins are bad. This project aims to solve, or at least improve, the situation. This plugin generates responsive layouts in [Tailwind](https://tailwindcss.com/) and [Flutter](https://flutter.github.io/). The plan is to eventually add support for [Jetpack Compose](https://developer.android.com/jetpack/compose) and possibly standard HTML or other frameworks like [React Native](https://reactnative.dev/), [SwiftUI](https://developer.apple.com/xcode/swiftui/), [Bootstrap](https://getbootstrap.com/), [Material](https://material.io/develop/web/) or [Fluent](https://www.microsoft.com/design/fluent/). Feedback and partnerships are appreciated!
 
 ![Gif showing the conversion](assets/lossy_gif.gif)
