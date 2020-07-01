@@ -113,8 +113,8 @@ describe("Flutter Size", () => {
 
   it("adjust parent if children's size + stroke > parent size", () => {
     const node = new AltRectangleNode();
-    node.width = 12;
-    node.height = 12;
+    node.width = 8;
+    node.height = 8;
 
     node.strokeWeight = 4;
     node.strokeAlign = "OUTSIDE";
@@ -134,7 +134,7 @@ describe("Flutter Size", () => {
     expect(flutterSize(parentNode)).toEqual("width: 16, height: 16, ");
 
     node.strokeAlign = "CENTER";
-    expect(flutterSize(parentNode)).toEqual("width: 10, height: 10, ");
+    expect(flutterSize(parentNode)).toEqual("width: 12, height: 12, ");
   });
 
   it("full width when width is same to the parent", () => {

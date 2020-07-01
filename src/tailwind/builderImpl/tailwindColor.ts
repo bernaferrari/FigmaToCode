@@ -1,6 +1,5 @@
 import { nearestColorFrom } from "../../nearest-color/nearestColor";
 import { nearestValue } from "../conversionTables";
-import { rgbTo6hex } from "../../common/rgbToHex";
 
 // retrieve the SOLID color for tailwind
 export const tailwindColor = (
@@ -23,8 +22,6 @@ export const tailwindColor = (
         return "";
       }
 
-      const hex = rgbTo6hex(fill.color);
-
       const opacity = fill.opacity ?? 1.0;
 
       // example: text-opacity-50
@@ -37,8 +34,15 @@ export const tailwindColor = (
           ? `${kind}-opacity-${nearestValue(opacity * 100, [0, 25, 50, 75])} `
           : "";
 
+      // figma uses r,g,b in [0, 1], while nearestColor uses it in [0, 255]
+      const color = {
+        r: fill.color.r * 255,
+        g: fill.color.g * 255,
+        b: fill.color.b * 255,
+      };
+
       // example: text-red-500
-      const colorProp = `${kind}-${getTailwindColor(hex)} `;
+      const colorProp = `${kind}-${getTailwindColor(color)} `;
 
       // if fill isn't visible, it shouldn't be painted.
       return fill.visible !== false ? `${colorProp}${opacityProp}` : "";
@@ -157,6 +161,6 @@ export const tailwindNearestColor = nearestColorFrom(
   Object.keys(tailwindColors)
 );
 
-export const getTailwindColor = (color: string): string => {
+export const getTailwindColor = (color: string | RGB): string => {
   return tailwindColors[tailwindNearestColor(color)];
 };

@@ -68,11 +68,13 @@ export const convertNodeIfChildIsBigRect = (
 const identifyRectAsBackground = (
   children: ReadonlyArray<AltSceneNode>
 ): AltRectangleNode | undefined => {
+  // todo should the conversion happen also when a group has a single rect?
   // needs at least two items (rect in bg and something else in fg)
   if (children.length < 2) {
     return undefined;
   }
 
+  // check if there is a child covering all the other children
   const maxH = Math.max(...children.map((d) => d.height));
   const maxW = Math.max(...children.map((d) => d.width));
   const largestChild = children.find(

@@ -11,9 +11,11 @@ describe("Nearest colors", () => {
   });
 
   it("can it identify tailwind colors?", () => {
-    const tailwindCompare = (color: string, equals: string) => {
+    const tailwindCompare = (color: string | RGB, equals: string) => {
       expect(getTailwindColor(color)).toEqual(equals);
     };
+
+    tailwindCompare({ r: 255, g: 245, b: 244 }, "red-100");
 
     tailwindCompare("#fff5f4", "red-100");
     tailwindCompare("#fff5f5", "red-100");

@@ -31,7 +31,6 @@ describe("AltConversions", () => {
       tailwindMain("", convertIntoAltNodes([frame], undefined), false, false)
     ).toEqual('<div class="w-5 h-5"></div>');
   });
-  // todo Ellipse. There is no Ellipse in figma stubs.
 
   it("Group", () => {
     const node = figma.createFrame();
@@ -46,4 +45,19 @@ describe("AltConversions", () => {
 <div class="inline-flex items-center justify-center"></div></div>`
     );
   });
+
+  it("Text", () => {
+    const node = figma.createText();
+
+    figma.loadFontAsync({ family: "Roboto", style: "Regular" });
+
+    node.fontName = { family: "Roboto", style: "Regular" };
+    node.characters = "";
+
+    expect(
+      tailwindMain("", convertIntoAltNodes([node], undefined), false, false)
+    ).toEqual(`<p></p>`);
+  });
+
+  // todo add a test for EllipseNode, but there is no EllipseNode in figma-api-stubs!
 });

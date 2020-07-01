@@ -47,7 +47,7 @@ describe("Flutter Border", () => {
       },
     ];
     expect(flutterBorder(node)).toEqual(
-      "border: Border.all(color: Color(0xff000000),width: 2,),"
+      "border: Border.all(color: Color(0xff000000), width: 2,),"
     );
 
     node.strokeWeight = 0;
@@ -60,7 +60,7 @@ describe("Flutter Border", () => {
     node.cornerRadius = figma.mixed;
     node.topLeftRadius = 4;
     expect(flutterShape(node)).toEqual(
-      "shape: RoundedRectangleBorder(side: BorderSide(width: 0, color: Color(0xff000000),), borderRadius: BorderRadius.only(topLeft: 4, topRight: 0, bottomLeft: 0, bottomRight: 0), ),"
+      "shape: RoundedRectangleBorder(side: BorderSide(width: 0, color: Color(0xff000000), ), borderRadius: BorderRadius.only(topLeft: 4, topRight: 0, bottomLeft: 0, bottomRight: 0), ),"
     );
 
     const ellipseNode = new AltEllipseNode();

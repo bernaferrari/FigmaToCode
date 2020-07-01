@@ -60,7 +60,7 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
   let distanceSq,
     minDistanceSq = Infinity,
     rgb,
-    value;
+    value: ColorSpec;
 
   for (let i = 0; i < colors.length; ++i) {
     rgb = colors[i].rgb;
@@ -76,10 +76,8 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
     }
   }
 
-  if (value) {
-    return value.source;
-  }
-  return "";
+  // @ts-ignore this is always not null
+  return value.source;
 }
 
 /**
@@ -149,14 +147,9 @@ function mapColors(colors: Array<string>): Array<ColorSpec> {
  */
 export const nearestColorFrom = (
   availableColors: Array<string>
-): ((hex: string) => string) => {
+): ((hex: string | RGB) => string) => {
   const colors = mapColors(availableColors);
-  return (hex: string) => nearestColor(hex, colors);
-};
-
-type ColorObject = {
-  name: string;
-  hex: string;
+  return (hex: string | RGB) => nearestColor(hex, colors);
 };
 
 /**
