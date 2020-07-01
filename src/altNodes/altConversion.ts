@@ -37,7 +37,9 @@ export const frameNodeToAlt = (
   altNode.id = node.id;
   altNode.name = node.name;
 
-  if (altParent) altNode.parent = altParent;
+  if (altParent) {
+    altNode.parent = altParent;
+  }
 
   convertDefaultShape(altNode, node);
   convertFrame(altNode, node);
@@ -59,7 +61,9 @@ const frameToRectangleNode = (
   newNode.id = node.id;
   newNode.name = node.name;
 
-  if (altParent) newNode.parent = altParent;
+  if (altParent) {
+    newNode.parent = altParent;
+  }
 
   convertRectangleCorner(newNode, node);
   convertDefaultShape(newNode, node);
@@ -85,7 +89,9 @@ export const convertIntoAltNodes = (
         altNode.id = node.id;
         altNode.name = node.name;
 
-        if (altParent) altNode.parent = altParent;
+        if (altParent) {
+          altNode.parent = altParent;
+        }
 
         convertDefaultShape(altNode, node);
         convertCorner(altNode, node);
@@ -103,7 +109,9 @@ export const convertIntoAltNodes = (
         altNode.id = node.id;
         altNode.name = node.name;
 
-        if (altParent) altNode.parent = altParent;
+        if (altParent) {
+          altNode.parent = altParent;
+        }
 
         convertLayout(altNode, node);
         convertBlend(altNode, node);
@@ -119,7 +127,9 @@ export const convertIntoAltNodes = (
         altNode.id = node.id;
         altNode.name = node.name;
 
-        if (altParent) altNode.parent = altParent;
+        if (altParent) {
+          altNode.parent = altParent;
+        }
 
         convertLayout(altNode, node);
         convertBlend(altNode, node);

@@ -1,3 +1,4 @@
+import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   AltSceneNode,
   AltGeometryMixin,
@@ -98,41 +99,7 @@ export class tailwindDefaultBuilder {
    * example: shadow
    */
   shadow(node: AltBlendMixin): this {
-    // [when testing] node.effects can be undefined
-    if (node.effects && node.effects.length > 0) {
-      const drop_shadow: Array<ShadowEffect> = node.effects.filter(
-        (d): d is ShadowEffect => d.type === "DROP_SHADOW"
-      );
-      let boxShadow = "";
-      // simple shadow from tailwind
-      if (drop_shadow) {
-        boxShadow = "shadow";
-      }
-
-      const innerShadow =
-        node.effects.filter((d): d is ShadowEffect => d.type === "INNER_SHADOW")
-          .length > 0
-          ? "shadow-inner"
-          : "";
-
-      this.attributes += innerShadow;
-
-      // todo customize the shadow
-
-      // if (drop_shadow) {
-      //   drop_shadow.forEach((d: ShadowEffect) => {
-      //     d.radius;
-      //     boxShadow += `BoxShadow(
-      //       color: ${rgbTohex(d.color)},
-      //       blurRadius: ${d.radius},
-      //       offset: Offset(${d.offset.x}, ${d.offset.y}),
-      //     ), `;
-      //   });
-      // }
-      // TODO layer blur, shadow-outline
-      this.attributes += `${boxShadow} `;
-    }
-
+    this.attributes += tailwindShadow(node);
     return this;
   }
 

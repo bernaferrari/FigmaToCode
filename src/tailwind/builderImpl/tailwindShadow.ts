@@ -25,17 +25,6 @@ export const tailwindShadow = (node: AltBlendMixin): string => {
     return boxShadow + innerShadow;
 
     // todo customize the shadow
-
-    // if (drop_shadow) {
-    //   drop_shadow.forEach((d: ShadowEffect) => {
-    //     d.radius;
-    //     boxShadow += `BoxShadow(
-    //       color: ${rgbTohex(d.color)},
-    //       blurRadius: ${d.radius},
-    //       offset: Offset(${d.offset.x}, ${d.offset.y}),
-    //     ), `;
-    //   });
-    // }
     // TODO layer blur, shadow-outline
   }
   return "";
