@@ -17,7 +17,7 @@ describe("Tailwind Shadow", () => {
       color: { r: 0, g: 0, b: 0 },
     },
   ];
-  it("test", () => {
+  it("drop shadow", () => {
     // no shadow
     expect(tailwindShadow(node)).toEqual("");
 
@@ -31,7 +31,9 @@ describe("Tailwind Shadow", () => {
         visible: true,
       },
     ];
+  });
 
+  it("inner shadow", () => {
     expect(tailwindShadow(node)).toEqual("shadow ");
 
     node.effects = [

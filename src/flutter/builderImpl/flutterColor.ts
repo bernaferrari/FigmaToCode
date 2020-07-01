@@ -10,9 +10,11 @@ export const flutterColor = (
     if (fill.type === "SOLID") {
       const opacity = fill.opacity ?? 1.0;
 
+      // todo maybe ignore text color when it is black?
+
       // if fill isn't visible, it shouldn't be painted.
-      return opacity
-        ? `color: Color(0x${rgbTo8hex(fill.color, opacity)}),`
+      return fill.visible !== false
+        ? `color: Color(0x${rgbTo8hex(fill.color, opacity)}), `
         : "";
     }
   }

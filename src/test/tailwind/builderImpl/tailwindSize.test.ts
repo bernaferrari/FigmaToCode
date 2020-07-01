@@ -26,15 +26,43 @@ describe("Tailwind Builder", () => {
   it("STRETCH inside AutoLayout", () => {
     const node = new AltFrameNode();
     node.layoutMode = "HORIZONTAL";
+    node.counterAxisSizingMode = "FIXED";
 
     const child = new AltRectangleNode();
-    child.parent = node;
     child.layoutAlign = "STRETCH";
 
+    child.parent = node;
+    node.children = [child];
+
     expect(tailwindSize(child)).toEqual("w-full ");
+
+    // fail
+    node.layoutMode = "VERTICAL";
+    child.width = 16;
+    child.height = 16;
+    expect(tailwindSize(child)).toEqual("w-4 h-4 ");
+
+    expect(tailwindSize(node)).toEqual("");
   });
 
-  it("Fixed size when children are absolute", () => {
+  it("Vertical layout with FIXED counterAxis", () => {
+    const node = new AltFrameNode();
+    node.layoutMode = "VERTICAL";
+    node.counterAxisSizingMode = "FIXED";
+    node.width = 16;
+    node.height = 16;
+
+    const child = new AltRectangleNode();
+    child.width = 8;
+    child.height = 8;
+
+    child.parent = node;
+    node.children = [child];
+
+    expect(tailwindSize(node)).toEqual("w-4 ");
+  });
+
+  it("Children are rectangles, size shouldn't be relative", () => {
     const node = new AltFrameNode();
     node.layoutMode = "NONE";
     node.width = 48;
@@ -111,12 +139,16 @@ describe("Tailwind Builder", () => {
   });
 
   it("adjust parent if children's size + stroke > parent size", () => {
+    const parentNode = new AltFrameNode();
+    parentNode.width = 8;
+    parentNode.height = 8;
+
     const node = new AltRectangleNode();
-    node.width = 12;
-    node.height = 12;
+    node.width = 8;
+    node.height = 8;
 
     node.strokeWeight = 4;
-    node.strokeAlign = "OUTSIDE";
+    node.strokeAlign = "CENTER";
     node.strokes = [
       {
         type: "SOLID",
@@ -124,15 +156,44 @@ describe("Tailwind Builder", () => {
       },
     ];
 
+    expect(tailwindSize(parentNode)).toEqual("w-2 h-2 ");
+
+    parentNode.children = [node];
+    node.parent = parentNode;
+    expect(tailwindSize(parentNode)).toEqual("w-3 h-3 ");
+
+    node.strokeAlign = "OUTSIDE";
+    expect(tailwindSize(parentNode)).toEqual("w-4 h-4 ");
+  });
+
+  it("all branches with children's size + stroke < children's size", () => {
     const parentNode = new AltFrameNode();
     parentNode.width = 8;
     parentNode.height = 8;
+
+    const node = new AltRectangleNode();
+    node.width = 4;
+    node.height = 4;
+
+    node.strokeWeight = 2;
+    node.strokeAlign = "CENTER";
+    node.strokes = [
+      {
+        type: "SOLID",
+        color: { r: 0.25, g: 0.25, b: 0.25 },
+      },
+    ];
+
+    expect(tailwindSize(parentNode)).toEqual("w-2 h-2 ");
+
     parentNode.children = [node];
     node.parent = parentNode;
+    expect(tailwindSize(parentNode)).toEqual("w-2 h-2 ");
 
-    expect(tailwindSize(parentNode)).toEqual("w-4 h-4 ");
+    node.strokeAlign = "OUTSIDE";
+    expect(tailwindSize(parentNode)).toEqual("w-2 h-2 ");
 
-    node.strokeAlign = "CENTER";
+    node.strokeAlign = "INSIDE";
     expect(tailwindSize(parentNode)).toEqual("w-2 h-2 ");
   });
 
@@ -150,6 +211,24 @@ describe("Tailwind Builder", () => {
 
     expect(tailwindSize(parentNode)).toEqual("");
     expect(tailwindSize(node)).toEqual("w-full h-3 ");
+  });
+
+  it("set the width to max if the view is near the corner", () => {
+    const node = new AltFrameNode();
+    node.width = 100;
+    node.height = 100;
+    node.x = 0;
+    node.y = 0;
+
+    const parentNode = new AltFrameNode();
+    parentNode.layoutMode = "NONE";
+    parentNode.width = 120;
+    parentNode.height = 120;
+
+    parentNode.children = [node];
+    node.parent = parentNode;
+
+    expect(tailwindSize(node)).toEqual("w-full h-24 ");
   });
 
   it("responsive width", () => {

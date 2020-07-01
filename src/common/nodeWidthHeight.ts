@@ -29,10 +29,10 @@ export const nodeWidthHeight = (
   //   }
   // }
 
-  // if layoutAlign is STRETCH, w/h should be full
+  // if node's layoutAlign is STRETCH, w/h should be full
   if (
-    node.parent &&
     node.layoutAlign === "STRETCH" &&
+    node.parent &&
     "layoutMode" in node.parent
   ) {
     if (node.parent.layoutMode === "HORIZONTAL") {
@@ -42,7 +42,7 @@ export const nodeWidthHeight = (
       };
     }
     // else if (node.parent.layoutMode === "VERTICAL") {
-    //   // TODO. h-full? It isn't always reliable, but it is inside a Frame anyway..
+    // todo use h-full? It isn't always reliable, but it is inside a Frame anyway..
     // }
   }
 
@@ -64,20 +64,17 @@ export const nodeWidthHeight = (
   }
 
   if (allowRelative) {
-    // calculate the responsivness using the correct parent
-    const rW = calculateResponsiveW(node, nodeWidth);
+    // avoid relative width when parent is relative (therefore, child is probably absolute, which doesn't work nice)
+    const relativePos =
+      node.parent &&
+      node.parent.children.length > 1 &&
+      (node.parent.type === "GROUP" ||
+        ("layoutMode" in node.parent && node.parent.layoutMode === "NONE"));
 
-    if (rW) {
-      // if (rW === "full" && node.parent?.height === nodeHeight) {
-      // ignore this responsiviness when container is exactly the same width and height
-      // } else {
-      // avoid relative width when parent is relative (therefore, child is probably absolute)
-      const relativePos =
-        node.parent &&
-        node.parent.children.length > 1 &&
-        (node.parent.type === "GROUP" ||
-          ("layoutMode" in node.parent && node.parent.layoutMode === "NONE"));
-      if (!relativePos) {
+    if (!relativePos) {
+      const rW = calculateResponsiveW(node, nodeWidth);
+
+      if (rW) {
         propWidth = rW;
       }
     }
@@ -115,6 +112,9 @@ export const nodeWidthHeight = (
   // }
 
   if ("layoutMode" in node && node.layoutMode && node.layoutMode !== "NONE") {
+    // there is an edge case: frame with no children, layoutMode !== NONE and counterAxis = AUTO, but:
+    // in [altConversions] it is already solved: Frame without children becomes a Rectangle.
+
     if (node.counterAxisSizingMode === "FIXED") {
       // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
       // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.
@@ -123,7 +123,9 @@ export const nodeWidthHeight = (
           width: null,
           height: propHeight,
         };
-      } else if (node.layoutMode === "VERTICAL") {
+      } else {
+        // node.layoutMode === "VERTICAL"
+
         // when AutoLayout is VERTICAL, height is set by Figma and width is auto.
         return {
           width: propWidth,
@@ -133,12 +135,6 @@ export const nodeWidthHeight = (
       // node.layoutMode === "NONE" won't reach here
       // if node.children.length === 1, it will be converted to HORIZONTAL AutoLayout
       // if node.children.length > 1, it will be taken care before.
-    } else if (node.children.length === 0) {
-      // if node has no children, it can be AUTO and needs a fixed size.
-      return {
-        width: propWidth,
-        height: propHeight,
-      };
     }
   } else {
     return {
@@ -185,11 +181,11 @@ const getNodeSizeWithStrokes = (node: AltSceneNode): Array<number> => {
             nodeHeight += d.strokeWeight * 2;
           }
         } else if (d.strokeAlign === "CENTER") {
-          if (nodeWidth < d.width + d.strokeWeight * 0.5) {
-            nodeWidth += d.strokeWeight * 0.5;
+          if (nodeWidth < d.width + d.strokeWeight) {
+            nodeWidth += d.strokeWeight;
           }
-          if (nodeHeight < d.height + d.strokeWeight * 0.5) {
-            nodeHeight += d.strokeWeight * 0.5;
+          if (nodeHeight < d.height + d.strokeWeight) {
+            nodeHeight += d.strokeWeight;
           }
         }
       }
@@ -288,17 +284,17 @@ const calculateResponsiveW = (
 
   if ("width" in node.parent) {
     // set the width to max if the view is near the corner
-    // that will be complemented with margins from [retrieveContainerPosition]
-    // the third check [parentWidth - nodeWidth >= 2 * magicMargin]
-    // was made to avoid setting h-full when parent is almost the same size as children
 
-    // nodeWidth / node.parent.width >= 0.8: this means only when it covers 80% of the frame
-    if (
-      node.x - node.parent.x <= magicMargin &&
-      nodeWidth / node.parent.width >= 0.8 &&
-      nodeWidth + 2 * magicMargin >= node.parent.width &&
-      node.parent.width - nodeWidth >= 2 * magicMargin
-    ) {
+    // check if initial and final positions are within a magic number (currently 32)
+    // this will only be reached when parent is FRAME, so node.parent.x is always 0.
+    const betweenValueMargins =
+      node.x <= magicMargin &&
+      node.parent.width - (node.x + nodeWidth) <= magicMargin;
+
+    // check if total width is at least 80% of the parent. This number is also a magic number and has worked fine so far.
+    const betweenPercentMargins = nodeWidth / node.parent.width >= 0.8;
+
+    if (betweenValueMargins && betweenPercentMargins) {
       propWidth = "full";
     }
   }

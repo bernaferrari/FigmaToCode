@@ -30,7 +30,7 @@ export class tailwindDefaultBuilder {
   constructor(optIsJSX: boolean, node: AltSceneNode, showLayerName: boolean) {
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
-    this.style = this.isJSX ? " style={{" : ' style="';
+    this.style = "";
     this.visible = node.visible;
 
     if (showLayerName) {
@@ -157,13 +157,11 @@ export class tailwindDefaultBuilder {
     this.attributes = this.name + additionalAttr + this.attributes;
     this.removeTrailingSpace();
 
-    if (this.style.length < 12) {
-      this.style = "";
-    } else {
+    if (this.style) {
       if (this.isJSX) {
-        this.style = `${this.style}}}`;
+        this.style = ` style={{"${this.style}}}`;
       } else {
-        this.style = `${this.style};"`;
+        this.style = ` style="${this.style}"`;
       }
     }
     if (!this.attributes && !this.style) {
