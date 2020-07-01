@@ -49,7 +49,7 @@ type namedColor = {
 
 const convertColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): namedColor | undefined => {
+): namedColor | null => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
   if (fills && fills !== figma.mixed && fills.length > 0) {
@@ -65,7 +65,7 @@ const convertColor = (
     }
   }
 
-  return undefined;
+  return null;
 };
 
 function deepFlatten(arr: Array<AltSceneNode>): Array<AltSceneNode> {

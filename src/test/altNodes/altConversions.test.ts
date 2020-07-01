@@ -14,12 +14,7 @@ describe("AltConversions", () => {
     rectangle.resize(20, 20);
 
     expect(
-      tailwindMain(
-        "",
-        convertIntoAltNodes([rectangle], undefined),
-        false,
-        false
-      )
+      tailwindMain("", convertIntoAltNodes([rectangle], null), false, false)
     ).toEqual('<div class="w-5 h-5"></div>');
   });
 
@@ -28,7 +23,7 @@ describe("AltConversions", () => {
     frame.resize(20, 20);
 
     expect(
-      tailwindMain("", convertIntoAltNodes([frame], undefined), false, false)
+      tailwindMain("", convertIntoAltNodes([frame], null), false, false)
     ).toEqual('<div class="w-5 h-5"></div>');
   });
 
@@ -39,7 +34,7 @@ describe("AltConversions", () => {
     figma.group([figma.createRectangle()], node);
 
     expect(
-      tailwindMain("", convertIntoAltNodes([node], undefined), false, false)
+      tailwindMain("", convertIntoAltNodes([node], null), false, false)
     ).toEqual(
       `<div class="w-5 h-5">
 <div class="inline-flex items-center justify-center"></div></div>`
@@ -55,7 +50,7 @@ describe("AltConversions", () => {
     node.characters = "";
 
     expect(
-      tailwindMain("", convertIntoAltNodes([node], undefined), false, false)
+      tailwindMain("", convertIntoAltNodes([node], null), false, false)
     ).toEqual(`<p></p>`);
   });
 

@@ -18,14 +18,14 @@ import { convertToAutoLayout } from "./convertToAutoLayout";
 
 export const convertSingleNodeToAlt = (
   node: SceneNode,
-  parent: AltFrameNode | AltGroupNode | undefined = undefined
+  parent: AltFrameNode | AltGroupNode | null = null
 ): AltSceneNode => {
   return convertIntoAltNodes([node], parent)[0];
 };
 
 export const frameNodeToAlt = (
   node: FrameNode | InstanceNode | ComponentNode,
-  altParent: AltFrameNode | AltGroupNode | undefined = undefined
+  altParent: AltFrameNode | AltGroupNode | null = null
 ): AltRectangleNode | AltFrameNode | AltGroupNode => {
   if (node.children.length === 0) {
     // if it has no children, convert frame to rectangle
@@ -52,7 +52,7 @@ export const frameNodeToAlt = (
 // auto convert Frame to Rectangle when Frame has no Children
 const frameToRectangleNode = (
   node: FrameNode | InstanceNode | ComponentNode,
-  altParent: AltFrameNode | AltGroupNode | undefined
+  altParent: AltFrameNode | AltGroupNode | null
 ): AltRectangleNode => {
   const newNode = new AltRectangleNode();
 
@@ -69,9 +69,9 @@ const frameToRectangleNode = (
 
 export const convertIntoAltNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
-  altParent: AltFrameNode | AltGroupNode | undefined
+  altParent: AltFrameNode | AltGroupNode | null
 ): Array<AltSceneNode> => {
-  const mapped: Array<AltSceneNode | undefined> = sceneNode.map(
+  const mapped: Array<AltSceneNode | null> = sceneNode.map(
     (node: SceneNode) => {
       if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
         let altNode;
@@ -128,7 +128,7 @@ export const convertIntoAltNodes = (
         return altNode;
       }
 
-      return undefined;
+      return null;
     }
   );
 

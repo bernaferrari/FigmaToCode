@@ -32,12 +32,12 @@ export const flutterElevationAndShadowColor = (
   let shadowColor = "";
 
   if (node.effects.length > 0) {
-    const drop_shadow: Array<ShadowEffect> = node.effects.filter(
+    const dropShadow: Array<ShadowEffect> = node.effects.filter(
       (d): d is ShadowEffect => d.type === "DROP_SHADOW"
     );
-    if (drop_shadow.length > 0 && drop_shadow[0].type === "DROP_SHADOW") {
-      shadowColor = `color: Color(0x${rgbTo8hex(drop_shadow[0].color)}), `;
-      elevation = `elevation: ${drop_shadow[0].radius}, `;
+    if (dropShadow.length > 0 && dropShadow[0].type === "DROP_SHADOW") {
+      shadowColor = `color: Color(0x${rgbTo8hex(dropShadow[0].color)}), `;
+      elevation = `elevation: ${dropShadow[0].radius}, `;
     }
   }
 
