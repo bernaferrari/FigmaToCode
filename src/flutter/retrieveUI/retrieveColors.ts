@@ -46,7 +46,7 @@ type contrastedColor = {
 
 const convertColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): contrastedColor | undefined => {
+): contrastedColor | null => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
   if (fills && fills !== figma.mixed && fills.length > 0) {
@@ -76,7 +76,7 @@ const convertColor = (
     }
   }
 
-  return undefined;
+  return null;
 };
 
 // from https://dev.to/alvaromontoro/building-your-own-color-contrast-checker-4j7o

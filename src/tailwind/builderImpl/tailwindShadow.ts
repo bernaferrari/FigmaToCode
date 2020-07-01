@@ -7,12 +7,12 @@ import { AltBlendMixin } from "../../altNodes/altMixins";
 export const tailwindShadow = (node: AltBlendMixin): string => {
   // [when testing] node.effects can be undefined
   if (node.effects && node.effects.length > 0) {
-    const drop_shadow = node.effects.filter(
+    const dropShadow = node.effects.filter(
       (d): d is ShadowEffect => d.type === "DROP_SHADOW"
     );
     let boxShadow = "";
     // simple shadow from tailwind
-    if (drop_shadow.length > 0) {
+    if (dropShadow.length > 0) {
       boxShadow = "shadow ";
     }
 

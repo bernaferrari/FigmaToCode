@@ -38,7 +38,7 @@ const run = () => {
 
   const convertedSelection = convertIntoAltNodes(
     figma.currentPage.selection,
-    undefined
+    null
   );
 
   // @ts-ignore
