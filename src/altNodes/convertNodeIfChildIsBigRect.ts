@@ -28,7 +28,7 @@ export const convertNodeIfChildIsBigRect = (
     updatedNode.children = node.children.filter((d) => d !== rect);
 
     // ignore fill if it isn't visible
-    // visible can be undefinied in tests
+    // visible can be undefined in tests
     if (rect.visible !== false) {
       updatedNode.fills = rect.fills;
       updatedNode.fillStyleId = rect.fillStyleId;

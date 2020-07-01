@@ -52,8 +52,6 @@ const convertColor = (
   if (fills && fills !== figma.mixed && fills.length > 0) {
     const fill = fills[0];
     if (fill.type === "SOLID") {
-      const hex = "#" + rgbTo6hex(fill.color);
-
       const black = {
         r: 0,
         g: 0,
@@ -69,7 +67,7 @@ const convertColor = (
       const contrastWhite = calculateContrastRatio(fill.color, white);
 
       return {
-        hex: hex,
+        hex: "#" + rgbTo6hex(fill.color),
         contrastBlack: contrastBlack,
         contrastWhite: contrastWhite,
       };
