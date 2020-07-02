@@ -1,5 +1,6 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { rgbTo6hex } from "../../common/rgbToHex";
+import { retrieveFill } from "../../common/retrieveFill";
 
 export const retrieveFlutterColors = (
   sceneNode: Array<AltSceneNode>
@@ -49,27 +50,27 @@ const convertColor = (
 ): contrastedColor | null => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
-  if (fills && fills !== figma.mixed && fills.length > 0) {
-    const fill = fills[0];
-    if (fill.type === "SOLID") {
-      const black = {
-        r: 0,
-        g: 0,
-        b: 0,
-      };
 
-      const white = {
-        r: 1,
-        g: 1,
-        b: 1,
-      };
+  const fill = retrieveFill(fills);
 
-      return {
-        hex: "#" + rgbTo6hex(fill.color),
-        contrastBlack: calculateContrastRatio(fill.color, black),
-        contrastWhite: calculateContrastRatio(fill.color, white),
-      };
-    }
+  if (fill?.type === "SOLID") {
+    const black = {
+      r: 0,
+      g: 0,
+      b: 0,
+    };
+
+    const white = {
+      r: 1,
+      g: 1,
+      b: 1,
+    };
+
+    return {
+      hex: "#" + rgbTo6hex(fill.color),
+      contrastBlack: calculateContrastRatio(fill.color, black),
+      contrastWhite: calculateContrastRatio(fill.color, white),
+    };
   }
 
   return null;

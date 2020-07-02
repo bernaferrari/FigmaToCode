@@ -4,6 +4,7 @@ import {
   tailwindColors,
 } from "../builderImpl/tailwindColor";
 import { rgbTo6hex } from "../../common/rgbToHex";
+import { retrieveFill } from "../../common/retrieveFill";
 
 export const retrieveTailwindColors = (
   sceneNode: Array<AltSceneNode>
@@ -52,17 +53,15 @@ const convertColor = (
 ): namedColor | null => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
-  if (fills && fills !== figma.mixed && fills.length > 0) {
-    const fill = fills[0];
-    if (fill.type === "SOLID") {
-      const hex = rgbTo6hex(fill.color);
-      const tailColor = tailwindNearestColor(hex);
-      const nameTailwind = tailwindColors[tailColor];
-      return {
-        name: nameTailwind,
-        hex: tailColor,
-      };
-    }
+  const fill = retrieveFill(fills);
+
+  if (fill?.type === "SOLID") {
+    const hex = rgbTo6hex(fill.color);
+    const tailColor = tailwindNearestColor(hex);
+    return {
+      name: tailwindColors[tailColor],
+      hex: tailColor,
+    };
   }
 
   return null;

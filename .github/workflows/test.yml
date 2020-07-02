@@ -11,11 +11,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install modules
-      run: npm install
+      run: yarn
     - name: Run tests
-      run: npm test
+      run: yarn test
     - name: Run coverage
-      run: npm run coverage
+      run: yarn run coverage
     - name: Run codacy-coverage-reporter
       uses: codacy/codacy-coverage-reporter-action@master
       with:

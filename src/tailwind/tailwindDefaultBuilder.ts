@@ -1,3 +1,4 @@
+import { htmlGradient } from "../htmlBuilder/htmlGradient";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   AltSceneNode,
@@ -68,7 +69,7 @@ export class TailwindDefaultBuilder {
       const top = node.y - parentY;
 
       // todo is there a way to improve this?
-      this.style += `left:${left}px${this.styleSeparator} top:${top}px`;
+      this.style += `left:${left}px${this.styleSeparator} top:${top}px${this.styleSeparator} `;
       this.attributes += "absolute ";
     } else {
       this.attributes += position;
@@ -89,7 +90,15 @@ export class TailwindDefaultBuilder {
   ): this {
     // visible is true or undefinied (tests)
     if (this.visible !== false) {
-      this.attributes += tailwindColor(paint, kind);
+      let gradient = "";
+      if (kind === "bg") {
+        gradient = htmlGradient(paint, this.isJSX);
+      }
+      if (gradient) {
+        this.style += gradient + this.styleSeparator;
+      } else {
+        this.attributes += tailwindColor(paint, kind);
+      }
     }
     return this;
   }
