@@ -1,7 +1,7 @@
 import { convertSingleNodeToAlt } from "../../../src/altNodes/altConversion";
 import { tailwindPosition } from "../../../src/tailwind/builderImpl/tailwindPosition";
 import { AltGroupNode, AltFrameNode } from "../../../src/altNodes/altMixins";
-import { createFigma } from "./figma-api-stub";
+import { createFigma } from "figma-api-stub";
 
 describe("Tailwind Position", () => {
   const figma = createFigma({
