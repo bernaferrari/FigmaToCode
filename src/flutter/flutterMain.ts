@@ -5,10 +5,10 @@ import {
   AltGroupNode,
   AltTextNode,
 } from "../altNodes/altMixins";
-import { FlutterDefaultBuilder } from "./flutterBuilder";
+import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltSceneNode } from "../altNodes/altMixins";
 import { mostFrequent } from "./flutter_helpers";
-import { FlutterTextBuilder } from "./flutter_text_methods";
+import { FlutterTextBuilder } from "./flutterTextBuilder";
 
 let parentId = "";
 let material = true;

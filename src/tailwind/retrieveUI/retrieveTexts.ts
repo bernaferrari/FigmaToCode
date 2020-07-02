@@ -1,6 +1,6 @@
 import { AltSceneNode, AltTextNode } from "../../altNodes/altMixins";
 import { tailwindNearestColor } from "../builderImpl/tailwindColor";
-import { tailwindTextNodeBuilder, convertFontWeight } from "../builderText";
+import { TailwindTextBuilder, convertFontWeight } from "../tailwindTextBuilder";
 import { rgbTo6hex } from "../../common/rgbToHex";
 
 export const retrieveTailwindText = (
@@ -13,7 +13,7 @@ export const retrieveTailwindText = (
 
   selectedText.forEach((node) => {
     if (node.type === "TEXT") {
-      const attr = new tailwindTextNodeBuilder(false, node, false)
+      const attr = new TailwindTextBuilder(false, node, false)
         .blend(node)
         .position(node, node.parent?.id ?? "")
         .textAutoSize(node)

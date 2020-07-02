@@ -1,7 +1,7 @@
 import {
-  tailwindTextNodeBuilder,
+  TailwindTextBuilder,
   convertFontWeight,
-} from "./../../tailwind/builderText";
+} from "../../tailwind/tailwindTextBuilder";
 import { tailwindMain } from "./../../tailwind/tailwindMain";
 import { AltTextNode } from "../../altNodes/altMixins";
 
@@ -18,7 +18,7 @@ describe("AltText", () => {
 
     node.textAutoResize = "NONE";
     expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="h-4 w-4"></p>'
+      '<p class="w-4 h-4"></p>'
     );
 
     node.textAutoResize = "HEIGHT";
@@ -43,12 +43,12 @@ describe("AltText", () => {
     node.textAutoResize = "NONE";
     node.textAlignHorizontal = "CENTER";
     expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="h-4 w-4 text-center"></p>'
+      '<p class="w-4 h-4 text-center"></p>'
     );
 
     node.textAlignHorizontal = "JUSTIFIED";
     expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="h-4 w-4 text-justified"></p>'
+      '<p class="w-4 h-4 text-justified"></p>'
     );
   });
   it("fontSize", () => {
@@ -197,7 +197,7 @@ describe("AltText", () => {
     const node = new AltTextNode();
     node.characters = "";
 
-    const builder = new tailwindTextNodeBuilder(false, node, false);
+    const builder = new TailwindTextBuilder(false, node, false);
     builder.reset();
     expect(builder.build()).toEqual("");
   });

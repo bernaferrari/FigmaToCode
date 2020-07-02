@@ -122,7 +122,7 @@ describe("Convert to AutoLayout", () => {
       tailwindMain("", [convertToAutoLayout(frame)], false, false)
     ).toEqual(
       `<div class="relative w-12 h-12">
-<div class="absolute w-5 h-5 bg-green-600" style="left:10; top:10"></div>
+<div class="absolute w-5 h-5 bg-green-600" style="left:10px; top:10px"></div>
 <div class="absolute left-0 top-0 w-5 h-5 bg-red-700"></div></div>`
     );
 
