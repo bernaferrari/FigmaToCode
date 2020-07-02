@@ -142,21 +142,19 @@ const detectAutoLayoutDirection = (
  */
 const calculateInterval = (
   children: ReadonlyArray<AltSceneNode>,
-  x_or_y: "x" | "y"
+  xOrY: "x" | "y"
 ): Array<number> => {
-  const h_or_w: "width" | "height" = x_or_y === "x" ? "width" : "height";
+  const hOrW: "width" | "height" = xOrY === "x" ? "width" : "height";
 
   // sort children based on X or Y values
   const sorted: Array<AltSceneNode> = [...children].sort(
-    (a, b) => a[x_or_y] - b[x_or_y]
+    (a, b) => a[xOrY] - b[xOrY]
   );
 
   // calculate the distance between values (either vertically or horizontally)
   const interval = [];
   for (let i = 0; i < sorted.length - 1; i++) {
-    interval.push(
-      sorted[i + 1][x_or_y] - (sorted[i][x_or_y] + sorted[i][h_or_w])
-    );
+    interval.push(sorted[i + 1][xOrY] - (sorted[i][xOrY] + sorted[i][hOrW]));
   }
   return interval;
 };

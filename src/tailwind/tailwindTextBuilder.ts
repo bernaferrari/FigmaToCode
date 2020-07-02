@@ -1,75 +1,20 @@
+import { tailwindTextSize } from "./builderImpl/tailwindTextSize";
 import { AltTextNode } from "../altNodes/altMixins";
-import { magicMargin } from "../common/nodeWidthHeight";
 import {
   pxToMapLetterSpacing,
   pxToAbsoluteLineHeight,
-  pxToLayoutSize,
   pxToFontSize,
   percentToAbsoluteLineHeight,
 } from "./conversionTables";
-import { tailwindDefaultBuilder } from "./builderDefault";
+import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
-export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
+export class TailwindTextBuilder extends TailwindDefaultBuilder {
   constructor(optIsJSX: boolean, node: AltTextNode, showLayerName: boolean) {
     super(optIsJSX, node, showLayerName);
   }
 
   textAutoSize(node: AltTextNode): this {
-    // if (node.parent && "layoutMode" in node.parent) {
-    //   if (node.parent.layoutMode === "VERTICAL") {
-    //     // when parent is AutoLayout, the text width is set by the parent
-    //     return this;
-    //   }
-    // }
-
-    if (node.textAutoResize === "NONE") {
-      const hRem = pxToLayoutSize(node.height);
-      const wRem = pxToLayoutSize(node.width);
-
-      let propHeight = `h-${hRem} `;
-      let propWidth = `w-${wRem} `;
-
-      if (node.parent && "width" in node.parent) {
-        // set the width to max if the view is near the corner
-        // that will be complemented with margins from [retrieveContainerPosition]
-        // the third check [parentWidth - nodeWidth >= 2 * magicMargin]
-        // was made to avoid setting h-full when parent is almost the same size as children
-        if (
-          node.parent.x - node.x <= magicMargin &&
-          node.width + 2 * magicMargin >= node.parent.width &&
-          node.parent.width - node.width >= 2 * magicMargin
-        ) {
-          propWidth = "w-full ";
-        }
-
-        if (
-          node.parent.y - node.y <= magicMargin &&
-          node.height + 2 * magicMargin >= node.parent.height &&
-          node.parent.height - node.height >= 2 * magicMargin
-        ) {
-          propHeight = "h-full ";
-        }
-      }
-
-      this.attributes += propHeight;
-      this.attributes += propWidth;
-    } else if (node.textAutoResize === "HEIGHT") {
-      const wRem = pxToLayoutSize(node.width);
-      let propHeight = `w-${wRem} `;
-
-      if (node.parent) {
-        if (
-          node.parent.x - node.x <= magicMargin &&
-          node.width + 2 * magicMargin >= node.parent.width &&
-          node.parent.width - node.width >= 2 * magicMargin
-        ) {
-          propHeight = "w-full ";
-        }
-      }
-
-      this.attributes += propHeight;
-    }
-
+    this.attributes += tailwindTextSize(node);
     return this;
   }
 
@@ -125,17 +70,13 @@ export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
    * example: tracking-widest
    */
   letterSpacing(node: AltTextNode): this {
-    if (node.letterSpacing !== figma.mixed) {
-      if (
-        node.letterSpacing.unit === "PIXELS" &&
-        node.letterSpacing.value !== 0
-      ) {
+    if (node.letterSpacing !== figma.mixed && node.letterSpacing.value !== 0) {
+      if (node.letterSpacing.unit === "PIXELS") {
         const value = pxToMapLetterSpacing(node.letterSpacing.value);
         this.attributes += `tracking-${value} `;
-      } else if (
-        node.letterSpacing.unit === "PERCENT" &&
-        node.letterSpacing.value !== 0
-      ) {
+      } else {
+        // node.letterSpacing.unit === "PERCENT"
+
         // divide by 10 so it works as expected visually.
         const value = pxToMapLetterSpacing(node.letterSpacing.value / 10);
         this.attributes += `tracking-${value} `;
@@ -149,12 +90,17 @@ export class tailwindTextNodeBuilder extends tailwindDefaultBuilder {
    * example: leading-3
    */
   lineHeight(node: AltTextNode): this {
-    if (node.lineHeight !== figma.mixed) {
+    if (
+      node.lineHeight !== figma.mixed &&
+      node.lineHeight.unit !== "AUTO" &&
+      node.lineHeight.value !== 0
+    ) {
       if (node.lineHeight.unit === "PIXELS") {
         // rollup has issues when ` ${method(\n...\n)} `, so this value declaration is necessary
         const value = pxToAbsoluteLineHeight(node.lineHeight.value);
         this.attributes += `leading-${value} `;
-      } else if (node.lineHeight.unit === "PERCENT") {
+      } else {
+        // node.lineHeight.unit === "PERCENT"
         const value = percentToAbsoluteLineHeight(node.lineHeight.value);
         this.attributes += `leading-${value} `;
       }

@@ -20,7 +20,7 @@ import { tailwindColor } from "./builderImpl/tailwindColor";
 import { tailwindSize } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
 
-export class tailwindDefaultBuilder {
+export class TailwindDefaultBuilder {
   attributes: string = "";
   style: string;
   styleSeparator: string = "";
@@ -67,8 +67,8 @@ export class tailwindDefaultBuilder {
       const left = node.x - parentX;
       const top = node.y - parentY;
 
-      // todo need a way to improve this
-      this.style += `left:${left}${this.styleSeparator} top:${top}`;
+      // todo is there a way to improve this?
+      this.style += `left:${left}px${this.styleSeparator} top:${top}px`;
       this.attributes += "absolute ";
     } else {
       this.attributes += position;
@@ -126,7 +126,7 @@ export class tailwindDefaultBuilder {
 
     if (this.style) {
       if (this.isJSX) {
-        this.style = ` style={{"${this.style}}}`;
+        this.style = ` style={{${this.style}}}`;
       } else {
         this.style = ` style="${this.style}"`;
       }

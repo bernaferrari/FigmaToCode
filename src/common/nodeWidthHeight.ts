@@ -282,7 +282,19 @@ const calculateResponsiveW = (
     }
   }
 
-  if ("width" in node.parent) {
+  if (isWidthFull(node, nodeWidth)) {
+    propWidth = "full";
+  }
+
+  return propWidth;
+};
+
+// set the width to max if the view is near the corner
+export const isWidthFull = (
+  node: AltSceneNode,
+  nodeWidth: number = node.width
+): boolean => {
+  if (node.parent && "width" in node.parent) {
     // set the width to max if the view is near the corner
 
     // check if initial and final positions are within a magic number (currently 32)
@@ -295,9 +307,9 @@ const calculateResponsiveW = (
     const betweenPercentMargins = nodeWidth / node.parent.width >= 0.8;
 
     if (betweenValueMargins && betweenPercentMargins) {
-      propWidth = "full";
+      return true;
     }
   }
 
-  return propWidth;
+  return false;
 };

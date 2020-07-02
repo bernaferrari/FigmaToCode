@@ -57,19 +57,17 @@ const convertColor = (
         g: 0,
         b: 0,
       };
-      const contrastBlack = calculateContrastRatio(fill.color, black);
 
       const white = {
         r: 1,
         g: 1,
         b: 1,
       };
-      const contrastWhite = calculateContrastRatio(fill.color, white);
 
       return {
         hex: "#" + rgbTo6hex(fill.color),
-        contrastBlack: contrastBlack,
-        contrastWhite: contrastWhite,
+        contrastBlack: calculateContrastRatio(fill.color, black),
+        contrastWhite: calculateContrastRatio(fill.color, white),
       };
     }
   }

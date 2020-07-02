@@ -8,8 +8,8 @@ import {
 } from "../altNodes/altMixins";
 import { pxToLayoutSize } from "./conversionTables";
 import { tailwindVector } from "./vector";
-import { tailwindTextNodeBuilder } from "./builderText";
-import { tailwindDefaultBuilder } from "./builderDefault";
+import { TailwindTextBuilder } from "./tailwindTextBuilder";
+import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
 let parentId = "";
 
@@ -99,7 +99,7 @@ const tailwindGroup = (node: AltGroupNode): string => {
   if (vectorIfExists) return vectorIfExists;
 
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new tailwindDefaultBuilder(isJsx, node, showLayerName)
+  const builder = new TailwindDefaultBuilder(isJsx, node, showLayerName)
     .blend(node)
     .position(node, parentId)
     .widthHeight(node);
@@ -115,7 +115,7 @@ const tailwindGroup = (node: AltGroupNode): string => {
 const tailwindText = (node: AltTextNode): string => {
   // follow the website order, to make it easier
 
-  const builderResult = new tailwindTextNodeBuilder(isJsx, node, showLayerName)
+  const builderResult = new TailwindTextBuilder(isJsx, node, showLayerName)
     .blend(node)
     .position(node, parentId)
     .textAutoSize(node)
@@ -177,7 +177,7 @@ export const tailwindContainer = (
     return children;
   }
 
-  const builder = new tailwindDefaultBuilder(isJsx, node, showLayerName)
+  const builder = new TailwindDefaultBuilder(isJsx, node, showLayerName)
     .blend(node)
     .autoLayoutPadding(node)
     .position(node, parentId)
