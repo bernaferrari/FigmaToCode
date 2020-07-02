@@ -1,5 +1,6 @@
 import { nearestColorFrom } from "../../nearest-color/nearestColor";
 import { nearestValue } from "../conversionTables";
+import { retrieveFill } from "../../common/retrieveFill";
 
 // retrieve the SOLID color for tailwind
 export const tailwindColor = (
@@ -8,45 +9,44 @@ export const tailwindColor = (
 ): string => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
-  if (fills && fills !== figma.mixed && fills.length > 0) {
-    const fill = fills[0];
-    if (fill.type === "SOLID") {
-      // don't set text color when color is black (default) and opacity is 100%
-      if (
-        kind === "text" &&
-        fill.color.r === 0.0 &&
-        fill.color.g === 0.0 &&
-        fill.color.b === 0.0 &&
-        fill.opacity === 1.0
-      ) {
-        return "";
-      }
 
-      const opacity = fill.opacity ?? 1.0;
-
-      // example: text-opacity-50
-      //
-      // https://tailwindcss.com/docs/opacity/
-      // default is [0, 25, 50, 75, 100]
-      // ignore the 100. If opacity was changed, let it be visible.
-      const opacityProp =
-        opacity !== 1.0
-          ? `${kind}-opacity-${nearestValue(opacity * 100, [0, 25, 50, 75])} `
-          : "";
-
-      // figma uses r,g,b in [0, 1], while nearestColor uses it in [0, 255]
-      const color = {
-        r: fill.color.r * 255,
-        g: fill.color.g * 255,
-        b: fill.color.b * 255,
-      };
-
-      // example: text-red-500
-      const colorProp = `${kind}-${getTailwindColor(color)} `;
-
-      // if fill isn't visible, it shouldn't be painted.
-      return fill.visible !== false ? `${colorProp}${opacityProp}` : "";
+  const fill = retrieveFill(fills);
+  if (fill?.type === "SOLID") {
+    // don't set text color when color is black (default) and opacity is 100%
+    if (
+      kind === "text" &&
+      fill.color.r === 0.0 &&
+      fill.color.g === 0.0 &&
+      fill.color.b === 0.0 &&
+      fill.opacity === 1.0
+    ) {
+      return "";
     }
+
+    const opacity = fill.opacity ?? 1.0;
+
+    // example: text-opacity-50
+    //
+    // https://tailwindcss.com/docs/opacity/
+    // default is [0, 25, 50, 75, 100]
+    // ignore the 100. If opacity was changed, let it be visible.
+    const opacityProp =
+      opacity !== 1.0
+        ? `${kind}-opacity-${nearestValue(opacity * 100, [0, 25, 50, 75])} `
+        : "";
+
+    // figma uses r,g,b in [0, 1], while nearestColor uses it in [0, 255]
+    const color = {
+      r: fill.color.r * 255,
+      g: fill.color.g * 255,
+      b: fill.color.b * 255,
+    };
+
+    // example: text-red-500
+    const colorProp = `${kind}-${getTailwindColor(color)} `;
+
+    // if fill isn't visible, it shouldn't be painted.
+    return `${colorProp}${opacityProp}`;
   }
 
   return "";

@@ -2,6 +2,7 @@ import { AltSceneNode, AltTextNode } from "../../altNodes/altMixins";
 import { tailwindNearestColor } from "../builderImpl/tailwindColor";
 import { TailwindTextBuilder, convertFontWeight } from "../tailwindTextBuilder";
 import { rgbTo6hex } from "../../common/rgbToHex";
+import { retrieveFill } from "../../common/retrieveFill";
 
 export const retrieveTailwindText = (
   sceneNode: Array<AltSceneNode>
@@ -40,11 +41,11 @@ export const retrieveTailwindText = (
       };
 
       let contrastBlack = 21;
-      if (node.fills && node.fills !== figma.mixed && node.fills.length > 0) {
-        const fill = node.fills[0];
-        if (fill.type === "SOLID") {
-          contrastBlack = calculateContrastRatio(fill.color, black);
-        }
+
+      const fill = retrieveFill(node.fills);
+
+      if (fill?.type === "SOLID") {
+        contrastBlack = calculateContrastRatio(fill.color, black);
       }
 
       textStr.push({
@@ -131,11 +132,10 @@ const convertColor = (
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
 
-  if (fills && fills !== figma.mixed && fills.length > 0) {
-    const fill = fills[0];
-    if (fill.type === "SOLID") {
-      return tailwindNearestColor(rgbTo6hex(fill.color));
-    }
+  const fill = retrieveFill(fills);
+
+  if (fill?.type === "SOLID") {
+    return tailwindNearestColor(rgbTo6hex(fill.color));
   }
 
   return undefined;

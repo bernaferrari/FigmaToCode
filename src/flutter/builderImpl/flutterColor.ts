@@ -1,22 +1,20 @@
 import { rgbTo8hex } from "../../common/rgbToHex";
+import { retrieveFill } from "../../common/retrieveFill";
 
-// retrieve the SOLID color for Flutter when existent, otherwise ""
+/**
+ * Retrieve the SOLID color for Flutter when existent, otherwise ""
+ */
 export const flutterColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
-  if (fills && fills !== figma.mixed && fills.length > 0) {
-    const fill = fills[0];
+  const fill = retrieveFill(fills);
 
-    if (fill.type === "SOLID") {
-      const opacity = fill.opacity ?? 1.0;
+  if (fill?.type === "SOLID") {
+    const opacity = fill.opacity ?? 1.0;
 
-      // todo maybe ignore text color when it is black?
+    // todo maybe ignore text color when it is black?
 
-      // if fill isn't visible, it shouldn't be painted.
-      return fill.visible !== false
-        ? `color: Color(0x${rgbTo8hex(fill.color, opacity)}), `
-        : "";
-    }
+    return `color: Color(0x${rgbTo8hex(fill.color, opacity)}), `;
   }
 
   return "";
