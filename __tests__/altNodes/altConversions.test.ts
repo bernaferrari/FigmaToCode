@@ -1,5 +1,5 @@
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
-import { createFigma } from "./figma-api-stub";
+import { createFigma } from "figma-api-stub";
 import { convertIntoAltNodes } from "../../src/altNodes/altConversion";
 
 describe("AltConversions", () => {
