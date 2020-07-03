@@ -23,8 +23,8 @@ export const convertToAutoLayout = (
     node.children = reorderChildrenIfAligned(node.children);
     const [direction, itemSpacing] = detectAutoLayoutDirection(node.children);
 
-    // if no direction was found, add an attribute that helps children know they should be have absolute position.
-    if (direction === "NONE" && node.children.length > 1) {
+    // catches when children is 0 or children is larger than 1
+    if (direction === "NONE" && node.children.length !== 1) {
       return node;
     }
 
@@ -221,7 +221,7 @@ const detectAutoLayoutPadding = (
 
     // similar to [right] calculation, but using height and getting the minimum
     const bottom = Math.min(
-      ...node.children.map((d) => node.height - (d.height + d.x))
+      ...node.children.map((d) => node.height - (d.height + d.y))
     );
 
     // return the smallest padding in each axis
