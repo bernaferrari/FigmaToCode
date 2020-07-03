@@ -2,6 +2,7 @@ import { AltFrameNode } from "../../src/altNodes/altMixins";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "../../src/altNodes/altMixins";
 import { convertNodeIfChildIsBigRect } from "../../src/altNodes/convertNodeIfChildIsBigRect";
+import { convertToAutoLayout } from "../../src/altNodes/convertToAutoLayout";
 
 describe("convert node if child is big rect ", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -36,7 +37,7 @@ describe("convert node if child is big rect ", () => {
     // it will only work with two or more items.
     const converted = convertNodeIfChildIsBigRect(frame);
 
-    expect(tailwindMain("", [converted], false, false)).toEqual(
+    expect(tailwindMain([converted])).toEqual(
       `<div class="inline-flex flex-col items-center justify-center">
 <div class="w-full h-24 bg-black"></div></div>`
     );
@@ -87,7 +88,7 @@ describe("convert node if child is big rect ", () => {
     frame.children = [rect2, rect1];
 
     const invisibleConverted = convertNodeIfChildIsBigRect(frame);
-    expect(tailwindMain("", [invisibleConverted], false, false)).toEqual(
+    expect(tailwindMain([invisibleConverted])).toEqual(
       `<div class="inline-flex flex-col items-center justify-center w-24 h-24">
 <div class="w-1/2 h-12 bg-white"></div></div>`
     );
@@ -139,7 +140,7 @@ describe("convert node if child is big rect ", () => {
     // todo should the conversion happen also when a group has a single rect?
     const converted = convertNodeIfChildIsBigRect(frame);
 
-    expect(tailwindMain("", [converted], false, false)).toEqual(
+    expect(tailwindMain([converted])).toEqual(
       `<div class="inline-flex flex-col items-center justify-center w-5 h-5 bg-black">
 <div class="w-1/2 h-2 bg-white"></div></div>`
     );
@@ -167,8 +168,9 @@ describe("convert node if child is big rect ", () => {
     rect1.parent = group;
     rect2.parent = group;
 
-    expect(tailwindMain("", [convertNodeIfChildIsBigRect(group)], false, false))
-      .toEqual(`<div class="relative w-32 h-5">
+    expect(
+      tailwindMain([convertToAutoLayout(convertNodeIfChildIsBigRect(group))])
+    ).toEqual(`<div class="relative" style="width: 120px; height: 20px;">
 <div class="absolute left-0 top-0 w-24 h-24"></div>
 <div class="absolute left-0 top-0 w-5 h-32"></div></div>`);
   });
@@ -221,7 +223,7 @@ describe("convert node if child is big rect ", () => {
     // counterAxisSizingMode is AUTO, therefore bg-black doesn't contain the size
     // todo should it keep that way?
 
-    expect(tailwindMain("", [converted], false, false)).toEqual(
+    expect(tailwindMain([converted])).toEqual(
       `<div class="w-5 h-5 bg-black">
 <div class="absolute m-auto inset-0 w-1/2 h-2 bg-white"></div></div>`
     );

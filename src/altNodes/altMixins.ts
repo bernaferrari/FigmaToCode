@@ -103,13 +103,17 @@ export interface AltFrameNode
     AltCornerMixin,
     AltRectangleCornerMixin,
     AltBlendMixin,
-    AltLayoutMixin {}
+    AltLayoutMixin {
+  isRelative?: boolean;
+}
 
 export interface AltGroupNode
   extends AltBaseNodeMixin,
     AltChildrenMixin,
     AltBlendMixin,
-    AltLayoutMixin {}
+    AltLayoutMixin {
+  isRelative?: boolean;
+}
 
 // DOCUMENT
 

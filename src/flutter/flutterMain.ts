@@ -14,11 +14,11 @@ let parentId = "";
 let material = true;
 
 export const flutterMain = (
-  parentId_src: string,
   sceneNode: Array<AltSceneNode>,
+  parentIdSrc: string,
   isMaterial: boolean
 ): string => {
-  parentId = parentId_src;
+  parentId = parentIdSrc;
   material = isMaterial;
 
   let result = flutterWidgetGenerator(sceneNode);

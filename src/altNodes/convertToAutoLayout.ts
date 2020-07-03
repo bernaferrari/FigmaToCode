@@ -23,8 +23,12 @@ export const convertToAutoLayout = (
     node.children = reorderChildrenIfAligned(node.children);
     const [direction, itemSpacing] = detectAutoLayoutDirection(node.children);
 
-    // catches when children is 0 or children is larger than 1
+    if (direction === "NONE" && node.children.length > 1) {
+      node.isRelative = true;
+    }
+
     if (direction === "NONE" && node.children.length !== 1) {
+      // catches when children is 0 or children is larger than 1
       return node;
     }
 
@@ -69,8 +73,9 @@ const average = (arr: Array<number>) =>
 /**
  * Check the average of children positions against this threshold;
  * This allows a small tolerance, which is useful when items are slightly overlayed.
+ * If you set this lower, layouts will get more responsive but with less visual fidelity.
  */
-const threshold = -8;
+const threshold = -2;
 
 /**
  * Verify if children are sorted by their relative position and return them sorted, if identified.

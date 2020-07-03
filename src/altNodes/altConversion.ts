@@ -73,7 +73,7 @@ const frameToRectangleNode = (
 
 export const convertIntoAltNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
-  altParent: AltFrameNode | AltGroupNode | null
+  altParent: AltFrameNode | AltGroupNode | null = null
 ): Array<AltSceneNode> => {
   const mapped: Array<AltSceneNode | null> = sceneNode.map(
     (node: SceneNode) => {
@@ -119,7 +119,8 @@ export const convertIntoAltNodes = (
         altNode.children = convertIntoAltNodes(node.children, altNode);
 
         // try to find big rect and regardless of that result, also try to convert to autolayout.
-        // There is a big chance this will be returned as a FRAME
+        // There is a big chance this will be returned as a Frame
+        // also, Group will always have at least 2 children.
         return convertToAutoLayout(convertNodeIfChildIsBigRect(altNode));
       } else if (node.type === "TEXT") {
         const altNode = new AltTextNode();

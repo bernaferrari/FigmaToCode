@@ -1,3 +1,4 @@
+import { convertToAutoLayout } from "./../../src/altNodes/convertToAutoLayout";
 import {
   AltRectangleNode,
   AltFrameNode,
@@ -34,13 +35,13 @@ describe("Tailwind Default Builder", () => {
     node.layoutMode = "NONE";
     node.counterAxisSizingMode = "FIXED";
 
-    const child = new AltRectangleNode();
-    child.width = 4;
-    child.height = 4;
-    child.x = 9;
-    child.y = 9;
-    child.name = "RECT";
-    child.fills = [
+    const child1 = new AltRectangleNode();
+    child1.width = 4;
+    child1.height = 4;
+    child1.x = 9;
+    child1.y = 9;
+    child1.name = "RECT1";
+    child1.fills = [
       {
         type: "SOLID",
         color: {
@@ -51,12 +52,22 @@ describe("Tailwind Default Builder", () => {
       },
     ];
 
+    const child2 = new AltRectangleNode();
+    child2.width = 4;
+    child2.height = 4;
+    child2.x = 9;
+    child2.y = 9;
+    child2.name = "RECT2";
+
     // this works as a test for JSX, but should never happen in reality. In reality Frame would need to have 2 children and be relative.
-    node.children = [child];
-    child.parent = node;
-    expect(tailwindMain("", [node], true, true))
-      .toEqual(`<div className="FRAME w-8 h-8">
-<div className="RECT absolute w-1 h-1 bg-white" style={{left:9px, top:9px, }}></div></div>`);
+    node.children = [child1, child2];
+    child1.parent = node;
+    child2.parent = node;
+
+    expect(tailwindMain([convertToAutoLayout(node)], "", true, true))
+      .toEqual(`<div className="FRAME relative" style={{width: 32, height: 32,}}>
+<div className="RECT1 absolute w-1 h-1 bg-white" style={{left:9px, top:9px,}}></div>
+<div className="RECT2 absolute w-1 h-1" style={{left:9px, top:9px,}}></div></div>`);
   });
 
   it("Group with relative position", () => {
@@ -88,8 +99,8 @@ describe("Tailwind Default Builder", () => {
 
     node.children = [child];
     child.parent = node;
-    expect(tailwindMain("", [node], true, true))
+    expect(tailwindMain([node], "", true, true))
       .toEqual(`<div className="GROUP relative w-8 h-8">
-<div className="RECT absolute w-1 h-1 bg-white" style={{left:9px, top:9px, }}></div></div>`);
+<div className="RECT absolute w-1 h-1 bg-white" style={{left:9px, top:9px,}}></div></div>`);
   });
 });

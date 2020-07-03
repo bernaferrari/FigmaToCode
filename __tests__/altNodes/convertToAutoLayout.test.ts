@@ -55,9 +55,7 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     // output should be HORIZONTAL
-    expect(
-      tailwindMain("", [convertToAutoLayout(frame)], false, false)
-    ).toEqual(
+    expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
       `<div class="inline-flex items-center justify-center">
 <div class="self-start w-5 h-5 bg-red-700"></div>
 <div class="self-start w-5 h-5 bg-green-600"></div></div>`
@@ -69,9 +67,7 @@ describe("Convert to AutoLayout", () => {
     frame.layoutMode = "NONE";
     frame.children = [node2, node1];
 
-    expect(
-      tailwindMain("", [convertToAutoLayout(frame)], false, false)
-    ).toEqual(
+    expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
       `<div class="inline-flex flex-col items-center justify-center">
 <div class="self-start w-5 h-5 bg-red-700"></div>
 <div class="self-start w-5 h-5 bg-green-600"></div></div>`
@@ -85,9 +81,7 @@ describe("Convert to AutoLayout", () => {
     frame.layoutMode = "NONE";
     frame.children = [node2, node1];
 
-    expect(
-      tailwindMain("", [convertToAutoLayout(frame)], false, false)
-    ).toEqual(
+    expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
       `<div class="inline-flex flex-col space-y-1 items-center justify-center">
 <div class="w-full h-5 bg-red-700"></div>
 <div class="self-end w-5 h-5 bg-green-600"></div></div>`
@@ -102,9 +96,7 @@ describe("Convert to AutoLayout", () => {
     frame.layoutMode = "NONE";
     frame.children = [node2, node1];
 
-    expect(
-      tailwindMain("", [convertToAutoLayout(frame)], false, false)
-    ).toEqual(
+    expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
       `<div class="inline-flex items-center justify-center">
 <div class="w-5 h-12 bg-red-700"></div>
 <div class="self-end w-5 h-5 bg-green-600"></div></div>`
@@ -118,11 +110,9 @@ describe("Convert to AutoLayout", () => {
     frame.layoutMode = "NONE";
     frame.children = [node2, node1];
 
-    expect(
-      tailwindMain("", [convertToAutoLayout(frame)], false, false)
-    ).toEqual(
-      `<div class="relative w-12 h-12">
-<div class="absolute w-5 h-5 bg-green-600" style="left:10px; top:10px; "></div>
+    expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
+      `<div class="relative" style="width: 50px; height: 50px;">
+<div class="absolute w-5 h-5 bg-green-600" style="left:10px; top:10px;"></div>
 <div class="absolute left-0 top-0 w-5 h-5 bg-red-700"></div></div>`
     );
 
@@ -130,8 +120,6 @@ describe("Convert to AutoLayout", () => {
     frame.layoutMode = "NONE";
     frame.children = [];
 
-    expect(
-      tailwindMain("", [convertToAutoLayout(frame)], false, false)
-    ).toEqual(`<div class="w-12 h-12"></div>`);
+    expect(tailwindMain([convertToAutoLayout(frame)])).toEqual("");
   });
 });

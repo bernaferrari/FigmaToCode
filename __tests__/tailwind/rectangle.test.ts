@@ -17,7 +17,7 @@ describe("Tailwind Rectangle", () => {
   global.figma = figma;
 
   const executeMain = () => {
-    return tailwindMain(parentId, [node], true, false);
+    return tailwindMain([node], parentId, true, false);
   };
 
   it("small size", () => {

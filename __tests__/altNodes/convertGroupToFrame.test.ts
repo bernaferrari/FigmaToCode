@@ -22,9 +22,9 @@ describe("Convert Group to Frame", () => {
     group.height = 20;
     group.children = [rectangle];
 
-    expect(
-      tailwindMain("", [convertGroupToFrame(group)], false, false)
-    ).toEqual('<div class="w-full h-5"></div>');
+    expect(tailwindMain([convertGroupToFrame(group)])).toEqual(
+      '<div class="w-full h-5"></div>'
+    );
   });
 
   it("Correctly position the children", () => {
