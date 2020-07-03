@@ -18,12 +18,12 @@ let isJsx = false;
 let showLayerName = false;
 
 export const tailwindMain = (
-  parentId_src: string,
   sceneNode: Array<AltSceneNode>,
-  jsx: boolean,
-  layerName: boolean
+  parentIdSrc: string = "",
+  jsx: boolean = false,
+  layerName: boolean = false
 ): string => {
-  parentId = parentId_src;
+  parentId = parentIdSrc;
   isJsx = jsx;
   showLayerName = layerName;
 
@@ -104,7 +104,7 @@ const tailwindGroup = (node: AltGroupNode): string => {
     .position(node, parentId)
     .widthHeight(node);
 
-  if (builder.attributes) {
+  if (builder.attributes || builder.style) {
     const attr = builder.build("relative ");
     return `\n<div${attr}>${tailwindWidgetGenerator(node.children)}</div>`;
   }

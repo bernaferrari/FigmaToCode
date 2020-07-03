@@ -17,17 +17,13 @@ describe("AltText", () => {
     node.height = 16;
 
     node.textAutoResize = "NONE";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="w-4 h-4"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="w-4 h-4"></p>');
 
     node.textAutoResize = "HEIGHT";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="w-4"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="w-4"></p>');
 
     node.textAutoResize = "WIDTH_AND_HEIGHT";
-    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
+    expect(tailwindMain([node])).toEqual("<p></p>");
   });
 
   it("textAlignHorizontal", () => {
@@ -38,16 +34,14 @@ describe("AltText", () => {
 
     node.textAutoResize = "WIDTH_AND_HEIGHT";
     node.textAlignHorizontal = "LEFT";
-    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
+    expect(tailwindMain([node])).toEqual("<p></p>");
 
     node.textAutoResize = "NONE";
     node.textAlignHorizontal = "CENTER";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="w-4 h-4 text-center"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="w-4 h-4 text-center"></p>');
 
     node.textAlignHorizontal = "JUSTIFIED";
-    expect(tailwindMain("", [node], false, false)).toEqual(
+    expect(tailwindMain([node])).toEqual(
       '<p class="w-4 h-4 text-justified"></p>'
     );
   });
@@ -58,9 +52,7 @@ describe("AltText", () => {
     node.height = 16;
     node.fontSize = 16;
 
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="text-base"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="text-base"></p>');
   });
 
   it("fontName", () => {
@@ -73,23 +65,19 @@ describe("AltText", () => {
       family: "inter",
       style: "bold",
     };
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="font-bold"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="font-bold"></p>');
 
     node.fontName = {
       family: "inter",
       style: "medium italic",
     };
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="italic font-medium"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="italic font-medium"></p>');
 
     node.fontName = {
       family: "inter",
       style: "regular",
     };
-    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
+    expect(tailwindMain([node])).toEqual("<p></p>");
   });
 
   it("letterSpacing", () => {
@@ -102,17 +90,13 @@ describe("AltText", () => {
       value: 110,
       unit: "PERCENT",
     };
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="tracking-widest"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="tracking-widest"></p>');
 
     node.letterSpacing = {
       value: 10,
       unit: "PIXELS",
     };
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="tracking-widest"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="tracking-widest"></p>');
   });
 
   it("lineHeight", () => {
@@ -125,17 +109,13 @@ describe("AltText", () => {
       value: 110,
       unit: "PERCENT",
     };
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="leading-none"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="leading-none"></p>');
 
     node.lineHeight = {
       value: 10,
       unit: "PIXELS",
     };
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="leading-3"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="leading-3"></p>');
   });
 
   it("textCase", () => {
@@ -143,22 +123,16 @@ describe("AltText", () => {
     node.characters = "";
 
     node.textCase = "LOWER";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="lowercase"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="lowercase"></p>');
 
     node.textCase = "TITLE";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="capitalize"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="capitalize"></p>');
 
     node.textCase = "UPPER";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="uppercase"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="uppercase"></p>');
 
     node.textCase = "ORIGINAL";
-    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
+    expect(tailwindMain([node])).toEqual("<p></p>");
   });
 
   it("textDecoration", () => {
@@ -166,17 +140,13 @@ describe("AltText", () => {
     node.characters = "";
 
     node.textDecoration = "NONE";
-    expect(tailwindMain("", [node], false, false)).toEqual("<p></p>");
+    expect(tailwindMain([node])).toEqual("<p></p>");
 
     node.textDecoration = "STRIKETHROUGH";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="line-through"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="line-through"></p>');
 
     node.textDecoration = "UNDERLINE";
-    expect(tailwindMain("", [node], false, false)).toEqual(
-      '<p class="underline"></p>'
-    );
+    expect(tailwindMain([node])).toEqual('<p class="underline"></p>');
   });
 
   it("weight", () => {

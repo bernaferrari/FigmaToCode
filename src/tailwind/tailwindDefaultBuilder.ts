@@ -1,3 +1,4 @@
+import { htmlSize } from "./../htmlBuilder/htmlSize";
 import { htmlGradient } from "../htmlBuilder/htmlGradient";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
@@ -113,7 +114,11 @@ export class TailwindDefaultBuilder {
   }
 
   widthHeight(node: AltSceneNode): this {
-    this.attributes += tailwindSize(node);
+    if ("isRelative" in node && node.isRelative === true) {
+      this.style += htmlSize(node, this.isJSX);
+    } else {
+      this.attributes += tailwindSize(node);
+    }
     return this;
   }
 
@@ -125,6 +130,10 @@ export class TailwindDefaultBuilder {
   removeTrailingSpace(): this {
     if (this.attributes.length > 0 && this.attributes.slice(-1) === " ") {
       this.attributes = this.attributes.slice(0, -1);
+    }
+
+    if (this.style.length > 0 && this.style.slice(-1) === " ") {
+      this.style = this.style.slice(0, -1);
     }
     return this;
   }

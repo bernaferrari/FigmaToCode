@@ -15,7 +15,7 @@ describe("TextSize", () => {
 
     const node = new AltTextNode();
     node.characters = "";
-    node.width = 100;
+    node.width = 120;
     node.height = 12;
     node.x = 0;
     node.y = 0;
@@ -24,6 +24,10 @@ describe("TextSize", () => {
     parentNode.children = [node];
     node.parent = parentNode;
 
+    // no relative when same width as parent
+    expect(tailwindTextSize(node)).toEqual("w-32 h-3 ");
+
+    node.width = 100;
     expect(tailwindTextSize(node)).toEqual("w-full h-3 ");
 
     node.textAutoResize = "HEIGHT";

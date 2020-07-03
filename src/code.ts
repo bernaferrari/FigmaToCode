@@ -43,9 +43,9 @@ const run = () => {
 
   // @ts-ignore
   if (mode === "flutter") {
-    result = flutterMain(parentId, convertedSelection, material);
+    result = flutterMain(convertedSelection, parentId, material);
   } else if (mode === "tailwind") {
-    result = tailwindMain(parentId, convertedSelection, isJsx, layerName);
+    result = tailwindMain(convertedSelection, parentId, isJsx, layerName);
   }
 
   console.log(result);

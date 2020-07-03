@@ -52,26 +52,22 @@ export const nodeWidthHeight = (
   let propHeight: number | null = nodeHeight;
 
   // todo can a relative container be w-full? I don't think so.
-  if (
-    (("layoutMode" in node && node.layoutMode === "NONE") ||
-      node.type === "GROUP") &&
-    node.children.length > 1
-  ) {
-    return {
-      width: nodeWidth,
-      height: nodeHeight,
-    };
-  }
+  // this has been moved to [htmlSize]. Was this a good choice?
+  // if ("isRelative" in node && node.isRelative === true) {
+  //   return {
+  //     width: nodeWidth,
+  //     height: nodeHeight,
+  //   };
+  // }
 
   if (allowRelative) {
     // avoid relative width when parent is relative (therefore, child is probably absolute, which doesn't work nice)
-    const relativePos =
+    const insideRelative =
       node.parent &&
-      node.parent.children.length > 1 &&
-      (node.parent.type === "GROUP" ||
-        ("layoutMode" in node.parent && node.parent.layoutMode === "NONE"));
+      "isRelative" in node.parent &&
+      node.parent.isRelative === true;
 
-    if (!relativePos) {
+    if (!insideRelative) {
       const rW = calculateResponsiveW(node, nodeWidth);
 
       if (rW) {
@@ -306,7 +302,11 @@ export const isWidthFull = (
     // check if total width is at least 80% of the parent. This number is also a magic number and has worked fine so far.
     const betweenPercentMargins = nodeWidth / node.parent.width >= 0.8;
 
-    if (betweenValueMargins && betweenPercentMargins) {
+    // when parent's width is the same as the child, child should set it..
+    // but the child can't set it to full since parent doesn't have it. Therefore, ignore it.
+    const differentThanParent = node.width !== node.parent.width;
+
+    if (differentThanParent && betweenValueMargins && betweenPercentMargins) {
       return true;
     }
   }

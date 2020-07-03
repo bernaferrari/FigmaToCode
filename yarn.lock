@@ -6939,11 +6939,6 @@ svelte-prism@^1.1.3:
     prism-svelte "^0.4.0"
     prismjs "^1.17.1"
 
-svelte-tabs@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/svelte-tabs/-/svelte-tabs-1.1.0.tgz#093c5fdac57cbb0e6ba81e717d68fb9da7239208"
-  integrity sha512-bCynxgET2uvqpB6xf/dVyqHjzmumRURQyh2QqXlrki8NxzO7h2WghF8qgpb5qeB5NTX1bMU+9Q5Hf5ey2WLaMg==
-
 svelte@^3.23.2:
   version "3.23.2"
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.23.2.tgz#f3e500384261a2e77b29681ee744c3c790fbcdc3"
