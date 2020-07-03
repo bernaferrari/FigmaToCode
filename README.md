@@ -1,6 +1,6 @@
 <!-- <p align="center"><img src="assets/icon_256.png" alt="Figma to Code" height="128px"></p> -->
 
-![Figma to Code](assets/git_preview.png)
+[![Figma to Code](assets/git_preview.png)](https://www.figma.com/community/plugin/842128343887142055)
 
 # Figma to Code
 
@@ -8,6 +8,9 @@
 <a href="https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bernaferrari/FigmaToCode&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/af3321afff1f4d078037e09111120384"/></a>
 <a href="https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bernaferrari/FigmaToCode&amp;utm_campaign=Badge_Coverage"><img src="https://app.codacy.com/project/badge/Coverage/af3321afff1f4d078037e09111120384"/></a>
 <a href="http://twitter.com/bernaferrari"><img src="https://img.shields.io/badge/Twitter-@bernaferrari-brightgreen.svg?style=flat" style="max-height: 300px;" alt="Twitter"/></a>
+</p>
+<p align="center">
+<a href="https://www.figma.com/community/plugin/842128343887142055"><img src="assets/badge.png" height="60"/></a>
 </p>
 
 Most _design to code_ plugins are bad, some are even paid. This project aims to raise the bar by generating **responsive** layouts in [Tailwind](https://tailwindcss.com/) and [Flutter](https://flutter.github.io/). The plan is to eventually add support for [Jetpack Compose](https://developer.android.com/jetpack/compose) and possibly standard HTML or other frameworks like [React Native](https://reactnative.dev/), [SwiftUI](https://developer.apple.com/xcode/swiftui/), [Bootstrap](https://getbootstrap.com/) or [Fluent](https://www.microsoft.com/design/fluent/). Feedback, ideas and partnerships are appreciated!
