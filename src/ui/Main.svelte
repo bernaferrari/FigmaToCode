@@ -20,8 +20,6 @@
     });
   }
 
-  import { Switch } from "figma-plugin-ds-svelte";
-
   //use bind:group, with a var to create a radio group and store the value of selected item
   //set value if this var to same value as radio item to set initial selection
   var switchValue;

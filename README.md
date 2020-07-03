@@ -16,7 +16,7 @@ Most _design to code_ plugins are bad, some are even paid. This project aims to 
 
 ## How it works
 
-This plugin takes an unconventional approach to improve code quality: it optimizes the layout before the conversion to code even begins. The standard Figma [Nodes](https://www.figma.com/plugin-docs/api/nodes/) (what represents each layer) is a joy to work with, but it can't modify a layer without modifying the user project. For this reason, I decided to virtualize it, remaking the official implementation and naming them `AltNodes`. During the process to convert a `Node` into an `AltNode`, the plugin does the following:
+This plugin takes an unconventional approach to improve code quality: it optimizes the layout before the conversion to code even begins. The standard Figma [Nodes](https://www.figma.com/plugin-docs/api/nodes/) (what represents each layer) is a joy to work with, but it can't modify a layer without modifying the user project. For this reason, I decided to virtualize it, remaking the official implementation and naming them `AltNodes`. During the process of converting a `Node` into an `AltNode`, the plugin does the following:
 
 ![Conversion Workflow](assets/workflow.png)
 
@@ -32,7 +32,7 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 - Vectors (tricky in HTML, unsupported in Flutter)
 - Images (they are local, how to support?)
-- Gradients (unsupported by Tailwind, todo in Flutter)
+- Gradients (todo in Flutter)
 - Line/Star/Polygon (todo. Rectangle and Ellipse were prioritized and are more common)
 - Identify buttons
 - The source code is fully commented and there are around 30 "todo"s there
@@ -52,7 +52,7 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 ## How to build the project
 
-The project is configured to be built with Webpack or Rollup. The author couldn't find a way to correctly configure Svelte in Webpack, so Rollup was added. But Rollup is a lot less stable than Webpack and crashes regularly in watch mode when editing Typescript files. So, if you are going to work only Typescript, I reccommend sticking with Webpack. If you are going to make changes in the UI, you **need** to use Rollup for now.
+The project is configured to be built with Webpack or Rollup. The author couldn't find a way to correctly configure Svelte in Webpack, so Rollup was added. But Rollup is a lot less stable than Webpack and crashes regularly in watch mode when editing Typescript files. So, if you are going to work with Typescript only, I reccommend sticking with Webpack. If you are going to make changes in the UI, you **need** to use Rollup for now.
 
 ## Issues
 
