@@ -51,7 +51,7 @@ export const retrieveTailwindText = (
       textStr.push({
         name: node.name,
         attr: attr.attributes,
-        full: `<p ${attr.attributes}>${charsWithLineBreak}</p>`,
+        full: `<p class="${attr.attributes}">${charsWithLineBreak}</p>`,
         style: style(node),
         contrastBlack: contrastBlack,
       });

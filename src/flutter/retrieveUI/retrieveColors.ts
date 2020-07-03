@@ -67,7 +67,7 @@ const convertColor = (
     };
 
     return {
-      hex: "#" + rgbTo6hex(fill.color),
+      hex: rgbTo6hex(fill.color),
       contrastBlack: calculateContrastRatio(fill.color, black),
       contrastWhite: calculateContrastRatio(fill.color, white),
     };
