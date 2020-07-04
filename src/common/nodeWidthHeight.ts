@@ -62,10 +62,7 @@ export const nodeWidthHeight = (
 
   if (allowRelative) {
     // avoid relative width when parent is relative (therefore, child is probably absolute, which doesn't work nice)
-    const insideRelative =
-      node.parent &&
-      "isRelative" in node.parent &&
-      node.parent.isRelative === true;
+    const insideRelative = node.parent && node.parent.isRelative === true;
 
     if (!insideRelative) {
       const rW = calculateResponsiveW(node, nodeWidth);

@@ -25,7 +25,7 @@ describe("Tailwind Default Builder", () => {
     expect(builder.attributes).toEqual("");
   });
 
-  it("JSX being used", () => {
+  it("JSX with relative position", () => {
     const node = new AltFrameNode();
     node.width = 32;
     node.height = 32;
@@ -68,6 +68,49 @@ describe("Tailwind Default Builder", () => {
       .toEqual(`<div className="FRAME relative" style={{width: 32, height: 32,}}>
 <div className="RECT1 absolute w-1 h-1 bg-white" style={{left:9px, top:9px,}}></div>
 <div className="RECT2 absolute w-1 h-1" style={{left:9px, top:9px,}}></div></div>`);
+  });
+
+  it("children is larger than 256", () => {
+    const node = new AltFrameNode();
+    node.width = 320;
+    node.height = 320;
+    node.name = "FRAME";
+    node.layoutMode = "NONE";
+    node.counterAxisSizingMode = "FIXED";
+
+    const child1 = new AltRectangleNode();
+    child1.width = 257;
+    child1.height = 8;
+    child1.x = 9;
+    child1.y = 9;
+    child1.name = "RECT1";
+    child1.fills = [
+      {
+        type: "SOLID",
+        color: {
+          r: 1,
+          g: 1,
+          b: 1,
+        },
+      },
+    ];
+
+    const child2 = new AltRectangleNode();
+    child2.width = 8;
+    child2.height = 257;
+    child2.x = 9;
+    child2.y = 9;
+    child2.name = "RECT2";
+
+    // this works as a test for JSX, but should never happen in reality. In reality Frame would need to have 2 children and be relative.
+    node.children = [child1, child2];
+    child1.parent = node;
+    child2.parent = node;
+
+    expect(tailwindMain([convertToAutoLayout(node)]))
+      .toEqual(`<div class="relative" style="width: 320px; height: 320px;">
+<div class="absolute bg-white" style="left:9px; top:9px; width: 257px; height: 8px;"></div>
+<div class="absolute" style="left:9px; top:9px; width: 8px; height: 257px;"></div></div>`);
   });
 
   it("Group with relative position", () => {

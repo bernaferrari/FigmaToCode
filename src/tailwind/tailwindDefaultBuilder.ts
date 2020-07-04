@@ -114,7 +114,13 @@ export class TailwindDefaultBuilder {
   }
 
   widthHeight(node: AltSceneNode): this {
-    if ("isRelative" in node && node.isRelative === true) {
+    // if current element is relative (therefore, children are absolute)
+    // or current element is one of the absoltue children and has a width or height > w/h-64
+    if (
+      ("isRelative" in node && node.isRelative === true) ||
+      (node.parent?.isRelative === true &&
+        (node.width > 256 || node.height > 256))
+    ) {
       this.style += htmlSize(node, this.isJSX);
     } else {
       this.attributes += tailwindSize(node);

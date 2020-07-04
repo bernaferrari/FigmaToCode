@@ -103,17 +103,13 @@ export interface AltFrameNode
     AltCornerMixin,
     AltRectangleCornerMixin,
     AltBlendMixin,
-    AltLayoutMixin {
-  isRelative?: boolean;
-}
+    AltLayoutMixin {}
 
 export interface AltGroupNode
   extends AltBaseNodeMixin,
     AltChildrenMixin,
     AltBlendMixin,
-    AltLayoutMixin {
-  isRelative?: boolean;
-}
+    AltLayoutMixin {}
 
 // DOCUMENT
 
@@ -159,6 +155,7 @@ export interface AltBaseNodeMixin {
 
 export interface AltChildrenMixin {
   children: Array<AltSceneNode>;
+  isRelative?: boolean;
 }
 
 // // DOCUMENT
