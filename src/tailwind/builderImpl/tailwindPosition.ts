@@ -9,6 +9,7 @@ export const tailwindPosition = (
     return "";
   }
 
+  // isRelative shouldn't be used here, as isRelative is for children length > 1, and this will also catch 1.
   // Group
   if (
     node.parent.type === "GROUP" ||

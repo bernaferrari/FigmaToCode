@@ -1,3 +1,5 @@
+import { AltFrameNode, AltRectangleNode } from "./../../src/altNodes/altMixins";
+import { tailwindMain } from "./../../src/tailwind/tailwindMain";
 import { frameNodeToAlt } from "../../src/altNodes/altConversion";
 import { createFigma } from "figma-api-stub";
 import { tailwindSize } from "../../src/tailwind/builderImpl/tailwindSize";
@@ -54,13 +56,22 @@ describe("Tailwind Size", () => {
   it("small frame inside large frame", () => {
     const node = figma.createFrame();
     node.resize(500, 500);
+    node.layoutMode = "NONE";
+    node.counterAxisSizingMode = "FIXED";
+    node.x = 0;
+    node.y = 0;
 
     const subnode = figma.createFrame();
     subnode.resize(8, 8);
+    subnode.x = 246;
+    subnode.y = 246;
 
     node.appendChild(subnode);
 
-    expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-full ");
+    expect(tailwindMain([frameNodeToAlt(node)]))
+      .toEqual(`<div class="inline-flex items-center justify-center p-64 w-full">
+<div class="w-full h-2"></div></div>`);
+
     expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
   });
 
@@ -135,6 +146,78 @@ describe("Tailwind Size", () => {
       expect(tailwindSize(frameNodeToAlt(node))).toEqual("");
       expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-full ");
       expect(tailwindSize(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
+    });
+
+    it("complex autolayout example", () => {
+      const node = new AltFrameNode();
+      node.width = 225;
+      node.height = 300;
+      node.counterAxisSizingMode = "FIXED";
+      node.layoutMode = "VERTICAL";
+      node.horizontalPadding = 10;
+      node.itemSpacing = 10;
+      node.fills = [
+        {
+          type: "SOLID",
+          color: {
+            r: 1,
+            g: 0,
+            b: 0,
+          },
+        },
+      ];
+
+      const fills: ReadonlyArray<Paint> = [
+        {
+          type: "SOLID",
+          color: {
+            r: 1,
+            g: 1,
+            b: 1,
+          },
+        },
+      ];
+
+      const child1 = new AltRectangleNode();
+      child1.width = 205;
+      child1.height = 20;
+      child1.x = 10;
+      child1.layoutAlign = "CENTER";
+      child1.fills = fills;
+      child1.parent = node;
+
+      const child2 = new AltRectangleNode();
+      child2.width = 205;
+      child2.height = 20;
+      child2.x = 10;
+      child2.layoutAlign = "STRETCH";
+      child2.fills = fills;
+      child2.parent = node;
+
+      const child3 = new AltRectangleNode();
+      child3.width = 100;
+      child3.height = 20;
+      child3.x = 10;
+      child3.layoutAlign = "MIN";
+      child3.fills = fills;
+      child3.parent = node;
+
+      const child4 = new AltRectangleNode();
+      child4.width = 30;
+      child4.height = 20;
+      child4.x = 10;
+      child4.layoutAlign = "CENTER";
+      child4.fills = fills;
+      child4.parent = node;
+
+      node.children = [child1, child2, child3, child4];
+
+      expect(tailwindMain([node]))
+        .toEqual(`<div class="inline-flex flex-col space-y-2 items-center justify-center px-2 w-56 bg-red-700">
+<div class="w-full h-5 bg-white"></div>
+<div class="w-full h-5 bg-white"></div>
+<div class="self-start w-24 h-5 bg-white"></div>
+<div class="w-8 h-5 bg-white"></div></div>`);
     });
   });
 

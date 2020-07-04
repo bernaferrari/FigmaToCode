@@ -38,6 +38,13 @@ describe("Tailwind Blend", () => {
   });
 
   it("rotation", () => {
+    // avoid rounding errors
+    node.rotation = -7.0167096047110005e-15;
+    expect(tailwindRotation(node)).toEqual("");
+
+    node.rotation = 45;
+    expect(tailwindRotation(node)).toEqual("rotate-45 ");
+
     node.rotation = 45;
     expect(tailwindRotation(node)).toEqual("rotate-45 ");
 

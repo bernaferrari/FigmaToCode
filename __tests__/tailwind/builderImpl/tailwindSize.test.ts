@@ -30,9 +30,11 @@ describe("Tailwind Builder", () => {
     const node = new AltFrameNode();
     node.layoutMode = "HORIZONTAL";
     node.counterAxisSizingMode = "FIXED";
+    node.width = 100;
 
     const child = new AltRectangleNode();
     child.layoutAlign = "STRETCH";
+    child.width = 100;
 
     child.parent = node;
     node.children = [child];
@@ -43,9 +45,10 @@ describe("Tailwind Builder", () => {
     node.layoutMode = "VERTICAL";
     child.width = 16;
     child.height = 16;
-    expect(tailwindSize(child)).toEqual("w-4 h-4 ");
+    expect(tailwindSize(child)).toEqual("w-1/6 h-4 ");
 
-    expect(tailwindSize(node)).toEqual("");
+    // child is relative, therefore it must have a value
+    expect(tailwindSize(node)).toEqual("w-24 ");
   });
 
   it("Vertical layout with FIXED counterAxis", () => {
