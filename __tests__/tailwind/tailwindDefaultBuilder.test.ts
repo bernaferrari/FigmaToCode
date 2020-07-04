@@ -122,6 +122,7 @@ describe("Tailwind Default Builder", () => {
     node.x = 0;
     node.y = 0;
     node.name = "GROUP";
+    node.isRelative = true;
 
     const child = new AltRectangleNode();
     child.width = 4;
@@ -143,7 +144,7 @@ describe("Tailwind Default Builder", () => {
     node.children = [child];
     child.parent = node;
     expect(tailwindMain([node], "", true, true))
-      .toEqual(`<div className="GROUP relative w-8 h-8">
+      .toEqual(`<div className="GROUP relative" style={{width: 32, height: 32,}}>
 <div className="RECT absolute w-1 h-1 bg-white" style={{left:9px, top:9px,}}></div></div>`);
   });
 });

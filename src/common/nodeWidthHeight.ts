@@ -29,22 +29,23 @@ export const nodeWidthHeight = (
   //   }
   // }
 
+  // todo this can be seen as an optimization, but then the parent, when it is horizontal, must also look if any children is stretch, which adds more code.
   // if node's layoutAlign is STRETCH, w/h should be full
-  if (
-    node.layoutAlign === "STRETCH" &&
-    node.parent &&
-    "layoutMode" in node.parent
-  ) {
-    if (node.parent.layoutMode === "HORIZONTAL") {
-      return {
-        width: allowRelative ? "full" : node.width,
-        height: null,
-      };
-    }
-    // else if (node.parent.layoutMode === "VERTICAL") {
-    // todo use h-full? It isn't always reliable, but it is inside a Frame anyway..
-    // }
-  }
+  // if (
+  //   node.layoutAlign === "STRETCH" &&
+  //   node.parent &&
+  //   "layoutMode" in node.parent
+  // ) {
+  //   if (node.parent.layoutMode === "HORIZONTAL") {
+  //     return {
+  //       width: allowRelative ? "full" : node.width,
+  //       height: null,
+  //     };
+  //   }
+  //   // else if (node.parent.layoutMode === "VERTICAL") {
+  //   // todo use h-full? It isn't always reliable, but it is inside a Frame anyway..
+  //   // }
+  // }
 
   const [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
 
@@ -97,14 +98,17 @@ export const nodeWidthHeight = (
     propHeight = null;
   }
 
-  // if FRAME is too big for tailwind to handle, just let it be w-full or h-auto
-  // if its width is larger than 256 or the sum of its children
+  // when any child has a relative width and parent is HORIZONTAL,
+  // parent must have a defined width, which wouldn't otherwise.
+  // todo check if the performance impact of this is worth it.
+  const hasRelativeChild =
+    "layoutMode" in node &&
+    node.layoutMode === "HORIZONTAL" &&
+    node.children.find((d) =>
+      calculateResponsiveW(d, getNodeSizeWithStrokes(d)[0])
+    ) !== undefined;
 
-  // if (rW !== "") {
-  //   return `${propWidth}${propHeight}`;
-  // }
-
-  if ("layoutMode" in node && node.layoutMode && node.layoutMode !== "NONE") {
+  if (!hasRelativeChild && "layoutMode" in node && node.layoutMode !== "NONE") {
     // there is an edge case: frame with no children, layoutMode !== NONE and counterAxis = AUTO, but:
     // in [altConversions] it is already solved: Frame without children becomes a Rectangle.
 
@@ -189,8 +193,8 @@ const getNodeSizeWithStrokes = (node: AltSceneNode): Array<number> => {
 };
 
 const childLargerThanMaxSize = (node: AltSceneNode, axis: "x" | "y") => {
-  const widthHeight: "width" | "height" = axis === "x" ? "width" : "height";
   if ("children" in node && node.children.length > 0) {
+    const widthHeight: "width" | "height" = axis === "x" ? "width" : "height";
     const lastChild = node.children[node.children.length - 1];
 
     const maxLen =
@@ -220,9 +224,6 @@ const calculateResponsiveW = (
 ): responsive => {
   let propWidth: responsive = "";
 
-  // verifies if size > 256 or any child has size > 256
-  // todo improve to verify if the sum of children is also not larger than 256
-
   if (nodeWidth > 256 || childLargerThanMaxSize(node, "x")) {
     propWidth = "full";
   }
@@ -231,51 +232,67 @@ const calculateResponsiveW = (
     return propWidth;
   }
 
+  let parentWidth;
+
+  // add padding back to the layout width, so it can be full when compared with parent.
+  if (
+    node.parent &&
+    "layoutMode" in node.parent &&
+    node.parent.horizontalPadding &&
+    node.parent.layoutMode === "HORIZONTAL"
+  ) {
+    parentWidth = node.parent.width - node.parent.horizontalPadding * 2;
+    // currently ignoring h-full
+  } else {
+    parentWidth = node.parent.width;
+  }
+
+  // verifies if size > 256 or any child has size > 256
+  // todo improve to verify if the sum of children is also not larger than 256
+
   // if width is same as parent, with a small threshold, w is 100%
   // parent must be a frame (gets weird in groups)
-  if ("layoutMode" in node.parent && node.parent.width - nodeWidth < 2) {
+  if ("layoutMode" in node.parent && parentWidth - nodeWidth < 2) {
     propWidth = "full";
   }
 
-  if ("width" in node.parent) {
-    // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
-    const dividedWidth = nodeWidth / node.parent.width;
+  // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
+  const dividedWidth = nodeWidth / parentWidth;
 
-    // todo what if the element is ~1/2 but there is a margin? This won't detect it
+  // todo what if the element is ~1/2 but there is a margin? This won't detect it
 
-    const calculateResp = (div: number, str: responsive) => {
-      if (Math.abs(dividedWidth - div) < 0.01) {
-        propWidth = str;
-        return true;
-      }
-      return false;
-    };
-
-    // they will try to set the value, and if false keep calculating
-    // todo is there a better way of writing this?
-
-    const checkList: Array<[number, responsive]> = [
-      [1, "full"],
-      [1 / 2, "1/2"],
-      [1 / 3, "1/3"],
-      [2 / 3, "2/3"],
-      [1 / 4, "1/4"],
-      [3 / 4, "3/4"],
-      [1 / 5, "1/5"],
-      [1 / 6, "1/6"],
-      [5 / 6, "5/6"],
-      [1 / 12, "1/12"],
-    ];
-
-    // exit the for when result is found.
-    let resultFound = false;
-    for (let i = 0; i < checkList.length && !resultFound; i++) {
-      const [div, resp] = checkList[i];
-      resultFound = calculateResp(div, resp);
+  const calculateResp = (div: number, str: responsive) => {
+    if (Math.abs(dividedWidth - div) < 0.01) {
+      propWidth = str;
+      return true;
     }
+    return false;
+  };
+
+  // they will try to set the value, and if false keep calculating
+  // todo is there a better way of writing this?
+
+  const checkList: Array<[number, responsive]> = [
+    [1, "full"],
+    [1 / 2, "1/2"],
+    [1 / 3, "1/3"],
+    [2 / 3, "2/3"],
+    [1 / 4, "1/4"],
+    [3 / 4, "3/4"],
+    [1 / 5, "1/5"],
+    [1 / 6, "1/6"],
+    [5 / 6, "5/6"],
+    [1 / 12, "1/12"],
+  ];
+
+  // exit the for when result is found.
+  let resultFound = false;
+  for (let i = 0; i < checkList.length && !resultFound; i++) {
+    const [div, resp] = checkList[i];
+    resultFound = calculateResp(div, resp);
   }
 
-  if (isWidthFull(node, nodeWidth)) {
+  if (isWidthFull(node, nodeWidth, parentWidth)) {
     propWidth = "full";
   }
 
@@ -285,7 +302,8 @@ const calculateResponsiveW = (
 // set the width to max if the view is near the corner
 export const isWidthFull = (
   node: AltSceneNode,
-  nodeWidth: number = node.width
+  nodeWidth: number = node.width,
+  parentWidth: number = node.parent?.width ?? 1
 ): boolean => {
   if (node.parent && "width" in node.parent) {
     // set the width to max if the view is near the corner
@@ -294,14 +312,14 @@ export const isWidthFull = (
     // this will only be reached when parent is FRAME, so node.parent.x is always 0.
     const betweenValueMargins =
       node.x <= magicMargin &&
-      node.parent.width - (node.x + nodeWidth) <= magicMargin;
+      parentWidth - (node.x + nodeWidth) <= magicMargin;
 
     // check if total width is at least 80% of the parent. This number is also a magic number and has worked fine so far.
-    const betweenPercentMargins = nodeWidth / node.parent.width >= 0.8;
+    const betweenPercentMargins = nodeWidth / parentWidth >= 0.8;
 
     // when parent's width is the same as the child, child should set it..
     // but the child can't set it to full since parent doesn't have it. Therefore, ignore it.
-    const differentThanParent = node.width !== node.parent.width;
+    const differentThanParent = node.width !== parentWidth;
 
     if (differentThanParent && betweenValueMargins && betweenPercentMargins) {
       return true;

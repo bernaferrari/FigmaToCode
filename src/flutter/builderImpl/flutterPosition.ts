@@ -11,12 +11,7 @@ export const flutterPosition = (
   }
 
   // check if view is in a stack. Group and Frames must have more than 1 element
-  if (
-    (node.parent.type === "GROUP" && node.parent.children.length > 1) ||
-    (node.parent.type === "FRAME" &&
-      node.parent.layoutMode === "NONE" &&
-      node.parent.children.length > 1)
-  ) {
+  if (node.parent.isRelative === true) {
     // [--x--][-width-][--x--]
     // that's how the formula below works, to see if view is centered
     const centerX = 2 * node.x + node.width === node.parent.width;

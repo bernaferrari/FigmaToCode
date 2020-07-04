@@ -17,10 +17,6 @@ import { makeMaterial } from "./flutterMaterial";
 export class FlutterDefaultBuilder {
   child: string = "";
 
-  /**
-   * A fresh builder instance should contain a blank product object, which is
-   * used in further assembly.
-   */
   constructor(optChild: string = "") {
     this.child = optChild ?? "";
   }

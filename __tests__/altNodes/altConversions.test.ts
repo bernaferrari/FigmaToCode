@@ -1,3 +1,4 @@
+import { convertToAutoLayout } from "./../../src/altNodes/convertToAutoLayout";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { createFigma } from "figma-api-stub";
 import { convertIntoAltNodes } from "../../src/altNodes/altConversion";
@@ -34,8 +35,7 @@ describe("AltConversions", () => {
     figma.group([figma.createRectangle()], node);
 
     expect(tailwindMain(convertIntoAltNodes([node]))).toEqual(
-      `<div class="w-5 h-5">
-<div class="inline-flex items-center justify-center"></div></div>`
+      `<div class="inline-flex items-center justify-center"></div>`
     );
   });
 

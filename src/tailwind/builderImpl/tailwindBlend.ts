@@ -41,7 +41,7 @@ export const tailwindVisibility = (node: AltSceneNode): string => {
 export const tailwindRotation = (node: AltLayoutMixin): string => {
   // that's how you convert angles to clockwise radians: angle * -pi/180
   // using 3.14159 as Pi for enough precision and to avoid importing math lib.
-  if (node.rotation !== undefined && node.rotation !== 0) {
+  if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
     const array = [-180, -90, -45, 45, 90, 180];
     let nearest = nearestValue(node.rotation, array);
     let minusIfNegative = "";
