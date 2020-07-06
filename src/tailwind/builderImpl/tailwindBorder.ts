@@ -43,7 +43,7 @@ export const tailwindBorderRadius = (node: AltSceneNode): string => {
   let comp = "";
 
   if (node.cornerRadius !== figma.mixed) {
-    if (node.cornerRadius > node.height / 2) {
+    if (node.cornerRadius >= node.height / 2) {
       // special case. If height is 90 and cornerRadius is 45, it is full.
       comp += "rounded-full";
     } else {
