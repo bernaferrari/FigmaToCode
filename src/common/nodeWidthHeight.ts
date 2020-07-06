@@ -1,4 +1,5 @@
 import { AltSceneNode } from "../altNodes/altMixins";
+import { monitorEventLoopDelay } from "perf_hooks";
 
 export const magicMargin = 32;
 
@@ -239,7 +240,7 @@ const calculateResponsiveW = (
     node.parent &&
     "layoutMode" in node.parent &&
     node.parent.horizontalPadding &&
-    node.parent.layoutMode === "HORIZONTAL"
+    node.parent.layoutMode !== "NONE"
   ) {
     parentWidth = node.parent.width - node.parent.horizontalPadding * 2;
     // currently ignoring h-full
@@ -319,7 +320,7 @@ export const isWidthFull = (
 
     // when parent's width is the same as the child, child should set it..
     // but the child can't set it to full since parent doesn't have it. Therefore, ignore it.
-    const differentThanParent = node.width !== parentWidth;
+    const differentThanParent = nodeWidth !== parentWidth;
 
     if (differentThanParent && betweenValueMargins && betweenPercentMargins) {
       return true;
