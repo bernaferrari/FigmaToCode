@@ -45,9 +45,6 @@ describe("Tailwind Blend", () => {
     node.rotation = 45;
     expect(tailwindRotation(node)).toEqual("rotate-45 ");
 
-    node.rotation = 45;
-    expect(tailwindRotation(node)).toEqual("rotate-45 ");
-
     node.rotation = 90;
     expect(tailwindRotation(node)).toEqual("rotate-90 ");
 

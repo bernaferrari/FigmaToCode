@@ -51,6 +51,7 @@ describe("AltText", () => {
     node.width = 16;
     node.height = 16;
     node.fontSize = 16;
+    node.textAutoResize = "WIDTH_AND_HEIGHT";
 
     expect(tailwindMain([node])).toEqual('<p class="text-base"></p>');
   });
@@ -60,6 +61,7 @@ describe("AltText", () => {
     node.characters = "";
     node.width = 16;
     node.height = 16;
+    node.textAutoResize = "WIDTH_AND_HEIGHT";
 
     node.fontName = {
       family: "inter",
@@ -85,6 +87,7 @@ describe("AltText", () => {
     node.characters = "";
     node.width = 16;
     node.height = 16;
+    node.textAutoResize = "WIDTH_AND_HEIGHT";
 
     node.letterSpacing = {
       value: 110,
@@ -104,6 +107,7 @@ describe("AltText", () => {
     node.characters = "";
     node.width = 16;
     node.height = 16;
+    node.textAutoResize = "WIDTH_AND_HEIGHT";
 
     node.lineHeight = {
       value: 110,

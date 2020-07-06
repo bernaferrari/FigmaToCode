@@ -135,7 +135,7 @@ const tailwindText = (node: AltTextNode): string => {
   const splittedChars = node.characters.split("\n");
   const charsWithLineBreak =
     splittedChars.length > 1
-      ? node.characters.split("\n").join("<br></br>")
+      ? node.characters.split("\n").join("</br>")
       : node.characters;
 
   return `<p${builderResult}>${charsWithLineBreak}</p>`;
