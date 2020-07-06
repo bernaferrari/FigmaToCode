@@ -31,14 +31,15 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 ![Conversion Workflow](assets/examples.png)
 
+**Tip**: Instead of selecting the whole page, you can also select individual items. This can be useful for both debugging and componentization. For example: you can use the plugin to generate the code of a single element and then replicate it using a for-loop.
+
 ### Todo
 
 - Vectors (tricky in HTML, unsupported in Flutter)
-- Images (they are local, how to support?)
+- Images (they are local, how to support them?)
 - Gradients (todo in Flutter)
 - Line/Star/Polygon (todo. Rectangle and Ellipse were prioritized and are more common)
-- Identify buttons
-- The source code is fully commented and there are around 30 "todo"s there
+- The source code is fully commented and there are more than 30 "todo"s there
 
 ### Tailwind limitations
 
