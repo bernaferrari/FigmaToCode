@@ -51,7 +51,7 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 - **Align:** currently items are aligned inside a Row/Column according to their average position. Todo: find a way to improve this.
 - **Unreadable code:** output code is not formatted, but even [dartpad](https://dartpad.dev/) offers a format button.
 - **Stack:** in some simpler cases, a `Stack` could be replaced with a `Container` and a `BoxDecoration`. Discover those cases and optimize them.
-- **Material Styles**: texts could be matched to existing Material styles (like outputting `Headline6` when text size is 20).
+- **Material Styles**: text could be matched to existing Material styles (like outputting `Headline6` when text size is 20).
 - **Identify FlatButtons**: the plugin could identify specific buttons and output them instead of always using `Container` or `Material`.
 
 ## How to build the project
