@@ -303,28 +303,24 @@ const calculateResponsiveW = (
 // set the width to max if the view is near the corner
 export const isWidthFull = (
   node: AltSceneNode,
-  nodeWidth: number = node.width,
-  parentWidth: number = node.parent?.width ?? 1
+  nodeWidth: number,
+  parentWidth: number
 ): boolean => {
-  if (node.parent && "width" in node.parent) {
-    // set the width to max if the view is near the corner
 
-    // check if initial and final positions are within a magic number (currently 32)
-    // this will only be reached when parent is FRAME, so node.parent.x is always 0.
-    const betweenValueMargins =
-      node.x <= magicMargin &&
-      parentWidth - (node.x + nodeWidth) <= magicMargin;
+  // check if initial and final positions are within a magic number (currently 32)
+  // this will only be reached when parent is FRAME, so node.parent.x is always 0.
+  const betweenValueMargins =
+    node.x <= magicMargin && parentWidth - (node.x + nodeWidth) <= magicMargin;
 
-    // check if total width is at least 80% of the parent. This number is also a magic number and has worked fine so far.
-    const betweenPercentMargins = nodeWidth / parentWidth >= 0.8;
+  // check if total width is at least 80% of the parent. This number is also a magic number and has worked fine so far.
+  const betweenPercentMargins = nodeWidth / parentWidth >= 0.8;
 
-    // when parent's width is the same as the child, child should set it..
-    // but the child can't set it to full since parent doesn't have it. Therefore, ignore it.
-    const differentThanParent = nodeWidth !== parentWidth;
+  // when parent's width is the same as the child, child should set it..
+  // but the child can't set it to full since parent doesn't have it. Therefore, ignore it.
+  const differentThanParent = nodeWidth !== parentWidth;
 
-    if (differentThanParent && betweenValueMargins && betweenPercentMargins) {
-      return true;
-    }
+  if (differentThanParent && betweenValueMargins && betweenPercentMargins) {
+    return true;
   }
 
   return false;
