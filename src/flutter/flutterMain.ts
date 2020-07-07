@@ -15,8 +15,8 @@ let material = true;
 
 export const flutterMain = (
   sceneNode: Array<AltSceneNode>,
-  parentIdSrc: string,
-  isMaterial: boolean
+  parentIdSrc: string = "",
+  isMaterial: boolean = false
 ): string => {
   parentId = parentIdSrc;
   material = isMaterial;
