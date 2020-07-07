@@ -1,4 +1,3 @@
-import { convertToAutoLayout } from "./../../src/altNodes/convertToAutoLayout";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { createFigma } from "figma-api-stub";
 import { convertIntoAltNodes } from "../../src/altNodes/altConversion";

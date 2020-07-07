@@ -22,10 +22,13 @@ export const flutterShape = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ): string => {
   const strokeColor = flutterColor(node.strokes);
-  const side = `side: BorderSide(width: ${node.strokeWeight}, ${strokeColor}), `;
+  const side =
+    strokeColor && node.strokeWeight > 0
+      ? `side: BorderSide(width: ${node.strokeWeight}, ${strokeColor}), `
+      : "";
 
   if (node.type === "ELLIPSE") {
-    return `shape: CircleBorder(${side})`;
+    return `shape: CircleBorder(${side}), `;
   }
 
   return `shape: RoundedRectangleBorder(${side}${flutterBorderRadius(node)}),`;

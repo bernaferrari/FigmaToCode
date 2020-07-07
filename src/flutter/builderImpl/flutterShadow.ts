@@ -31,7 +31,7 @@ export const flutterElevationAndShadowColor = (
   let elevation = "";
   let shadowColor = "";
 
-  if (node.effects.length > 0) {
+  if (node.effects?.length > 0) {
     const dropShadow: Array<ShadowEffect> = node.effects.filter(
       (d): d is ShadowEffect => d.type === "DROP_SHADOW"
     );

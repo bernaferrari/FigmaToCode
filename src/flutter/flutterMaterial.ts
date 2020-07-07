@@ -31,12 +31,12 @@ export const flutterMaterial = (
   const materialAttr =
     color + elevation + shadowColor + shape + clip + padChild;
 
-  const material = `\nMaterial(${materialAttr}),`;
+  const material = `\nMaterial(${materialAttr}), `;
 
   const sizedBoxAttr = flutterSize(node);
 
   if (sizedBoxAttr) {
-    return `SizedBox(${sizedBoxAttr}child: ${material}),`;
+    return `SizedBox(${sizedBoxAttr}child: ${material}), `;
   }
 
   return material;
@@ -55,7 +55,7 @@ const materialColor = (
 const materialShape = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ): string => {
-  if (node.type === "ELLIPSE" || node.strokes.length > 0) {
+  if (node.type === "ELLIPSE" || node.strokes?.length > 0) {
     return flutterShape(node);
   } else {
     return flutterBorderRadius(node);
@@ -64,11 +64,7 @@ const materialShape = (
 
 const getClipping = (node: AltSceneNode): string => {
   let clip = false;
-  if (
-    node.type === "FRAME" &&
-    node.cornerRadius !== 0 &&
-    node.cornerRadius !== figma.mixed
-  ) {
+  if (node.type === "FRAME" && node.cornerRadius && node.cornerRadius !== 0) {
     clip = node.clipsContent;
   }
   return clip ? "clipBehavior: Clip.antiAlias, " : "";
@@ -80,7 +76,7 @@ const getPadding = (
 ): string => {
   const padding = flutterPadding(node);
   if (padding) {
-    return `Padding(padding: const EdgeInsets.symmetric(${padding}), child: ${child}),`;
+    return `Padding(${padding}), child: ${child}), `;
   }
 
   return child;

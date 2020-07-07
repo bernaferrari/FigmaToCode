@@ -59,14 +59,23 @@ describe("Flutter Border", () => {
   it("flutterShape", () => {
     node.cornerRadius = figma.mixed;
     node.topLeftRadius = 4;
+    node.topRightRadius = 0;
+    node.bottomLeftRadius = 0;
+    node.bottomRightRadius = 0;
     expect(flutterShape(node)).toEqual(
-      "shape: RoundedRectangleBorder(side: BorderSide(width: 0, color: Color(0xff000000), ), borderRadius: BorderRadius.only(topLeft: 4, topRight: 0, bottomLeft: 0, bottomRight: 0), ),"
+      "shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: 4, topRight: 0, bottomLeft: 0, bottomRight: 0), ),"
     );
 
     const ellipseNode = new AltEllipseNode();
     ellipseNode.strokeWeight = 4;
+    ellipseNode.strokes = [
+      {
+        type: "SOLID",
+        color: { r: 0.25, g: 0.25, b: 0.25 },
+      },
+    ];
     expect(flutterShape(ellipseNode)).toEqual(
-      "shape: CircleBorder(side: BorderSide(width: 4, ), )"
+      "shape: CircleBorder(side: BorderSide(width: 4, color: Color(0xff3f3f3f), ), ), "
     );
   });
 });

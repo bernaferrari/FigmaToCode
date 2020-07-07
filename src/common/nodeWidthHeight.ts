@@ -1,5 +1,4 @@
 import { AltSceneNode } from "../altNodes/altMixins";
-import { monitorEventLoopDelay } from "perf_hooks";
 
 export const magicMargin = 32;
 
