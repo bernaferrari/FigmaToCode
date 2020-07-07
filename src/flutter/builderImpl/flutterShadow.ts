@@ -3,7 +3,7 @@ import { rgbTo8hex } from "../../common/rgbToHex";
 
 export const flutterBoxShadow = (node: AltSceneNode): string => {
   let propBoxShadow = "";
-  if (node.effects.length > 0) {
+  if (node.effects?.length > 0) {
     const dropShadow: Array<ShadowEffect> = node.effects.filter(
       (d): d is ShadowEffect => d.type === "DROP_SHADOW"
     );
