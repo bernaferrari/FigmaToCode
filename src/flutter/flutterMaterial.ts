@@ -11,7 +11,7 @@ import {
 import { flutterColor } from "./builderImpl/flutterColor";
 
 // https://api.flutter.dev/flutter/material/Material-class.html
-export const makeMaterial = (
+export const flutterMaterial = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode,
   child: string
 ): string => {

@@ -14,7 +14,7 @@ import { flutterColor } from "./builderImpl/flutterColor";
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
-export const makeContainer = (
+export const flutterContainer = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode,
   child: string
 ): string => {
@@ -61,8 +61,8 @@ const getBoxDecoration = (
   // modify the circle's shape when type is ellipse
   const propShape = node.type === "ELLIPSE" ? "shape: BoxShape.circle," : "";
 
-  // generate the decoration, or just the backgroundColor
-  return node.cornerRadius !== 0 || propShape || propBorder
+  // generate the decoration, or just the backgroundColor. Node.CornerRadius
+  return propBorder || propShape || propBorder
     ? `decoration: BoxDecoration(${propBorderRadius}${propShape}${propBorder}${propBoxShadow}${propBackgroundColor}),`
     : `${propBackgroundColor}`;
 };

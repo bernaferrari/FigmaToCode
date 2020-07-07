@@ -122,7 +122,7 @@ describe("Tailwind Size", () => {
       subnode.appendChild(child);
       node.appendChild(subnode);
 
-      expect(tailwindSize(frameNodeToAlt(node))).toEqual("");
+      expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-full ");
       expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("");
       expect(tailwindSize(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
     });

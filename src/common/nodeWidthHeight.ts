@@ -75,14 +75,39 @@ export const nodeWidthHeight = (
     }
   }
 
+  // when any child has a relative width and parent is HORIZONTAL,
+  // parent must have a defined width, which wouldn't otherwise.
+  // todo check if the performance impact of this is worth it.
+  const hasRelativeChild =
+    allowRelative &&
+    "layoutMode" in node &&
+    node.layoutMode === "HORIZONTAL" &&
+    node.children.find((d) =>
+      calculateResponsiveW(d, getNodeSizeWithStrokes(d)[0])
+    ) !== undefined;
+
   // when the child has the same size as the parent, don't set the size of the parent (twice)
-  if ("children" in node && node.children && node.children.length === 1) {
+  if (
+    !hasRelativeChild &&
+    "children" in node &&
+    node.children &&
+    node.children.length === 1
+  ) {
     const child = node.children[0];
+
+    // detect if Frame's width is same as Child when Frame has Padding.
+    let hPadding = 0;
+    let vPadding = 0;
+    if ("layoutMode" in node) {
+      hPadding = 2 * (node.horizontalPadding ?? 0);
+      vPadding = 2 * (node.verticalPadding ?? 0);
+    }
+
     // set them independently, in case w is equal but h isn't
-    if (child.width === nodeWidth) {
+    if (child.width === nodeWidth - hPadding) {
       propWidth = null;
     }
-    if (child.height === nodeHeight) {
+    if (child.height === nodeHeight - vPadding) {
       propHeight = null;
     }
   }
@@ -98,16 +123,6 @@ export const nodeWidthHeight = (
     // propHeight = "h-full ";
     propHeight = null;
   }
-
-  // when any child has a relative width and parent is HORIZONTAL,
-  // parent must have a defined width, which wouldn't otherwise.
-  // todo check if the performance impact of this is worth it.
-  const hasRelativeChild =
-    "layoutMode" in node &&
-    node.layoutMode === "HORIZONTAL" &&
-    node.children.find((d) =>
-      calculateResponsiveW(d, getNodeSizeWithStrokes(d)[0])
-    ) !== undefined;
 
   if (!hasRelativeChild && "layoutMode" in node && node.layoutMode !== "NONE") {
     // there is an edge case: frame with no children, layoutMode !== NONE and counterAxis = AUTO, but:
@@ -242,6 +257,7 @@ const calculateResponsiveW = (
     node.parent.horizontalPadding &&
     node.parent.layoutMode !== "NONE"
   ) {
+    // parentWidth = node.parent.width;
     parentWidth = node.parent.width - node.parent.horizontalPadding * 2;
     // currently ignoring h-full
   } else {
@@ -306,7 +322,6 @@ export const isWidthFull = (
   nodeWidth: number,
   parentWidth: number
 ): boolean => {
-
   // check if initial and final positions are within a magic number (currently 32)
   // this will only be reached when parent is FRAME, so node.parent.x is always 0.
   const betweenValueMargins =

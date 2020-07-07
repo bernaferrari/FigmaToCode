@@ -11,8 +11,8 @@ import {
   AltFrameNode,
 } from "../altNodes/altMixins";
 
-import { makeContainer } from "./flutterContainer";
-import { makeMaterial } from "./flutterMaterial";
+import { flutterContainer } from "./flutterContainer";
+import { flutterMaterial } from "./flutterMaterial";
 
 export class FlutterDefaultBuilder {
   child: string = "";
@@ -35,9 +35,9 @@ export class FlutterDefaultBuilder {
       node.fills.length > 0 &&
       node.fills[0].visible === true
     ) {
-      this.child = makeMaterial(node, this.child);
+      this.child = flutterMaterial(node, this.child);
     } else {
-      this.child = makeContainer(node, this.child);
+      this.child = flutterContainer(node, this.child);
     }
     return this;
   }
