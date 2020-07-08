@@ -7,7 +7,6 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "release": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
-    "postbuild": "purgecss -c purgecss.config.js -o public",
     "wp": "webpack --mode=development --watch",
     "test": "jest",
     "coverage": "jest --coverage",
@@ -15,7 +14,7 @@
     "lint": "eslint . --ext .ts"
   },
   "author": "Bernardo Ferrari",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "dependencies": {
     "@figma/plugin-typings": "^1.15.0",
     "clipboard-copy": "^3.1.0",
