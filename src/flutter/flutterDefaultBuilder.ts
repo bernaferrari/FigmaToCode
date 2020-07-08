@@ -1,3 +1,4 @@
+import { retrieveFill } from "./../common/retrieveFill";
 import { flutterPosition } from "./builderImpl/flutterPosition";
 import {
   flutterVisibility,
@@ -15,26 +16,23 @@ import { flutterContainer } from "./flutterContainer";
 import { flutterMaterial } from "./flutterMaterial";
 
 export class FlutterDefaultBuilder {
-  child: string = "";
+  child: string;
 
-  constructor(optChild: string = "") {
-    this.child = optChild ?? "";
+  constructor(optChild: string) {
+    this.child = optChild;
   }
 
-  reset(): void {
-    this.child = "";
-  }
+  // reset(): void {
+  //   this.child = "";
+  // }
 
   createContainer(
     node: AltRectangleNode | AltEllipseNode | AltFrameNode,
     material: boolean
   ): this {
-    if (
-      material &&
-      node.fills !== figma.mixed &&
-      node.fills.length > 0 &&
-      node.fills[0].visible === true
-    ) {
+    const fill = retrieveFill(node.fills);
+    // fill.visible can be true or undefined (on tests)
+    if (material && fill && fill.visible !== false) {
       this.child = flutterMaterial(node, this.child);
     } else {
       this.child = flutterContainer(node, this.child);

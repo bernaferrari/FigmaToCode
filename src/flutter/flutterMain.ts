@@ -7,7 +7,6 @@ import {
 } from "../altNodes/altMixins";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltSceneNode } from "../altNodes/altMixins";
-import { mostFrequent } from "./flutter_helpers";
 import { FlutterTextBuilder } from "./flutterTextBuilder";
 
 let parentId = "";
@@ -28,11 +27,7 @@ export const flutterMain = (
     result = result.slice(1, result.length);
   }
 
-  if (result.length > 0) {
-    result = result.slice(0, -1);
-  }
-
-  console.log(result);
+  result = result.slice(0, -1);
 
   return result;
 };
@@ -53,11 +48,7 @@ const flutterWidgetGenerator = (
     // }
     else if (node.type === "GROUP") {
       comp += flutterGroup(node);
-    } else if (
-      node.type === "FRAME"
-      // || node.type === "INSTANCE" ||
-      // node.type === "COMPONENT"
-    ) {
+    } else if (node.type === "FRAME") {
       comp += flutterFrame(node);
     } else if (node.type === "TEXT") {
       comp += flutterText(node);
@@ -116,15 +107,10 @@ const flutterFrame = (node: AltFrameNode): string => {
   if (node.layoutMode !== "NONE") {
     const rowColumn = makeRowColumn(node, children);
     return flutterContainer(node, rowColumn);
-  } else if (node.layoutMode === "NONE" && node.children.length > 1) {
-    // children will need to be absolute
-    return flutterContainer(node, `Stack(children:[${children}],),`);
   } else {
-    // node.layoutMode === "NONE" && node.children.length === 1
-    // children doesn't need to be absolute, but might need to be positioned
-    // TODO add a flex here?!
-    // TODO 2 maybe just add margin right/left/top/bottom can solve?
-    return flutterContainer(node, children);
+    // node.layoutMode === "NONE" && node.children.length > 1
+    // children needs to be absolute
+    return flutterContainer(node, `Stack(children:[${children}],),`);
   }
 };
 
@@ -144,25 +130,34 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
 
   const crossAxisColumn =
     rowOrColumn === "Column"
-      ? `crossAxisAlignment: CrossAxisAlignment.${layoutAlign},`
+      ? `crossAxisAlignment: CrossAxisAlignment.${layoutAlign}, `
       : "";
 
-  const mainAxisSize = "mainAxisSize: MainAxisSize.min,";
+  const mainAxisSize = "mainAxisSize: MainAxisSize.min, ";
 
-  return `${rowOrColumn}(${mainAxisSize}${crossAxisColumn}children:[${children}],),`;
+  return `${rowOrColumn}(${mainAxisSize}${crossAxisColumn}children:[${children}], ), `;
 };
 
-const flutterVector = (node: VectorNode) => {
-  // TODO Vector support in Flutter is complicated.
-  return `\nCenter(
-          child: Container(
-          //todo this is a vector. 
-          width: ${node.width},
-          height: ${node.height},
-          color: Color(0xffff0000),
-        ),
-      ),`;
+// https://stackoverflow.com/a/20762713
+export const mostFrequent = (arr: Array<string>): string | undefined => {
+  return arr
+    .sort(
+      (a, b) =>
+        arr.filter((v) => v === a).length - arr.filter((v) => v === b).length
+    )
+    .pop();
 };
+
+// TODO Vector support in Flutter is complicated.
+// const flutterVector = (node: VectorNode) => {
+//   return `\nCenter(
+//           child: Container(
+//           width: ${node.width},
+//           height: ${node.height},
+//           color: Color(0xffff0000),
+//         ),
+//       ),`;
+// };
 
 const addSpacingIfNeeded = (
   node: AltSceneNode,
@@ -170,13 +165,14 @@ const addSpacingIfNeeded = (
   index: number,
   len: number
 ): string => {
-  if (node.parent?.type === "FRAME") {
+  if (node.parent?.type === "FRAME" && node.parent.layoutMode !== "NONE") {
     // check if itemSpacing is set and if it isn't the last value.
     // Don't add the SizedBox at last value. In Figma, itemSpacing CAN be negative; here it can't.
     if (node.parent.itemSpacing > 0 && index < len - 1) {
       if (node.parent.layoutMode === "HORIZONTAL") {
         return `${comp} SizedBox(width: ${node.parent.itemSpacing}),`;
-      } else if (node.parent.layoutMode === "VERTICAL") {
+      } else {
+        // node.parent.layoutMode === "VERTICAL"
         return `${comp} SizedBox(height: ${node.parent.itemSpacing}),`;
       }
     }

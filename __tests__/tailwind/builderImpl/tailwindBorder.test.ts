@@ -80,7 +80,7 @@ describe("Tailwind Border", () => {
     // Ellipses are always round
     expect(tailwindBorderRadius(new AltEllipseNode())).toEqual("rounded-full ");
 
-    // Texts are unsupported
+    // Text is unsupported
     expect(tailwindBorderRadius(new AltTextNode())).toEqual("");
   });
 });

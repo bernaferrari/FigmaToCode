@@ -115,11 +115,5 @@ describe("Convert to AutoLayout", () => {
 <div class="absolute w-5 h-5 bg-green-600" style="left:10px; top:10px;"></div>
 <div class="absolute left-0 top-0 w-5 h-5 bg-red-700"></div></div>`
     );
-
-    // error handling with no children
-    frame.layoutMode = "NONE";
-    frame.children = [];
-
-    expect(tailwindMain([convertToAutoLayout(frame)])).toEqual("");
   });
 });
