@@ -150,15 +150,10 @@ const tailwindFrame = (node: AltFrameNode): string => {
   if (node.layoutMode !== "NONE") {
     const rowColumn = rowColumnProps(node);
     return tailwindContainer(node, childrenStr, rowColumn);
-  } else if (node.layoutMode === "NONE" && node.children.length > 1) {
-    // children will need to be absolute
-    return tailwindContainer(node, childrenStr, "relative ");
   } else {
-    // todo is this still used? I think Auto AutoLayout has deprecated it.
-    // node.layoutMode === "NONE" && node.children.length === 1
-    // children doesn't need to be absolute, but might need to be positioned
-    // TODO maybe just add margin right/left/top/bottom can solve?
-    return tailwindContainer(node, childrenStr, "");
+    // node.layoutMode === "NONE" && node.children.length > 1
+    // children needs to be absolute
+    return tailwindContainer(node, childrenStr, "relative ");
   }
 };
 

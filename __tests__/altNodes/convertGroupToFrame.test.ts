@@ -1,6 +1,7 @@
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "../../src/altNodes/altMixins";
 import { convertGroupToFrame } from "../../src/altNodes/convertGroupToFrame";
+import { convertToAutoLayout } from "../../src/altNodes/convertToAutoLayout";
 
 describe("Convert Group to Frame", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -22,9 +23,10 @@ describe("Convert Group to Frame", () => {
     group.height = 20;
     group.children = [rectangle];
 
-    expect(tailwindMain([convertGroupToFrame(group)])).toEqual(
-      '<div class="w-full h-5"></div>'
-    );
+    const converted = convertToAutoLayout(convertGroupToFrame(group));
+    expect(tailwindMain([converted]))
+      .toEqual(`<div class="inline-flex items-center justify-center w-5">
+<div class="w-full h-5"></div></div>`);
   });
 
   it("Correctly position the children", () => {
