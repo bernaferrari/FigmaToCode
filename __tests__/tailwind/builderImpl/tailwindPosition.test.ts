@@ -64,7 +64,8 @@ describe("Tailwind Position", () => {
     // center
     node.x = 37;
     node.y = 37;
-    expect(tailwindPosition(node, "")).toEqual("absolute m-auto inset-0 ");
+    // expect(tailwindPosition(node, "")).toEqual("absolute m-auto inset-0 ");
+    expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // top-left
     node.x = 0;
@@ -89,30 +90,34 @@ describe("Tailwind Position", () => {
     // top-center
     node.x = 37;
     node.y = 0;
-    expect(tailwindPosition(node, "")).toEqual(
-      "absolute inset-x-0 top-0 mx-auto "
-    );
+    // expect(tailwindPosition(node, "")).toEqual(
+    //   "absolute inset-x-0 top-0 mx-auto "
+    // );
+    expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // left-center
     node.x = 0;
     node.y = 37;
-    expect(tailwindPosition(node, "")).toEqual(
-      "absolute inset-y-0 left-0 my-auto "
-    );
+    // expect(tailwindPosition(node, "")).toEqual(
+    //   "absolute inset-y-0 left-0 my-auto "
+    // );
+    expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // bottom-center
     node.x = 37;
     node.y = 75;
-    expect(tailwindPosition(node, "")).toEqual(
-      "absolute inset-x-0 bottom-0 mx-auto "
-    );
+    // expect(tailwindPosition(node, "")).toEqual(
+    //   "absolute inset-x-0 bottom-0 mx-auto "
+    // );
+    expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // right-center
     node.x = 75;
     node.y = 37;
-    expect(tailwindPosition(node, "")).toEqual(
-      "absolute inset-y-0 right-0 my-auto "
-    );
+    // expect(tailwindPosition(node, "")).toEqual(
+    //   "absolute inset-y-0 right-0 my-auto "
+    // );
+    expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // center Y, random X
     node.x = 22;

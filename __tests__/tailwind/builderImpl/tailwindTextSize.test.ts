@@ -28,9 +28,9 @@ describe("TextSize", () => {
     expect(tailwindTextSize(node)).toEqual("w-full h-3 ");
 
     node.width = 100;
-    expect(tailwindTextSize(node)).toEqual("w-full h-3 ");
+    expect(tailwindTextSize(node)).toEqual("w-5/6 h-3 ");
 
     node.textAutoResize = "HEIGHT";
-    expect(tailwindTextSize(node)).toEqual("w-full ");
+    expect(tailwindTextSize(node)).toEqual("w-5/6 ");
   });
 });

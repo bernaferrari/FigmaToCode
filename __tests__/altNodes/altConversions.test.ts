@@ -28,13 +28,21 @@ describe("AltConversions", () => {
   });
 
   it("Group", () => {
+    // todo verify if this is working as inteded.
     const node = figma.createFrame();
     node.resize(20, 20);
 
-    figma.group([figma.createRectangle()], node);
+    const rectangle = figma.createRectangle();
+    rectangle.resize(20, 20);
 
-    expect(tailwindMain(convertIntoAltNodes([node]))).toEqual(
-      `<div class="inline-flex items-center justify-center"></div>`
+    figma.group([rectangle], node);
+
+    const convert = convertIntoAltNodes([node]);
+
+    expect(tailwindMain(convert)).toEqual(
+      `<div class="inline-flex flex-col items-center justify-center">
+<div class="inline-flex items-center justify-center">
+<div class="w-5 h-5"></div></div></div>`
     );
   });
 

@@ -23,7 +23,7 @@ describe("Tailwind Builder", () => {
 
     node.width = 300;
     node.height = 300;
-    expect(tailwindSize(node)).toEqual("w-full h-64 ");
+    expect(tailwindSize(node)).toEqual("w-64 h-64 ");
   });
 
   it("STRETCH inside AutoLayout", () => {
@@ -117,7 +117,7 @@ describe("Tailwind Builder", () => {
     parentNode.children = [node];
     node.parent = parentNode;
     expect(tailwindSize(node)).toEqual("");
-    expect(tailwindSize(parentNode)).toEqual("");
+    expect(tailwindSize(parentNode)).toEqual("w-12 ");
   });
 
   it("width changes when there are strokes", () => {
@@ -215,7 +215,7 @@ describe("Tailwind Builder", () => {
     parentNode.children = [node];
     node.parent = parentNode;
 
-    expect(tailwindSize(parentNode)).toEqual("");
+    expect(tailwindSize(parentNode)).toEqual("w-3 ");
     expect(tailwindSize(node)).toEqual("w-full h-3 ");
   });
 
@@ -234,7 +234,7 @@ describe("Tailwind Builder", () => {
     parentNode.children = [node];
     node.parent = parentNode;
 
-    expect(tailwindSize(node)).toEqual("w-full h-24 ");
+    expect(tailwindSize(node)).toEqual("w-5/6 h-24 ");
   });
 
   it("responsive width", () => {

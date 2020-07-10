@@ -36,7 +36,7 @@ describe("Tailwind Rectangle", () => {
   it("large size", () => {
     node.width = 300;
     node.height = 300;
-    expect(executeMain()).toEqual('<div className="w-full h-64"></div>');
+    expect(executeMain()).toEqual('<div className="w-64 h-64"></div>');
   });
 
   it("color orange", () => {
@@ -48,7 +48,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '<div className="w-full h-64 bg-orange-600"></div>'
+      '<div className="w-64 h-64 bg-orange-600"></div>'
     );
   });
 
@@ -64,7 +64,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '<div className="w-full h-64 bg-gray-800"></div>'
+      '<div className="w-64 h-64 bg-gray-800"></div>'
     );
   });
 
@@ -82,7 +82,7 @@ describe("Tailwind Rectangle", () => {
       },
     ];
     expect(executeMain()).toEqual(
-      '<div className="w-full h-64 border-4 border-gray-800"></div>'
+      '<div className="w-64 h-64 border-4 border-gray-800"></div>'
     );
   });
 
@@ -91,7 +91,7 @@ describe("Tailwind Rectangle", () => {
     node.strokes = [];
     node.cornerRadius = 8;
     expect(executeMain()).toEqual(
-      '<div className="w-full h-64 rounded-lg"></div>'
+      '<div className="w-64 h-64 rounded-lg"></div>'
     );
   });
 
@@ -99,7 +99,7 @@ describe("Tailwind Rectangle", () => {
     node.cornerRadius = figma.mixed;
     node.opacity = 0.4;
     expect(executeMain()).toEqual(
-      '<div className="opacity-50 w-full h-64"></div>'
+      '<div className="opacity-50 w-64 h-64"></div>'
     );
   });
 
@@ -107,7 +107,7 @@ describe("Tailwind Rectangle", () => {
     node.opacity = 1;
     node.visible = false;
     expect(executeMain()).toEqual(
-      '<div className="invisible w-full h-64"></div>'
+      '<div className="invisible w-64 h-64"></div>'
     );
   });
 });

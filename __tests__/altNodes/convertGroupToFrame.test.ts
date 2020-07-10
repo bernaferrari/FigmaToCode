@@ -24,8 +24,7 @@ describe("Convert Group to Frame", () => {
     group.children = [rectangle];
 
     const converted = convertToAutoLayout(convertGroupToFrame(group));
-    expect(tailwindMain([converted]))
-      .toEqual(`<div class="inline-flex items-center justify-center w-5">
+    expect(tailwindMain([converted])).toEqual(`<div class="w-5">
 <div class="w-full h-5"></div></div>`);
   });
 

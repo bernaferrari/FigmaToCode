@@ -32,8 +32,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
   //   // const alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
 
   //   // if (
-  //   //   node.textAlignHorizontal !== "LEFT" &&
-  //   //   node.textAutoResize !== "WIDTH_AND_HEIGHT"
+  //   //   node.textAlignHorizontal !== "LEFT"
   //   // ) {
   //   //   this.attributes += `text-${alignHorizontal} `;
   //   // }

@@ -117,17 +117,14 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * example: text-justify
    */
   textAlign(node: AltTextNode): this {
-    // if layoutAlign !== MIN, Text will be wrapped by Align
     // if alignHorizontal is LEFT, don't do anything because that is native
 
     // only undefined in testing
     if (node.textAlignHorizontal) {
       const alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
 
-      if (
-        node.textAlignHorizontal !== "LEFT" &&
-        node.textAutoResize !== "WIDTH_AND_HEIGHT"
-      ) {
+      // todo when node.textAutoResize === "WIDTH_AND_HEIGHT" and there is no \n in the text, this can be ignored.
+      if (node.textAlignHorizontal !== "LEFT") {
         this.attributes += `text-${alignHorizontal} `;
       }
     }
