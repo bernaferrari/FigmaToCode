@@ -191,11 +191,11 @@ export const tailwindContainer = (
 export const rowColumnProps = (node: AltFrameNode): string => {
   // ROW or COLUMN
 
-  // if children is a child that is a FRAME without AutoLayout, ignore and return here
+  // ignore current node when it has only one child and it has the same size
   if (
     node.children.length === 1 &&
-    "layoutMode" in node.children[0] &&
-    node.children[0].layoutMode !== "NONE"
+    node.children[0].width === node.width &&
+    node.children[0].height === node.height
   ) {
     return "";
   }

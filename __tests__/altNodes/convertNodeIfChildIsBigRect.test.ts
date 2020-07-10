@@ -1,3 +1,4 @@
+import { tailwindSize } from "./../../src/tailwind/builderImpl/tailwindSize";
 import { AltFrameNode } from "../../src/altNodes/altMixins";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "../../src/altNodes/altMixins";
@@ -35,10 +36,12 @@ describe("convert node if child is big rect ", () => {
     frame.children = [rectangle];
 
     // it will only work with two or more items.
-    const converted = convertNodeIfChildIsBigRect(frame);
+    const converted = convertToAutoLayout(convertNodeIfChildIsBigRect(frame));
+
+    expect(tailwindSize(converted)).toEqual("w-24 ");
 
     expect(tailwindMain([converted])).toEqual(
-      `<div class="inline-flex flex-col items-center justify-center">
+      `<div class="w-24">
 <div class="w-full h-24 bg-black"></div></div>`
     );
   });
@@ -224,7 +227,7 @@ describe("convert node if child is big rect ", () => {
     // todo should it keep that way?
 
     expect(tailwindMain([converted])).toEqual(
-      `<div class="inline-flex items-center justify-center p-1 w-5 h-5 bg-black">
+      `<div class="inline-flex items-center justify-center p-1 w-5 bg-black">
 <div class="w-full h-2 bg-white"></div></div>`
     );
   });

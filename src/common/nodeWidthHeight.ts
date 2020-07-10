@@ -61,16 +61,12 @@ export const nodeWidthHeight = (
   //   };
   // }
 
-  if (allowRelative) {
-    // avoid relative width when parent is relative (therefore, child is probably absolute, which doesn't work nice)
-    const insideRelative = node.parent && node.parent.isRelative === true;
+  // avoid relative width when parent is relative (therefore, child is probably absolute, which doesn't work nice)
+  if (allowRelative && node.parent && node.parent.isRelative !== true) {
+    const rW = calculateResponsiveW(node, nodeWidth);
 
-    if (!insideRelative) {
-      const rW = calculateResponsiveW(node, nodeWidth);
-
-      if (rW) {
-        propWidth = rW;
-      }
+    if (rW) {
+      propWidth = rW;
     }
   }
 
@@ -79,19 +75,13 @@ export const nodeWidthHeight = (
   // todo check if the performance impact of this is worth it.
   const hasRelativeChild =
     allowRelative &&
-    "layoutMode" in node &&
-    node.layoutMode === "HORIZONTAL" &&
+    "children" in node &&
     node.children.find((d) =>
       calculateResponsiveW(d, getNodeSizeWithStrokes(d)[0])
     ) !== undefined;
 
   // when the child has the same size as the parent, don't set the size of the parent (twice)
-  if (
-    !hasRelativeChild &&
-    "children" in node &&
-    node.children &&
-    node.children.length === 1
-  ) {
+  if ("children" in node && node.children && node.children.length === 1) {
     const child = node.children[0];
 
     // detect if Frame's width is same as Child when Frame has Padding.
@@ -103,7 +93,7 @@ export const nodeWidthHeight = (
     }
 
     // set them independently, in case w is equal but h isn't
-    if (child.width === nodeWidth - hPadding) {
+    if (!hasRelativeChild && child.width === nodeWidth - hPadding) {
       propWidth = null;
     }
     if (child.height === nodeHeight - vPadding) {
@@ -263,19 +253,10 @@ const calculateResponsiveW = (
     parentWidth = node.parent.width;
   }
 
-  // verifies if size > 256 or any child has size > 256
-  // todo improve to verify if the sum of children is also not larger than 256
-
-  // if width is same as parent, with a small threshold, w is 100%
-  // parent must be a frame (gets weird in groups)
-  if ("layoutMode" in node.parent && parentWidth - nodeWidth < 2) {
-    propWidth = "full";
-  }
+  // todo what if the element is ~1/2 but there is a margin? This won't detect it
 
   // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
   const dividedWidth = nodeWidth / parentWidth;
-
-  // todo what if the element is ~1/2 but there is a margin? This won't detect it
 
   const calculateResp = (div: number, str: responsive) => {
     if (Math.abs(dividedWidth - div) < 0.01) {
@@ -308,34 +289,31 @@ const calculateResponsiveW = (
     resultFound = calculateResp(div, resp);
   }
 
-  if (isWidthFull(node, nodeWidth, parentWidth)) {
-    propWidth = "full";
-  }
+  // todo this was commented because it is almost never used. Should it be uncommented?
+  // if (!resultFound && isWidthFull(node, nodeWidth, parentWidth)) {
+  //   propWidth = "full";
+  // }
 
   return propWidth;
 };
 
 // set the width to max if the view is near the corner
-export const isWidthFull = (
-  node: AltSceneNode,
-  nodeWidth: number,
-  parentWidth: number
-): boolean => {
-  // check if initial and final positions are within a magic number (currently 32)
-  // this will only be reached when parent is FRAME, so node.parent.x is always 0.
-  const betweenValueMargins =
-    node.x <= magicMargin && parentWidth - (node.x + nodeWidth) <= magicMargin;
+// export const isWidthFull = (
+//   node: AltSceneNode,
+//   nodeWidth: number,
+//   parentWidth: number
+// ): boolean => {
+//   // check if initial and final positions are within a magic number (currently 32)
+//   // this will only be reached when parent is FRAME, so node.parent.x is always 0.
+//   const betweenValueMargins =
+//     node.x <= magicMargin && parentWidth - (node.x + nodeWidth) <= magicMargin;
 
-  // check if total width is at least 80% of the parent. This number is also a magic number and has worked fine so far.
-  const betweenPercentMargins = nodeWidth / parentWidth >= 0.8;
+//   // check if total width is at least 80% of the parent. This number is also a magic number and has worked fine so far.
+//   const betweenPercentMargins = nodeWidth / parentWidth >= 0.8;
 
-  // when parent's width is the same as the child, child should set it..
-  // but the child can't set it to full since parent doesn't have it. Therefore, ignore it.
-  const differentThanParent = nodeWidth !== parentWidth;
+//   if (betweenValueMargins && betweenPercentMargins) {
+//     return true;
+//   }
 
-  if (differentThanParent && betweenValueMargins && betweenPercentMargins) {
-    return true;
-  }
-
-  return false;
-};
+//   return false;
+// };

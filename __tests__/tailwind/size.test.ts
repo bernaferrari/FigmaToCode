@@ -36,21 +36,24 @@ describe("Tailwind Size", () => {
 
     node.appendChild(subnode);
 
-    expect(tailwindSize(frameNodeToAlt(node))).toEqual("");
+    expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-4 ");
     expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-4 h-4 ");
   });
 
   it("frame inside frame (1/2)", () => {
-    const node = figma.createFrame();
-    node.resize(8, 8);
+    const node = new AltFrameNode();
+    node.width = 8;
+    node.height = 8;
 
-    const subnode = figma.createFrame();
-    subnode.resize(8, 8);
+    const subnode = new AltFrameNode();
+    subnode.width = 8;
+    subnode.height = 8;
 
-    node.appendChild(subnode);
+    subnode.parent = node;
+    node.children = [subnode];
 
-    expect(tailwindSize(frameNodeToAlt(node))).toEqual("");
-    expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
+    expect(tailwindSize(node)).toEqual("w-2 ");
+    expect(tailwindSize(subnode)).toEqual("w-full h-2 ");
   });
 
   it("small frame inside large frame", () => {
@@ -69,7 +72,7 @@ describe("Tailwind Size", () => {
     node.appendChild(subnode);
 
     expect(tailwindMain([frameNodeToAlt(node)]))
-      .toEqual(`<div class="inline-flex items-center justify-center p-64 w-full">
+      .toEqual(`<div class="inline-flex items-center justify-center p-64 w-64">
 <div class="w-full h-2"></div></div>`);
 
     expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
@@ -122,30 +125,38 @@ describe("Tailwind Size", () => {
       subnode.appendChild(child);
       node.appendChild(subnode);
 
-      expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-full ");
+      expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-64 ");
       expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("");
       expect(tailwindSize(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
     });
 
     it("when parent is vertical and node is vertical, child defines the size", () => {
-      const node = figma.createFrame();
-      node.resize(500, 500);
+      const node = new AltFrameNode();
+      node.width = 500;
+      node.height = 500;
       node.counterAxisSizingMode = "FIXED";
       node.layoutMode = "VERTICAL";
 
-      const subnode = figma.createFrame();
+      const subnode = new AltFrameNode();
+      subnode.width = 500;
+      subnode.height = 255;
       subnode.counterAxisSizingMode = "FIXED";
-      subnode.resize(500, 250);
       subnode.layoutMode = "VERTICAL";
 
-      const child = figma.createFrame();
-      child.resize(16, 16);
-      subnode.appendChild(child);
-      node.appendChild(subnode);
+      const child = new AltFrameNode();
+      child.width = 16;
+      child.height = 16;
+      child.layoutMode = "NONE";
 
-      expect(tailwindSize(frameNodeToAlt(node))).toEqual("");
-      expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-full ");
-      expect(tailwindSize(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
+      node.children = [subnode];
+      subnode.parent = node;
+
+      subnode.children = [child];
+      child.parent = subnode;
+
+      expect(tailwindSize(node)).toEqual("w-64 ");
+      expect(tailwindSize(subnode)).toEqual("w-full ");
+      expect(tailwindSize(child)).toEqual("w-4 h-4 ");
     });
 
     it("complex autolayout example", () => {

@@ -30,6 +30,7 @@ export const tailwindPosition = (
 };
 
 const retrieveAbsolutePos = (node: AltSceneNode): string => {
+  // todoEverything with Center was commented, because mx-auto requires a width, and my-auto requires a height, but it is uncertain if the nodes have it. Should it verify, or can we live this way?
   switch (commonPosition(node)) {
     case "":
       return "";
@@ -38,19 +39,24 @@ const retrieveAbsolutePos = (node: AltSceneNode): string => {
     case "TopStart":
       return "absolute left-0 top-0 ";
     case "TopCenter":
-      return "absolute inset-x-0 top-0 mx-auto ";
+      return "absoluteManualLayout";
+    // return "absolute inset-x-0 top-0 mx-auto ";
     case "TopEnd":
       return "absolute right-0 top-0 ";
     case "CenterStart":
-      return "absolute inset-y-0 left-0 my-auto ";
+      return "absoluteManualLayout";
+    // return "absolute inset-y-0 left-0 my-auto ";
     case "Center":
-      return "absolute m-auto inset-0 ";
+      return "absoluteManualLayout";
+    // return "absolute m-auto inset-0 ";
     case "CenterEnd":
-      return "absolute inset-y-0 right-0 my-auto ";
+      return "absoluteManualLayout";
+    // return "absolute inset-y-0 right-0 my-auto ";
     case "BottomStart":
       return "absolute left-0 bottom-0 ";
     case "BottomCenter":
-      return "absolute inset-x-0 bottom-0 mx-auto ";
+      return "absoluteManualLayout";
+    // return "absolute inset-x-0 bottom-0 mx-auto ";
     case "BottomEnd":
       return "absolute right-0 bottom-0 ";
   }
