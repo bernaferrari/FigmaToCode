@@ -1,7 +1,7 @@
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "../../src/altNodes/altMixins";
 import { convertGroupToFrame } from "../../src/altNodes/convertGroupToFrame";
-import { convertToAutoLayout } from "../../src/altNodes/convertToAutoLayout";
+import { convertNodesOnRectangle } from "../../src/altNodes/convertNodesOnRectangle";
 
 describe("Convert Group to Frame", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -23,8 +23,9 @@ describe("Convert Group to Frame", () => {
     group.height = 20;
     group.children = [rectangle];
 
-    const converted = convertToAutoLayout(convertGroupToFrame(group));
-    expect(tailwindMain([converted])).toEqual(`<div class="w-5">
+    const converted = convertGroupToFrame(group);
+    expect(tailwindMain([convertNodesOnRectangle(converted)]))
+      .toEqual(`<div class="relative w-5">
 <div class="w-full h-5"></div></div>`);
   });
 

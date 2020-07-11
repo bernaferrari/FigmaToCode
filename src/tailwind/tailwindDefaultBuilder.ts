@@ -1,4 +1,4 @@
-import { htmlSize } from "./../htmlBuilder/htmlSize";
+import { htmlSize, htmlSizePartial } from "./../htmlBuilder/htmlSize";
 import { htmlGradient } from "../htmlBuilder/htmlGradient";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
@@ -19,7 +19,7 @@ import {
 } from "./builderImpl/tailwindBorder";
 import { tailwindPosition } from "./builderImpl/tailwindPosition";
 import { tailwindColor } from "./builderImpl/tailwindColor";
-import { tailwindSize } from "./builderImpl/tailwindSize";
+import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
 
 export class TailwindDefaultBuilder {
@@ -29,6 +29,7 @@ export class TailwindDefaultBuilder {
   isJSX: boolean;
   visible: boolean;
   name: string = "";
+  hasFixedSize = false;
 
   constructor(optIsJSX: boolean, node: AltSceneNode, showLayerName: boolean) {
     this.isJSX = optIsJSX;
@@ -58,7 +59,7 @@ export class TailwindDefaultBuilder {
   }
 
   position(node: AltSceneNode, parentId: string): this {
-    const position = tailwindPosition(node, parentId);
+    const position = tailwindPosition(node, parentId, this.hasFixedSize);
 
     if (position === "absoluteManualLayout" && node.parent) {
       // tailwind can't deal with absolute layouts.
@@ -70,7 +71,11 @@ export class TailwindDefaultBuilder {
       const top = node.y - parentY;
 
       // todo is there a way to improve this?
-      this.style += `left:${left}px${this.styleSeparator} top:${top}px${this.styleSeparator} `;
+      if (this.isJSX) {
+        this.style += `left:${left}${this.styleSeparator} top:${top}${this.styleSeparator} `;
+      } else {
+        this.style += `left:${left}px${this.styleSeparator} top:${top}px${this.styleSeparator} `;
+      }
       this.attributes += "absolute ";
     } else {
       this.attributes += position;
@@ -116,14 +121,33 @@ export class TailwindDefaultBuilder {
   widthHeight(node: AltSceneNode): this {
     // if current element is relative (therefore, children are absolute)
     // or current element is one of the absoltue children and has a width or height > w/h-64
-    if (
-      ("isRelative" in node && node.isRelative === true) ||
-      (node.parent?.isRelative === true &&
-        (node.width > 256 || node.height > 256))
-    ) {
+    if ("isRelative" in node && node.isRelative === true) {
       this.style += htmlSize(node, this.isJSX);
+    } else if (
+      node.parent?.isRelative === true &&
+      (node.width > 256 || node.height > 256)
+    ) {
+      // to avoid mixing html and tailwind sizing too much, only use html sizing when absolutely necessary.
+      // therefore, if only one attribute is larger than 256, only use the html size in there.
+      const [tWidth, tHeight] = tailwindSizePartial(node);
+      const [hWidth, hHeight] = htmlSizePartial(node, this.isJSX);
+
+      if (node.width > 256) {
+        this.style += hWidth;
+        this.attributes += tHeight;
+        this.hasFixedSize = hWidth !== "";
+      }
+
+      if (node.height > 256) {
+        this.attributes += tWidth;
+        this.style += hHeight;
+        this.hasFixedSize = tWidth !== "";
+      }
     } else {
-      this.attributes += tailwindSize(node);
+      const partial = tailwindSizePartial(node);
+      this.hasFixedSize = partial[0] !== "" && partial[1] !== "";
+
+      this.attributes += partial.join("");
     }
     return this;
   }

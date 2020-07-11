@@ -1,6 +1,6 @@
 import { convertSingleNodeToAlt } from "../../../src/altNodes/altConversion";
 import { tailwindPosition } from "../../../src/tailwind/builderImpl/tailwindPosition";
-import { AltGroupNode, AltFrameNode } from "../../../src/altNodes/altMixins";
+import { AltFrameNode } from "../../../src/altNodes/altMixins";
 import { createFigma } from "figma-api-stub";
 
 describe("Tailwind Position", () => {
@@ -40,32 +40,43 @@ describe("Tailwind Position", () => {
   });
 
   it("Frame Absolute Position", () => {
-    const parentF = figma.createFrame();
-    parentF.resize(100, 100);
-    parentF.x = 0;
-    parentF.y = 0;
-    parentF.layoutMode = "NONE";
+    const parent = new AltFrameNode();
+    parent.width = 100;
+    parent.height = 100;
+    parent.x = 0;
+    parent.y = 0;
+    parent.id = "root";
+    parent.layoutMode = "NONE";
+    parent.isRelative = true;
 
-    const nodeF1 = figma.createFrame();
-    nodeF1.resize(25, 25);
-    parentF.appendChild(nodeF1);
+    const node = new AltFrameNode();
+    parent.id = "node";
+    node.parent = parent;
 
-    const nodeF2 = figma.createFrame();
-    nodeF2.resize(25, 25);
-    parentF.appendChild(nodeF2);
+    // child equals parent
+    node.width = 100;
+    node.height = 100;
+    expect(tailwindPosition(node, "")).toEqual("");
 
-    // you may wonder: where is the AutoLayout if layoutMode was set to NONE?
-    // answer: the auto conversion when AltNodes are generated.
-    const parent = convertSingleNodeToAlt(parentF) as AltFrameNode;
-    const node = parent.children[0];
+    node.width = 25;
+    node.height = 25;
+
+    const nodeF2 = new AltFrameNode();
+    nodeF2.width = 25;
+    nodeF2.height = 25;
+    nodeF2.parent = parent;
+
+    parent.children = [node, nodeF2];
 
     // position is set after the conversion to avoid AutoLayout auto converison
 
     // center
     node.x = 37;
     node.y = 37;
-    // expect(tailwindPosition(node, "")).toEqual("absolute m-auto inset-0 ");
-    expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
+    expect(tailwindPosition(node, "", true)).toEqual(
+      "absolute m-auto inset-0 "
+    );
+    expect(tailwindPosition(node, "", false)).toEqual("absoluteManualLayout");
 
     // top-left
     node.x = 0;
@@ -90,33 +101,33 @@ describe("Tailwind Position", () => {
     // top-center
     node.x = 37;
     node.y = 0;
-    // expect(tailwindPosition(node, "")).toEqual(
-    //   "absolute inset-x-0 top-0 mx-auto "
-    // );
+    expect(tailwindPosition(node, "", true)).toEqual(
+      "absolute inset-x-0 top-0 mx-auto "
+    );
     expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // left-center
     node.x = 0;
     node.y = 37;
-    // expect(tailwindPosition(node, "")).toEqual(
-    //   "absolute inset-y-0 left-0 my-auto "
-    // );
+    expect(tailwindPosition(node, "", true)).toEqual(
+      "absolute inset-y-0 left-0 my-auto "
+    );
     expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // bottom-center
     node.x = 37;
     node.y = 75;
-    // expect(tailwindPosition(node, "")).toEqual(
-    //   "absolute inset-x-0 bottom-0 mx-auto "
-    // );
+    expect(tailwindPosition(node, "", true)).toEqual(
+      "absolute inset-x-0 bottom-0 mx-auto "
+    );
     expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // right-center
     node.x = 75;
     node.y = 37;
-    // expect(tailwindPosition(node, "")).toEqual(
-    //   "absolute inset-y-0 right-0 my-auto "
-    // );
+    expect(tailwindPosition(node, "", true)).toEqual(
+      "absolute inset-y-0 right-0 my-auto "
+    );
     expect(tailwindPosition(node, "")).toEqual("absoluteManualLayout");
 
     // center Y, random X
@@ -136,21 +147,22 @@ describe("Tailwind Position", () => {
   });
 
   it("Position: node has same size as parent", () => {
-    const parentF = figma.createFrame();
-    parentF.resize(100, 100);
-    parentF.layoutMode = "NONE";
+    const parent = new AltFrameNode();
+    parent.width = 100;
+    parent.height = 100;
+    parent.layoutMode = "NONE";
 
-    const nodeF1 = figma.createFrame();
-    nodeF1.resize(100, 100);
+    const node = new AltFrameNode();
+    node.width = 100;
+    node.height = 100;
+    node.parent = parent;
 
-    const nodeF2 = figma.createFrame();
-    nodeF2.resize(50, 50);
+    const nodeF2 = new AltFrameNode();
+    nodeF2.width = 100;
+    nodeF2.height = 100;
+    nodeF2.parent = parent;
 
-    parentF.appendChild(nodeF1);
-    parentF.appendChild(nodeF2);
-
-    const parent = convertSingleNodeToAlt(parentF) as AltGroupNode;
-    const node = parent.children[0];
+    parent.children = [node, nodeF2];
 
     expect(tailwindPosition(node, "")).toEqual("");
   });

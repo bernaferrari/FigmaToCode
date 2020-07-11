@@ -1,6 +1,5 @@
 import { FlutterTextBuilder } from "./../../src/flutter/flutterTextBuilder";
 import { flutterMain } from "./../../src/flutter/flutterMain";
-import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { AltTextNode } from "../../src/altNodes/altMixins";
 
 describe("Flutter Text", () => {

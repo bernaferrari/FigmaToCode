@@ -25,7 +25,7 @@ const retrieveAbsolutePos = (node: AltSceneNode, child: string): string => {
 
   switch (commonPosition(node)) {
     case "":
-      return "";
+      return child;
     case "Absolute":
       return `Positioned(left: ${node.x}, top: ${node.y}, child: ${child}),`;
     case "TopStart":

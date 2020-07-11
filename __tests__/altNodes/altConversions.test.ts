@@ -41,8 +41,7 @@ describe("AltConversions", () => {
 
     expect(tailwindMain(convert)).toEqual(
       `<div class="inline-flex flex-col items-center justify-center">
-<div class="inline-flex items-center justify-center">
-<div class="w-5 h-5"></div></div></div>`
+<div class="w-5 h-5"></div></div>`
     );
   });
 
