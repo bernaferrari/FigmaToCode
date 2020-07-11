@@ -62,7 +62,8 @@ export const nodeWidthHeight = (
   // }
 
   // avoid relative width when parent is relative (therefore, child is probably absolute, which doesn't work nice)
-  if (allowRelative && node.parent && node.parent.isRelative !== true) {
+  // ignore for root layer
+  if (allowRelative && node.parent?.isRelative !== true) {
     const rW = calculateResponsiveW(node, nodeWidth);
 
     if (rW) {
@@ -246,7 +247,6 @@ const calculateResponsiveW = (
     node.parent.horizontalPadding &&
     node.parent.layoutMode !== "NONE"
   ) {
-    // parentWidth = node.parent.width;
     parentWidth = node.parent.width - node.parent.horizontalPadding * 2;
     // currently ignoring h-full
   } else {

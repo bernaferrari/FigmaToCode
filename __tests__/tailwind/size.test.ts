@@ -72,7 +72,7 @@ describe("Tailwind Size", () => {
     node.appendChild(subnode);
 
     expect(tailwindMain([frameNodeToAlt(node)]))
-      .toEqual(`<div class="inline-flex items-center justify-center p-64 w-64">
+      .toEqual(`<div class="inline-flex items-center justify-center p-64 w-full">
 <div class="w-full h-2"></div></div>`);
 
     expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
@@ -125,7 +125,7 @@ describe("Tailwind Size", () => {
       subnode.appendChild(child);
       node.appendChild(subnode);
 
-      expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-64 ");
+      expect(tailwindSize(frameNodeToAlt(node))).toEqual("w-full ");
       expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("");
       expect(tailwindSize(frameNodeToAlt(child))).toEqual("w-4 h-4 ");
     });
@@ -154,7 +154,7 @@ describe("Tailwind Size", () => {
       subnode.children = [child];
       child.parent = subnode;
 
-      expect(tailwindSize(node)).toEqual("w-64 ");
+      expect(tailwindSize(node)).toEqual("w-full ");
       expect(tailwindSize(subnode)).toEqual("w-full ");
       expect(tailwindSize(child)).toEqual("w-4 h-4 ");
     });

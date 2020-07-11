@@ -23,7 +23,7 @@ describe("Tailwind Builder", () => {
 
     node.width = 300;
     node.height = 300;
-    expect(tailwindSize(node)).toEqual("w-64 h-64 ");
+    expect(tailwindSize(node)).toEqual("w-full h-64 ");
   });
 
   it("STRETCH inside AutoLayout", () => {

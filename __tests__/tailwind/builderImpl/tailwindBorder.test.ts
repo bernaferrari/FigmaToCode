@@ -48,7 +48,7 @@ describe("Tailwind Border", () => {
 
     node.height = 90;
     node.cornerRadius = 45;
-    expect(tailwindBorderRadius(node)).toEqual("rounded-full");
+    expect(tailwindBorderRadius(node)).toEqual("rounded-full ");
 
     node.topLeftRadius = 0;
     node.cornerRadius = 0;

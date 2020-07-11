@@ -3,20 +3,25 @@ import { pxToLayoutSize } from "../conversionTables";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
 
 export const tailwindSize = (node: AltSceneNode): string => {
+  return tailwindSizePartial(node).join("");
+};
+
+export const tailwindSizePartial = (node: AltSceneNode): [string, string] => {
   const sizeResult = nodeWidthHeight(node, true);
 
-  let comp = "";
+  let w = "";
   if (sizeResult.width) {
     if (typeof sizeResult.width === "number") {
-      comp += `w-${pxToLayoutSize(sizeResult.width)} `;
+      w += `w-${pxToLayoutSize(sizeResult.width)} `;
     } else {
-      comp += `w-${sizeResult.width} `;
+      w += `w-${sizeResult.width} `;
     }
   }
 
+  let h = "";
   if (sizeResult.height) {
-    comp += `h-${pxToLayoutSize(sizeResult.height)} `;
+    h = `h-${pxToLayoutSize(sizeResult.height)} `;
   }
 
-  return comp;
+  return [w, h];
 };

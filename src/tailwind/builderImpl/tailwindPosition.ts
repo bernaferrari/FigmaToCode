@@ -3,7 +3,8 @@ import { commonPosition } from "../../common/commonPosition";
 
 export const tailwindPosition = (
   node: AltSceneNode,
-  parentId: string
+  parentId: string,
+  hasFixedSize: boolean = false
 ): string => {
   // don't add position to the first (highest) node in the tree
   if (!node.parent || parentId === node.parent.id) {
@@ -13,7 +14,7 @@ export const tailwindPosition = (
   // Group
   if (node.parent.isRelative === true) {
     // position is absolute, needs to be relative
-    return retrieveAbsolutePos(node);
+    return retrieveAbsolutePos(node, hasFixedSize);
   }
 
   // Frame, Instance, Component
@@ -29,34 +30,47 @@ export const tailwindPosition = (
   return "";
 };
 
-const retrieveAbsolutePos = (node: AltSceneNode): string => {
-  // todoEverything with Center was commented, because mx-auto requires a width, and my-auto requires a height, but it is uncertain if the nodes have it. Should it verify, or can we live this way?
+const retrieveAbsolutePos = (
+  node: AltSceneNode,
+  hasFixedSize: boolean
+): string => {
+  // everything related to Center requires a defined width and height. Therefore, we use hasFixedSize.
   switch (commonPosition(node)) {
     case "":
       return "";
     case "Absolute":
       return "absoluteManualLayout";
+    case "TopCenter":
+      if (hasFixedSize) {
+        return "absolute inset-x-0 top-0 mx-auto ";
+      }
+      return "absoluteManualLayout";
+    case "CenterStart":
+      if (hasFixedSize) {
+        return "absolute inset-y-0 left-0 my-auto ";
+      }
+      return "absoluteManualLayout";
+    case "Center":
+      if (hasFixedSize) {
+        return "absolute m-auto inset-0 ";
+      }
+      return "absoluteManualLayout";
+    case "CenterEnd":
+      if (hasFixedSize) {
+        return "absolute inset-y-0 right-0 my-auto ";
+      }
+      return "absoluteManualLayout";
+    case "BottomCenter":
+      if (hasFixedSize) {
+        return "absolute inset-x-0 bottom-0 mx-auto ";
+      }
+      return "absoluteManualLayout";
     case "TopStart":
       return "absolute left-0 top-0 ";
-    case "TopCenter":
-      return "absoluteManualLayout";
-    // return "absolute inset-x-0 top-0 mx-auto ";
     case "TopEnd":
       return "absolute right-0 top-0 ";
-    case "CenterStart":
-      return "absoluteManualLayout";
-    // return "absolute inset-y-0 left-0 my-auto ";
-    case "Center":
-      return "absoluteManualLayout";
-    // return "absolute m-auto inset-0 ";
-    case "CenterEnd":
-      return "absoluteManualLayout";
-    // return "absolute inset-y-0 right-0 my-auto ";
     case "BottomStart":
       return "absolute left-0 bottom-0 ";
-    case "BottomCenter":
-      return "absoluteManualLayout";
-    // return "absolute inset-x-0 bottom-0 mx-auto ";
     case "BottomEnd":
       return "absolute right-0 bottom-0 ";
   }

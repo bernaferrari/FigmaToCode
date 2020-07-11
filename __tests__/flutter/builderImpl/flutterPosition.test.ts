@@ -1,30 +1,26 @@
-import { convertSingleNodeToAlt } from "../../../src/altNodes/altConversion";
-import { AltGroupNode, AltFrameNode } from "../../../src/altNodes/altMixins";
-import { createFigma } from "figma-api-stub";
+import { AltFrameNode } from "../../../src/altNodes/altMixins";
 import { flutterPosition } from "../../../src/flutter/builderImpl/flutterPosition";
 
 describe("Flutter Position", () => {
-  const figma = createFigma({
-    simulateErrors: true,
-    isWithoutTimeout: false,
-  });
   // @ts-ignore for some reason, need to override this for figma.mixed to work
-  global.figma = figma;
+  global.figma = {
+    mixed: undefined,
+  };
+
   it("Frame AutoLayout Position", () => {
-    const parentF = figma.createFrame();
-    parentF.resize(100, 100);
-    parentF.x = 0;
-    parentF.y = 0;
-    parentF.layoutMode = "NONE";
+    const parent = new AltFrameNode();
+    parent.width = 100;
+    parent.height = 100;
+    parent.x = 0;
+    parent.y = 0;
+    parent.layoutMode = "NONE";
 
-    const nodeF = figma.createFrame();
-    nodeF.resize(50, 50);
-    parentF.appendChild(nodeF);
+    const node = new AltFrameNode();
+    node.width = 100;
+    node.height = 100;
+    node.parent = parent;
 
-    // you may wonder: where is the AutoLayout if layoutMode was set to NONE?
-    // answer: the auto conversion when AltNodes are generated.
-    const parent = convertSingleNodeToAlt(parentF) as AltFrameNode;
-    const node = parent.children[0];
+    parent.children = [node];
 
     // node.parent.id === parent.id, so return ""
     expect(flutterPosition(node, "", parent.id)).toEqual("");
@@ -42,26 +38,33 @@ describe("Flutter Position", () => {
   });
 
   it("Frame Absolute Position", () => {
-    const parentF = figma.createFrame();
-    parentF.resize(100, 100);
-    parentF.x = 0;
-    parentF.y = 0;
-    parentF.layoutMode = "NONE";
+    const parent = new AltFrameNode();
+    parent.width = 100;
+    parent.height = 100;
+    parent.x = 0;
+    parent.y = 0;
+    parent.id = "root";
+    parent.layoutMode = "NONE";
+    parent.isRelative = true;
 
-    const nodeF1 = figma.createFrame();
-    nodeF1.resize(25, 25);
-    parentF.appendChild(nodeF1);
+    const node = new AltFrameNode();
+    parent.id = "node";
+    node.parent = parent;
 
-    const nodeF2 = figma.createFrame();
-    nodeF2.resize(25, 25);
-    parentF.appendChild(nodeF2);
+    // child equals parent
+    node.width = 100;
+    node.height = 100;
+    expect(flutterPosition(node, "child")).toEqual("child");
 
-    // you may wonder: where is the AutoLayout if layoutMode was set to NONE?
-    // answer: the auto conversion when AltNodes are generated.
-    const parent = convertSingleNodeToAlt(parentF) as AltFrameNode;
-    const node = parent.children[0];
+    node.width = 25;
+    node.height = 25;
 
-    // position is set after the conversion to avoid AutoLayout auto converison
+    const nodeF2 = new AltFrameNode();
+    nodeF2.width = 25;
+    nodeF2.height = 25;
+    nodeF2.parent = parent;
+
+    parent.children = [node, nodeF2];
 
     // center
     node.x = 37;
@@ -149,21 +152,22 @@ describe("Flutter Position", () => {
   });
 
   it("Position: node has same size as parent", () => {
-    const parentF = figma.createFrame();
-    parentF.resize(100, 100);
-    parentF.layoutMode = "NONE";
+    const parent = new AltFrameNode();
+    parent.width = 100;
+    parent.height = 100;
+    parent.layoutMode = "NONE";
 
-    const nodeF1 = figma.createFrame();
-    nodeF1.resize(100, 100);
+    const node = new AltFrameNode();
+    node.width = 100;
+    node.height = 100;
+    node.parent = parent;
 
-    const nodeF2 = figma.createFrame();
-    nodeF2.resize(50, 50);
+    const nodeF2 = new AltFrameNode();
+    nodeF2.width = 100;
+    nodeF2.height = 100;
+    nodeF2.parent = parent;
 
-    parentF.appendChild(nodeF1);
-    parentF.appendChild(nodeF2);
-
-    const parent = convertSingleNodeToAlt(parentF) as AltGroupNode;
-    const node = parent.children[0];
+    parent.children = [node, nodeF2];
 
     expect(flutterPosition(node, "")).toEqual("");
   });

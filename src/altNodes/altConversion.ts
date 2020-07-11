@@ -1,3 +1,4 @@
+import { convertNodesOnRectangle } from "./convertNodesOnRectangle";
 import {
   AltSceneNode,
   AltRectangleNode,
@@ -13,7 +14,6 @@ import {
   AltDefaultShapeMixin,
   AltEllipseNode,
 } from "./altMixins";
-import { convertNodeIfChildIsBigRect } from "./convertNodeIfChildIsBigRect";
 import { convertToAutoLayout } from "./convertToAutoLayout";
 
 export const convertSingleNodeToAlt = (
@@ -48,7 +48,7 @@ export const frameNodeToAlt = (
 
   altNode.children = convertIntoAltNodes(node.children, altNode);
 
-  return convertToAutoLayout(convertNodeIfChildIsBigRect(altNode));
+  return convertToAutoLayout(convertNodesOnRectangle(altNode));
 };
 
 // auto convert Frame to Rectangle when Frame has no Children
@@ -121,7 +121,7 @@ export const convertIntoAltNodes = (
         // try to find big rect and regardless of that result, also try to convert to autolayout.
         // There is a big chance this will be returned as a Frame
         // also, Group will always have at least 2 children.
-        return convertToAutoLayout(convertNodeIfChildIsBigRect(altNode));
+        return convertNodesOnRectangle(altNode);
       } else if (node.type === "TEXT") {
         const altNode = new AltTextNode();
 
