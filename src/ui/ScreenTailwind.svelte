@@ -86,10 +86,12 @@
   onMount(() => {
     parent.postMessage({ pluginMessage: { type: "tailwind" } }, "*");
   });
+
+  const sectionStyle = "border rounded-lg bg-white";
 </script>
 
 <div>
-  <div class="bg-gray-100 p-2 flex flex-col items-center">
+  <div class="bg-gray-100 p-4 flex flex-col items-center">
 
     <div class="flex">
       <svg
@@ -192,8 +194,8 @@
 
     <a href="https://codepen.io/bernardoferrari/pen/mdVBJxe" target="_blank">
       <button
-        class="mt-2 bg-white hover:bg-gray-100 text-gray-800
-        font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+        class="mt-2 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2
+        px-4 border border-gray-400 rounded shadow">
         Tailwind on CodePen
       </button>
     </a>
@@ -202,17 +204,16 @@
 
 </div>
 
-<div class="px-2 pt-2">
+<div class="px-2 pt-2 bg-gray-100">
 
   {#if emptySelection}
     <div
-      class="flex flex-col space-y-2 m-auto items-center justify-center p-4
-      border-2 rounded-lg">
+      class="flex flex-col space-y-2 m-auto items-center justify-center p-4 {sectionStyle}">
       <p class="text-lg font-bold">Nothing is selected</p>
       <p class="text-xs">Try selecting a layer, any layer</p>
     </div>
   {:else}
-    <div class="border-2 rounded-lg w-full pt-2">
+    <div class="w-full pt-2 {sectionStyle}">
       <div class="flex items-center px-2 space-x-2 justify-between">
         <p
           class="text-lg font-medium text-center bg-gray-300 py-2 px-4
@@ -243,8 +244,7 @@
 
     {#if colorObservable.length > 0}
       <div
-        class="flex flex-col space-y-2 items-center w-full p-2 border-2
-        rounded-lg">
+        class="flex flex-col space-y-2 items-center w-full p-2 {sectionStyle}">
         <div class="flex flex-wrap w-full">
           <div class="p-1 w-1/3">
             <div
@@ -267,8 +267,7 @@
 
     {#if textObservable.length > 0}
       <div
-        class="flex flex-col space-y-2 items-center w-full p-2 border-2
-        rounded-lg">
+        class="flex flex-col space-y-2 items-center w-full p-2 mb-2 {sectionStyle}">
         <div class="flex flex-wrap w-full">
           <div class="p-1 w-1/2">
             <div
