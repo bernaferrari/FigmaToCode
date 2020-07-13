@@ -65,8 +65,8 @@ const frameToRectangleNode = (
     newNode.parent = altParent;
   }
 
-  convertRectangleCorner(newNode, node);
   convertDefaultShape(newNode, node);
+  convertRectangleCorner(newNode, node);
   convertCorner(newNode, node);
   return newNode;
 };
@@ -132,10 +132,24 @@ export const convertIntoAltNodes = (
           altNode.parent = altParent;
         }
 
-        convertLayout(altNode, node);
-        convertBlend(altNode, node);
-        convertGeometry(altNode, node);
+        convertDefaultShape(altNode, node);
         convertIntoAltText(altNode, node);
+        return altNode;
+      } else if (node.type === "VECTOR") {
+        const altNode = new AltRectangleNode();
+        altNode.id = node.id;
+        altNode.name = node.name;
+
+        if (altParent) {
+          altNode.parent = altParent;
+        }
+
+        convertDefaultShape(altNode, node);
+
+        // Vector support is still missing. Meanwhile, add placeholder.
+        altNode.radius = 16;
+        altNode.opacity = 0.5;
+
         return altNode;
       }
 

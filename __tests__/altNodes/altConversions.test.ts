@@ -56,5 +56,57 @@ describe("AltConversions", () => {
     expect(tailwindMain(convertIntoAltNodes([node]))).toEqual(`<p></p>`);
   });
 
+  it("Ellipse", () => {
+    // this test requires mocking the full EllipseNode. Figma-api-stub doesn't support VectorNode.
+    class EllipseNode {
+      readonly type = "ELLIPSE";
+    }
+
+    interface EllipseNode
+      extends DefaultShapeMixin,
+        ConstraintMixin,
+        CornerMixin {
+      readonly type: "ELLIPSE";
+      clone(): EllipseNode;
+      arcData: ArcData;
+    }
+
+    const node = new EllipseNode();
+    // set read-only variables
+    Object.defineProperty(node, "width", { value: 20 });
+    Object.defineProperty(node, "height", { value: 20 });
+
+    expect(tailwindMain(convertIntoAltNodes([node]))).toEqual(
+      `<div class="w-5 h-5 rounded-full"></div>`
+    );
+  });
+
+  it("Vector", () => {
+    // this test requires mocking the full VectorNode. Figma-api-stub doesn't support VectorNode.
+    class VectorNode {
+      readonly type = "VECTOR";
+    }
+
+    interface VectorNode
+      extends DefaultShapeMixin,
+        ConstraintMixin,
+        CornerMixin {
+      readonly type: "VECTOR";
+      clone(): VectorNode;
+      vectorNetwork: VectorNetwork;
+      vectorPaths: VectorPaths;
+      handleMirroring: HandleMirroring | PluginAPI["mixed"];
+    }
+
+    const node = new VectorNode();
+    // set read-only variables
+    Object.defineProperty(node, "width", { value: 20 });
+    Object.defineProperty(node, "height", { value: 20 });
+
+    expect(tailwindMain(convertIntoAltNodes([node]))).toEqual(
+      `<div class="opacity-50 w-5 h-5"></div>`
+    );
+  });
+
   // todo add a test for EllipseNode, but there is no EllipseNode in figma-api-stubs!
 });

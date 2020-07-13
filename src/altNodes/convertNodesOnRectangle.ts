@@ -32,6 +32,9 @@ export const convertNodesOnRectangle = (
     ) as AltRectangleNode;
 
     const frameNode = convertRectangleToFrame(parentNode);
+
+    // todo when the soon-to-be-parent is larger than its parent, things get weird. Happens, for example, when a large image is used in the background. Should this be handled or is this something user should never do?
+
     frameNode.children = [...colliding[key]];
     colliding[key].forEach((d) => {
       d.parent = frameNode;
@@ -67,6 +70,8 @@ const convertRectangleToFrame = (rect: AltRectangleNode) => {
   frameNode.y = rect.y;
   frameNode.rotation = rect.rotation;
   frameNode.layoutMode = "NONE";
+
+  // opacity should be ignored, else it will affect children
 
   // when invisible, add the layer but don't fill it; he designer might use invisible layers for alignment.
   // visible can be undefined in tests
