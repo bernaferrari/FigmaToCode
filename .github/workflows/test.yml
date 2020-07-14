@@ -21,3 +21,9 @@ jobs:
       with:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: coverage/clover.xml
+    - name: Run codecov
+      uses: codecov/codecov-action@v1
+      with:
+        file: coverage/clover.xml
+
+
