@@ -24,12 +24,22 @@ export const convertNodesOnRectangle = (
   const colliding = retrieveCollidingItems(node.children);
 
   const parentsKeys = Object.keys(colliding);
-  const updatedChildren: Array<AltSceneNode> = [];
+  // start with all children. This is going to be filtered.
+  let updatedChildren: Array<AltSceneNode> = [...node.children];
+
   parentsKeys.forEach((key) => {
     // dangerous cast, but this is always true
     const parentNode = node.children.find(
       (d) => d.id === key
     ) as AltRectangleNode;
+
+    // retrieve the position. Key should always be at the left side, so even when other items are removed, the index is kept the same.
+    const indexPosition = updatedChildren.findIndex((d) => d.id === key);
+
+    // filter the children to remove those that are being modified
+    updatedChildren = updatedChildren.filter(
+      (d) => !colliding[key].map((dd) => dd.id).includes(d.id) && key !== d.id
+    );
 
     const frameNode = convertRectangleToFrame(parentNode);
 
@@ -42,10 +52,11 @@ export const convertNodesOnRectangle = (
       d.y = d.y - frameNode.y;
     });
 
-    // try to convert the children to AutoLayout.
-    updatedChildren.push(convertToAutoLayout(frameNode));
+    // try to convert the children to AutoLayout, and insert back at updatedChildren.
+    updatedChildren.splice(indexPosition, 0, convertToAutoLayout(frameNode));
   });
 
+  console.log("node is ", node.children, "updated is ", updatedChildren);
   if (updatedChildren.length > 0) {
     node.children = updatedChildren;
   }

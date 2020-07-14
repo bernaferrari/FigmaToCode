@@ -357,7 +357,8 @@ describe("convert node if child is big rect ", () => {
 
     const convert = convertNodesOnRectangle(node);
 
-    expect(convert.children.length).toEqual(2);
+    // 4, because it should include even those that are not converted.
+    expect(convert.children.length).toEqual(4);
   });
 
   it("invalid when testing without id", () => {
