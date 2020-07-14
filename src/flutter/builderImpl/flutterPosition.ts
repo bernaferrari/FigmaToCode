@@ -21,7 +21,7 @@ export const flutterPosition = (
 
 const retrieveAbsolutePos = (node: AltSceneNode, child: string): string => {
   const positionedAlign = (align: string) =>
-    `Positioned.fill(child: Align(alingment: Alingment.${align}, child: ${child}),),`;
+    `Positioned.fill(child: Align(alignment: Alignment.${align}, child: ${child}),),`;
 
   switch (commonPosition(node)) {
     case "":
