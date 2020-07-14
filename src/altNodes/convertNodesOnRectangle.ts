@@ -56,7 +56,6 @@ export const convertNodesOnRectangle = (
     updatedChildren.splice(indexPosition, 0, convertToAutoLayout(frameNode));
   });
 
-  console.log("node is ", node.children, "updated is ", updatedChildren);
   if (updatedChildren.length > 0) {
     node.children = updatedChildren;
   }

@@ -12,10 +12,10 @@ export const flutterBoxShadow = (node: AltSceneNode): string => {
       let boxShadow = "";
 
       dropShadow.forEach((d: ShadowEffect) => {
-        const color = `color: Color(0x${rgbTo8hex(d.color)}, `;
+        const color = `color: Color(0x${rgbTo8hex(d.color)}), `;
         const radius = `blurRadius: ${d.radius}, `;
         const offset = `offset: Offset(${d.offset.x}, ${d.offset.y}), `;
-        boxShadow += `BoxShadow(${color}${radius}${offset}),),`;
+        boxShadow += `BoxShadow(${color}${radius}${offset}),`;
       });
 
       propBoxShadow = `boxShadow: [ ${boxShadow} ],`;
