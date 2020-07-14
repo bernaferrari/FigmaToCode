@@ -128,8 +128,8 @@ Container(width: 8, height: 257, ),),],),)`);
     node.children = [child];
     child.parent = node;
     expect(flutterMain([node]))
-      .toEqual(`Stack(children:[Positioned(left: 9, top: 9, child: 
-Container(width: 4, height: 4, color: Color(0xffffffff), ),),],)`);
+      .toEqual(`Container(width: 32, height: 32, child: Stack(children:[Positioned(left: 9, top: 9, child: 
+Container(width: 4, height: 4, color: Color(0xffffffff), ),),],),)`);
   });
 
   it("Row and Column with 2 children", () => {

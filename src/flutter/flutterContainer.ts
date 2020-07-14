@@ -1,3 +1,4 @@
+import { AltGroupNode } from "./../altNodes/altMixins";
 import {
   flutterBorderRadius,
   flutterBorder,
@@ -15,7 +16,7 @@ import { flutterColor } from "./builderImpl/flutterColor";
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const flutterContainer = (
-  node: AltRectangleNode | AltEllipseNode | AltFrameNode,
+  node: AltRectangleNode | AltEllipseNode | AltFrameNode | AltGroupNode,
   child: string
 ): string => {
   // ignore the view when size is zero or less
@@ -25,7 +26,8 @@ export const flutterContainer = (
     return child;
   }
 
-  const propBoxDecoration = getBoxDecoration(node);
+  // ignore for Groups
+  const propBoxDecoration = node.type === "GROUP" ? "" : getBoxDecoration(node);
   const propWidthHeight = flutterSize(node);
 
   // todo Image, Gradient & multiple fills
