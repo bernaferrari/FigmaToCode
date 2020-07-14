@@ -13,7 +13,20 @@ export const flutterPosition = (
 
   // check if view is in a stack. Group and Frames must have more than 1 element
   if (node.parent.isRelative === true) {
-    return retrieveAbsolutePos(node, child);
+    const pos = retrieveAbsolutePos(node, child);
+    if (pos !== "Absolute") {
+      return pos;
+    } else {
+      // this is necessary because Group have absolute position, while Frame is relative.
+      // output is always going to be relative to the parent.
+      const parentX = "layoutMode" in node.parent ? 0 : node.parent.x;
+      const parentY = "layoutMode" in node.parent ? 0 : node.parent.y;
+
+      const diffX = node.x - parentX;
+      const diffY = node.y - parentY;
+
+      return `Positioned(left: ${diffX}, top: ${diffY}, child: ${child}),`;
+    }
   }
 
   return child;
@@ -27,7 +40,7 @@ const retrieveAbsolutePos = (node: AltSceneNode, child: string): string => {
     case "":
       return child;
     case "Absolute":
-      return `Positioned(left: ${node.x}, top: ${node.y}, child: ${child}),`;
+      return "Absolute";
     case "TopStart":
       return positionedAlign("topLeft");
     case "TopCenter":

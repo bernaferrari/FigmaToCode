@@ -1,3 +1,4 @@
+import { AltGroupNode } from "./../altNodes/altMixins";
 import { retrieveFill } from "./../common/retrieveFill";
 import { flutterPosition } from "./builderImpl/flutterPosition";
 import {
@@ -27,12 +28,12 @@ export class FlutterDefaultBuilder {
   // }
 
   createContainer(
-    node: AltRectangleNode | AltEllipseNode | AltFrameNode,
+    node: AltRectangleNode | AltEllipseNode | AltFrameNode | AltGroupNode,
     material: boolean
   ): this {
-    const fill = retrieveFill(node.fills);
+    const fill = node.type === "GROUP" ? null : retrieveFill(node.fills);
     // fill.visible can be true or undefined (on tests)
-    if (material && fill && fill.visible !== false) {
+    if (node.type !== "GROUP" && material && fill && fill.visible !== false) {
       this.child = flutterMaterial(node, this.child);
     } else {
       this.child = flutterContainer(node, this.child);

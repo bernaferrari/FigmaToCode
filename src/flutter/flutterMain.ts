@@ -64,18 +64,16 @@ const flutterWidgetGenerator = (
 
 const flutterGroup = (node: AltGroupNode): string => {
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new FlutterDefaultBuilder(
+  return flutterContainer(
+    node,
     `Stack(children:[${flutterWidgetGenerator(node.children)}],),`
-  )
-    .blendAttr(node)
-    .containerPosition(node, parentId);
-  // .widthHeight(node);
+  );
 
-  return builder.child;
+  // return builder.child;
 };
 
 const flutterContainer = (
-  node: AltFrameNode | AltRectangleNode | AltEllipseNode,
+  node: AltFrameNode | AltGroupNode | AltRectangleNode | AltEllipseNode,
   child: string
 ): string => {
   const builder = new FlutterDefaultBuilder(child);
