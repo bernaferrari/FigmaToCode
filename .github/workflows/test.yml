@@ -12,9 +12,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install modules
       run: yarn
-    - name: Run tests
-      run: yarn test
-    - name: Run coverage
+    - name: Run tests and coverage
       run: yarn run coverage
     - name: Run codacy-coverage-reporter
       uses: codacy/codacy-coverage-reporter-action@master

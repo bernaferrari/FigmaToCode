@@ -4,8 +4,8 @@ This project uses [Jest](https://jestjs.io/) for tests, and has some help from [
 
 ## Coverage
 
-Coverage is currently at an impressive 98%. Some artifacts, like EllipseNode, are currently not present in Figma API Stub, so 100% will probably never be reached. Important to notice: 98% is the result for all **covered** files. There are still some **uncovered** files, specially at the Flutter side. You can also inspect the coverage by clicking at the Codacy badge:
-[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/af3321afff1f4d078037e09111120384)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=bernaferrari/FigmaToCode&utm_campaign=Badge_Coverage)
+Coverage is currently at an impressive 99%. You can inspect the coverage by clicking at the Codecov badge:
+[![codecov](https://codecov.io/gh/bernaferrari/FigmaToCode/branch/master/graph/badge.svg)](https://codecov.io/gh/bernaferrari/FigmaToCode)
 
 ![Coverage](../assets/coverage.png)
 
