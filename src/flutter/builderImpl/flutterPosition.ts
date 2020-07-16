@@ -7,7 +7,7 @@ export const flutterPosition = (
   parentId: string = ""
 ): string => {
   // avoid adding Positioned() when parent is not a Stack(), which can happen at the beggining
-  if (!node.parent || parentId === node.parent.id) {
+  if (!node.parent || parentId === node.parent.id || child === "") {
     return child;
   }
 
