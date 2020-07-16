@@ -53,10 +53,10 @@ export const makeTextComponent = (node: AltTextNode): string => {
   alignHorizontal =
     alignHorizontal === "justified" ? "justify" : alignHorizontal;
 
-  // if layoutAlign !== MIN, Text will be wrapped by Align
+  // todo if layoutAlign !== MIN, Text will be wrapped by Align
   // if alignHorizontal is LEFT, don't do anything because that is native
   const textAlign =
-    node.layoutAlign === "MIN" && alignHorizontal !== "left"
+    alignHorizontal !== "left"
       ? `textAlign: TextAlign.${alignHorizontal}, `
       : "";
 

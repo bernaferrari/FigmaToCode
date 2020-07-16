@@ -5,7 +5,7 @@ import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
  * https://api.flutter.dev/flutter/widgets/Opacity-class.html
  */
 export const flutterOpacity = (node: AltBlendMixin, child: string): string => {
-  if (node.opacity !== undefined && node.opacity !== 1) {
+  if (node.opacity !== undefined && node.opacity !== 1 && child !== "") {
     return `Opacity(opacity: ${node.opacity}, child: ${child}),`;
   }
   return child;
@@ -20,7 +20,7 @@ export const flutterVisibility = (
 ): string => {
   // [when testing] node.visible can be undefined
 
-  if (node.visible !== undefined && node.visible === false) {
+  if (node.visible !== undefined && node.visible === false && child !== "") {
     return `Visibility(visible: ${node.visible}, child: ${child}),`;
   }
   return child;
@@ -35,7 +35,7 @@ export const flutterRotation = (
   node: AltLayoutMixin,
   child: string
 ): string => {
-  if (node.rotation !== undefined && node.rotation > 0) {
+  if (node.rotation !== undefined && node.rotation > 0 && child !== "") {
     return `Transform.rotate(angle: ${
       node.rotation * (-3.14159 / 180)
     }, child: ${child})`;
