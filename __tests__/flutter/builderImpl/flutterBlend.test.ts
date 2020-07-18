@@ -14,7 +14,7 @@ describe("Flutter Blend", () => {
 
     node.opacity = 0.5;
     expect(flutterOpacity(node, "test")).toEqual(
-      "Opacity(opacity: 0.5, child: test),"
+      "Opacity(opacity: 0.50, child: test),"
     );
 
     node.opacity = 1.0;
@@ -40,12 +40,12 @@ describe("Flutter Blend", () => {
 
     node.rotation = 45;
     expect(flutterRotation(node, "test")).toEqual(
-      "Transform.rotate(angle: -0.7853975, child: test)"
+      "Transform.rotate(angle: -0.79, child: test)"
     );
 
     node.rotation = 90;
     expect(flutterRotation(node, "test")).toEqual(
-      "Transform.rotate(angle: -1.570795, child: test)"
+      "Transform.rotate(angle: -1.57, child: test)"
     );
   });
 });

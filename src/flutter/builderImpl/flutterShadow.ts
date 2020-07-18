@@ -1,5 +1,6 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { rgbTo8hex } from "../../common/rgbToHex";
+import { numToAutoFixed } from "../../common/numToAutoFixed";
 
 export const flutterBoxShadow = (node: AltSceneNode): string => {
   let propBoxShadow = "";
@@ -13,8 +14,10 @@ export const flutterBoxShadow = (node: AltSceneNode): string => {
 
       dropShadow.forEach((d: ShadowEffect) => {
         const color = `color: Color(0x${rgbTo8hex(d.color)}), `;
-        const radius = `blurRadius: ${d.radius}, `;
-        const offset = `offset: Offset(${d.offset.x}, ${d.offset.y}), `;
+        const radius = `blurRadius: ${numToAutoFixed(d.radius)}, `;
+        const offset = `offset: Offset(${numToAutoFixed(
+          d.offset.x
+        )}, ${numToAutoFixed(d.offset.y)}), `;
         boxShadow += `BoxShadow(${color}${radius}${offset}),`;
       });
 
@@ -37,7 +40,7 @@ export const flutterElevationAndShadowColor = (
     );
     if (dropShadow.length > 0 && dropShadow[0].type === "DROP_SHADOW") {
       shadowColor = `color: Color(0x${rgbTo8hex(dropShadow[0].color)}), `;
-      elevation = `elevation: ${dropShadow[0].radius}, `;
+      elevation = `elevation: ${numToAutoFixed(dropShadow[0].radius)}, `;
     }
   }
 

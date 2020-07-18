@@ -66,8 +66,8 @@ describe("Tailwind Default Builder", () => {
 
     expect(tailwindMain([convertToAutoLayout(node)], "", true, true))
       .toEqual(`<div className="FRAME relative" style={{width: 32, height: 32,}}>
-<div className="RECT1 absolute w-1 h-1 bg-white" style={{left:9, top:9,}}></div>
-<div className="RECT2 absolute w-1 h-1" style={{left:9, top:9,}}></div></div>`);
+<div className="RECT1 absolute w-1 h-1 bg-white" style={{left: 9, top: 9,}}></div>
+<div className="RECT2 absolute w-1 h-1" style={{left: 9, top: 9,}}></div></div>`);
   });
 
   it("children is larger than 256", () => {
@@ -109,8 +109,8 @@ describe("Tailwind Default Builder", () => {
 
     expect(tailwindMain([convertToAutoLayout(node)]))
       .toEqual(`<div class="relative" style="width: 320px; height: 320px;">
-<div class="absolute h-2 bg-white" style="left:9px; top:9px; width: 257px;"></div>
-<div class="absolute w-2" style="left:9px; top:9px; height: 257px;"></div></div>`);
+<div class="absolute h-2 bg-white" style="left: 9px; top: 9px; width: 257px;"></div>
+<div class="absolute w-2" style="left: 9px; top: 9px; height: 257px;"></div></div>`);
   });
 
   it("Group with relative position", () => {
@@ -145,6 +145,6 @@ describe("Tailwind Default Builder", () => {
     child.parent = node;
     expect(tailwindMain([node], "", true, true))
       .toEqual(`<div className="GROUP relative" style={{width: 32, height: 32,}}>
-<div className="RECT absolute w-1 h-1 bg-white" style={{left:9, top:9,}}></div></div>`);
+<div className="RECT absolute w-1 h-1 bg-white" style={{left: 9, top: 9,}}></div></div>`);
   });
 });

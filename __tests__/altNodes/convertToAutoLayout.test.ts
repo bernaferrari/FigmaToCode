@@ -112,7 +112,7 @@ describe("Convert to AutoLayout", () => {
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
       `<div class="relative" style="width: 50px; height: 50px;">
-<div class="absolute w-5 h-5 bg-green-600" style="left:10px; top:10px;"></div>
+<div class="absolute w-5 h-5 bg-green-600" style="left: 10px; top: 10px;"></div>
 <div class="absolute left-0 top-0 w-5 h-5 bg-red-700"></div></div>`
     );
   });

@@ -21,6 +21,7 @@ import { tailwindPosition } from "./builderImpl/tailwindPosition";
 import { tailwindColor } from "./builderImpl/tailwindColor";
 import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
+import { parseNumJSX } from "../common/parseJSX";
 
 export class TailwindDefaultBuilder {
   attributes: string = "";
@@ -70,12 +71,9 @@ export class TailwindDefaultBuilder {
       const left = node.x - parentX;
       const top = node.y - parentY;
 
-      // todo is there a way to improve this?
-      if (this.isJSX) {
-        this.style += `left:${left}${this.styleSeparator} top:${top}${this.styleSeparator} `;
-      } else {
-        this.style += `left:${left}px${this.styleSeparator} top:${top}px${this.styleSeparator} `;
-      }
+      this.style += parseNumJSX("left", "left", this.isJSX, left);
+      this.style += parseNumJSX("top", "top", this.isJSX, top);
+
       this.attributes += "absolute ";
     } else {
       this.attributes += position;

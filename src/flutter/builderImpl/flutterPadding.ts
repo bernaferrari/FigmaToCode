@@ -1,4 +1,5 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
+import { numToAutoFixed } from "../../common/numToAutoFixed";
 
 // Add padding if necessary!
 // This must happen before Stack or after the Positioned, but not before.
@@ -15,11 +16,13 @@ export const flutterPadding = (node: AltSceneNode): string => {
     } else {
       const propHorizontalPadding =
         node.horizontalPadding > 0
-          ? `horizontal: ${node.horizontalPadding}, `
+          ? `horizontal: ${numToAutoFixed(node.horizontalPadding)}, `
           : "";
 
       const propVerticalPadding =
-        node.verticalPadding > 0 ? `vertical: ${node.verticalPadding}, ` : "";
+        node.verticalPadding > 0
+          ? `vertical: ${numToAutoFixed(node.verticalPadding)}, `
+          : "";
 
       return `padding: const EdgeInsets.symmetric(${propHorizontalPadding}${propVerticalPadding}),`;
     }
