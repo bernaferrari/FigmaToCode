@@ -64,7 +64,7 @@ const getBoxDecoration = (
   const propShape = node.type === "ELLIPSE" ? "shape: BoxShape.circle," : "";
 
   // generate the decoration, or just the backgroundColor. Node.CornerRadius
-  return propBorder || propShape || propBorder
+  return propBorder || propShape || propBorder || propBorderRadius
     ? `decoration: BoxDecoration(${propBorderRadius}${propShape}${propBorder}${propBoxShadow}${propBackgroundColor}),`
     : `${propBackgroundColor}`;
 };

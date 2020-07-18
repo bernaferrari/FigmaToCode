@@ -8,6 +8,7 @@ import {
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltSceneNode } from "../altNodes/altMixins";
 import { FlutterTextBuilder } from "./flutterTextBuilder";
+import { numToAutoFixed } from "../common/numToAutoFixed";
 
 let parentId = "";
 let material = true;
@@ -168,10 +169,14 @@ const addSpacingIfNeeded = (
     // Don't add the SizedBox at last value. In Figma, itemSpacing CAN be negative; here it can't.
     if (node.parent.itemSpacing > 0 && index < len - 1) {
       if (node.parent.layoutMode === "HORIZONTAL") {
-        return `${comp} SizedBox(width: ${node.parent.itemSpacing}),`;
+        return `${comp} SizedBox(width: ${numToAutoFixed(
+          node.parent.itemSpacing
+        )}),`;
       } else {
         // node.parent.layoutMode === "VERTICAL"
-        return `${comp} SizedBox(height: ${node.parent.itemSpacing}),`;
+        return `${comp} SizedBox(height: ${numToAutoFixed(
+          node.parent.itemSpacing
+        )}),`;
       }
     }
   }

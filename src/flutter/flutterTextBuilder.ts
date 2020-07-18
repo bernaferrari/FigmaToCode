@@ -2,6 +2,7 @@ import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltTextNode } from "../altNodes/altMixins";
 import { convertFontWeight } from "../tailwind/tailwindTextBuilder";
 import { flutterColor } from "./builderImpl/flutterColor";
+import { numToAutoFixed } from "../common/numToAutoFixed";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {
   constructor(optChild: string = "") {
@@ -84,7 +85,7 @@ export const getTextStyle = (node: AltTextNode): string => {
   styleBuilder += flutterColor(node.fills);
 
   if (node.fontSize !== figma.mixed) {
-    styleBuilder += `fontSize: ${node.fontSize}, `;
+    styleBuilder += `fontSize: ${numToAutoFixed(node.fontSize)}, `;
   }
 
   if (node.textDecoration === "UNDERLINE") {
@@ -110,11 +111,15 @@ export const getTextStyle = (node: AltTextNode): string => {
 
   if (node.letterSpacing !== figma.mixed && node.letterSpacing.value !== 0) {
     if (node.letterSpacing.unit === "PIXELS") {
-      styleBuilder += `letterSpacing: ${node.letterSpacing.value}, `;
+      styleBuilder += `letterSpacing: ${numToAutoFixed(
+        node.letterSpacing.value
+      )}, `;
     } else {
       // node.letterSpacing.unit === "PERCENT"
       // TODO test if end result is satisfatory
-      styleBuilder += `letterSpacing: ${node.letterSpacing.value / 10}, `;
+      styleBuilder += `letterSpacing: ${numToAutoFixed(
+        node.letterSpacing.value / 10
+      )}, `;
     }
   }
 
@@ -137,11 +142,13 @@ export const wrapTextAutoResize = (
 ): string => {
   if (node.textAutoResize === "NONE") {
     // = instead of += because we want to replace it
-    return `SizedBox(width: ${node.width}, height: ${node.height}, child: ${child}),`;
+    return `SizedBox(width: ${numToAutoFixed(node.width)}, height: ${
+      node.height
+    }, child: ${child}),`;
   } else if (node.textAutoResize === "HEIGHT") {
     // if HEIGHT is set, it means HEIGHT will be calculated automatically, but width won't
     // = instead of += because we want to replace it
-    return `SizedBox(width: ${node.width}, child: ${child}),`;
+    return `SizedBox(width: ${numToAutoFixed(node.width)}, child: ${child}),`;
   }
 
   return child;

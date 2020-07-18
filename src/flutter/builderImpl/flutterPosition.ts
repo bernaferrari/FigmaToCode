@@ -1,5 +1,6 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { commonPosition } from "../../common/commonPosition";
+import { numToAutoFixed } from "../../common/numToAutoFixed";
 
 export const flutterPosition = (
   node: AltSceneNode,
@@ -22,8 +23,8 @@ export const flutterPosition = (
       const parentX = "layoutMode" in node.parent ? 0 : node.parent.x;
       const parentY = "layoutMode" in node.parent ? 0 : node.parent.y;
 
-      const diffX = node.x - parentX;
-      const diffY = node.y - parentY;
+      const diffX = numToAutoFixed(node.x - parentX);
+      const diffY = numToAutoFixed(node.y - parentY);
 
       return `Positioned(left: ${diffX}, top: ${diffY}, child: ${child}),`;
     }
