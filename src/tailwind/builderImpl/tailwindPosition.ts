@@ -3,7 +3,7 @@ import { commonPosition } from "../../common/commonPosition";
 
 export const tailwindPosition = (
   node: AltSceneNode,
-  parentId: string,
+  parentId: string = "",
   hasFixedSize: boolean = false
 ): string => {
   // don't add position to the first (highest) node in the tree

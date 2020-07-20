@@ -22,6 +22,7 @@ import { tailwindColor } from "./builderImpl/tailwindColor";
 import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
 import { parseNumJSX } from "../common/parseJSX";
+import { parentCoordinates } from "../common/parentCoordinates";
 
 export class TailwindDefaultBuilder {
   attributes: string = "";
@@ -65,8 +66,7 @@ export class TailwindDefaultBuilder {
     if (position === "absoluteManualLayout" && node.parent) {
       // tailwind can't deal with absolute layouts.
 
-      const parentX = "layoutMode" in node.parent ? 0 : node.parent.x;
-      const parentY = "layoutMode" in node.parent ? 0 : node.parent.y;
+      const [parentX, parentY] = parentCoordinates(node.parent);
 
       const left = node.x - parentX;
       const top = node.y - parentY;

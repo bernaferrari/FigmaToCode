@@ -48,43 +48,16 @@ const tailwindWidgetGenerator = (
       comp += tailwindContainer(node, "");
     } else if (node.type === "GROUP") {
       comp += tailwindGroup(node);
-    } else if (
-      node.type === "FRAME"
-      //  || node.type === "INSTANCE" ||
-      // node.type === "COMPONENT"
-    ) {
+    } else if (node.type === "FRAME") {
       comp += tailwindFrame(node);
     } else if (node.type === "TEXT") {
       comp += tailwindText(node);
     }
     // todo support Line
-    // else if (node.type === "LINE") {
-    // comp += tailwindLine(node);
-    // }
   });
 
   return comp;
 };
-
-// const tailwindLine = (node: LineNode): string => {
-//   // todo Height is always zero on Lines
-//   const builder = new tailwindAttributesBuilder("", isJsx, node.visible)
-//     .visibility(node)
-//     .widthHeight(node)
-//     .containerPosition(node, parentId)
-//     .layoutAlign(node, parentId)
-//     .opacity(node)
-//     .rotation(node)
-//     .shadow(node)
-//     .customColor(node.strokes, "border")
-//     .borderWidth(node)
-//     .borderRadius(node);
-
-//   if (builder.attributes) {
-//     return `\n<div ${builder.buildAttributes()}></div>`;
-//   }
-//   return "";
-// };
 
 const tailwindGroup = (node: AltGroupNode): string => {
   // ignore the view when size is zero or less

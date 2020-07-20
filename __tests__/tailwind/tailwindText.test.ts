@@ -5,7 +5,7 @@ import {
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { AltTextNode } from "../../src/altNodes/altMixins";
 
-describe("AltText", () => {
+describe("Tailwind Text", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
@@ -163,7 +163,9 @@ describe("AltText", () => {
     expect(convertFontWeight("Regular")).toEqual("400");
     expect(convertFontWeight("Medium")).toEqual("500");
     expect(convertFontWeight("Semi Bold")).toEqual("600");
+    expect(convertFontWeight("SemiBold")).toEqual("600");
     expect(convertFontWeight("Bold")).toEqual("700");
+    expect(convertFontWeight("Heavy")).toEqual("800");
     expect(convertFontWeight("Extra Bold")).toEqual("800");
     expect(convertFontWeight("Black")).toEqual("900");
   });

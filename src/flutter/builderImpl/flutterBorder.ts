@@ -5,13 +5,15 @@ import { numToAutoFixed } from "../../common/numToAutoFixed";
 
 // generate the border, when it exists
 export const flutterBorder = (node: AltSceneNode): string => {
-  if (node.type === "GROUP") return "";
+  if (node.type === "GROUP" || !node.strokes || node.strokes.length === 0) {
+    return "";
+  }
 
   // retrieve the stroke color, when existent (returns "" otherwise)
   const propStrokeColor = flutterColor(node.strokes);
 
   // only add strokeWidth when there is a strokeColor (returns "" otherwise)
-  const propStrokeWidth = `width: ${node.strokeWeight},`;
+  const propStrokeWidth = `width: ${numToAutoFixed(node.strokeWeight)},`;
 
   // generate the border, when it should exist
   return propStrokeColor && node.strokeWeight

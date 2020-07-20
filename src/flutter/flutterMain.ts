@@ -56,21 +56,18 @@ const flutterWidgetGenerator = (
     }
 
     // if the parent is an AutoLayout, and itemSpacing is set, add a SizedBox between items.
-    // on else, comp = comp (return it to itself);
-    comp = addSpacingIfNeeded(node, comp, index, sceneLen);
+    // on else, comp += ""
+    comp += addSpacingIfNeeded(node, index, sceneLen);
   });
 
   return comp;
 };
 
 const flutterGroup = (node: AltGroupNode): string => {
-  // this needs to be called after CustomNode because widthHeight depends on it
   return flutterContainer(
     node,
     `Stack(children:[${flutterWidgetGenerator(node.children)}],),`
   );
-
-  // return builder.child;
 };
 
 const flutterContainer = (
@@ -82,7 +79,7 @@ const flutterContainer = (
   builder
     .createContainer(node, material)
     .blendAttr(node)
-    .containerPosition(node, parentId);
+    .position(node, parentId);
 
   return builder.child;
 };
@@ -93,9 +90,8 @@ const flutterText = (node: AltTextNode): string => {
   builder
     .createText(node)
     .blendAttr(node)
-    .textInAlign(node)
     .textAutoSize(node)
-    .containerPosition(node, parentId);
+    .position(node, parentId);
 
   return builder.child;
 };
@@ -147,20 +143,10 @@ export const mostFrequent = (arr: Array<string>): string | undefined => {
     .pop();
 };
 
-// TODO Vector support in Flutter is complicated.
-// const flutterVector = (node: VectorNode) => {
-//   return `\nCenter(
-//           child: Container(
-//           width: ${node.width},
-//           height: ${node.height},
-//           color: Color(0xffff0000),
-//         ),
-//       ),`;
-// };
+// TODO Vector support in Flutter is complicated. Currently, AltConversion converts it in a Rectangle.
 
 const addSpacingIfNeeded = (
   node: AltSceneNode,
-  comp: string,
   index: number,
   len: number
 ): string => {
@@ -169,16 +155,12 @@ const addSpacingIfNeeded = (
     // Don't add the SizedBox at last value. In Figma, itemSpacing CAN be negative; here it can't.
     if (node.parent.itemSpacing > 0 && index < len - 1) {
       if (node.parent.layoutMode === "HORIZONTAL") {
-        return `${comp} SizedBox(width: ${numToAutoFixed(
-          node.parent.itemSpacing
-        )}),`;
+        return ` SizedBox(width: ${numToAutoFixed(node.parent.itemSpacing)}),`;
       } else {
         // node.parent.layoutMode === "VERTICAL"
-        return `${comp} SizedBox(height: ${numToAutoFixed(
-          node.parent.itemSpacing
-        )}),`;
+        return ` SizedBox(height: ${numToAutoFixed(node.parent.itemSpacing)}),`;
       }
     }
   }
-  return comp;
+  return "";
 };
