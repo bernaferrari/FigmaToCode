@@ -1,4 +1,5 @@
 import { AltSceneNode } from "../altNodes/altMixins";
+import { parentCoordinates } from "./parentCoordinates";
 
 type position =
   | ""
@@ -36,8 +37,7 @@ export const commonPosition = (node: AltSceneNode): position => {
   // position is absolute, parent is relative
   // return "absolute inset-0 m-auto ";
 
-  const parentX = "layoutMode" in node.parent ? 0 : node.parent.x;
-  const parentY = "layoutMode" in node.parent ? 0 : node.parent.y;
+  const [parentX, parentY] = parentCoordinates(node.parent);
 
   // if view is too small, anything will be detected; this is necessary to reduce the tolerance.
   let threshold = 8;

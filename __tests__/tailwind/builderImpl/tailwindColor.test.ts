@@ -1,6 +1,6 @@
 import { tailwindColor } from "../../../src/tailwind/builderImpl/tailwindColor";
 import { AltRectangleNode, AltTextNode } from "../../../src/altNodes/altMixins";
-describe("Tailwind Shadow", () => {
+describe("Tailwind Color", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
