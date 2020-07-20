@@ -38,7 +38,11 @@ export const flutterRotation = (
   node: AltLayoutMixin,
   child: string
 ): string => {
-  if (node.rotation !== undefined && node.rotation > 0 && child !== "") {
+  if (
+    node.rotation !== undefined &&
+    child !== "" &&
+    Math.round(node.rotation) !== 0
+  ) {
     return `Transform.rotate(angle: ${numToAutoFixed(
       node.rotation * (-3.14159 / 180)
     )}, child: ${child})`;
