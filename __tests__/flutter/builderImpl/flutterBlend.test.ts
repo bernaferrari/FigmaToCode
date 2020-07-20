@@ -38,9 +38,23 @@ describe("Flutter Blend", () => {
     // undefined (unitialized, only happen on tests)
     expect(flutterRotation(node, "")).toEqual("");
 
+    // test small negative value to check if output will be nothing
+    node.rotation = -7.0167096047110005e-15;
+    expect(flutterRotation(node, "")).toEqual("");
+
     node.rotation = 45;
     expect(flutterRotation(node, "test")).toEqual(
       "Transform.rotate(angle: -0.79, child: test)"
+    );
+
+    node.rotation = 45;
+    expect(flutterRotation(node, "test")).toEqual(
+      "Transform.rotate(angle: -0.79, child: test)"
+    );
+
+    node.rotation = -45;
+    expect(flutterRotation(node, "test")).toEqual(
+      "Transform.rotate(angle: 0.79, child: test)"
     );
 
     node.rotation = 90;
