@@ -14,7 +14,13 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     super(optIsJSX, node, showLayerName);
   }
 
+  // must be called before Position method
   textAutoSize(node: AltTextNode): this {
+    if (node.textAutoResize === "NONE") {
+      // going to be used for position
+      this.hasFixedSize = true;
+    }
+
     this.attributes += tailwindTextSize(node);
     return this;
   }

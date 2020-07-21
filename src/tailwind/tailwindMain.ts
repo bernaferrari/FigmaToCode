@@ -74,8 +74,8 @@ const tailwindGroup = (node: AltGroupNode): string => {
   // this needs to be called after CustomNode because widthHeight depends on it
   const builder = new TailwindDefaultBuilder(isJsx, node, showLayerName)
     .blend(node)
-    .position(node, parentId)
-    .widthHeight(node);
+    .widthHeight(node)
+    .position(node, parentId);
 
   if (builder.attributes || builder.style) {
     const attr = builder.build("relative ");
@@ -90,8 +90,8 @@ const tailwindText = (node: AltTextNode): string => {
 
   const builderResult = new TailwindTextBuilder(isJsx, node, showLayerName)
     .blend(node)
-    .position(node, parentId)
     .textAutoSize(node)
+    .position(node, parentId)
     // todo fontFamily (via node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}`)
     // todo font smoothing
     .fontSize(node)
@@ -148,8 +148,8 @@ export const tailwindContainer = (
   const builder = new TailwindDefaultBuilder(isJsx, node, showLayerName)
     .blend(node)
     .autoLayoutPadding(node)
-    .position(node, parentId)
     .widthHeight(node)
+    .position(node, parentId)
     .customColor(node.fills, "bg")
     // TODO image and gradient support (tailwind does not support gradients)
     .shadow(node)
