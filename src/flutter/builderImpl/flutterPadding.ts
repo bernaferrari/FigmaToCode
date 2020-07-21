@@ -24,7 +24,7 @@ export const flutterPadding = (node: AltSceneNode): string => {
           ? `vertical: ${numToAutoFixed(node.verticalPadding)}, `
           : "";
 
-      return `padding: const EdgeInsets.symmetric(${propHorizontalPadding}${propVerticalPadding}),`;
+      return `padding: const EdgeInsets.symmetric(${propHorizontalPadding}${propVerticalPadding}), `;
     }
   }
 
