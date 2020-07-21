@@ -35,8 +35,10 @@ Material(color: Colors.transparent, ), `);
     parent.height = 30;
     parent.x = 0;
     parent.y = 0;
-    parent.horizontalPadding = 10;
-    parent.verticalPadding = 10;
+    parent.paddingLeft = 10;
+    parent.paddingRight = 10;
+    parent.paddingTop = 10;
+    parent.paddingBottom = 10;
 
     parent.children = [node];
     node.parent = parent;

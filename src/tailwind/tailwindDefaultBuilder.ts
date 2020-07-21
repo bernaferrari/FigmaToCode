@@ -116,6 +116,7 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
+  // must be called before Position, because of the hasFixedSize attribute.
   widthHeight(node: AltSceneNode): this {
     // if current element is relative (therefore, children are absolute)
     // or current element is one of the absoltue children and has a width or height > w/h-64

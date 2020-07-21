@@ -172,8 +172,11 @@ const convertLayout = (altNode: AltLayoutMixin, node: LayoutMixin) => {
 const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
   altNode.layoutMode = node.layoutMode;
   altNode.counterAxisSizingMode = node.counterAxisSizingMode;
-  altNode.horizontalPadding = node.horizontalPadding;
-  altNode.verticalPadding = node.verticalPadding;
+
+  altNode.paddingLeft = node.horizontalPadding;
+  altNode.paddingRight = node.horizontalPadding;
+  altNode.paddingTop = node.verticalPadding;
+  altNode.paddingBottom = node.verticalPadding;
 
   altNode.itemSpacing = node.itemSpacing;
   altNode.layoutGrids = node.layoutGrids;
