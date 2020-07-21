@@ -55,9 +55,16 @@ export interface AltLayoutMixin {
 export interface AltFrameMixin {
   layoutMode: "NONE" | "HORIZONTAL" | "VERTICAL";
   counterAxisSizingMode: "FIXED" | "AUTO"; // applicable only if layoutMode != "NONE"
-  horizontalPadding: number; // applicable only if layoutMode != "NONE"
-  verticalPadding: number; // applicable only if layoutMode != "NONE"
+
+  // horizontal and vertical were replaced by individual padding in each direction.
+  // horizontalPadding: number; // applicable only if layoutMode != "NONE"
+  // verticalPadding: number; // applicable only if layoutMode != "NONE"
   itemSpacing: number; // applicable only if layoutMode != "NONE"
+
+  paddingRight: number;
+  paddingLeft: number;
+  paddingTop: number;
+  paddingBottom: number;
 
   layoutGrids: ReadonlyArray<LayoutGrid>;
   gridStyleId: string;

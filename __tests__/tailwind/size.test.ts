@@ -165,7 +165,8 @@ describe("Tailwind Size", () => {
       node.height = 300;
       node.counterAxisSizingMode = "FIXED";
       node.layoutMode = "VERTICAL";
-      node.horizontalPadding = 10;
+      node.paddingLeft = 10;
+      node.paddingRight = 10;
       node.itemSpacing = 10;
       node.fills = [
         {

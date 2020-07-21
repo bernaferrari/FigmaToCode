@@ -48,8 +48,11 @@ export const convertToAutoLayout = (
 
     // todo while this is similar to Figma, verify if this is good enough or if padding should be allowed in all four directions.
     const padding = detectAutoLayoutPadding(node);
-    node.verticalPadding = padding.vertical;
-    node.horizontalPadding = padding.horizontal;
+
+    node.paddingTop = padding.top;
+    node.paddingBottom = padding.bottom;
+    node.paddingLeft = padding.left;
+    node.paddingRight = padding.right;
 
     // update the layoutAlign attribute for every child
     node.children = node.children.map((d) => {
@@ -171,8 +174,10 @@ const calculateInterval = (
 const detectAutoLayoutPadding = (
   node: AltFrameNode
 ): {
-  horizontal: number;
-  vertical: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
 } => {
   // this need to be run before VERTICAL or HORIZONTAL
   if (node.children.length === 1) {
@@ -187,8 +192,10 @@ const detectAutoLayoutPadding = (
 
     // return the smallest padding in each axis
     return {
-      horizontal: Math.min(left, right),
-      vertical: Math.min(top, bottom),
+      left: left,
+      right: right,
+      top: top,
+      bottom: bottom,
     };
   } else if (node.layoutMode === "VERTICAL") {
     // top padding is first element's y value
@@ -208,8 +215,10 @@ const detectAutoLayoutPadding = (
 
     // return the smallest padding in each axis
     return {
-      horizontal: Math.min(left, right),
-      vertical: Math.min(top, bottom),
+      left: left,
+      right: right,
+      top: top,
+      bottom: bottom,
     };
   } else {
     // node.layoutMode === "HORIZONTAL"
@@ -231,8 +240,10 @@ const detectAutoLayoutPadding = (
 
     // return the smallest padding in each axis
     return {
-      horizontal: Math.min(left, right),
-      vertical: Math.min(top, bottom),
+      left: left,
+      right: right,
+      top: top,
+      bottom: bottom,
     };
   }
 };
@@ -250,12 +261,12 @@ const layoutAlignInChild = (
     const nodeCenteredPosX = node.x + node.width / 2;
     const parentCenteredPosX = parentNode.width / 2;
 
-    const marginX = nodeCenteredPosX - parentCenteredPosX;
+    const paddingX = nodeCenteredPosX - parentCenteredPosX;
 
     // allow a small threshold
-    if (marginX < -4) {
+    if (paddingX < -4) {
       return "MIN";
-    } else if (marginX > 4) {
+    } else if (paddingX > 4) {
       return "MAX";
     } else {
       return "CENTER";
@@ -266,12 +277,12 @@ const layoutAlignInChild = (
     const nodeCenteredPosY = node.y + node.height / 2;
     const parentCenteredPosY = parentNode.height / 2;
 
-    const marginY = nodeCenteredPosY - parentCenteredPosY;
+    const paddingY = nodeCenteredPosY - parentCenteredPosY;
 
     // allow a small threshold
-    if (marginY < -4) {
+    if (paddingY < -4) {
       return "MIN";
-    } else if (marginY > 4) {
+    } else if (paddingY > 4) {
       return "MAX";
     } else {
       return "CENTER";
