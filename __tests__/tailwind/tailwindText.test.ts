@@ -88,19 +88,24 @@ describe("Tailwind Text", () => {
     node.characters = "";
     node.width = 16;
     node.height = 16;
+    node.fontSize = 24;
     node.textAutoResize = "WIDTH_AND_HEIGHT";
 
     node.letterSpacing = {
       value: 110,
       unit: "PERCENT",
     };
-    expect(tailwindMain([node])).toEqual('<p class="tracking-widest"></p>');
+    expect(tailwindMain([node])).toEqual(
+      '<p class="text-2xl tracking-widest"></p>'
+    );
 
     node.letterSpacing = {
       value: 10,
       unit: "PIXELS",
     };
-    expect(tailwindMain([node])).toEqual('<p class="tracking-widest"></p>');
+    expect(tailwindMain([node])).toEqual(
+      '<p class="text-2xl tracking-widest"></p>'
+    );
   });
 
   it("lineHeight", () => {
@@ -109,18 +114,21 @@ describe("Tailwind Text", () => {
     node.width = 16;
     node.height = 16;
     node.textAutoResize = "WIDTH_AND_HEIGHT";
+    node.fontSize = 24;
 
     node.lineHeight = {
       value: 110,
       unit: "PERCENT",
     };
-    expect(tailwindMain([node])).toEqual('<p class="leading-none"></p>');
+    expect(tailwindMain([node])).toEqual(
+      '<p class="text-2xl leading-relaxed"></p>'
+    );
 
     node.lineHeight = {
       value: 10,
       unit: "PIXELS",
     };
-    expect(tailwindMain([node])).toEqual('<p class="leading-3"></p>');
+    expect(tailwindMain([node])).toEqual('<p class="text-2xl leading-3"></p>');
   });
 
   it("textCase", () => {

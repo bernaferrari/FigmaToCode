@@ -1,11 +1,10 @@
 import {
-  pxToAbsoluteLineHeight,
   nearestValue,
-  pxToMapLetterSpacing,
   pxToFontSize,
   pxToBorderRadius,
   pxToLayoutSize,
-  percentToAbsoluteLineHeight,
+  pxToLetterSpacing,
+  pxToLineHeight,
 } from "../../src/tailwind/conversionTables";
 
 describe("Tailwind Conversion Table", () => {
@@ -20,11 +19,11 @@ describe("Tailwind Conversion Table", () => {
   });
 
   it("convert pixels to tailwind values", () => {
-    expect(pxToAbsoluteLineHeight(16)).toEqual("none");
-    expect(pxToAbsoluteLineHeight(40)).toEqual("10");
+    expect(pxToLineHeight(16)).toEqual("none");
+    expect(pxToLineHeight(40)).toEqual("10");
 
-    expect(pxToMapLetterSpacing(-0.4)).toEqual("tight");
-    expect(pxToMapLetterSpacing(0.4)).toEqual("wide");
+    expect(pxToLetterSpacing(-0.4)).toEqual("tight");
+    expect(pxToLetterSpacing(0.4)).toEqual("wide");
 
     expect(pxToFontSize(14)).toEqual("sm");
     expect(pxToFontSize(18)).toEqual("lg");
@@ -34,10 +33,5 @@ describe("Tailwind Conversion Table", () => {
 
     expect(pxToLayoutSize(4)).toEqual("1");
     expect(pxToLayoutSize(256)).toEqual("64");
-
-    // todo check if they correspond to reality
-    expect(percentToAbsoluteLineHeight(108)).toEqual("none");
-    expect(percentToAbsoluteLineHeight(150)).toEqual("normal");
-    expect(percentToAbsoluteLineHeight(200)).toEqual("loose");
   });
 });

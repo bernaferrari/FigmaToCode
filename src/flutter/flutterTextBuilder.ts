@@ -1,3 +1,4 @@
+import { commonLetterSpacing } from "./../common/commonTextHeightSpacing";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltTextNode } from "../altNodes/altMixins";
 import { convertFontWeight } from "../tailwind/tailwindTextBuilder";
@@ -86,29 +87,11 @@ export const getTextStyle = (node: AltTextNode): string => {
     )}, `;
   }
 
-  if (node.letterSpacing !== figma.mixed && node.letterSpacing.value !== 0) {
-    if (node.letterSpacing.unit === "PIXELS") {
-      styleBuilder += `letterSpacing: ${numToAutoFixed(
-        node.letterSpacing.value
-      )}, `;
-    } else {
-      // node.letterSpacing.unit === "PERCENT"
-      // TODO test if end result is satisfatory
-      styleBuilder += `letterSpacing: ${numToAutoFixed(
-        node.letterSpacing.value / 10
-      )}, `;
-    }
+  // todo lineSpacing
+  const letterSpacing = commonLetterSpacing(node);
+  if (letterSpacing > 0) {
+    styleBuilder += `letterSpacing: ${numToAutoFixed(letterSpacing)}, `;
   }
-
-  // TODO this calculation is completely wrong
-  // if (node.lineHeight !== figma.mixed && node.lineHeight.value !== 0) {
-  //   if (node.lineHeight.unit === "PIXELS") {
-  //     // TODO test if end result is satisfatory
-  //     styleBuilder += `height: ${node.lineHeight.value}, `;
-  //   } else if (node.lineHeight.unit === "PERCENT") {
-  //     styleBuilder += `height: ${node.lineHeight.value / 100}, `;
-  //   }
-  // }
 
   return styleBuilder;
 };
