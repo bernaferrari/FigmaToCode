@@ -99,7 +99,10 @@ const flutterText = (node: AltTextNode): string => {
 const flutterFrame = (node: AltFrameNode): string => {
   const children = flutterWidgetGenerator(node.children);
 
-  if (node.layoutMode !== "NONE") {
+  if (node.children.length === 1) {
+    // if there is only one child, there is no need for Container or Row. Padding works indepdently of them.
+    return flutterContainer(node, children);
+  } else if (node.layoutMode !== "NONE") {
     const rowColumn = makeRowColumn(node, children);
     return flutterContainer(node, rowColumn);
   } else {
@@ -111,12 +114,6 @@ const flutterFrame = (node: AltFrameNode): string => {
 
 const makeRowColumn = (node: AltFrameNode, children: string): string => {
   // ROW or COLUMN
-
-  // if there is only one child, there is no need for Container or Row. Padding works indepdently of them.
-  if (node.children.length === 1) {
-    return children;
-  }
-
   const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
   const mostFreq = mostFrequent(node.children.map((d) => d.layoutAlign));

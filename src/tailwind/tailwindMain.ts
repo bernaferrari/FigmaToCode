@@ -196,12 +196,21 @@ export const rowColumnProps = (node: AltFrameNode): string => {
       ? `space-${spaceDirection}-${spacing} `
       : "";
 
-  // align according to the most frequent way the children are aligned.
-  // todo layoutAlign should go to individual fields and this should be threated as an optimization
-  // const layoutAlign =
-  //   mostFrequentString(node.children.map((d) => d.layoutAlign)) === "MIN"
-  //     ? ""
-  //     : "items-center ";
+  // special case when there is only one children; need to position correctly in Flex.
+  let justify = "justify-center";
+  if (node.children.length === 1) {
+    const nodeCenteredPosX = node.children[0].x + node.children[0].width / 2;
+    const parentCenteredPosX = node.width / 2;
+
+    const marginX = nodeCenteredPosX - parentCenteredPosX;
+
+    // allow a small threshold
+    if (marginX < -4) {
+      justify = "justify-start";
+    } else if (marginX > 4) {
+      justify = "justify-end";
+    }
+  }
 
   // [optimization]
   // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, center it.
@@ -209,7 +218,7 @@ export const rowColumnProps = (node: AltFrameNode): string => {
     node.layoutMode === "VERTICAL" &&
     node.children.every((d) => d.layoutAlign === "STRETCH")
       ? ""
-      : "items-center justify-center ";
+      : `items-center ${justify} `;
 
   // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
   const flex =
