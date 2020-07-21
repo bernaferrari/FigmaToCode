@@ -97,13 +97,14 @@ describe("Flutter Text", () => {
     node.width = 16;
     node.height = 16;
     node.textAutoResize = "WIDTH_AND_HEIGHT";
+    node.fontSize = 24;
 
     node.letterSpacing = {
       value: 110,
       unit: "PERCENT",
     };
     expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(letterSpacing: 11, ), ),'
+      'Text("", style: TextStyle(fontSize: 24, letterSpacing: 26.40, ), ),'
     );
 
     node.letterSpacing = {
@@ -111,7 +112,7 @@ describe("Flutter Text", () => {
       unit: "PIXELS",
     };
     expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(letterSpacing: 10, ), ),'
+      'Text("", style: TextStyle(fontSize: 24, letterSpacing: 10, ), ),'
     );
   });
 

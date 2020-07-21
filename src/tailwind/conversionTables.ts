@@ -31,7 +31,7 @@ const mapLetterSpacing: Record<number, string> = {
   0.1: "widest",
 };
 
-const mapAbsoluteLineHeight: Record<number, string> = {
+const mapLineHeight: Record<number, string> = {
   0.75: "3",
   1: "none",
   1.25: "tight",
@@ -87,20 +87,11 @@ const mapWidthHeightSize: Record<number, string> = {
   16: "64",
 };
 
-export const pxToMapLetterSpacing = (value: number): string =>
+export const pxToLetterSpacing = (value: number): string =>
   pixelToTailwindValue(value, mapLetterSpacing);
 
-// visually, percent / 100 => rem works nicely
-export const percentToAbsoluteLineHeight = (value: number): string =>
-  mapAbsoluteLineHeight[
-    nearestValue(
-      value / 100,
-      Object.keys(mapAbsoluteLineHeight).map((d) => +d)
-    )
-  ];
-
-export const pxToAbsoluteLineHeight = (value: number): string =>
-  pixelToTailwindValue(value, mapAbsoluteLineHeight);
+export const pxToLineHeight = (value: number): string =>
+  pixelToTailwindValue(value, mapLineHeight);
 
 export const pxToFontSize = (value: number): string =>
   pixelToTailwindValue(value, mapFontSize);
