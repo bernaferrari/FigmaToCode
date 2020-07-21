@@ -6,7 +6,7 @@ export const flutterBoxShadow = (node: AltSceneNode): string => {
   let propBoxShadow = "";
   if (node.effects?.length > 0) {
     const dropShadow: Array<ShadowEffect> = node.effects.filter(
-      (d): d is ShadowEffect => d.type === "DROP_SHADOW"
+      (d): d is ShadowEffect => d.type === "DROP_SHADOW" && d.visible !== false
     );
 
     if (dropShadow.length > 0) {
@@ -36,7 +36,7 @@ export const flutterElevationAndShadowColor = (
 
   if (node.effects?.length > 0) {
     const dropShadow: Array<ShadowEffect> = node.effects.filter(
-      (d): d is ShadowEffect => d.type === "DROP_SHADOW"
+      (d): d is ShadowEffect => d.type === "DROP_SHADOW" && d.visible !== false
     );
     if (dropShadow.length > 0 && dropShadow[0].type === "DROP_SHADOW") {
       shadowColor = `color: Color(0x${rgbTo8hex(dropShadow[0].color)}), `;

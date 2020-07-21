@@ -1,3 +1,4 @@
+import { AltFrameNode } from "./../../src/altNodes/altMixins";
 import {
   TailwindTextBuilder,
   convertFontWeight,
