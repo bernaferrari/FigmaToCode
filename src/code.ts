@@ -1,3 +1,4 @@
+import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
 import { flutterMain } from "./flutter/flutterMain";
 import { retrieveFlutterColors } from "./flutter/retrieveUI/retrieveColors";
@@ -46,6 +47,8 @@ const run = () => {
     result = flutterMain(convertedSelection, parentId, material);
   } else if (mode === "tailwind") {
     result = tailwindMain(convertedSelection, parentId, isJsx, layerName);
+  } else if (mode === "swiftui") {
+    result = swiftuiMain(convertedSelection, parentId);
   }
 
   console.log(result);
@@ -87,6 +90,9 @@ figma.ui.onmessage = (msg) => {
     run();
   } else if (msg.type === "flutter") {
     mode = "flutter";
+    run();
+  } else if (msg.type === "swiftui") {
+    mode = "swiftui";
     run();
   } else if (msg.type === "jsx" && msg.data !== isJsx) {
     isJsx = msg.data;
