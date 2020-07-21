@@ -24,7 +24,7 @@ export const swiftuiColor = (
       })
       .join(", ");
 
-    return `LinearGradient(gradient: Gradient(colors: [${colors}]), startPoint: .top, endPoint: .bottom))`;
+    return `LinearGradient(gradient: Gradient(colors: [${colors}]), startPoint: .top, endPoint: .bottom)`;
   }
 
   return "";

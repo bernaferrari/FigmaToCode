@@ -131,7 +131,7 @@ describe("SwiftUI Color", () => {
     ];
 
     expect(swiftuiColor(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .top, endPoint: .bottom))"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .top, endPoint: .bottom)"
     );
   });
 

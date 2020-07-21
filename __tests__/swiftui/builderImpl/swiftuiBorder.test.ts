@@ -108,7 +108,7 @@ describe("SwiftUI Border", () => {
     node.strokeWeight = 10;
 
     expect(swiftuiBorder(node)).toEqual(
-      "\n.overlay(RoundedRectangle(cornerRadius: 8).stroke(LinearGradient(gradient: Gradient(colors: []), startPoint: .top, endPoint: .bottom)), lineWidth: 10))"
+      "\n.overlay(RoundedRectangle(cornerRadius: 8).stroke(LinearGradient(gradient: Gradient(colors: []), startPoint: .top, endPoint: .bottom), lineWidth: 10))"
     );
     expect(swiftuiShapeStroke(node)).toEqual("");
   });
