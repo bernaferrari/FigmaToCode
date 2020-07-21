@@ -15,9 +15,8 @@ describe("Flutter Border", () => {
     mixed: undefined,
   };
 
-  const node = new AltRectangleNode();
-
   it("flutterBorderRadius", () => {
+    const node = new AltRectangleNode();
     expect(flutterBorderRadius(node)).toEqual("");
 
     node.cornerRadius = 2;
@@ -39,6 +38,7 @@ describe("Flutter Border", () => {
   });
 
   it("flutterBorder", () => {
+    const node = new AltRectangleNode();
     node.strokeWeight = 2;
     node.strokes = [
       {
@@ -57,6 +57,8 @@ describe("Flutter Border", () => {
   });
 
   it("flutterShape", () => {
+    const node = new AltRectangleNode();
+
     node.cornerRadius = figma.mixed;
     node.topLeftRadius = 4;
     node.topRightRadius = 0;

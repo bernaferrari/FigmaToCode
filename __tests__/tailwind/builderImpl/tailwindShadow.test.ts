@@ -6,18 +6,9 @@ describe("Tailwind Shadow", () => {
     mixed: undefined,
   };
 
-  const node = new AltRectangleNode();
-  node.topRightRadius = 0;
-  node.bottomLeftRadius = 0;
-  node.bottomRightRadius = 0;
-
-  node.strokes = [
-    {
-      type: "SOLID",
-      color: { r: 0, g: 0, b: 0 },
-    },
-  ];
   it("drop shadow", () => {
+    const node = new AltRectangleNode();
+
     // no shadow
     expect(tailwindShadow(node)).toEqual("");
 
@@ -31,10 +22,12 @@ describe("Tailwind Shadow", () => {
         visible: true,
       },
     ];
+
+    expect(tailwindShadow(node)).toEqual("shadow ");
   });
 
   it("inner shadow", () => {
-    expect(tailwindShadow(node)).toEqual("shadow ");
+    const node = new AltRectangleNode();
 
     node.effects = [
       {
