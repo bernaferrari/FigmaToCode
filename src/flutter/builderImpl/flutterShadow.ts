@@ -13,7 +13,7 @@ export const flutterBoxShadow = (node: AltSceneNode): string => {
       let boxShadow = "";
 
       dropShadow.forEach((d: ShadowEffect) => {
-        const color = `color: Color(0x${rgbTo8hex(d.color)}), `;
+        const color = `color: Color(0x${rgbTo8hex(d.color, d.color.a)}), `;
         const radius = `blurRadius: ${numToAutoFixed(d.radius)}, `;
         const offset = `offset: Offset(${numToAutoFixed(
           d.offset.x
@@ -38,8 +38,12 @@ export const flutterElevationAndShadowColor = (
     const dropShadow: Array<ShadowEffect> = node.effects.filter(
       (d): d is ShadowEffect => d.type === "DROP_SHADOW" && d.visible !== false
     );
+
     if (dropShadow.length > 0 && dropShadow[0].type === "DROP_SHADOW") {
-      shadowColor = `color: Color(0x${rgbTo8hex(dropShadow[0].color)}), `;
+      shadowColor = `color: Color(0x${rgbTo8hex(
+        dropShadow[0].color,
+        dropShadow[0].color.a
+      )}), `;
       elevation = `elevation: ${numToAutoFixed(dropShadow[0].radius)}, `;
     }
   }

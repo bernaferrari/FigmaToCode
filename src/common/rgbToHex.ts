@@ -7,10 +7,7 @@ export const rgbTo6hex = (color: RGB | RGBA): string => {
   return hex;
 };
 
-export const rgbTo8hex = (
-  color: RGB | RGBA,
-  alpha: number = "a" in color ? color.a : 1.0
-): string => {
+export const rgbTo8hex = (color: RGB, alpha: number): string => {
   // when color is RGBA, alpha is set automatically
   // when color is RGB, alpha need to be set manually (default: 1.0)
   const hex =
