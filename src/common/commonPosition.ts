@@ -18,12 +18,12 @@ export const commonPosition = (node: AltSceneNode): position => {
   // if node is same size as height, position is not necessary
 
   // detect if Frame's width is same as Child when Frame has Padding.
-  // todo this may return true even when false, if size is same, but position is different. However, it would be an unexpected layout.
+  // warning: this may return true even when false, if size is same, but position is different. However, it would be an unexpected layout.
   let hPadding = 0;
   let vPadding = 0;
   if (node.parent && "layoutMode" in node.parent) {
-    hPadding = 2 * (node.parent.horizontalPadding ?? 0);
-    vPadding = 2 * (node.parent.verticalPadding ?? 0);
+    hPadding = (node.parent.paddingLeft ?? 0) + (node.parent.paddingRight ?? 0);
+    vPadding = (node.parent.paddingTop ?? 0) + (node.parent.paddingBottom ?? 0);
   }
 
   if (
@@ -42,7 +42,7 @@ export const commonPosition = (node: AltSceneNode): position => {
   // if view is too small, anything will be detected; this is necessary to reduce the tolerance.
   let threshold = 8;
   if (node.width < 16 || node.height < 16) {
-    threshold = 0;
+    threshold = 1;
   }
 
   // < 4 is a threshold. If === is used, there can be rounding errors (28.002 !== 28)
