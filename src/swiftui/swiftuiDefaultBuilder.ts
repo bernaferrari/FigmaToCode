@@ -59,7 +59,8 @@ export class SwiftuiDefaultBuilder {
         if (corner) {
           this.modifiers += `\n.cornerRadius(${corner})`;
         }
-      } else {
+      } else if (fillColor[0] === "C") {
+        // foregroundColor can't be a gradient
         this.modifiers += `\n.foregroundColor(${fillColor})`;
       }
     }
