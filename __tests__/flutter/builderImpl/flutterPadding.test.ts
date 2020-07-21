@@ -41,7 +41,7 @@ describe("Flutter Padding", () => {
     frameNode.paddingTop = 0;
     frameNode.paddingBottom = 0;
     expect(flutterPadding(frameNode)).toEqual(
-      "padding: const EdgeInsets.symmetric(horizontal: 2), "
+      "padding: const EdgeInsets.symmetric(horizontal: 2, ), "
     );
 
     frameNode.paddingLeft = 0;
@@ -49,7 +49,7 @@ describe("Flutter Padding", () => {
     frameNode.paddingTop = 2;
     frameNode.paddingBottom = 2;
     expect(flutterPadding(frameNode)).toEqual(
-      "padding: const EdgeInsets.symmetric(vertical: 2), "
+      "padding: const EdgeInsets.symmetric(vertical: 2, ), "
     );
 
     frameNode.paddingLeft = 0;

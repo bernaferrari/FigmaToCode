@@ -228,7 +228,7 @@ describe("Tailwind Size", () => {
         .toEqual(`<div class="inline-flex flex-col space-y-2 items-center justify-center px-2 w-56 bg-red-700">
 <div class="w-full h-5 bg-white"></div>
 <div class="w-full h-5 bg-white"></div>
-<div class="self-start w-24 h-5 bg-white"></div>
+<div class="w-24 h-5 self-start bg-white"></div>
 <div class="w-8 h-5 bg-white"></div></div>`);
     });
   });
