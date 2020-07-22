@@ -18,10 +18,10 @@ export const convertToAutoLayout = (
       node.children.length > 0) ||
     node.type === "GROUP"
   ) {
-    // [reorderChildrenIfAligned] and [detectAutoLayoutDirection] are very similar,
-    // but merging them together would result in too much nesting.
-    node.children = reorderChildrenIfAligned(node.children);
-    const [direction, itemSpacing] = detectAutoLayoutDirection(node.children);
+    const [orderedChildren, direction, itemSpacing] = reorderChildrenIfAligned(
+      node.children
+    );
+    node.children = orderedChildren;
 
     if (direction === "NONE" && node.children.length > 1) {
       node.isRelative = true;
@@ -85,29 +85,55 @@ const threshold = -2;
  */
 const reorderChildrenIfAligned = (
   children: ReadonlyArray<AltSceneNode>
-): Array<AltSceneNode> => {
+): [Array<AltSceneNode>, "HORIZONTAL" | "VERTICAL" | "NONE", number] => {
   if (children.length === 1) {
-    return [...children];
+    return [[...children], "NONE", 0];
   }
 
-  const intervalY = calculateInterval(children, "y");
-
   const updateChildren = [...children];
+  const [visit, avg] = shouldVisit(updateChildren);
 
   // check against a threshold
-  if (average(intervalY) > threshold) {
+  if (visit === "VERTICAL") {
     // if all elements are horizontally aligned
-    return updateChildren.sort((a, b) => a.y - b.y);
+    return [updateChildren.sort((a, b) => a.y - b.y), "VERTICAL", avg];
   } else {
-    const intervalX = calculateInterval(children, "x");
-
-    if (average(intervalX) > threshold) {
+    if (visit === "HORIZONTAL") {
       // if all elements are vertically aligned
-      return updateChildren.sort((a, b) => a.x - b.x);
+      return [updateChildren.sort((a, b) => a.x - b.x), "HORIZONTAL", avg];
     }
   }
 
-  return updateChildren;
+  return [updateChildren, "NONE", 0];
+};
+
+/**
+ * Checks if layout is horizontally or vertically aligned.
+ * First verify if all items are vertically aligned in Y axis (spacing > 0), then for X axis, then the average for Y and finally the average for X.
+ * If no correspondence is found, returns "NONE".
+ */
+const shouldVisit = (
+  children: ReadonlyArray<AltSceneNode>
+): ["HORIZONTAL" | "VERTICAL" | "NONE", number] => {
+  const intervalY = calculateInterval(children, "y");
+  const intervalX = calculateInterval(children, "x");
+
+  const avgX = average(intervalX);
+  const avgY = average(intervalY);
+
+  if (!intervalY.every((d) => d >= threshold)) {
+    if (!intervalX.every((d) => d >= threshold)) {
+      if (avgY <= threshold) {
+        if (avgX <= threshold) {
+          return ["NONE", 0];
+        }
+        return ["HORIZONTAL", avgX];
+      }
+      return ["VERTICAL", avgY];
+    }
+    return ["HORIZONTAL", avgX];
+  }
+  return ["VERTICAL", avgY];
 };
 
 // todo improve this method to try harder. Idea: maybe use k-means or hierarchical cluster?
