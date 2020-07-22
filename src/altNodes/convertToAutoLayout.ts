@@ -111,6 +111,7 @@ const reorderChildrenIfAligned = (
  * Checks if layout is horizontally or vertically aligned.
  * First verify if all items are vertically aligned in Y axis (spacing > 0), then for X axis, then the average for Y and finally the average for X.
  * If no correspondence is found, returns "NONE".
+ * In a previous version, it used a "standard deviation", but "average" performed better.
  */
 const shouldVisit = (
   children: ReadonlyArray<AltSceneNode>
@@ -137,38 +138,6 @@ const shouldVisit = (
 };
 
 // todo improve this method to try harder. Idea: maybe use k-means or hierarchical cluster?
-/**
- * The method to detect the direction.
- * Currently, it uses the average position of children's position.
- * In a previous version, it used a "standard deviation", but "average" performed better.
- */
-const detectAutoLayoutDirection = (
-  children: ReadonlyArray<AltSceneNode>
-): ["NONE" | "HORIZONTAL" | "VERTICAL", number] => {
-  // check if elements are vertically aligned
-  const intervalY = calculateInterval(children, "y");
-
-  // console.log("intervalY:", intervalY);
-  if (intervalY.length === 0) {
-    return ["NONE", 0];
-  }
-
-  // check if elements are vertically aligned
-  const avgY = average(intervalY);
-  if (avgY >= threshold) {
-    return ["VERTICAL", avgY];
-  } else {
-    // check if elements are horizontally aligned
-    const intervalX = calculateInterval(children, "x");
-    const avgX = average(intervalX);
-
-    if (avgX >= threshold) {
-      return ["HORIZONTAL", avgX];
-    }
-  }
-
-  return ["NONE", 0];
-};
 
 /**
  * This function calculates the distance (interval) between items.
