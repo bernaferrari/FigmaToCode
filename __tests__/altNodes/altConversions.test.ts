@@ -28,8 +28,8 @@ describe("AltConversions", () => {
     );
   });
 
-  it("Group", () => {
-    // todo verify if this is working as inteded.
+  it("Group wrapping single item", () => {
+    // single Group should disappear
     const node = figma.createFrame();
     node.resize(20, 20);
 
@@ -41,8 +41,31 @@ describe("AltConversions", () => {
     const convert = convertIntoAltNodes([node]);
 
     expect(tailwindMain(convert)).toEqual(
+      `<div class="w-5">
+<div class="w-full h-5"></div></div>`
+    );
+  });
+
+  it("Group wrapping two items", () => {
+    // single Group should disappear
+    const node = figma.createFrame();
+    node.resize(20, 20);
+
+    const rect1 = figma.createRectangle();
+    rect1.resize(20, 20);
+
+    const rect2 = figma.createRectangle();
+    rect2.resize(20, 20);
+
+    figma.group([rect1, rect2], node);
+
+    const convert = convertIntoAltNodes([node]);
+
+    expect(tailwindMain(convert)).toEqual(
       `<div class="inline-flex flex-col items-center justify-center">
-<div class="w-5 h-5"></div></div>`
+<div class="inline-flex flex-col items-center justify-center">
+<div class="w-5 h-5"></div>
+<div class="w-5 h-5"></div></div></div>`
     );
   });
 

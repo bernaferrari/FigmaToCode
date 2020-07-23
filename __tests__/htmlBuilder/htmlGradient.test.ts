@@ -51,11 +51,11 @@ describe("HTML Gradient", () => {
   ];
   it("test the gradient for inline CSS and JSX", () => {
     expect(htmlGradient(fills, false)).toEqual(
-      "background: linear-gradient(rgba(242,153,74,1), rgba(66,133,244,1) 51%, rgba(61,219,133,1))"
+      "background: linear-gradient(90deg, rgba(242,153,74,1), rgba(66,133,244,1) 51%, rgba(61,219,133,1))"
     );
 
     expect(htmlGradient(fills, true)).toEqual(
-      'background: "linear-gradient(rgba(242,153,74,1), rgba(66,133,244,1) 51%, rgba(61,219,133,1))"'
+      'background: "linear-gradient(90deg, rgba(242,153,74,1), rgba(66,133,244,1) 51%, rgba(61,219,133,1))"'
     );
 
     const node = new AltRectangleNode();
@@ -63,7 +63,7 @@ describe("HTML Gradient", () => {
     node.height = 16;
     node.fills = fills;
     expect(tailwindMain([node])).toEqual(
-      '<div class="w-4 h-4" style="background: linear-gradient(rgba(242,153,74,1), rgba(66,133,244,1) 51%, rgba(61,219,133,1));"></div>'
+      '<div class="w-4 h-4" style="background: linear-gradient(90deg, rgba(242,153,74,1), rgba(66,133,244,1) 51%, rgba(61,219,133,1));"></div>'
     );
   });
 });

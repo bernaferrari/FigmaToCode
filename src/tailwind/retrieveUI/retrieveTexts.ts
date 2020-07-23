@@ -1,7 +1,7 @@
 import { AltSceneNode, AltTextNode } from "../../altNodes/altMixins";
 import { tailwindNearestColor } from "../builderImpl/tailwindColor";
 import { TailwindTextBuilder, convertFontWeight } from "../tailwindTextBuilder";
-import { rgbTo6hex } from "../../common/rgbToHex";
+import { rgbTo6hex } from "../../common/color";
 import { retrieveFill } from "../../common/retrieveFill";
 
 export const retrieveTailwindText = (

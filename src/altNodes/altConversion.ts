@@ -104,6 +104,12 @@ export const convertIntoAltNodes = (
       ) {
         return frameNodeToAlt(node, altParent);
       } else if (node.type === "GROUP") {
+        if (node.children.length === 1 && node.visible !== false) {
+          // if Group is visible and has only one child, Group should disappear.
+          // there will be a single value anyway.
+          return convertIntoAltNodes(node.children, altParent)[0];
+        }
+
         const altNode = new AltGroupNode();
 
         altNode.id = node.id;
