@@ -116,4 +116,44 @@ describe("Convert to AutoLayout", () => {
 <div class="w-5 h-5 absolute left-0 top-0 bg-red-700"></div></div>`
     );
   });
+
+  it("Trigger avgX", () => {
+    const frame = new AltFrameNode();
+    frame.x = 0;
+    frame.y = 0;
+    frame.width = 50;
+    frame.height = 50;
+    frame.layoutMode = "NONE";
+
+    const node1 = new AltRectangleNode();
+    node1.x = 0;
+    node1.y = 0;
+    node1.width = 20;
+    node1.height = 20;
+    node1.parent = frame;
+
+    const node2 = new AltRectangleNode();
+    node2.x = 16;
+    node2.y = 0;
+    node2.width = 20;
+    node2.height = 20;
+    node2.parent = frame;
+
+    const node3 = new AltRectangleNode();
+    node3.x = 40;
+    node3.y = 0;
+    node3.width = 20;
+    node3.height = 20;
+    node3.parent = frame;
+
+    // initially they are not ordered. ConvertToAutoLayout will also order them.
+    frame.children = [node3, node2, node1];
+
+    // output should be HORIZONTAL
+    expect(tailwindMain([convertToAutoLayout(frame)]))
+      .toEqual(`<div class="inline-flex items-center justify-center pb-8 w-12 h-12\">
+<div class="w-1/3 h-5 self-start"></div>
+<div class="w-1/3 h-5 self-start"></div>
+<div class="w-1/3 h-5 self-start"></div></div>`);
+  });
 });

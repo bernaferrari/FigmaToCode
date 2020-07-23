@@ -23,10 +23,6 @@ export class FlutterDefaultBuilder {
     this.child = optChild;
   }
 
-  // reset(): void {
-  //   this.child = "";
-  // }
-
   createContainer(
     node: AltRectangleNode | AltEllipseNode | AltFrameNode | AltGroupNode,
     material: boolean

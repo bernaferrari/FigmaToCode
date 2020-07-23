@@ -50,18 +50,25 @@ export class SwiftuiDefaultBuilder {
     }
 
     const fillColor = swiftuiColor(node.fills);
+    const isFgColor = fillColor[0] === "C";
+
     if (fillColor) {
       if (node.type === "FRAME") {
         this.modifiers += `\n.background(${fillColor})`;
-
-        // add corner to Frame. It needs to come after the Background, and since we already in the if, let's add it here.
-        const corner = swiftuiCornerRadius(node);
-        if (corner) {
-          this.modifiers += `\n.cornerRadius(${corner})`;
-        }
-      } else if (fillColor[0] === "C") {
+      } else if (isFgColor) {
         // foregroundColor can't be a gradient
         this.modifiers += `\n.foregroundColor(${fillColor})`;
+      } else {
+        this.modifiers += `\n.foregroundColor(.clear)`;
+        this.modifiers += `\n.background(${fillColor})`;
+      }
+
+      // add corner to the background. It needs to come after the Background, and since we already in the if, let's add it here.
+      const corner = swiftuiCornerRadius(node);
+
+      // it seems this is necessary even in RoundedRectangle
+      if (corner && (!isFgColor || node.type === "FRAME")) {
+        this.modifiers += `\n.cornerRadius(${corner})`;
       }
     }
 

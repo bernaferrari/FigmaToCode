@@ -1,4 +1,4 @@
-import { rgbTo8hex } from "../../common/rgbToHex";
+import { rgbTo8hex } from "../../common/color";
 import { retrieveFill } from "../../common/retrieveFill";
 
 /**

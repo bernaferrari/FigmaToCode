@@ -1,5 +1,5 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
-import { rgbTo8hex } from "../../common/rgbToHex";
+import { rgbTo8hex } from "../../common/color";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 
 export const flutterBoxShadow = (node: AltSceneNode): string => {
