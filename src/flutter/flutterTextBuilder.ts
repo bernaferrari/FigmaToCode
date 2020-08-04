@@ -53,7 +53,11 @@ export const makeTextComponent = (node: AltTextNode): string => {
 
   const style = textStyle ? `style: TextStyle(${textStyle}), ` : "";
 
-  return `Text("${text}", ${textAlign}${style}), `;
+  const splittedChars = text.split("\n");
+  const charsWithLineBreak =
+    splittedChars.length > 1 ? splittedChars.join("\\n") : text;
+
+  return `Text("${charsWithLineBreak}", ${textAlign}${style}), `;
 };
 
 export const getTextStyle = (node: AltTextNode): string => {

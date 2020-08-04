@@ -85,7 +85,10 @@ const tailwindGroup = (node: AltGroupNode): string => {
   return tailwindWidgetGenerator(node.children);
 };
 
-const tailwindText = (node: AltTextNode): string => {
+const tailwindText = (
+  node: AltTextNode,
+  isInput: boolean = false
+): string | [string, string] => {
   // follow the website order, to make it easier
 
   const builderResult = new TailwindTextBuilder(isJsx, node, showLayerName)
@@ -102,8 +105,7 @@ const tailwindText = (node: AltTextNode): string => {
     // todo text lists (<li>)
     .textAlign(node)
     .customColor(node.fills, "text")
-    .textTransform(node)
-    .build();
+    .textTransform(node);
 
   const splittedChars = node.characters.split("\n");
   const charsWithLineBreak =
@@ -111,12 +113,25 @@ const tailwindText = (node: AltTextNode): string => {
       ? node.characters.split("\n").join("<br/>")
       : node.characters;
 
-  return `<p${builderResult}>${charsWithLineBreak}</p>`;
+  if (isInput) {
+    return [builderResult.attributes, charsWithLineBreak];
+  } else {
+    return `<p${builderResult.build()}>${charsWithLineBreak}</p>`;
+  }
 };
 
 const tailwindFrame = (node: AltFrameNode): string => {
   const vectorIfExists = tailwindVector(node, isJsx);
   if (vectorIfExists) return vectorIfExists;
+
+  if (
+    node.children.length === 1 &&
+    node.children[0].type === "TEXT" &&
+    node?.name?.toLowerCase().match("input")
+  ) {
+    const [attr, char] = tailwindText(node.children[0], true);
+    return tailwindContainer(node, ` placeholder="${char}"`, attr, true);
+  }
 
   const childrenStr = tailwindWidgetGenerator(node.children);
 
@@ -134,9 +149,9 @@ const tailwindFrame = (node: AltFrameNode): string => {
 // sometimes a property might not exist, so it doesn't add ","
 export const tailwindContainer = (
   node: AltFrameNode | AltRectangleNode | AltEllipseNode,
-  // | LineNode,
   children: string,
-  additionalAttr: string = ""
+  additionalAttr: string = "",
+  isInput: boolean = false
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -155,9 +170,14 @@ export const tailwindContainer = (
     .shadow(node)
     .border(node);
 
+  if (isInput) {
+    return `\n<input${builder.build(additionalAttr)}${children}></input>`;
+  }
+
   if (builder.attributes || additionalAttr) {
     return `\n<div${builder.build(additionalAttr)}>${children}</div>`;
   }
+
   return children;
 };
 
