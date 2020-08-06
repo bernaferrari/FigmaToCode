@@ -21,7 +21,7 @@ export const flutterBoxShadow = (node: AltSceneNode): string => {
         boxShadow += `BoxShadow(${color}${radius}${offset}),`;
       });
 
-      propBoxShadow = `boxShadow: [ ${boxShadow} ],`;
+      propBoxShadow = `boxShadow: [ ${boxShadow} ], `;
     }
     // TODO inner shadow, layer blur
   }

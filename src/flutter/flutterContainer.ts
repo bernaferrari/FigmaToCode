@@ -11,7 +11,7 @@ import {
 } from "../altNodes/altMixins";
 import { flutterPadding } from "./builderImpl/flutterPadding";
 import { flutterBoxShadow } from "./builderImpl/flutterShadow";
-import { flutterColor } from "./builderImpl/flutterColor";
+import { flutterBoxDecorationColor } from "./builderImpl/flutterColor";
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
@@ -55,16 +55,20 @@ export const flutterContainer = (
 const getBoxDecoration = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ): string => {
-  const propBackgroundColor = flutterColor(node.fills);
+  const propBackgroundColor = flutterBoxDecorationColor(node.fills);
   const propBorder = flutterBorder(node);
   const propBoxShadow = flutterBoxShadow(node);
   const propBorderRadius = flutterBorderRadius(node);
 
   // modify the circle's shape when type is ellipse
-  const propShape = node.type === "ELLIPSE" ? "shape: BoxShape.circle," : "";
+  const propShape = node.type === "ELLIPSE" ? "shape: BoxShape.circle, " : "";
 
-  // generate the decoration, or just the backgroundColor. Node.CornerRadius
-  return propBorder || propShape || propBorder || propBorderRadius
-    ? `decoration: BoxDecoration(${propBorderRadius}${propShape}${propBorder}${propBoxShadow}${propBackgroundColor}),`
+  // generate the decoration, or just the backgroundColor when color is SOLID.
+  return propBorder ||
+    propShape ||
+    propBorder ||
+    propBorderRadius ||
+    propBackgroundColor[0] === "g"
+    ? `decoration: BoxDecoration(${propBorderRadius}${propShape}${propBorder}${propBoxShadow}${propBackgroundColor}), `
     : `${propBackgroundColor}`;
 };

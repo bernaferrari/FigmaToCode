@@ -17,7 +17,7 @@ export const flutterBorder = (node: AltSceneNode): string => {
 
   // generate the border, when it should exist
   return propStrokeColor && node.strokeWeight
-    ? `border: Border.all(${propStrokeColor}${propStrokeWidth}),`
+    ? `border: Border.all(${propStrokeColor}${propStrokeWidth}), `
     : "";
 };
 

@@ -23,7 +23,7 @@ describe("Flutter Shadow", () => {
     ];
 
     expect(flutterBoxShadow(node)).toEqual(
-      "boxShadow: [ BoxShadow(color: Color(0x3f000000), blurRadius: 4, offset: Offset(0, 4), ), ],"
+      "boxShadow: [ BoxShadow(color: Color(0x3f000000), blurRadius: 4, offset: Offset(0, 4), ), ], "
     );
 
     const [elev, color] = flutterElevationAndShadowColor(node);
