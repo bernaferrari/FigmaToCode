@@ -53,9 +53,9 @@ describe("SwiftUI Main", () => {
 
     expect(swiftuiMain([convertToAutoLayout(node)])).toEqual(`ZStack {
 Rectangle()
+.fill(Color.white)
 .offset(x: -5, y: -5)
 .frame(width: 4, height: 4)
-.foregroundColor(Color.white)
 Rectangle()
 .offset(x: -5, y: -5)
 .frame(width: 4, height: 4)
@@ -94,9 +94,9 @@ Rectangle()
     child.parent = node;
     expect(swiftuiMain([node])).toEqual(`ZStack {
 Rectangle()
+.fill(Color.white)
 .offset(x: -5, y: -5)
 .frame(width: 4, height: 4)
-.foregroundColor(Color.white)
 }
 .frame(width: 32, height: 32)`);
   });
@@ -154,11 +154,11 @@ Rectangle()
     expect(swiftuiMain([node]))
       .toEqual(`VStack(alignment: .trailing, spacing: 8) {
 Rectangle()
+.fill(Color.white)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.white)
 Rectangle()
+.fill(Color.black)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.black)
 }`);
 
     // variations in layoutAlign for test coverage
@@ -168,11 +168,11 @@ Rectangle()
 
     expect(swiftuiMain([node])).toEqual(`VStack() {
 Rectangle()
+.fill(Color.white)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.white)
 Rectangle()
+.fill(Color.black)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.black)
 }`);
 
     // variations in layoutAlign and spacing for coverage
@@ -190,11 +190,11 @@ Rectangle()
     expect(swiftuiMain([node]))
       .toEqual(`VStack(alignment: .leading, spacing: 0) {
 Rectangle()
+.fill(Color.white)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.white)
 Rectangle()
+.fill(Color.black)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.black)
 }
 .background(Color.black)`);
 
@@ -205,11 +205,11 @@ Rectangle()
 
     expect(swiftuiMain([node])).toEqual(`HStack(alignment: .top, spacing: 0) {
 Rectangle()
+.fill(Color.white)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.white)
 Rectangle()
+.fill(Color.black)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.black)
 }
 .background(Color.black)`);
 
@@ -218,11 +218,11 @@ Rectangle()
 
     expect(swiftuiMain([node])).toEqual(`HStack(spacing: 0) {
 Rectangle()
+.fill(Color.white)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.white)
 Rectangle()
+.fill(Color.black)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.black)
 }
 .background(Color.black)`);
 
@@ -232,11 +232,11 @@ Rectangle()
     expect(swiftuiMain([node]))
       .toEqual(`HStack(alignment: .bottom, spacing: 0) {
 Rectangle()
+.fill(Color.white)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.white)
 Rectangle()
+.fill(Color.black)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.black)
 }
 .background(Color.black)`);
   });
@@ -278,8 +278,8 @@ Rectangle()
     child1.parent = node;
 
     expect(swiftuiMain([node])).toEqual(`RoundedRectangle(cornerRadius: 8)
+.fill(Color.white)
 .frame(width: 8, height: 8)
-.foregroundColor(Color.white)
 .padding(8)`);
   });
 
