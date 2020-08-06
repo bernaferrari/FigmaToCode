@@ -29,7 +29,13 @@ export class FlutterDefaultBuilder {
   ): this {
     const fill = node.type === "GROUP" ? null : retrieveFill(node.fills);
     // fill.visible can be true or undefined (on tests)
-    if (node.type !== "GROUP" && material && fill && fill.visible !== false) {
+    if (
+      node.type !== "GROUP" &&
+      material &&
+      fill &&
+      fill.visible !== false &&
+      fill.type === "SOLID"
+    ) {
       this.child = flutterMaterial(node, this.child);
     } else {
       this.child = flutterContainer(node, this.child);

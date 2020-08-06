@@ -59,6 +59,6 @@ Container(width: 10, height: 10, child: child),`);
     node.height = 10;
 
     expect(flutterContainer(node, "")).toEqual(`
-Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle,),),`);
+Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle, ), ),`);
   });
 });

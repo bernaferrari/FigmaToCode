@@ -64,11 +64,11 @@ Material(color: Colors.transparent, child: Padding(padding: const EdgeInsets.all
 
     expect(flutterMaterial(node, ""))
       .toEqual(`SizedBox(width: 10, height: 10, child: 
-Material(color: Color(0xffffffff), ), ), `);
+Material(color: Colors.white, ), ), `);
 
     expect(flutterMaterial(node, "child"))
       .toEqual(`SizedBox(width: 10, height: 10, child: 
-Material(color: Color(0xffffffff), child: child), ), `);
+Material(color: Colors.white, child: child), ), `);
   });
 
   it("ellipse", () => {
@@ -99,7 +99,7 @@ Material(color: Colors.transparent, shape: CircleBorder(), ), ), `);
 
     expect(flutterMaterial(node, ""))
       .toEqual(`SizedBox(width: 10, height: 10, child: 
-Material(color: Colors.transparent, shape: RoundedRectangleBorder(side: BorderSide(width: 4, color: Color(0xffffffff), ), ),), ), `);
+Material(color: Colors.transparent, shape: RoundedRectangleBorder(side: BorderSide(width: 4, color: Colors.white, ), ),), ), `);
   });
 
   it("clipping", () => {

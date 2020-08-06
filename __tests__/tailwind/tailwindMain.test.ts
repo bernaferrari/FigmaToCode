@@ -1,4 +1,4 @@
-import { AltEllipseNode } from "./../../src/altNodes/altMixins";
+import { AltEllipseNode, AltTextNode } from "./../../src/altNodes/altMixins";
 import { convertToAutoLayout } from "./../../src/altNodes/convertToAutoLayout";
 import {
   AltRectangleNode,
@@ -105,6 +105,32 @@ describe("Tailwind Main", () => {
     node.width = 10;
     node.height = 0;
     expect(tailwindMain([node])).toEqual("");
+  });
+
+  it("input", () => {
+    const textNode = new AltTextNode();
+    textNode.characters = "username";
+    textNode.fontSize = 26;
+    textNode.x = 0;
+    textNode.y = 0;
+
+    const frameNode = new AltFrameNode();
+    frameNode.layoutMode = "HORIZONTAL";
+    frameNode.width = 100;
+    frameNode.height = 40;
+    frameNode.counterAxisSizingMode = "AUTO";
+
+    frameNode.children = [textNode];
+    textNode.parent = frameNode;
+
+    expect(tailwindMain([frameNode])).toEqual(
+      '<div class="inline-flex items-center justify-center"><p class="text-2xl">username</p></div>'
+    );
+
+    frameNode.name = "this is the InPuT";
+    expect(tailwindMain([frameNode])).toEqual(
+      '<input class="text-2xl" placeholder="username"></input>'
+    );
   });
 
   it("JSX", () => {

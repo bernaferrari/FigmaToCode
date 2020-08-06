@@ -37,7 +37,6 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 - Vectors (tricky in HTML, unsupported in Flutter)
 - Images (they are local, how to support them?)
-- Gradients (todo in Flutter)
 - Line/Star/Polygon (todo. Rectangle and Ellipse were prioritized and are more common)
 - The source code is fully commented and there are more than 30 "todo"s there
 

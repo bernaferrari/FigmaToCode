@@ -47,7 +47,7 @@ describe("Flutter Border", () => {
       },
     ];
     expect(flutterBorder(node)).toEqual(
-      "border: Border.all(color: Color(0xff000000), width: 2,),"
+      "border: Border.all(color: Colors.black, width: 2,), "
     );
 
     node.strokeWeight = 0;
