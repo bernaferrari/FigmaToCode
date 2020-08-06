@@ -57,13 +57,14 @@ export const swiftuiContainer = (
   }
 
   const modifiers = new SwiftuiDefaultBuilder()
-    .soonerBorder(node)
+    .shapeBackground(node)
+    .shapeBorder(node)
     .blend(node)
     .autoLayoutPadding(node)
     .position(node, parentId)
     .widthHeight(node)
-    .background(node)
-    .laterBorder(node)
+    .layerBackground(node)
+    .layerBorder(node)
     .effects(node)
     .build();
 
@@ -106,7 +107,7 @@ const swiftuiText = (node: AltTextNode): string => {
 
   const splittedChars = text.split("\n");
   const charsWithLineBreak =
-    splittedChars.length > 1 ? text.split("\n").join("\\n") : text;
+    splittedChars.length > 1 ? splittedChars.join("\\n") : text;
 
   const modifier = builder
     .textDecoration(node)
@@ -115,7 +116,7 @@ const swiftuiText = (node: AltTextNode): string => {
     .letterSpacing(node)
     .lineHeight(node)
     .blend(node)
-    .background(node)
+    .layerBackground(node)
     .position(node, parentId)
     .build();
 
@@ -131,7 +132,7 @@ const swiftuiFrame = (node: AltFrameNode): string => {
 
     // return swiftuiContainer(node, rowColumn);
   } else if (node.layoutMode !== "NONE") {
-    const rowColumn = makeRowColumn(node, children);
+    const rowColumn = wrapInDirectionalStack(node, children);
     return swiftuiContainer(node, rowColumn);
   } else {
     // node.layoutMode === "NONE" && node.children.length > 1
@@ -140,7 +141,10 @@ const swiftuiFrame = (node: AltFrameNode): string => {
   }
 };
 
-const makeRowColumn = (node: AltFrameNode, children: string): string => {
+const wrapInDirectionalStack = (
+  node: AltFrameNode,
+  children: string
+): string => {
   const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "HStack" : "VStack";
 
   // retrieve the align based on the most frequent position of children

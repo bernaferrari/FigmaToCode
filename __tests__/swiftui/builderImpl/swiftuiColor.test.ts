@@ -251,9 +251,7 @@ describe("SwiftUI Color", () => {
 
     expect(swiftuiMain([node])).toEqual(
       `RoundedRectangle(cornerRadius: 16)
-.foregroundColor(.clear)
-.background(LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 1, green: 0, blue: 0)]), startPoint: .topLeading, endPoint: .bottomTrailing))
-.cornerRadius(16)
+.fill(LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 1, green: 0, blue: 0)]), startPoint: .topLeading, endPoint: .bottomTrailing))
 .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color(red: 0.25, green: 0.25, blue: 0.25), lineWidth: 4))`
     );
   });

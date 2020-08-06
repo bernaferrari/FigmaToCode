@@ -34,45 +34,47 @@ export class SwiftuiDefaultBuilder {
     return this;
   }
 
-  soonerBorder(node: AltSceneNode): this {
+  shapeBorder(node: AltSceneNode): this {
     this.modifiers += swiftuiShapeStroke(node);
     return this;
   }
 
-  laterBorder(node: AltSceneNode): this {
+  layerBorder(node: AltSceneNode): this {
     this.modifiers += swiftuiBorder(node);
     return this;
   }
 
-  background(node: AltSceneNode): this {
-    if (node.type === "GROUP") {
+  shapeBackground(node: AltSceneNode): this {
+    if (node.type !== "ELLIPSE" && node.type !== "RECTANGLE") {
       return this;
     }
 
     const fillColor = swiftuiColor(node.fills);
-    const isFgColor = fillColor[0] === "C";
-
     if (fillColor) {
-      if (node.type === "FRAME") {
-        this.modifiers += `\n.background(${fillColor})`;
-      } else if (isFgColor) {
-        // foregroundColor can't be a gradient
-        this.modifiers += `\n.foregroundColor(${fillColor})`;
-      } else {
-        this.modifiers += `\n.foregroundColor(.clear)`;
-        this.modifiers += `\n.background(${fillColor})`;
-      }
-
-      // add corner to the background. It needs to come after the Background, and since we already in the if, let's add it here.
-      const corner = swiftuiCornerRadius(node);
-
-      // it seems this is necessary even in RoundedRectangle
-      if (corner && (!isFgColor || node.type === "FRAME")) {
-        this.modifiers += `\n.cornerRadius(${corner})`;
-      }
+      this.modifiers += `\n.fill(${fillColor})`;
     }
 
-    // todo gradient support
+    return this;
+  }
+
+  layerBackground(node: AltSceneNode): this {
+    if (node.type !== "FRAME") {
+      return this;
+    }
+
+    const fillColor = swiftuiColor(node.fills);
+    if (fillColor) {
+      this.modifiers += `\n.background(${fillColor})`;
+    }
+
+    // add corner to the background. It needs to come after the Background, and since we already in the if, let's add it here.
+    const corner = swiftuiCornerRadius(node);
+
+    // it seems this is necessary even in RoundedRectangle
+    if (corner) {
+      this.modifiers += `\n.cornerRadius(${corner})`;
+    }
+
     return this;
   }
 
