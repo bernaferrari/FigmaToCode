@@ -55,7 +55,7 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 ## How to build the project
 
-The project is configured to be built with Webpack or Rollup. The author couldn't find a way to correctly configure Svelte in Webpack, so Rollup was added. But Rollup is a lot less stable than Webpack and crashes regularly in watch mode when editing Typescript files. So, if you are going to work with Typescript only, I reccommend sticking with Webpack. If you are going to make changes in the UI, you **need** to use Rollup for now.
+The project is configured to be built with Webpack or Rollup. The author couldn't find a way to correctly configure Svelte in Webpack, so Rollup was added. But Rollup is a lot less stable than Webpack and crashes regularly in watch mode when editing Typescript files. So, if you are going to work with Typescript only, I recommend sticking with Webpack. If you are going to make changes in the UI, you **need** to use Rollup for now.
 
 ## Issues
 
