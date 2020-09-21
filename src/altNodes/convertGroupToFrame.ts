@@ -42,8 +42,9 @@ export const convertGroupToFrame = (node: AltGroupNode): AltFrameNode => {
 };
 
 /**
- * Recursively update all children's X and Y value from a Group.
+ * Update all children's X and Y value from a Group.
  * Group uses relative values, while Frame use absolute. So child.x - group.x = child.x on Frames.
+ * This isn't recursive, because it is going to run from the inner-most to outer-most element. Therefore, it would calculate wrongly otherwise.
  *
  * This must be called with a GroupNode. Param accepts anything because of the recurison.
  * Result of a Group with x,y = (250, 250) and child at (260, 260) must be child at (10, 10)
@@ -54,7 +55,6 @@ const updateChildrenXY = (node: AltSceneNode): AltSceneNode => {
     node.children.forEach((d) => {
       d.x = d.x - node.x;
       d.y = d.y - node.y;
-      updateChildrenXY(d);
     });
     return node;
   } else {
