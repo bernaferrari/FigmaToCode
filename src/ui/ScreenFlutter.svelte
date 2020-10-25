@@ -15,7 +15,6 @@
   $: emptyObservable = emptySelection;
 
   onmessage = event => {
-    console.log("got this from the plugin code", event.data);
     if (!event.data.pluginMessage) {
       return;
     }

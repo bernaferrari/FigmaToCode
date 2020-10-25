@@ -77,6 +77,9 @@ export const convertIntoAltNodes = (
 ): Array<AltSceneNode> => {
   const mapped: Array<AltSceneNode | null> = sceneNode.map(
     (node: SceneNode) => {
+      if (node.visible === false) {
+        return null;
+      }
       if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
         let altNode;
         if (node.type === "RECTANGLE") {
@@ -104,7 +107,7 @@ export const convertIntoAltNodes = (
       ) {
         return frameNodeToAlt(node, altParent);
       } else if (node.type === "GROUP") {
-        if (node.children.length === 1 && node.visible !== false) {
+        if (node.children.length === 1) {
           // if Group is visible and has only one child, Group should disappear.
           // there will be a single value anyway.
           return convertIntoAltNodes(node.children, altParent)[0];

@@ -69,6 +69,24 @@ describe("AltConversions", () => {
     );
   });
 
+  it("Don't convert hidden elements", () => {
+    // single Group should disappear
+    const node = figma.createFrame();
+    node.resize(20, 20);
+
+    const rectangle = figma.createRectangle();
+    rectangle.resize(20, 20);
+
+    figma.group([rectangle], node);
+
+    const convert = convertIntoAltNodes([node]);
+
+    expect(tailwindMain(convert)).toEqual(
+      `<div class="w-5">
+<div class="w-full h-5"></div></div>`
+    );
+  });
+
   it("Text", () => {
     const node = figma.createText();
 

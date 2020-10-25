@@ -51,8 +51,6 @@ const run = () => {
     result = swiftuiMain(convertedSelection, parentId);
   }
 
-  console.log(result);
-
   figma.ui.postMessage({
     type: "result",
     data: result,
