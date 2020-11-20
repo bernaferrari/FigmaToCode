@@ -1,10 +1,12 @@
 <script>
   import ItemColor from "./FlutterItemColor.svelte";
-  import ItemText from "./TailwindItemText.svelte";
 
   import Prism from "svelte-prism";
   import "prism-theme-night-owl";
   import "prismjs/components/prism-dart";
+
+  import { GlobalCSS } from 'figma-plugin-ds-svelte';
+  import { Switch } from "figma-plugin-ds-svelte";
 
   let colorData = [];
   let codeData = "";
@@ -13,6 +15,8 @@
   $: colorObservable = colorData;
   $: codeObservable = codeData;
   $: emptyObservable = emptySelection;
+
+  console.log(`Prism ${Prism}`);
 
   onmessage = event => {
     console.log("got this from the plugin code", event.data);
@@ -33,7 +37,7 @@
     }
   };
 
-  import Switch from "./Switch.svelte";
+  // import Switch from "./Switch.svelte";
 
   let material = false;
   $: if (material) {
@@ -62,13 +66,13 @@
   const sectionStyle = "border rounded-lg bg-white";
 </script>
 
-<div class="bg-gray-100 p-4 flex flex-col items-center">
+<div class="flex flex-col items-center p-4 bg-gray-50">
 
   <div class="flex">
 
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      class="h-8 w-1/4 m-auto px-1"
+      class="w-1/4 h-8 px-1 m-auto"
       fill="none"
       viewBox="0 0 415 120">
       <path
@@ -154,9 +158,9 @@
       </defs>
     </svg>
 
-    <p class="mx-2 w-3/4 text-md tracking-tight leading-tight">
+    <p class="w-3/4 mx-2 leading-tight tracking-tight text-md">
       Flutter is Google’s UI toolkit for building applications for
-      <a class="text-blue-500 font-medium" href="https://flutter.dev/">
+      <a class="font-medium text-blue-500" href="https://flutter.dev/">
         mobile, web, and desktop from a single codebase.
       </a>
       You can test your creations by pasting them here:
@@ -165,15 +169,14 @@
 
   <a href="https://codepen.io/bernardoferrari/pen/pogpBLB" target="_blank">
     <button
-      class="mt-2 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2
-      px-4 border border-gray-400 rounded shadow">
+      class="px-4 py-2 mt-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded shadow hover:bg-gray-50">
       Flutter on CodePen
     </button>
   </a>
 
 </div>
 
-<div class="px-2 pt-2 bg-gray-100">
+<div class="px-2 pt-2 bg-gray-50">
 
   {#if emptySelection}
     <div
@@ -183,16 +186,13 @@
     </div>
   {:else}
     <div class="w-full pt-2 {sectionStyle}">
-      <div class="flex items-center px-2 space-x-2 justify-between">
+      <div class="flex items-center justify-between px-2 space-x-2">
         <p
-          class="text-lg font-medium text-center bg-gray-300 py-2 px-4
-          rounded-lg">
+          class="px-4 py-2 text-lg font-medium text-center bg-gray-300 rounded-lg">
           Code
         </p>
         <button
-          class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold
-          hover:text-white py-2 px-4 border border-blue-500
-          hover:border-transparent rounded"
+          class="px-4 py-2 font-semibold text-blue-700 bg-transparent border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent"
           on:click={clipboard(codeObservable)}>
           Copy to Clipboard
         </button>
@@ -201,9 +201,11 @@
       <Prism language="dart" source={codeObservable} />
 
       <div
-        class="flex justify-end space-x-8 content-center items-center mb-2 mx-2">
+        class="flex items-center content-center justify-end mx-2 mb-2 space-x-8">
 
-        <Switch bind:checked={material} id="material" text="Material" />
+        <Switch value="value" bind:checked={material} id="material">
+          Material
+        </Switch>
 
       </div>
     </div>
@@ -213,10 +215,9 @@
       <div
         class="flex flex-col space-y-2 items-center w-full p-2 mb-2 {sectionStyle}">
         <div class="flex flex-wrap w-full">
-          <div class="p-1 w-1/2">
+          <div class="w-1/2 p-1">
             <div
-              class="flex w-full h-full items-center justify-center bg-gray-300
-              rounded-lg">
+              class="flex items-center justify-center w-full h-full bg-gray-300 rounded-lg">
               <p class="text-xl font-semibold">Colors</p>
             </div>
           </div>

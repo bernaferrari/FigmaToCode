@@ -34,7 +34,7 @@ export const flutterBoxDecorationColor = (
       .map((d) => {
         return rgbaToFlutterColor(d.color, d.color.a);
       })
-      .join("");
+      .join(", ");
 
     return `gradient: LinearGradient(${direction}, colors: [${colors}], ), `;
   }

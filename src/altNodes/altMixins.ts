@@ -33,7 +33,7 @@ export interface AltRectangleCornerMixin {
 
 export interface AltBlendMixin {
   opacity: number;
-  blendMode: BlendMode;
+  blendMode: "PASS_THROUGH" | BlendMode;
   isMask: boolean;
   effects: ReadonlyArray<Effect>;
   effectStyleId: string;
@@ -49,22 +49,23 @@ export interface AltLayoutMixin {
   width: number;
   height: number;
 
-  layoutAlign: "MIN" | "CENTER" | "MAX" | "STRETCH"; // applicable only inside auto-layout frames
+  layoutAlign: "MIN" | "CENTER" | "MAX" | "STRETCH" | "INHERIT"; // applicable only inside auto-layout frames
+  layoutGrow: number;
 }
 
 export interface AltFrameMixin {
   layoutMode: "NONE" | "HORIZONTAL" | "VERTICAL";
+  primaryAxisSizingMode: "FIXED" | "AUTO"; // applicable only if layoutMode != "NONE"
   counterAxisSizingMode: "FIXED" | "AUTO"; // applicable only if layoutMode != "NONE"
 
-  // horizontal and vertical were replaced by individual padding in each direction.
-  // horizontalPadding: number; // applicable only if layoutMode != "NONE"
-  // verticalPadding: number; // applicable only if layoutMode != "NONE"
-  itemSpacing: number; // applicable only if layoutMode != "NONE"
+  primaryAxisAlignItems: "MIN" | "MAX" | "CENTER" | "SPACE_BETWEEN"; // applicable only if layoutMode != "NONE"
+  counterAxisAlignItems: "MIN" | "MAX" | "CENTER"; // applicable only if layoutMode != "NONE"
 
-  paddingRight: number;
-  paddingLeft: number;
-  paddingTop: number;
-  paddingBottom: number;
+  paddingLeft: number; // applicable only if layoutMode != "NONE"
+  paddingRight: number; // applicable only if layoutMode != "NONE"
+  paddingTop: number; // applicable only if layoutMode != "NONE"
+  paddingBottom: number; // applicable only if layoutMode != "NONE"
+  itemSpacing: number; // applicable only if layoutMode != "NONE"
 
   layoutGrids: ReadonlyArray<LayoutGrid>;
   gridStyleId: string;

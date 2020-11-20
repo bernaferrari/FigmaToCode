@@ -19,18 +19,16 @@
     }
   }
 </script>
-
 <button
-  class="flex space-x-2 items-center px-2 py-1 text-left border rounded-lg
-  w-full transition duration-300 ease-in-out bg-white transform hover:scale-105"
+  class="flex items-center w-full px-2 py-1 space-x-2 text-left transition duration-300 ease-in-out transform bg-white border rounded-lg hover:scale-105"
   on:click={clipboard}>
   <div
-    class="flex items-center justify-center p-1 h-8 rounded-lg"
+    class="flex items-center justify-center h-8 p-1 rounded-lg"
     style="background-color:{backgroundColor}">
     <p class="text-xs text-center text-gray-700" {style}>Aa</p>
   </div>
   <div class="flex flex-col min-w-0">
-    <p class="text-sm font-medium truncate w-full">{name}</p>
-    <p class="text-xs tracking-wide truncate w-full">{attr}</p>
+    <p class="w-full text-sm font-medium truncate">{name}</p>
+    <p class="w-full text-xs tracking-wide truncate">{attr}</p>
   </div>
 </button>

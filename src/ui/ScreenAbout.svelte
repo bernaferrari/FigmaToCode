@@ -1,65 +1,53 @@
 <script>
-  import ItemColor from "./FlutterItemColor.svelte";
-  import ItemText from "./TailwindItemText.svelte";
-
   import Prism from "svelte-prism";
   import "prism-theme-night-owl";
   import "prismjs/components/prism-dart";
 </script>
 
-<div class="bg-orange-100 w-full px-8 py-4">
-  <p class="text-center font-bold text-xl">Responsive Layout</p>
-  <div class="w-full pt-4 flex items-center justify-center space-x-4">
+<div class="w-full px-8 py-4 bg-orange-100">
+  <p class="text-xl font-bold text-center">Responsive Layout</p>
+  <div class="flex items-center justify-center w-full pt-4 space-x-4">
     <div
-      class="inline-flex flex-col items-center justify-center p-5 border-red-600
-      border-2">
+      class="inline-flex flex-col items-center justify-center p-5 border-2 border-red-600">
       <div class="relative w-32 h-24">
         <div
           p
-          class="inline-flex items-center justify-center px-3 py-3 absolute
-          left-0 bottom-0 h-10 border-red-600 border-2">
+          class="absolute bottom-0 left-0 inline-flex items-center justify-center h-10 px-3 py-3 border-2 border-red-600">
           <p class="text-xs font-medium text-center text-red-600">BAD</p>
         </div>
         <div
-          class="inline-flex items-center justify-center px-3 py-3 absolute
-          left-0 top-0 h-10 border-red-600 border-2">
+          class="absolute top-0 left-0 inline-flex items-center justify-center h-10 px-3 py-3 border-2 border-red-600">
           <p class="text-xs font-medium text-center text-red-600">BAD</p>
         </div>
         <div
-          class="inline-flex items-center justify-center px-3 py-3 absolute
-          inset-y-0 right-0 my-auto h-10 border-red-600 border-2">
+          class="absolute inset-y-0 right-0 inline-flex items-center justify-center h-10 px-3 py-3 my-auto border-2 border-red-600">
           <p class="text-xs font-medium text-center text-red-600">BAD</p>
         </div>
       </div>
     </div>
 
     <div
-      class="inline-flex space-x-4 items-center justify-center p-4
-      border-blue-600 border-2">
+      class="inline-flex items-center justify-center p-4 space-x-4 border-2 border-blue-600">
       <div
-        class="inline-flex flex-col space-y-3 items-center justify-center p-1
-        border-blue-600 border-2">
+        class="inline-flex flex-col items-center justify-center p-1 space-y-3 border-2 border-blue-600">
         <div
-          class="inline-flex items-center justify-center p-3 h-10
-          border-blue-600 border-2">
+          class="inline-flex items-center justify-center h-10 p-3 border-2 border-blue-600">
           <p class="text-xs font-medium text-center text-blue-600">GOOD</p>
         </div>
         <div
-          class="inline-flex items-center justify-center p-3 h-10
-          border-blue-600 border-2">
+          class="inline-flex items-center justify-center h-10 p-3 border-2 border-blue-600">
           <p class="text-xs font-medium text-center text-blue-600">GOOD</p>
         </div>
       </div>
       <div
-        class="inline-flex items-center justify-center p-3 h-10 border-blue-600
-        border-2">
+        class="inline-flex items-center justify-center h-10 p-3 border-2 border-blue-600">
         <p class="text-xs font-medium text-center text-blue-600">GOOD</p>
       </div>
     </div>
   </div>
   <div class="h-4" />
 
-  <p class="text-center text-base">
+  <p class="text-base text-center">
     The plugin works
     <span class="font-bold">perfectly</span>
     when layers are vertically or horizontally aligned, even if AutoLayout is
@@ -69,11 +57,11 @@
 
 </div>
 
-<div class="bg-gray-100 w-full px-8 py-4">
-  <p class="text-center font-bold text-xl">Info</p>
+<div class="w-full px-8 py-4 bg-gray-50">
+  <p class="text-xl font-bold text-center">Info</p>
   <div class="h-2" />
 
-  <p class="text-center text-base">
+  <p class="text-base text-center">
     I have tried to think what would make sense for
     <span class="font-bold">80% of people.</span>
     Still, bugs can and will happen; ideas will appear. Your mission, should you
@@ -81,18 +69,17 @@
   </p>
 
 </div>
-<div class="bg-blue-900 w-full px-8 py-4">
-  <p class="text-center font-bold text-xl text-white">Figma to Code</p>
+<div class="w-full px-8 py-4 bg-blue-900">
+  <p class="text-xl font-bold text-center text-white">Figma to Code</p>
   <div class="h-2" />
-  <p class="text-center font-semibold text-md text-white">
+  <p class="font-semibold text-center text-white text-md">
     Designed and developed by Bernardo Ferrari.
   </p>
   <div class="h-4" />
   <div class="flex content-center justify-center space-x-4">
     <a href="https://twitter.com/@bernaferrari" target="_blank">
       <button
-        class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
-        border-gray-400 rounded-lg shadow">
+        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded-lg shadow hover:bg-gray-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -120,8 +107,7 @@
     </a>
     <a href="https://reddit.com/u/bernaferrari" target="_blank">
       <button
-        class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
-        border-gray-400 rounded-lg shadow">
+        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded-lg shadow hover:bg-gray-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -155,8 +141,7 @@
     </a>
     <a href="mailto:bernaferrari2@gmail.com" target="_blank">
       <button
-        class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
-        border-gray-400 rounded-lg shadow">
+        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded-lg shadow hover:bg-gray-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -177,8 +162,7 @@
     </a>
     <a href="https://github.com/bernaferrari" target="_blank">
       <button
-        class="bg-white hover:bg-gray-300 text-gray-800 font-semibold p-2 border
-        border-gray-400 rounded-lg shadow">
+        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded-lg shadow hover:bg-gray-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -207,7 +191,7 @@
   </div>
   <div class="flex justify-center mt-2 text-white">
     <a
-      class="text-center text-white text-xs py-2 px-4"
+      class="px-4 py-2 text-xs text-center text-white"
       href="https://github.com/bernaferrari/FigmaToCode"
       target="_blank">
       This project is open source and has no tracking.

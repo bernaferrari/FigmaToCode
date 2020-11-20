@@ -37,9 +37,9 @@
       }
     ];
 
-    codeData = `<div class="inline-flex space-x-1 items-center justify-center p-1 border-gray-700 border-2 rounded-lg">
-<div class="flex items-center justify-center p-1 h-4 bg-white rounded-lg"><p class="h-4 w-4 text-xs font-bold text-center text-gray-700">Aa</p></div>
-<div class="inline-flex flex-col items-center justify-center p-1 self-start w-16"><p class="self-start text-xs font-medium text-black">Header</p><p class="self-start text-xs text-black">font-xs bold arhhh</p></div></div>
+    codeData = `<div class="inline-flex items-center justify-center p-1 space-x-1 border-2 border-gray-700 rounded-lg">
+<div class="flex items-center justify-center h-4 p-1 bg-white rounded-lg"><p class="w-4 h-4 text-xs font-bold text-center text-gray-700">Aa</p></div>
+<div class="inline-flex flex-col items-center self-start justify-center w-16 p-1"><p class="self-start text-xs font-medium text-black">Header</p><p class="self-start text-xs text-black">font-xs bold arhhh</p></div></div>
 `;
   }
 
@@ -91,11 +91,11 @@
 </script>
 
 <div>
-  <div class="bg-gray-100 p-4 flex flex-col items-center">
+  <div class="flex flex-col items-center p-4 bg-gray-50">
 
     <div class="flex">
       <svg
-        class="h-8 w-1/4 m-auto"
+        class="w-1/4 h-8 m-auto"
         viewBox="0 0 273 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg">
@@ -183,9 +183,9 @@
           </linearGradient>
         </defs>
       </svg>
-      <p class="mx-2 w-3/4 text-md tracking-tight leading-tight">
+      <p class="w-3/4 mx-2 leading-tight tracking-tight text-md">
         Tailwind is a utility-first CSS framework for
-        <a class="text-teal-500 font-medium" href="https://tailwindcss.com/">
+        <a class="font-medium text-teal-500" href="https://tailwindcss.com/">
           rapidly building custom designs and responsive pages.
         </a>
         You can test your creations by pasting them here:
@@ -194,8 +194,7 @@
 
     <a href="https://codepen.io/bernardoferrari/pen/mdVBJxe" target="_blank">
       <button
-        class="mt-2 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2
-        px-4 border border-gray-400 rounded shadow">
+        class="px-4 py-2 mt-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded shadow hover:bg-gray-50">
         Tailwind on CodePen
       </button>
     </a>
@@ -204,7 +203,7 @@
 
 </div>
 
-<div class="px-2 pt-2 bg-gray-100">
+<div class="px-2 pt-2 bg-gray-50">
 
   {#if emptySelection}
     <div
@@ -214,16 +213,13 @@
     </div>
   {:else}
     <div class="w-full pt-2 {sectionStyle}">
-      <div class="flex items-center px-2 space-x-2 justify-between">
+      <div class="flex items-center justify-between px-2 space-x-2">
         <p
-          class="text-lg font-medium text-center bg-gray-300 py-2 px-4
-          rounded-lg">
+          class="px-4 py-2 text-lg font-medium text-center bg-gray-300 rounded-lg">
           Code
         </p>
         <button
-          class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold
-          hover:text-white py-2 px-4 border border-blue-500
-          hover:border-transparent rounded"
+          class="px-4 py-2 font-semibold text-blue-700 bg-transparent border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent"
           on:click={clipboard(codeObservable)}>
           Copy to Clipboard
         </button>
@@ -232,7 +228,7 @@
       <Prism language="html" source={codeObservable} />
 
       <div
-        class="flex justify-end space-x-8 content-center items-center mb-2 mx-2">
+        class="flex items-center content-center justify-end mx-2 mb-2 space-x-8">
 
         <Switch bind:checked={layerName} id="layerName" text="LayerName" />
 
@@ -246,10 +242,9 @@
       <div
         class="flex flex-col space-y-2 items-center w-full p-2 {sectionStyle}">
         <div class="flex flex-wrap w-full">
-          <div class="p-1 w-1/3">
+          <div class="w-1/3 p-1">
             <div
-              class="flex w-full h-full items-center justify-center bg-gray-300
-              rounded-lg">
+              class="flex items-center justify-center w-full h-full bg-gray-300 rounded-lg">
               <p class="text-xl font-semibold">Colors</p>
             </div>
           </div>
@@ -269,10 +264,9 @@
       <div
         class="flex flex-col space-y-2 items-center w-full p-2 mb-2 {sectionStyle}">
         <div class="flex flex-wrap w-full">
-          <div class="p-1 w-1/2">
+          <div class="w-1/2 p-1">
             <div
-              class="flex w-full h-full items-center justify-center bg-gray-300
-              rounded-lg">
+              class="flex items-center justify-center w-full h-full bg-gray-300 rounded-lg">
               <p class="text-xl font-semibold">Texts</p>
             </div>
           </div>
