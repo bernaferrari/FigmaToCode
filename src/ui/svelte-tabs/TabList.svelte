@@ -3,6 +3,6 @@
   } */
 </style>
 
-<ul role="tablist" class="svelte-tabs__tab-list flex pt-1 pl-4 border-b border-gray-300">
+<ul role="tablist" class="flex pt-1 pl-1 border-b border-gray-300 svelte-tabs__tab-list">
   <slot />
 </ul>

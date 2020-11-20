@@ -173,11 +173,16 @@ const convertLayout = (altNode: AltLayoutMixin, node: LayoutMixin) => {
   altNode.height = node.height;
   altNode.rotation = node.rotation;
   altNode.layoutAlign = node.layoutAlign;
+  altNode.layoutGrow = node.layoutGrow;
 };
 
 const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
   altNode.layoutMode = node.layoutMode;
+  altNode.primaryAxisSizingMode = node.primaryAxisSizingMode;
   altNode.counterAxisSizingMode = node.counterAxisSizingMode;
+
+  altNode.primaryAxisAlignItems = node.primaryAxisAlignItems;
+  altNode.counterAxisAlignItems = node.counterAxisAlignItems;
 
   altNode.paddingLeft = node.horizontalPadding;
   altNode.paddingRight = node.horizontalPadding;

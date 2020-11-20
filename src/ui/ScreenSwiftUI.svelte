@@ -1,7 +1,4 @@
 <script>
-  import ItemColor from "./TailwindItemColor.svelte";
-  import ItemText from "./TailwindItemText.svelte";
-
   import Prism from "svelte-prism";
   import "prism-theme-night-owl";
   import "prismjs/components/prism-swift";
@@ -14,9 +11,9 @@
 
   if (false) {
     // DEBUG
-    codeData = `<div class="inline-flex space-x-1 items-center justify-center p-1 border-gray-700 border-2 rounded-lg">
-<div class="flex items-center justify-center p-1 h-4 bg-white rounded-lg"><p class="h-4 w-4 text-xs font-bold text-center text-gray-700">Aa</p></div>
-<div class="inline-flex flex-col items-center justify-center p-1 self-start w-16"><p class="self-start text-xs font-medium text-black">Header</p><p class="self-start text-xs text-black">font-xs bold arhhh</p></div></div>
+    codeData = `<div class="inline-flex items-center justify-center p-1 space-x-1 border-2 border-gray-700 rounded-lg">
+<div class="flex items-center justify-center h-4 p-1 bg-white rounded-lg"><p class="w-4 h-4 text-xs font-bold text-center text-gray-700">Aa</p></div>
+<div class="inline-flex flex-col items-center self-start justify-center w-16 p-1"><p class="self-start text-xs font-medium text-black">Header</p><p class="self-start text-xs text-black">font-xs bold arhhh</p></div></div>
 `;
   }
 
@@ -55,12 +52,12 @@
 </script>
 
 <div>
-  <div class="bg-gray-100 p-4 flex flex-col items-center">
+  <div class="flex flex-col items-center p-4 bg-gray-50">
 
     <div class="flex">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="h-8 w-1/4 m-auto px-2"
+        class="w-1/4 h-8 px-2 m-auto"
         viewBox="0 0 160 50">
         <path
           d="m49.4889167
@@ -138,16 +135,16 @@
           2.59275-.1816667v-3.54725c-.295833.0456667-1.160167.1136667-1.637583.1136667-2.023834
           0-2.93325-.9550833-2.93325-3.0925833v-13.69075z" />
       </svg>
-      <p class="mx-2 w-3/4 text-md tracking-tight leading-tight">
+      <p class="w-3/4 mx-2 leading-tight tracking-tight text-md">
         SwiftUI an innovative, exceptionally simple way to build user interfaces
         <a
-          class="text-orange-500 font-medium"
+          class="font-medium text-orange-500"
           href="https://developer.apple.com/xcode/swiftui/">
           across all Apple platforms with the power of Swift.
         </a>
         You can test your creations in Xcode or
         <a
-          class="text-orange-500 font-medium"
+          class="font-medium text-orange-500"
           href="https://www.apple.com/swift/playgrounds/">
           Swift Playgrounds
         </a>
@@ -157,7 +154,7 @@
     <p class="mt-2">
       Tip:
       <a
-        class="text-orange-500 font-medium"
+        class="font-medium text-orange-500"
         href="https://stackoverflow.com/a/7828337/4418073">
         how to indent the code.
       </a>
@@ -167,7 +164,7 @@
 
 </div>
 
-<div class="px-2 pt-2 bg-gray-100">
+<div class="px-2 pt-2 bg-gray-50">
 
   {#if emptySelection}
     <div
@@ -177,16 +174,13 @@
     </div>
   {:else}
     <div class="w-full pt-2 {sectionStyle}">
-      <div class="flex items-center px-2 space-x-2 justify-between">
+      <div class="flex items-center justify-between px-2 space-x-2">
         <p
-          class="text-lg font-medium text-center bg-gray-300 py-2 px-4
-          rounded-lg">
+          class="px-4 py-2 text-lg font-medium text-center bg-gray-300 rounded-lg">
           Code
         </p>
         <button
-          class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold
-          hover:text-white py-2 px-4 border border-blue-500
-          hover:border-transparent rounded"
+          class="px-4 py-2 font-semibold text-blue-700 bg-transparent border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent"
           on:click={clipboard(codeObservable)}>
           Copy to Clipboard
         </button>
