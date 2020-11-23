@@ -21,31 +21,38 @@ describe("Tailwind Builder", () => {
     node.height = 200;
     expect(tailwindSize(node)).toEqual("w-24 h-48 ");
 
-    node.width = 300;
-    node.height = 300;
-    expect(tailwindSize(node)).toEqual("w-full h-64 ");
+    node.width = 500;
+    node.height = 500;
+    expect(tailwindSize(node)).toEqual("w-full h-96 ");
   });
 
   it("STRETCH inside AutoLayout", () => {
     const node = new AltFrameNode();
     node.layoutMode = "HORIZONTAL";
     node.counterAxisSizingMode = "FIXED";
+    node.primaryAxisSizingMode = "FIXED";
     node.width = 100;
+    node.height = 100;
+    node.paddingLeft = 0;
+    node.paddingRight = 0;
+    node.paddingTop = 0;
+    node.paddingBottom = 0;
 
     const child = new AltRectangleNode();
     child.layoutAlign = "STRETCH";
     child.width = 100;
+    child.height = 100;
 
     child.parent = node;
     node.children = [child];
 
-    expect(tailwindSize(child)).toEqual("w-full ");
+    expect(tailwindSize(child)).toEqual("w-full h-full ");
 
     // fail
     node.layoutMode = "VERTICAL";
     child.width = 16;
     child.height = 16;
-    expect(tailwindSize(child)).toEqual("w-1/6 h-4 ");
+    expect(tailwindSize(child)).toEqual("w-full h-1/6 ");
 
     // child is relative, therefore it must have a value
     expect(tailwindSize(node)).toEqual("w-24 ");
@@ -110,6 +117,7 @@ describe("Tailwind Builder", () => {
     // responsive
     const parentNode = new AltFrameNode();
     parentNode.counterAxisSizingMode = "FIXED";
+    parentNode.primaryAxisSizingMode = "FIXED";
     parentNode.x = 0;
     parentNode.y = 0;
     parentNode.width = 48;
@@ -117,7 +125,7 @@ describe("Tailwind Builder", () => {
     parentNode.children = [node];
     node.parent = parentNode;
     expect(tailwindSize(node)).toEqual("");
-    expect(tailwindSize(parentNode)).toEqual("w-12 ");
+    expect(tailwindSize(parentNode)).toEqual("w-12 h-12 ");
   });
 
   it("width changes when there are strokes", () => {
@@ -215,26 +223,26 @@ describe("Tailwind Builder", () => {
     parentNode.children = [node];
     node.parent = parentNode;
 
-    expect(tailwindSize(parentNode)).toEqual("w-3 ");
-    expect(tailwindSize(node)).toEqual("w-full h-3 ");
+    expect(tailwindSize(parentNode)).toEqual("w-3 h-3 ");
+    expect(tailwindSize(node)).toEqual("w-full h-full ");
   });
 
   it("set the width to max if the view is near the corner", () => {
+    const parentNode = new AltFrameNode();
+    parentNode.layoutMode = "NONE";
+    parentNode.width = 120;
+    parentNode.height = 120;
+
     const node = new AltFrameNode();
     node.width = 100;
     node.height = 100;
     node.x = 0;
     node.y = 0;
 
-    const parentNode = new AltFrameNode();
-    parentNode.layoutMode = "NONE";
-    parentNode.width = 120;
-    parentNode.height = 120;
-
-    parentNode.children = [node];
     node.parent = parentNode;
+    parentNode.children = [node];
 
-    expect(tailwindSize(node)).toEqual("w-5/6 h-24 ");
+    expect(tailwindSize(node)).toEqual("w-5/6 h-5/6 ");
   });
 
   it("responsive width", () => {
@@ -249,33 +257,38 @@ describe("Tailwind Builder", () => {
     parentNode.children = [node];
     node.parent = parentNode;
 
-    expect(tailwindSize(node)).toEqual("w-full h-5 ");
+    expect(tailwindSize(node)).toEqual("w-full h-full ");
 
     node.width = 10;
-    expect(tailwindSize(node)).toEqual("w-1/2 h-5 ");
+    node.height = 10;
+    expect(tailwindSize(node)).toEqual("w-1/2 h-1/2 ");
 
     node.width = 20 / 3;
-    expect(tailwindSize(node)).toEqual("w-1/3 h-5 ");
+    node.height = 20 / 3;
+    expect(tailwindSize(node)).toEqual("w-1/3 h-1/3 ");
 
     node.width = 40 / 3;
-    expect(tailwindSize(node)).toEqual("w-2/3 h-5 ");
+    node.height = 40 / 3;
+    expect(tailwindSize(node)).toEqual("w-2/3 h-2/3 ");
 
     node.width = 5;
-    expect(tailwindSize(node)).toEqual("w-1/4 h-5 ");
+    node.height = 5;
+    expect(tailwindSize(node)).toEqual("w-1/4 h-1/4 ");
 
     node.width = 15;
-    expect(tailwindSize(node)).toEqual("w-3/4 h-5 ");
+    node.height = 15;
+    expect(tailwindSize(node)).toEqual("w-3/4 h-3/4 ");
 
     node.width = 4;
-    expect(tailwindSize(node)).toEqual("w-1/5 h-5 ");
+    node.height = 4;
+    expect(tailwindSize(node)).toEqual("w-1/5 h-1/5 ");
 
     node.width = 10 / 3;
-    expect(tailwindSize(node)).toEqual("w-1/6 h-5 ");
+    node.height = 10 / 3;
+    expect(tailwindSize(node)).toEqual("w-1/6 h-1/6 ");
 
     node.width = 50 / 3;
-    expect(tailwindSize(node)).toEqual("w-5/6 h-5 ");
-
-    node.width = 20 / 12;
-    expect(tailwindSize(node)).toEqual("w-1/12 h-5 ");
+    node.height = 50 / 3;
+    expect(tailwindSize(node)).toEqual("w-5/6 h-5/6 ");
   });
 });

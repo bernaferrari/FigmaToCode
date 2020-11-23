@@ -23,7 +23,7 @@ describe("Tailwind Main", () => {
     node.counterAxisSizingMode = "FIXED";
 
     const child1 = new AltRectangleNode();
-    child1.width = 257;
+    child1.width = 385;
     child1.height = 8;
     child1.x = 9;
     child1.y = 9;
@@ -41,7 +41,7 @@ describe("Tailwind Main", () => {
 
     const child2 = new AltRectangleNode();
     child2.width = 8;
-    child2.height = 257;
+    child2.height = 385;
     child2.x = 9;
     child2.y = 9;
     child2.name = "RECT2";
@@ -53,8 +53,8 @@ describe("Tailwind Main", () => {
 
     expect(tailwindMain([convertToAutoLayout(node)]))
       .toEqual(`<div class="relative" style="width: 320px; height: 320px;">
-<div class="h-2 absolute bg-white" style="width: 257px; left: 9px; top: 9px;"></div>
-<div class="w-2 absolute" style="height: 257px; left: 9px; top: 9px;"></div></div>`);
+<div class="h-2 absolute bg-white" style="width: 385px; left: 9px; top: 9px;"></div>
+<div class="w-2 absolute" style="height: 385px; left: 9px; top: 9px;"></div></div>`);
   });
 
   it("Group with relative position", () => {
@@ -119,6 +119,10 @@ describe("Tailwind Main", () => {
     frameNode.width = 100;
     frameNode.height = 40;
     frameNode.counterAxisSizingMode = "AUTO";
+    frameNode.primaryAxisSizingMode = "AUTO";
+
+    frameNode.primaryAxisAlignItems = "CENTER";
+    frameNode.counterAxisAlignItems = "CENTER";
 
     frameNode.children = [textNode];
     textNode.parent = frameNode;

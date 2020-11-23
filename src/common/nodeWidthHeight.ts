@@ -4,7 +4,7 @@ export const magicMargin = 32;
 
 type SizeResult = {
   readonly width: responsive | number | null;
-  readonly height: number | null;
+  readonly height: responsive | number | null;
 };
 
 export const nodeWidthHeight = (
@@ -29,58 +29,70 @@ export const nodeWidthHeight = (
   //   }
   // }
 
-  // todo this can be seen as an optimization, but then the parent, when it is horizontal, must also look if any children is stretch, which adds more code.
-  // if node's layoutAlign is STRETCH, w/h should be full
-  // if (
-  //   node.layoutAlign === "STRETCH" &&
-  //   node.parent &&
-  //   "layoutMode" in node.parent
-  // ) {
-  //   if (node.parent.layoutMode === "HORIZONTAL") {
-  //     return {
-  //       width: allowRelative ? "full" : node.width,
-  //       height: null,
-  //     };
-  //   }
-  //   // else if (node.parent.layoutMode === "VERTICAL") {
-  //   // todo use h-full? It isn't always reliable, but it is inside a Frame anyway..
-  //   // }
-  // }
+  if (node.layoutAlign === "STRETCH" && node.layoutGrow === 1) {
+    return {
+      width: "full",
+      height: "full",
+    };
+  }
 
   const [nodeWidth, nodeHeight] = getNodeSizeWithStrokes(node);
 
   let propWidth: responsive | number | null = nodeWidth;
-  let propHeight: number | null = nodeHeight;
+  let propHeight: responsive | number | null = nodeHeight;
 
-  // todo can a relative container be w-full? I don't think so.
-  // this has been moved to [htmlSize]. Was this a good choice?
-  // if ("isRelative" in node && node.isRelative === true) {
-  //   return {
-  //     width: nodeWidth,
-  //     height: nodeHeight,
-  //   };
-  // }
+  if (node.parent && "layoutMode" in node.parent) {
+    // Stretch means the opposite direction
+    if (node.layoutAlign === "STRETCH") {
+      switch (node.parent.layoutMode) {
+        case "HORIZONTAL":
+          propHeight = "full";
+          break;
+        case "VERTICAL":
+          propWidth = "full";
+          break;
+      }
+    }
+
+    // Grow means the same direction
+    if (node.layoutGrow === 1) {
+      if (node.parent.layoutMode === "HORIZONTAL") {
+        propWidth = "full";
+      } else {
+        propHeight = "full";
+      }
+    }
+  }
 
   // avoid relative width when parent is relative (therefore, child is probably absolute, which doesn't work nice)
   // ignore for root layer
   // todo should this be kept this way? The issue is w-full which doesn't work well with absolute position.
   if (allowRelative && node.parent?.isRelative !== true) {
-    const rW = calculateResponsiveW(node, nodeWidth);
+    // don't calculate again if it was already calculated
+    if (propWidth !== "full") {
+      const rW = calculateResponsiveWH(node, nodeWidth, "x");
+      if (rW) {
+        propWidth = rW;
+      }
+    }
 
-    if (rW) {
-      propWidth = rW;
+    if (propHeight !== "full") {
+      const rH = calculateResponsiveWH(node, nodeHeight, "y");
+      if (rH && node.parent) {
+        propHeight = rH;
+      }
     }
   }
 
   // when any child has a relative width and parent is HORIZONTAL,
   // parent must have a defined width, which wouldn't otherwise.
   // todo check if the performance impact of this is worth it.
-  const hasRelativeChild =
-    allowRelative &&
-    "children" in node &&
-    node.children.find((d) =>
-      calculateResponsiveW(d, getNodeSizeWithStrokes(d)[0])
-    ) !== undefined;
+  // const hasRelativeChildW =
+  //   allowRelative &&
+  //   "children" in node &&
+  //   node.children.find((d) =>
+  //     calculateResponsiveWH(d, getNodeSizeWithStrokes(d)[0], "x")
+  //   ) !== undefined;
 
   // when the child has the same size as the parent, don't set the size of the parent (twice)
   if ("children" in node && node.children && node.children.length === 1) {
@@ -90,56 +102,47 @@ export const nodeWidthHeight = (
     let hPadding = 0;
     let vPadding = 0;
     if ("layoutMode" in node) {
-      // todo: horizontal became left and right, this almost always returns true. Is this the desired behavior? Is there a way to optimise?
-      hPadding = (node.paddingLeft ?? 0) + (node.paddingRight ?? 0);
-      vPadding = (node.paddingTop ?? 0) + (node.paddingBottom ?? 0);
+      hPadding = node.paddingLeft + node.paddingRight;
+      vPadding = node.paddingTop + node.paddingBottom;
     }
 
     // set them independently, in case w is equal but h isn't
-    if (!hasRelativeChild && child.width === nodeWidth - hPadding) {
-      propWidth = null;
+    if (child.width === nodeWidth - hPadding) {
+      // propWidth = null;
     }
     if (child.height === nodeHeight - vPadding) {
-      propHeight = null;
+      // propHeight = null;
     }
   }
 
   if (
     ("layoutMode" in node && node.layoutMode === "VERTICAL") ||
     ("layoutMode" in node &&
-      node.layoutMode === "HORIZONTAL" &&
-      node.counterAxisSizingMode === "AUTO") ||
-    (node.type !== "RECTANGLE" && nodeHeight > 256) ||
+      ((node.layoutMode === "HORIZONTAL" &&
+        node.counterAxisSizingMode === "AUTO") ||
+        (node.layoutMode === "VERTICAL" &&
+          node.primaryAxisSizingMode === "AUTO"))) ||
+    (node.type !== "RECTANGLE" && nodeHeight > 384) ||
     childLargerThanMaxSize(node, "y")
   ) {
     // propHeight = "h-full ";
     propHeight = null;
   }
 
-  if (!hasRelativeChild && "layoutMode" in node && node.layoutMode !== "NONE") {
+  if ("layoutMode" in node && node.layoutMode !== "NONE") {
     // there is an edge case: frame with no children, layoutMode !== NONE and counterAxis = AUTO, but:
     // in [altConversions] it is already solved: Frame without children becomes a Rectangle.
-
-    if (node.counterAxisSizingMode === "FIXED") {
-      // if counterAxisSizingMode === "AUTO", width and height won't be set. For every other case, it will be.
-      // when AutoLayout is HORIZONTAL, width is set by Figma and height is auto.
-      if (node.layoutMode === "HORIZONTAL") {
+    switch (node.layoutMode) {
+      case "HORIZONTAL":
         return {
-          width: null,
-          height: propHeight,
+          width: node.primaryAxisSizingMode === "FIXED" ? propWidth : null,
+          height: node.counterAxisSizingMode === "FIXED" ? propHeight : null,
         };
-      } else {
-        // node.layoutMode === "VERTICAL"
-
-        // when AutoLayout is VERTICAL, height is set by Figma and width is auto.
+      case "VERTICAL":
         return {
-          width: propWidth,
-          height: null,
+          width: node.counterAxisSizingMode === "FIXED" ? propWidth : null,
+          height: node.primaryAxisSizingMode === "FIXED" ? propHeight : null,
         };
-      }
-      // node.layoutMode === "NONE" won't reach here
-      // if node.children.length === 1, it will be converted to HORIZONTAL AutoLayout
-      // if node.children.length > 1, it will be taken care before.
     }
   } else {
     return {
@@ -147,12 +150,6 @@ export const nodeWidthHeight = (
       height: propHeight,
     };
   }
-
-  // when node.counterAxisSizingMode is AUTO
-  return {
-    width: null,
-    height: null,
-  };
 };
 
 // makes the view size bigger when there is a stroke
@@ -207,7 +204,7 @@ const childLargerThanMaxSize = (node: AltSceneNode, axis: "x" | "y") => {
 
     const maxLen =
       lastChild[axis] + lastChild[widthHeight] - node.children[0][axis];
-    return maxLen > 256;
+    return maxLen > 384;
   }
   return false;
 };
@@ -222,56 +219,52 @@ type responsive =
   | "3/4"
   | "1/5"
   | "1/6"
-  | "5/6"
-  | "1/12";
-// removed 5/12, 7/12 and 11/12 because they were disrupting more than helping.
+  | "5/6";
 
-const calculateResponsiveW = (
+const calculateResponsiveWH = (
   node: AltSceneNode,
-  nodeWidth: number
+  nodeWidthHeight: number,
+  axis: "x" | "y"
 ): responsive => {
-  let propWidth: responsive = "";
+  let returnValue: responsive = "";
 
-  if (nodeWidth > 256 || childLargerThanMaxSize(node, "x")) {
-    propWidth = "full";
+  if (nodeWidthHeight > 384 || childLargerThanMaxSize(node, axis)) {
+    console.log("aaaaa fu", axis);
+    returnValue = "full";
   }
 
   if (!node.parent) {
-    return propWidth;
+    return returnValue;
   }
 
-  let parentWidth;
-
-  // add padding back to the layout width, so it can be full when compared with parent.
-  if (
-    node.parent &&
-    "layoutMode" in node.parent &&
-    (node.parent.paddingLeft || node.parent.paddingRight) &&
-    node.parent.layoutMode !== "NONE"
-  ) {
-    parentWidth =
-      node.parent.width - node.parent.paddingLeft - node.parent.paddingRight;
-    // currently ignoring h-full
+  let parentWidthHeight;
+  if ("layoutMode" in node.parent && node.parent.layoutMode !== "NONE") {
+    if (axis === "x") {
+      // subtract padding from the layout width, so it can be full when compared with parent.
+      parentWidthHeight =
+        node.parent.width - node.parent.paddingLeft - node.parent.paddingRight;
+    } else {
+      // subtract padding from the layout height, so it can be full when compared with parent.
+      parentWidthHeight =
+        node.parent.height - node.parent.paddingTop - node.parent.paddingBottom;
+    }
   } else {
-    parentWidth = node.parent.width;
+    parentWidthHeight = axis === "x" ? node.parent.width : node.parent.height;
   }
-
-  // todo what if the element is ~1/2 but there is a margin? This won't detect it
 
   // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
-  const dividedWidth = nodeWidth / parentWidth;
+  const dividedWidth = nodeWidthHeight / parentWidthHeight;
+  console.log("dividedWidth ", dividedWidth, parentWidthHeight, node);
 
   const calculateResp = (div: number, str: responsive) => {
     if (Math.abs(dividedWidth - div) < 0.01) {
-      propWidth = str;
+      returnValue = str;
       return true;
     }
     return false;
   };
 
   // they will try to set the value, and if false keep calculating
-  // todo is there a better way of writing this?
-
   const checkList: Array<[number, responsive]> = [
     [1, "full"],
     [1 / 2, "1/2"],
@@ -282,7 +275,6 @@ const calculateResponsiveW = (
     [1 / 5, "1/5"],
     [1 / 6, "1/6"],
     [5 / 6, "5/6"],
-    [1 / 12, "1/12"],
   ];
 
   // exit the for when result is found.
@@ -297,7 +289,7 @@ const calculateResponsiveW = (
   //   propWidth = "full";
   // }
 
-  return propWidth;
+  return returnValue;
 };
 
 // set the width to max if the view is near the corner

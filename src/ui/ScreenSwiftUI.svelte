@@ -135,27 +135,30 @@
           2.59275-.1816667v-3.54725c-.295833.0456667-1.160167.1136667-1.637583.1136667-2.023834
           0-2.93325-.9550833-2.93325-3.0925833v-13.69075z" />
       </svg>
-      <p class="w-3/4 mx-2 leading-tight tracking-tight text-md">
+      <p class="w-3/4 mx-2 leading-tight tracking-tight text-sm">
         SwiftUI an innovative, exceptionally simple way to build user interfaces
         <a
-          class="font-medium text-orange-500"
-          href="https://developer.apple.com/xcode/swiftui/">
+          class="font-medium text-red-500 hover:text-red-800"
+          href="https://developer.apple.com/xcode/swiftui/"
+          target="_blank">
           across all Apple platforms with the power of Swift.
         </a>
         You can test your creations in Xcode or
         <a
-          class="font-medium text-orange-500"
-          href="https://www.apple.com/swift/playgrounds/">
+          class="font-medium text-red-500 hover:text-red-800"
+          href="https://www.apple.com/swift/playgrounds/"
+          target="_blank">
           Swift Playgrounds
         </a>
         (iPad and Mac).
       </p>
     </div>
-    <p class="mt-2">
+    <p class="mt-2 text-sm">
       Tip:
       <a
-        class="font-medium text-orange-500"
-        href="https://stackoverflow.com/a/7828337/4418073">
+        class="font-medium text-red-500 hover:text-red-800"
+        href="https://stackoverflow.com/a/7828337/4418073"
+        target="_blank">
         how to indent the code.
       </a>
     </p>
@@ -176,11 +179,14 @@
     <div class="w-full pt-2 {sectionStyle}">
       <div class="flex items-center justify-between px-2 space-x-2">
         <p
-          class="px-4 py-2 text-lg font-medium text-center bg-gray-300 rounded-lg">
+          class="px-4 py-2 text-lg font-medium text-center bg-gray-200
+          rounded-lg">
           Code
         </p>
         <button
-          class="px-4 py-2 font-semibold text-blue-700 bg-transparent border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent"
+          class="px-4 py-2 font-semibold text-blue-700 bg-transparent border
+          border-blue-500 rounded hover:bg-blue-500 hover:text-white
+          hover:border-transparent"
           on:click={clipboard(codeObservable)}>
           Copy to Clipboard
         </button>

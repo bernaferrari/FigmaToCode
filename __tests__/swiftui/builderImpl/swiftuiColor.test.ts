@@ -239,6 +239,8 @@ describe("SwiftUI Color", () => {
     };
 
     node.fills = [gradientFill];
+    node.width = 10;
+    node.height = 10;
     node.strokeWeight = 4;
     node.strokeAlign = "OUTSIDE";
     node.strokes = [
@@ -252,6 +254,7 @@ describe("SwiftUI Color", () => {
     expect(swiftuiMain([node])).toEqual(
       `RoundedRectangle(cornerRadius: 16)
 .fill(LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 1, green: 0, blue: 0)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+.frame(width: 18, height: 18)
 .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color(red: 0.25, green: 0.25, blue: 0.25), lineWidth: 4))`
     );
   });

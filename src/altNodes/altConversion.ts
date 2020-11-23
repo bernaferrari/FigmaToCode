@@ -184,10 +184,10 @@ const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
   altNode.primaryAxisAlignItems = node.primaryAxisAlignItems;
   altNode.counterAxisAlignItems = node.counterAxisAlignItems;
 
-  altNode.paddingLeft = node.horizontalPadding;
-  altNode.paddingRight = node.horizontalPadding;
-  altNode.paddingTop = node.verticalPadding;
-  altNode.paddingBottom = node.verticalPadding;
+  altNode.paddingLeft = node.paddingLeft;
+  altNode.paddingRight = node.paddingRight;
+  altNode.paddingTop = node.paddingTop;
+  altNode.paddingBottom = node.paddingBottom;
 
   altNode.itemSpacing = node.itemSpacing;
   altNode.layoutGrids = node.layoutGrids;

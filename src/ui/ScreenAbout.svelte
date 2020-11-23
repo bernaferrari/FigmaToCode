@@ -4,7 +4,7 @@
   import "prismjs/components/prism-dart";
 </script>
 
-<div class="w-full px-8 py-4 bg-orange-100">
+<div class="w-full px-8 py-4 bg-blue-50">
   <p class="text-xl font-bold text-center">Responsive Layout</p>
   <div class="flex items-center justify-center w-full pt-4 space-x-4">
     <div
@@ -57,14 +57,13 @@
 
 </div>
 
-<div class="w-full px-8 py-4 bg-gray-50">
+<div class="w-full px-8 py-4 bg-blue-200">
   <p class="text-xl font-bold text-center">Info</p>
   <div class="h-2" />
 
   <p class="text-base text-center">
     I have tried to think what would make sense for
-    <span class="font-bold">80% of people.</span>
-    Still, bugs can and will happen; ideas will appear. Your mission, should you
+   most people. Still, bugs can and will happen; ideas will appear. Your mission, should you
     choose to accept, is to share them with me.
   </p>
 
@@ -72,7 +71,7 @@
 <div class="w-full px-8 py-4 bg-blue-900">
   <p class="text-xl font-bold text-center text-white">Figma to Code</p>
   <div class="h-2" />
-  <p class="font-semibold text-center text-white text-md">
+  <p class="font-semibold text-center text-white text-base">
     Designed and developed by Bernardo Ferrari.
   </p>
   <div class="h-4" />

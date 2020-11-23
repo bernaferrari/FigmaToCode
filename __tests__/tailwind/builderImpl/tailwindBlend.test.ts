@@ -11,19 +11,19 @@ describe("Tailwind Blend", () => {
 
   it("opacity", () => {
     node.opacity = 0.1;
-    expect(tailwindOpacity(node)).toEqual("opacity-0 ");
+    expect(tailwindOpacity(node)).toEqual("opacity-10 ");
 
     node.opacity = 0.3;
-    expect(tailwindOpacity(node)).toEqual("opacity-25 ");
+    expect(tailwindOpacity(node)).toEqual("opacity-30 ");
 
     node.opacity = 0.45;
-    expect(tailwindOpacity(node)).toEqual("opacity-50 ");
+    expect(tailwindOpacity(node)).toEqual("opacity-40 ");
 
     node.opacity = 0.65;
-    expect(tailwindOpacity(node)).toEqual("opacity-75 ");
+    expect(tailwindOpacity(node)).toEqual("opacity-60 ");
 
     node.opacity = 0.95;
-    expect(tailwindOpacity(node)).toEqual("opacity-75 ");
+    expect(tailwindOpacity(node)).toEqual("opacity-95 ");
   });
 
   it("visibility", () => {

@@ -237,6 +237,9 @@ describe("Flutter Color", () => {
       ],
     };
 
+    // width is going be 18 because 10 + 4 + 4 of stroke.
+    node.height = 10;
+    node.width = 10;
     node.fills = [gradientFill];
     node.strokeWeight = 4;
     node.strokeAlign = "OUTSIDE";
@@ -249,7 +252,7 @@ describe("Flutter Color", () => {
     node.cornerRadius = 16;
 
     expect(flutterMain([node])).toEqual(
-      `Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: Color(0xff3f3f3f), width: 4,), gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.blackColor(0xffff0000)], ), ), )`
+      `Container(width: 18, height: 18, decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: Color(0xff3f3f3f), width: 4,), gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.black, Color(0xffff0000)], ), ), )`
     );
   });
 

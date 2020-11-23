@@ -116,28 +116,65 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   // ROW or COLUMN
   const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
-  const mostFreq = mostFrequent(node.children.map((d) => d.layoutAlign));
+  let crossAlignType;
+  switch (node.counterAxisAlignItems) {
+    case "MIN":
+      crossAlignType = "min";
+      break;
+    case "CENTER":
+      crossAlignType = "center";
+      break;
+    case "MAX":
+      crossAlignType = "max";
+      break;
+  }
+  const crossAxisAlignment = `crossAxisAlignment: CrossAxisAlignment.${crossAlignType}, `;
 
-  const layoutAlign = mostFreq === "MIN" ? "start" : "center";
+  let mainAlignType;
+  switch (node.primaryAxisAlignItems) {
+    case "MIN":
+      mainAlignType = "min";
+      break;
+    case "CENTER":
+      mainAlignType = "center";
+      break;
+    case "MAX":
+      mainAlignType = "max";
+      break;
+    case "SPACE_BETWEEN":
+      mainAlignType = "spaceBetween";
+      break;
+  }
+  const mainAxisAlignment = `mainAxisAlignment: MainAxisAlignment.${mainAlignType}, `;
 
-  const crossAxisColumn =
-    rowOrColumn === "Column"
-      ? `crossAxisAlignment: CrossAxisAlignment.${layoutAlign}, `
-      : "";
+  let mainAxisSize;
+  if (node.layoutGrow === 1) {
+    mainAxisSize = "mainAxisSize: MainAxisSize.max, ";
+  } else {
+    mainAxisSize = "mainAxisSize: MainAxisSize.min, ";
+  }
 
-  const mainAxisSize = "mainAxisSize: MainAxisSize.min, ";
-
-  return `${rowOrColumn}(${mainAxisSize}${crossAxisColumn}children:[${children}], ), `;
+  return `${rowOrColumn}(${mainAxisSize}${mainAxisAlignment}${crossAxisAlignment}children:[${children}], ), `;
 };
 
-// https://stackoverflow.com/a/20762713
-export const mostFrequent = (arr: Array<string>): string | undefined => {
-  return arr
-    .sort(
-      (a, b) =>
-        arr.filter((v) => v === a).length - arr.filter((v) => v === b).length
-    )
-    .pop();
+export const formatFlutterProperty = (
+  name: string,
+  positionedValues: Array<string>,
+  singleValue: string,
+  paddingLen: number
+): string => {
+  let returnValue = "";
+
+  returnValue += `${name}(`;
+  returnValue += positionedValues.map(
+    (d) => " ".repeat(paddingLen) + d + ",\n"
+  );
+  if (singleValue.length > 0) {
+    returnValue += " ".repeat(paddingLen) + singleValue + ",\n";
+  }
+  returnValue += "), ";
+
+  return returnValue;
 };
 
 // TODO Vector support in Flutter is complicated. Currently, AltConversion converts it in a Rectangle.

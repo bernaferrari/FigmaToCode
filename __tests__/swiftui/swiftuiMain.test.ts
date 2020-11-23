@@ -110,7 +110,10 @@ Rectangle()
     node.x = 0;
     node.y = 0;
     node.layoutMode = "VERTICAL";
+    node.primaryAxisAlignItems = "MAX";
+    node.counterAxisAlignItems = "MAX";
     node.counterAxisSizingMode = "AUTO";
+    node.primaryAxisSizingMode = "AUTO";
     node.itemSpacing = 8;
 
     const child1 = new AltRectangleNode();
@@ -118,7 +121,7 @@ Rectangle()
     child1.height = 8;
     child1.x = 0;
     child1.y = 0;
-    child1.layoutAlign = "MAX";
+    child1.layoutAlign = "INHERIT";
     child1.fills = [
       {
         type: "SOLID",
@@ -135,7 +138,7 @@ Rectangle()
     child2.height = 8;
     child2.x = 16;
     child2.y = 0;
-    child2.layoutAlign = "MAX";
+    child2.layoutAlign = "INHERIT";
     child2.fills = [
       {
         type: "SOLID",
@@ -162,8 +165,8 @@ Rectangle()
 }`);
 
     // variations in layoutAlign for test coverage
-    child1.layoutAlign = "CENTER";
-    child2.layoutAlign = "CENTER";
+    node.primaryAxisAlignItems = "CENTER";
+    node.counterAxisAlignItems = "CENTER";
     node.itemSpacing = 16;
 
     expect(swiftuiMain([node])).toEqual(`VStack() {
@@ -176,8 +179,8 @@ Rectangle()
 }`);
 
     // variations in layoutAlign and spacing for coverage
-    child1.layoutAlign = "MIN";
-    child2.layoutAlign = "MIN";
+    node.primaryAxisAlignItems = "MIN";
+    node.counterAxisAlignItems = "MIN";
     node.itemSpacing = 0;
     node.fills = [
       {
@@ -200,8 +203,8 @@ Rectangle()
 
     // change orientation
     node.layoutMode = "HORIZONTAL";
-    child1.layoutAlign = "MIN";
-    child2.layoutAlign = "MIN";
+    node.primaryAxisAlignItems = "MIN";
+    node.counterAxisAlignItems = "MIN";
 
     expect(swiftuiMain([node])).toEqual(`HStack(alignment: .top, spacing: 0) {
 Rectangle()
@@ -213,8 +216,8 @@ Rectangle()
 }
 .background(Color.black)`);
 
-    child1.layoutAlign = "CENTER";
-    child2.layoutAlign = "CENTER";
+    node.primaryAxisAlignItems = "CENTER";
+    node.counterAxisAlignItems = "CENTER";
 
     expect(swiftuiMain([node])).toEqual(`HStack(spacing: 0) {
 Rectangle()
@@ -226,8 +229,8 @@ Rectangle()
 }
 .background(Color.black)`);
 
-    child1.layoutAlign = "MAX";
-    child2.layoutAlign = "MAX";
+    node.primaryAxisAlignItems = "MAX";
+    node.counterAxisAlignItems = "MAX";
 
     expect(swiftuiMain([node]))
       .toEqual(`HStack(alignment: .bottom, spacing: 0) {
@@ -354,6 +357,7 @@ Rectangle()
     expect(swiftuiMain([convertToAutoLayout(node)])).toEqual(`Text("")
 .padding(.trailing, 10)
 .padding(.bottom, 10)
+.frame(width: 20, height: 20)
 .background(Color.black)
 .cornerRadius(20)`);
   });

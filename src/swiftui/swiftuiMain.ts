@@ -150,7 +150,7 @@ const wrapInDirectionalStack = (
   // retrieve the align based on the most frequent position of children
   // SwiftUI doesn't allow the children to be set individually. And there are different align properties for HStack and VStack.
   let layoutAlign = "";
-  const mostFreq = mostFrequent(node.children.map((d) => d.layoutAlign));
+  const mostFreq = node.counterAxisAlignItems;
   if (node.layoutMode === "VERTICAL") {
     if (mostFreq === "MIN") {
       layoutAlign = "alignment: .leading";

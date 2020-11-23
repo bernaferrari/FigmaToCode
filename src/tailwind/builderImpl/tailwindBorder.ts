@@ -10,8 +10,8 @@ export const tailwindBorderWidth = (node: AltGeometryMixin): string => {
   // [node.strokeWeight] can have a value even when there are no strokes
   // [when testing] node.effects can be undefined
   if (node.strokes && node.strokes.length > 0 && node.strokeWeight > 0) {
-    const array = [1, 2, 4, 8];
-    const nearest = nearestValue(node.strokeWeight, array);
+    const allowedValues = [1, 2, 4, 8];
+    const nearest = nearestValue(node.strokeWeight, allowedValues);
     if (nearest === 1) {
       // special case
       return "border ";

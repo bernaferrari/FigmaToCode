@@ -7,7 +7,7 @@
 
 <style>
   .switch {
-    @apply relative inline-block align-middle cursor-pointer select-none bg-transparent;
+    @apply relative inline-block align-middle cursor-pointer select-none;
   }
 
   .track {

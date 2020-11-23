@@ -12,6 +12,14 @@ describe("TextSize", () => {
     parentNode.layoutMode = "HORIZONTAL";
     parentNode.width = 120;
     parentNode.height = 12;
+    parentNode.paddingLeft = 0;
+    parentNode.paddingRight = 0;
+    parentNode.paddingTop = 0;
+    parentNode.paddingBottom = 0;
+    parentNode.primaryAxisAlignItems = "CENTER";
+    parentNode.counterAxisAlignItems = "CENTER";
+    parentNode.counterAxisSizingMode = "FIXED";
+    parentNode.primaryAxisSizingMode = "FIXED";
 
     const node = new AltTextNode();
     node.characters = "";
@@ -25,10 +33,10 @@ describe("TextSize", () => {
     node.parent = parentNode;
 
     // todo verify if this is correct
-    expect(tailwindTextSize(node)).toEqual("w-full h-3 ");
+    expect(tailwindTextSize(node)).toEqual("w-full h-full ");
 
     node.width = 100;
-    expect(tailwindTextSize(node)).toEqual("w-5/6 h-3 ");
+    expect(tailwindTextSize(node)).toEqual("w-5/6 h-full ");
 
     node.textAutoResize = "HEIGHT";
     expect(tailwindTextSize(node)).toEqual("w-5/6 ");

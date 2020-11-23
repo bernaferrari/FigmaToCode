@@ -14,61 +14,61 @@ describe("Tailwind padding", () => {
 
     frameNode.paddingLeft = 0;
     frameNode.paddingRight = 0;
-    frameNode.paddingTop = 2.1;
-    frameNode.paddingBottom = 2.2;
+    frameNode.paddingTop = 4.1;
+    frameNode.paddingBottom = 4.2;
     expect(tailwindPadding(frameNode)).toEqual("py-1 ");
 
     frameNode.paddingLeft = 8;
     frameNode.paddingRight = 8.01;
-    frameNode.paddingTop = 2;
-    frameNode.paddingBottom = 2;
+    frameNode.paddingTop = 4;
+    frameNode.paddingBottom = 4;
     expect(tailwindPadding(frameNode)).toEqual("px-2 py-1 ");
 
-    frameNode.paddingLeft = 2;
-    frameNode.paddingRight = 2;
+    frameNode.paddingLeft = 4;
+    frameNode.paddingRight = 4;
     frameNode.paddingTop = 0;
     frameNode.paddingBottom = 0;
     expect(tailwindPadding(frameNode)).toEqual("px-1 ");
 
-    frameNode.paddingLeft = 2;
-    frameNode.paddingRight = 2;
+    frameNode.paddingLeft = 4;
+    frameNode.paddingRight = 4;
     frameNode.paddingTop = 8;
     frameNode.paddingBottom = 8;
     expect(tailwindPadding(frameNode)).toEqual("px-1 py-2 ");
 
-    frameNode.paddingLeft = 2;
-    frameNode.paddingRight = 2;
+    frameNode.paddingLeft = 4;
+    frameNode.paddingRight = 4;
     frameNode.paddingTop = 8;
     frameNode.paddingBottom = 8;
     expect(tailwindPadding(frameNode)).toEqual("px-1 py-2 ");
 
-    frameNode.paddingLeft = 2;
-    frameNode.paddingRight = 2;
-    frameNode.paddingTop = 2;
-    frameNode.paddingBottom = 2;
+    frameNode.paddingLeft = 4;
+    frameNode.paddingRight = 4;
+    frameNode.paddingTop = 4;
+    frameNode.paddingBottom = 4;
     expect(tailwindPadding(frameNode)).toEqual("p-1 ");
 
-    frameNode.paddingLeft = 2;
-    frameNode.paddingRight = 3;
-    frameNode.paddingTop = 2;
-    frameNode.paddingBottom = 3;
+    frameNode.paddingLeft = 4;
+    frameNode.paddingRight = 4.5;
+    frameNode.paddingTop = 4;
+    frameNode.paddingBottom = 4.5;
     expect(tailwindPadding(frameNode)).toEqual("px-1 py-1 ");
 
-    frameNode.paddingLeft = 2;
+    frameNode.paddingLeft = 4;
     frameNode.paddingRight = 8;
-    frameNode.paddingTop = 2;
+    frameNode.paddingTop = 4;
     frameNode.paddingBottom = 8;
     expect(tailwindPadding(frameNode)).toEqual("pl-1 pr-2 pt-1 pb-2 ");
 
     frameNode.paddingLeft = 0;
-    frameNode.paddingRight = 2;
+    frameNode.paddingRight = 4;
     frameNode.paddingTop = 0;
-    frameNode.paddingBottom = 2;
+    frameNode.paddingBottom = 4;
     expect(tailwindPadding(frameNode)).toEqual("pr-1 pb-1 ");
 
-    frameNode.paddingLeft = 2;
+    frameNode.paddingLeft = 4;
     frameNode.paddingRight = 0;
-    frameNode.paddingTop = 2;
+    frameNode.paddingTop = 4;
     frameNode.paddingBottom = 0;
     expect(tailwindPadding(frameNode)).toEqual("pl-1 pt-1 ");
 

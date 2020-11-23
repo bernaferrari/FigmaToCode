@@ -29,13 +29,21 @@ describe("Flutter Size", () => {
   it("STRETCH inside AutoLayout", () => {
     const node = new AltFrameNode();
     node.layoutMode = "HORIZONTAL";
+    node.layoutAlign = "INHERIT";
+    node.primaryAxisSizingMode = "FIXED";
+    node.counterAxisSizingMode = "FIXED";
+    node.width = 10;
+    node.height = 10;
 
     const child = new AltRectangleNode();
-    child.parent = node;
     child.layoutAlign = "STRETCH";
+    child.layoutGrow = 1;
     child.width = 10;
+    child.height = 10;
 
-    expect(flutterSize(child)).toEqual("width: 10, ");
+    child.parent = node;
+
+    expect(flutterSize(child)).toEqual("width: 10, height: 10, ");
   });
 
   it("Fixed size when children are absolute", () => {
@@ -69,6 +77,7 @@ describe("Flutter Size", () => {
     const node = new AltFrameNode();
     node.layoutMode = "HORIZONTAL";
     node.counterAxisSizingMode = "AUTO";
+    node.primaryAxisSizingMode = "AUTO";
     node.x = 0;
     node.y = 0;
     node.width = 48;
@@ -80,14 +89,15 @@ describe("Flutter Size", () => {
     // responsive
     const parentNode = new AltFrameNode();
     parentNode.counterAxisSizingMode = "FIXED";
+    parentNode.primaryAxisSizingMode = "FIXED";
     parentNode.x = 0;
     parentNode.y = 0;
     parentNode.width = 48;
     parentNode.height = 48;
     parentNode.children = [node];
     node.parent = parentNode;
-    expect(flutterSize(node)).toEqual("");
-    expect(flutterSize(parentNode)).toEqual("");
+    expect(flutterSize(node)).toEqual("width: 48, height: 48, ");
+    expect(flutterSize(parentNode)).toEqual("width: 48, height: 48, ");
   });
 
   it("width changes when there are strokes", () => {
@@ -141,18 +151,21 @@ describe("Flutter Size", () => {
   });
 
   it("full width when width is same to the parent", () => {
-    const node = new AltFrameNode();
-    node.width = 12;
-    node.height = 12;
-
     const parentNode = new AltFrameNode();
     parentNode.layoutMode = "NONE";
     parentNode.width = 12;
     parentNode.height = 12;
-    parentNode.children = [node];
+    parentNode.counterAxisSizingMode = "AUTO";
+    parentNode.primaryAxisSizingMode = "AUTO";
+
+    const node = new AltFrameNode();
+    node.width = 12;
+    node.height = 12;
     node.parent = parentNode;
 
-    expect(flutterSize(parentNode)).toEqual("");
+    parentNode.children = [node];
+
+    expect(flutterSize(parentNode)).toEqual("width: 12, height: 12, ");
     expect(flutterSize(node)).toEqual("width: 12, height: 12, ");
   });
 });

@@ -193,14 +193,6 @@ export const rowColumnProps = (node: AltFrameNode): string => {
     return "";
   }
 
-  // if children is a child with STRETCH, ignore and return here
-  if (
-    node.children.length === 1 &&
-    node.children[0].layoutAlign === "STRETCH"
-  ) {
-    return "";
-  }
-
   // [optimization]
   // flex, by default, has flex-row. Therefore, it can be omitted.
   const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "flex-col ";
@@ -217,28 +209,57 @@ export const rowColumnProps = (node: AltFrameNode): string => {
       : "";
 
   // special case when there is only one children; need to position correctly in Flex.
-  let justify = "justify-center";
-  if (node.children.length === 1) {
-    const nodeCenteredPosX = node.children[0].x + node.children[0].width / 2;
-    const parentCenteredPosX = node.width / 2;
+  // let justify = "justify-center";
+  // if (node.children.length === 1) {
+  //   const nodeCenteredPosX = node.children[0].x + node.children[0].width / 2;
+  //   const parentCenteredPosX = node.width / 2;
 
-    const marginX = nodeCenteredPosX - parentCenteredPosX;
+  //   const marginX = nodeCenteredPosX - parentCenteredPosX;
 
-    // allow a small threshold
-    if (marginX < -4) {
-      justify = "justify-start";
-    } else if (marginX > 4) {
-      justify = "justify-end";
-    }
+  //   // allow a small threshold
+  //   if (marginX < -4) {
+  //     justify = "justify-start";
+  //   } else if (marginX > 4) {
+  //     justify = "justify-end";
+  //   }
+  // }
+  let primaryAlign: string;
+
+  switch (node.primaryAxisAlignItems) {
+    case "MIN":
+      primaryAlign = "justify-start ";
+      break;
+    case "CENTER":
+      primaryAlign = "justify-center ";
+      break;
+    case "MAX":
+      primaryAlign = "justify-end ";
+      break;
+    case "SPACE_BETWEEN":
+      primaryAlign = "justify-between ";
+      break;
   }
 
   // [optimization]
   // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, center it.
-  const layoutAlign =
-    node.layoutMode === "VERTICAL" &&
-    node.children.every((d) => d.layoutAlign === "STRETCH")
-      ? ""
-      : `items-center ${justify} `;
+  let counterAlign: string;
+  switch (node.counterAxisAlignItems) {
+    case "MIN":
+      counterAlign = "items-start ";
+      break;
+    case "CENTER":
+      counterAlign = "items-center ";
+      break;
+    case "MAX":
+      counterAlign = "items-end ";
+      break;
+  }
+
+  // const layoutAlign =
+  //   node.layoutMode === "VERTICAL" &&
+  //   node.children.every((d) => d.layoutAlign === "STRETCH")
+  //     ? ""
+  //     : `items-center ${justify} `;
 
   // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
   const flex =
@@ -248,5 +269,5 @@ export const rowColumnProps = (node: AltFrameNode): string => {
       ? "flex "
       : "inline-flex ";
 
-  return `${flex}${rowOrColumn}${space}${layoutAlign}`;
+  return `${flex}${rowOrColumn}${space}${counterAlign}${primaryAlign}`;
 };

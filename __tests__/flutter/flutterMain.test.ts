@@ -56,16 +56,16 @@ Container(width: 4, height: 4, color: Colors.white, ),),Positioned(left: 9, top:
 Container(width: 4, height: 4, ),),],),)`);
   });
 
-  it("children is larger than 256", () => {
+  it("children is larger than 384", () => {
     const node = new AltFrameNode();
-    node.width = 320;
-    node.height = 320;
+    node.width = 420;
+    node.height = 420;
     node.name = "FRAME";
     node.layoutMode = "NONE";
     node.counterAxisSizingMode = "FIXED";
 
     const child1 = new AltRectangleNode();
-    child1.width = 257;
+    child1.width = 385;
     child1.height = 8;
     child1.x = 9;
     child1.y = 9;
@@ -82,7 +82,7 @@ Container(width: 4, height: 4, ),),],),)`);
 
     const child2 = new AltRectangleNode();
     child2.width = 8;
-    child2.height = 257;
+    child2.height = 385;
     child2.x = 9;
     child2.y = 9;
 
@@ -92,9 +92,9 @@ Container(width: 4, height: 4, ),),],),)`);
     child2.parent = node;
 
     expect(flutterMain([convertToAutoLayout(node)]))
-      .toEqual(`Container(width: 320, child: Stack(children:[Positioned(left: 9, top: 9, child: 
-Container(width: 257, height: 8, color: Colors.white, ),),Positioned(left: 9, top: 9, child: 
-Container(width: 8, height: 257, ),),],),)`);
+      .toEqual(`Container(width: 420, child: Stack(children:[Positioned(left: 9, top: 9, child: 
+Container(width: 385, height: 8, color: Colors.white, ),),Positioned(left: 9, top: 9, child: 
+Container(width: 8, height: 385, ),),],),)`);
   });
 
   it("Group with relative position", () => {
@@ -142,6 +142,9 @@ Container(width: 4, height: 4, color: Colors.white, ),),],),)`);
     node.y = 0;
     node.layoutMode = "HORIZONTAL";
     node.counterAxisSizingMode = "AUTO";
+    node.primaryAxisSizingMode = "AUTO";
+    node.primaryAxisAlignItems = "MIN";
+    node.counterAxisAlignItems = "MIN";
     node.itemSpacing = 8;
 
     const child1 = new AltRectangleNode();
@@ -149,7 +152,7 @@ Container(width: 4, height: 4, color: Colors.white, ),),],),)`);
     child1.height = 8;
     child1.x = 0;
     child1.y = 0;
-    child1.layoutAlign = "MAX";
+    child1.layoutAlign = "INHERIT";
     child1.fills = [
       {
         type: "SOLID",
@@ -166,7 +169,6 @@ Container(width: 4, height: 4, color: Colors.white, ),),],),)`);
     child2.height = 8;
     child2.x = 16;
     child2.y = 0;
-    child2.layoutAlign = "MAX";
     child2.fills = [
       {
         type: "SOLID",
@@ -183,17 +185,25 @@ Container(width: 4, height: 4, color: Colors.white, ),),],),)`);
     child2.parent = node;
 
     expect(flutterMain([node]))
-      .toEqual(`Row(mainAxisSize: MainAxisSize.min, children:[
+      .toEqual(`Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.min, crossAxisAlignment: CrossAxisAlignment.min, children:[
 Container(width: 8, height: 8, color: Colors.white, ), SizedBox(width: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
 
     // variations for test coverage
     node.layoutMode = "VERTICAL";
-    child1.layoutAlign = "MIN";
-    child2.layoutAlign = "MIN";
+    node.primaryAxisAlignItems = "CENTER";
+    node.counterAxisAlignItems = "CENTER";
 
     expect(flutterMain([node]))
-      .toEqual(`Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children:[
+      .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children:[
+Container(width: 8, height: 8, color: Colors.white, ), SizedBox(height: 8),
+Container(width: 8, height: 8, color: Colors.black, ),], ),`);
+
+    node.primaryAxisAlignItems = "MAX";
+    node.counterAxisAlignItems = "MAX";
+
+    expect(flutterMain([node]))
+      .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.max, crossAxisAlignment: CrossAxisAlignment.max, children:[
 Container(width: 8, height: 8, color: Colors.white, ), SizedBox(height: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
   });

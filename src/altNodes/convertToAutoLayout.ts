@@ -1,3 +1,4 @@
+import { mostFrequent } from "./../swiftui/swiftuiMain";
 import { AltFrameNode, AltGroupNode, AltSceneNode } from "./altMixins";
 import { convertGroupToFrame } from "./convertGroupToFrame";
 
@@ -12,6 +13,7 @@ export const convertToAutoLayout = (
   node: AltFrameNode | AltGroupNode
 ): AltFrameNode | AltGroupNode => {
   // only go inside when AutoLayout is not already set.
+
   if (
     ("layoutMode" in node &&
       node.layoutMode === "NONE" &&
@@ -46,22 +48,38 @@ export const convertToAutoLayout = (
 
     node.itemSpacing = itemSpacing > 0 ? itemSpacing : 0;
 
-    // todo while this is similar to Figma, verify if this is good enough or if padding should be allowed in all four directions.
     const padding = detectAutoLayoutPadding(node);
 
-    node.paddingTop = padding.top;
-    node.paddingBottom = padding.bottom;
-    node.paddingLeft = padding.left;
-    node.paddingRight = padding.right;
+    node.paddingTop = Math.max(padding.top, 0);
+    node.paddingBottom = Math.max(padding.bottom, 0);
+    node.paddingLeft = Math.max(padding.left, 0);
+    node.paddingRight = Math.max(padding.right, 0);
 
-    // update the layoutAlign attribute for every child
-    node.children = node.children.map((d) => {
+    // set children to INHERIT or STRETCH
+    node.children.map((d) => {
       // @ts-ignore current node can't be AltGroupNode because it was converted into AltFrameNode
-      d.layoutAlign = layoutAlignInChild(d, node);
-      return d;
+      layoutAlignInChild(d, node);
     });
 
-    // todo counterAxisSizingMode = ??? auto when autolayout? auto when it was a group?
+    const allChildrenDirection = node.children.map((d) =>
+      // @ts-ignore current node can't be AltGroupNode because it was converted into AltFrameNode
+      primaryAxisDirection(d, node)
+    );
+
+    const primaryDirection = allChildrenDirection.map((d) => d.primary);
+    const counterDirection = allChildrenDirection.map((d) => d.counter);
+
+    // @ts-ignore it is never going to be undefined.
+    node.primaryAxisAlignItems = mostFrequent(primaryDirection);
+    // todo THERE IS A CRITICAL BUG IN FIGMA, THESE PROPERTIES WILL GET THE WRONG VALUE.
+    console.log("primary is ", node.primaryAxisAlignItems, primaryDirection);
+
+    // @ts-ignore it is never going to be undefined.
+    node.counterAxisAlignItems = mostFrequent(counterDirection);
+    console.log("counter is ", node.counterAxisAlignItems, counterDirection);
+
+    node.counterAxisSizingMode = "FIXED";
+    node.primaryAxisSizingMode = "FIXED";
   }
 
   return node;
@@ -244,43 +262,63 @@ const detectAutoLayoutPadding = (
 };
 
 /**
- * Detect if children are aligned at the start, end or center of parent.
- * Result is the layoutAlign attribute
+ * Detect if children stretch or inherit.
  */
-const layoutAlignInChild = (
+const layoutAlignInChild = (node: AltSceneNode, parentNode: AltFrameNode) => {
+  const sameWidth =
+    node.width - 2 >
+    parentNode.width - parentNode.paddingLeft - parentNode.paddingRight;
+
+  const sameHeight =
+    node.height - 2 >
+    parentNode.height - parentNode.paddingTop - parentNode.paddingBottom;
+
+  if (parentNode.layoutMode === "VERTICAL") {
+    node.layoutAlign = sameWidth ? "STRETCH" : "INHERIT";
+  } else {
+    node.layoutAlign = sameHeight ? "STRETCH" : "INHERIT";
+  }
+  // with custom AutoLayout, this is never going to be 1.
+  node.layoutGrow = 0;
+};
+
+const primaryAxisDirection = (
   node: AltSceneNode,
   parentNode: AltFrameNode
-): "MIN" | "CENTER" | "MAX" | "STRETCH" => {
+): { primary: "MIN" | "CENTER" | "MAX"; counter: "MIN" | "CENTER" | "MAX" } => {
   // parentNode.layoutMode can't be NONE.
+  const nodeCenteredPosX = node.x + node.width / 2;
+  const parentCenteredPosX = parentNode.width / 2;
+
+  const centerXPosition = nodeCenteredPosX - parentCenteredPosX;
+
+  const nodeCenteredPosY = node.y + node.height / 2;
+  const parentCenteredPosY = parentNode.height / 2;
+
+  const centerYPosition = nodeCenteredPosY - parentCenteredPosY;
+
+  console.log("centerX is ", centerXPosition, "centerY is ", centerYPosition);
+
   if (parentNode.layoutMode === "VERTICAL") {
-    const nodeCenteredPosX = node.x + node.width / 2;
-    const parentCenteredPosX = parentNode.width / 2;
-
-    const paddingX = nodeCenteredPosX - parentCenteredPosX;
-
-    // allow a small threshold
-    if (paddingX < -4) {
-      return "MIN";
-    } else if (paddingX > 4) {
-      return "MAX";
-    } else {
-      return "CENTER";
-    }
+    return {
+      primary: getPaddingDirection(centerYPosition),
+      counter: getPaddingDirection(centerXPosition),
+    };
   } else {
-    // parentNode.layoutMode === "HORIZONTAL"
+    return {
+      primary: getPaddingDirection(centerXPosition),
+      counter: getPaddingDirection(centerYPosition),
+    };
+  }
+};
 
-    const nodeCenteredPosY = node.y + node.height / 2;
-    const parentCenteredPosY = parentNode.height / 2;
-
-    const paddingY = nodeCenteredPosY - parentCenteredPosY;
-
-    // allow a small threshold
-    if (paddingY < -4) {
-      return "MIN";
-    } else if (paddingY > 4) {
-      return "MAX";
-    } else {
-      return "CENTER";
-    }
+const getPaddingDirection = (position: number): "MIN" | "CENTER" | "MAX" => {
+  // allow a small threshold
+  if (position < -4) {
+    return "MIN";
+  } else if (position > 4) {
+    return "MAX";
+  } else {
+    return "CENTER";
   }
 };
