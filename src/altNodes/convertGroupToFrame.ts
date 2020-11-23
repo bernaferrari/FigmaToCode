@@ -19,6 +19,9 @@ export const convertGroupToFrame = (node: AltGroupNode): AltFrameNode => {
 
   newNode.layoutMode = "NONE";
   newNode.counterAxisSizingMode = "AUTO";
+  newNode.primaryAxisSizingMode = "AUTO";
+  newNode.primaryAxisAlignItems = "CENTER";
+  newNode.primaryAxisAlignItems = "CENTER";
   newNode.clipsContent = false;
   newNode.layoutGrids = [];
   newNode.gridStyleId = "";

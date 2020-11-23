@@ -5,7 +5,7 @@
   import "prism-theme-night-owl";
   import "prismjs/components/prism-dart";
 
-  import { GlobalCSS } from 'figma-plugin-ds-svelte';
+  import { GlobalCSS } from "figma-plugin-ds-svelte";
   import { Switch } from "figma-plugin-ds-svelte";
 
   let colorData = [];
@@ -158,18 +158,24 @@
       </defs>
     </svg>
 
-    <p class="w-3/4 mx-2 leading-tight tracking-tight text-md">
+    <p class="w-3/4 mx-2 leading-tight tracking-tight text-sm">
       Flutter is Google’s UI toolkit for building applications for
-      <a class="font-medium text-blue-500" href="https://flutter.dev/">
+      <a
+        class="font-medium text-blue-500 hover:text-blue-800"
+        href="https://flutter.dev/"
+        target="_blank">
         mobile, web, and desktop from a single codebase.
       </a>
       You can test your creations by pasting them here:
     </p>
   </div>
 
+  <div class="my-1"></div>
+
   <a href="https://codepen.io/bernardoferrari/pen/pogpBLB" target="_blank">
     <button
-      class="px-4 py-2 mt-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded shadow hover:bg-gray-50">
+      class="px-4 py-2 font-semibold text-gray-800 bg-white border
+      border-gray-400 rounded shadow hover:bg-gray-50">
       Flutter on CodePen
     </button>
   </a>
@@ -188,11 +194,14 @@
     <div class="w-full pt-2 {sectionStyle}">
       <div class="flex items-center justify-between px-2 space-x-2">
         <p
-          class="px-4 py-2 text-lg font-medium text-center bg-gray-300 rounded-lg">
+          class="px-4 py-2 text-lg font-medium text-center bg-gray-200
+          rounded-lg">
           Code
         </p>
         <button
-          class="px-4 py-2 font-semibold text-blue-700 bg-transparent border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent"
+          class="px-4 py-2 font-semibold text-blue-700 bg-transparent border
+          border-blue-500 rounded hover:bg-blue-500 hover:text-white
+          hover:border-transparent"
           on:click={clipboard(codeObservable)}>
           Copy to Clipboard
         </button>
@@ -217,7 +226,8 @@
         <div class="flex flex-wrap w-full">
           <div class="w-1/2 p-1">
             <div
-              class="flex items-center justify-center w-full h-full bg-gray-300 rounded-lg">
+              class="flex items-center justify-center w-full h-full bg-gray-200
+              rounded-lg">
               <p class="text-xl font-semibold">Colors</p>
             </div>
           </div>

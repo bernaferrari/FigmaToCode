@@ -154,13 +154,13 @@ describe("Flutter Text", () => {
     expect(flutterMain([node])).toEqual('Text("aA", ),');
 
     node.textAlignHorizontal = "CENTER";
-    node.layoutAlign = "MIN";
+    node.layoutAlign = "INHERIT";
     expect(flutterMain([node])).toEqual(
       'Text("aA", textAlign: TextAlign.center, ),'
     );
 
     node.textAlignHorizontal = "JUSTIFIED";
-    node.layoutAlign = "MIN";
+    node.layoutAlign = "INHERIT";
     expect(flutterMain([node])).toEqual(
       'Text("aA", textAlign: TextAlign.justify, ),'
     );

@@ -1,11 +1,11 @@
-import { AltTextNode } from "./../../src/altNodes/altMixins";
+import { AltSceneNode, AltTextNode } from "./../../src/altNodes/altMixins";
 import { tailwindSize } from "../../src/tailwind/builderImpl/tailwindSize";
 import { AltFrameNode } from "../../src/altNodes/altMixins";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { AltGroupNode, AltRectangleNode } from "../../src/altNodes/altMixins";
 import { convertNodesOnRectangle } from "../../src/altNodes/convertNodesOnRectangle";
 
-describe("convert node if child is big rect ", () => {
+describe("convert node if child is big rect", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
@@ -38,11 +38,11 @@ describe("convert node if child is big rect ", () => {
     // it will only work with two or more items.
     const converted = convertNodesOnRectangle(frame);
 
-    expect(tailwindSize(converted)).toEqual("w-24 ");
+    expect(tailwindSize(converted)).toEqual("w-24 h-24 ");
 
     expect(tailwindMain([converted])).toEqual(
-      `<div class="w-24">
-<div class="w-full h-24 bg-black"></div></div>`
+      `<div class="w-24 h-24">
+<div class="w-full h-full bg-black"></div></div>`
     );
   });
 
@@ -96,9 +96,9 @@ describe("convert node if child is big rect ", () => {
     const invisibleConverted = convertNodesOnRectangle(frame);
 
     expect(tailwindMain([invisibleConverted])).toEqual(
-      `<div class="w-24">
-<div class="inline-flex items-center justify-start pr-12 pb-12 w-full">
-<div class="w-full h-12 self-start bg-white"></div></div></div>`
+      `<div class="w-24 h-24">
+<div class="inline-flex items-start justify-start pr-12 pb-12 w-full h-full">
+<div class="w-full h-full bg-white"></div></div></div>`
     );
   });
 
@@ -152,9 +152,9 @@ describe("convert node if child is big rect ", () => {
     const converted = convertNodesOnRectangle(frame);
 
     expect(tailwindMain([converted])).toEqual(
-      `<div class="w-5">
-<div class="inline-flex items-center justify-center p-1 w-full bg-black">
-<div class="w-full h-2 bg-white"></div></div></div>`
+      `<div class="w-5 h-5">
+<div class="inline-flex items-center justify-center p-1 w-full h-full bg-black">
+<div class="w-full h-full bg-white"></div></div></div>`
     );
   });
 
@@ -186,7 +186,7 @@ describe("convert node if child is big rect ", () => {
     expect(tailwindMain([convertNodesOnRectangle(group)]))
       .toEqual(`<div class="relative" style="width: 120px; height: 20px;">
 <div class="w-24 h-24 absolute left-0 top-0"></div>
-<div class="w-5 h-32 absolute left-0 top-0"></div></div>`);
+<div class="w-5 h-28 absolute left-0 top-0"></div></div>`);
   });
   it("group with 2 children", () => {
     const group = new AltGroupNode();
@@ -216,8 +216,8 @@ describe("convert node if child is big rect ", () => {
 
     const miniRect = new AltRectangleNode();
     miniRect.id = "rect 2";
-    miniRect.width = 10;
-    miniRect.height = 10;
+    miniRect.width = 8;
+    miniRect.height = 8;
     miniRect.x = 0;
     miniRect.y = 0;
     miniRect.visible = true;
@@ -235,15 +235,18 @@ describe("convert node if child is big rect ", () => {
     rectangle.parent = group;
     group.children = [rectangle, miniRect];
 
-    const converted = convertNodesOnRectangle(group);
+    const pre_conv = convertNodesOnRectangle(group);
 
+    // force Group removal. This is done automatically in AltConversion when executed in Figma.
+    const conv = pre_conv.children[0] as AltSceneNode;
+    conv.parent = null;
+
+    console.log("converted is ", conv);
     // counterAxisSizingMode is AUTO, therefore bg-black doesn't contain the size
-    // todo should it keep that way?
 
-    expect(tailwindMain([converted])).toEqual(
-      `<div class="w-5">
-<div class="flex items-center justify-start pr-2 pb-2 w-full bg-black">
-<div class="w-full h-2 self-start bg-white"></div></div></div>`
+    expect(tailwindMain([conv])).toEqual(
+      `<div class="inline-flex items-start justify-start pr-3 pb-3 w-5 h-5 bg-black">
+<div class="w-full h-full bg-white"></div></div>`
     );
   });
 

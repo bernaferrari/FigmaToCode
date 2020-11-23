@@ -41,7 +41,7 @@
 <Tabs>
 
   <TabList>
-    <Tab>Tailwind</Tab>
+    <Tab>Tailwind 2</Tab>
     <Tab>Flutter</Tab>
     <Tab>SwiftUI</Tab>
     <Tab>About</Tab>

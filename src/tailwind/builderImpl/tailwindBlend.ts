@@ -11,8 +11,23 @@ import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 export const tailwindOpacity = (node: AltBlendMixin): string => {
   // [when testing] node.opacity can be undefined
   if (node.opacity !== undefined && node.opacity !== 1) {
-    const values = [0, 25, 50, 75];
-    return `opacity-${nearestValue(node.opacity * 100, values)} `;
+    const allowedValues = [
+      0,
+      5,
+      10,
+      20,
+      25,
+      30,
+      40,
+      50,
+      60,
+      70,
+      75,
+      80,
+      90,
+      95,
+    ];
+    return `opacity-${nearestValue(node.opacity * 100, allowedValues)} `;
   }
   return "";
 };
@@ -42,8 +57,25 @@ export const tailwindRotation = (node: AltLayoutMixin): string => {
   // that's how you convert angles to clockwise radians: angle * -pi/180
   // using 3.14159 as Pi for enough precision and to avoid importing math lib.
   if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
-    const array = [-180, -90, -45, 45, 90, 180];
-    let nearest = nearestValue(node.rotation, array);
+    const allowedValues = [
+      -180,
+      -90,
+      -45,
+      -12,
+      -6,
+      -3,
+      -2,
+      -1,
+      1,
+      2,
+      3,
+      6,
+      12,
+      45,
+      90,
+      180,
+    ];
+    let nearest = nearestValue(node.rotation, allowedValues);
     let minusIfNegative = "";
     if (nearest < 0) {
       minusIfNegative = "-";

@@ -20,7 +20,13 @@ export const tailwindSizePartial = (node: AltSceneNode): [string, string] => {
 
   let h = "";
   if (sizeResult.height) {
-    h = `h-${pxToLayoutSize(sizeResult.height)} `;
+    // console.log("sizeResults is ", sizeResult, node);
+
+    if (typeof sizeResult.height === "number") {
+      h = `h-${pxToLayoutSize(sizeResult.height)} `;
+    } else {
+      w += `h-${sizeResult.height} `;
+    }
   }
 
   return [w, h];

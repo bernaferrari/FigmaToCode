@@ -124,20 +124,20 @@ export class TailwindDefaultBuilder {
       this.style += htmlSize(node, this.isJSX);
     } else if (
       node.parent?.isRelative === true &&
-      (node.width > 256 || node.height > 256)
+      (node.width > 384 || node.height > 384)
     ) {
       // to avoid mixing html and tailwind sizing too much, only use html sizing when absolutely necessary.
       // therefore, if only one attribute is larger than 256, only use the html size in there.
       const [tWidth, tHeight] = tailwindSizePartial(node);
       const [hWidth, hHeight] = htmlSizePartial(node, this.isJSX);
 
-      if (node.width > 256) {
+      if (node.width > 384) {
         this.style += hWidth;
         this.attributes += tHeight;
         this.hasFixedSize = hWidth !== "";
       }
 
-      if (node.height > 256) {
+      if (node.height > 384) {
         this.attributes += tWidth;
         this.style += hHeight;
         this.hasFixedSize = tWidth !== "";

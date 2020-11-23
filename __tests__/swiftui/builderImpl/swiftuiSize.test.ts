@@ -22,19 +22,29 @@ describe("swiftui Builder", () => {
     const node = new AltFrameNode();
     node.layoutMode = "HORIZONTAL";
     node.counterAxisSizingMode = "FIXED";
+    node.primaryAxisSizingMode = "FIXED";
+    node.paddingLeft = 0;
+    node.paddingRight = 0;
+    node.paddingTop = 0;
+    node.paddingBottom = 0;
     node.width = 100;
+    node.height = 100;
 
     const child = new AltRectangleNode();
     child.layoutAlign = "STRETCH";
+    child.layoutGrow = 1;
     child.width = 100;
+    child.height = 100;
 
     child.parent = node;
     node.children = [child];
 
-    expect(swiftuiSize(child)).toEqual("\n.frame(width: 100)");
+    expect(swiftuiSize(child)).toEqual("\n.frame(width: 100, height: 100)");
 
     // fail
     node.layoutMode = "VERTICAL";
+    child.layoutAlign = "INHERIT";
+    child.layoutGrow = 0;
     child.width = 16;
     child.height = 16;
     expect(swiftuiSize(child)).toEqual("\n.frame(width: 16, height: 16)");
@@ -108,8 +118,8 @@ describe("swiftui Builder", () => {
     parentNode.height = 48;
     parentNode.children = [node];
     node.parent = parentNode;
-    expect(swiftuiSize(node)).toEqual("");
-    expect(swiftuiSize(parentNode)).toEqual("");
+    expect(swiftuiSize(node)).toEqual("\n.frame(width: 48, height: 48)");
+    expect(swiftuiSize(parentNode)).toEqual("\n.frame(width: 48, height: 48)");
   });
 
   it("width changes when there are strokes", () => {
@@ -207,7 +217,7 @@ describe("swiftui Builder", () => {
     parentNode.children = [node];
     node.parent = parentNode;
 
-    expect(swiftuiSize(parentNode)).toEqual("");
+    expect(swiftuiSize(parentNode)).toEqual("\n.frame(width: 12, height: 12)");
     expect(swiftuiSize(node)).toEqual("\n.frame(width: 12, height: 12)");
   });
 

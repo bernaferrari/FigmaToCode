@@ -15,7 +15,11 @@ export const tailwindTextSize = (node: AltTextNode): string => {
   }
 
   if (sizeResult.height && node.textAutoResize === "NONE") {
-    comp += `h-${pxToLayoutSize(sizeResult.height)} `;
+    if (typeof sizeResult.height === "number") {
+      comp += `h-${pxToLayoutSize(sizeResult.height)} `;
+    } else {
+      comp += `h-${sizeResult.height} `;
+    }
   }
 
   return comp;

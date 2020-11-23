@@ -28,8 +28,8 @@ describe("Convert to AutoLayout", () => {
         type: "SOLID",
         color: {
           r: 1.0,
-          g: 0.0,
-          b: 0.0,
+          g: 1.0,
+          b: 1.0,
         },
       },
     ];
@@ -45,7 +45,7 @@ describe("Convert to AutoLayout", () => {
         type: "SOLID",
         color: {
           r: 0.0,
-          g: 1.0,
+          g: 0.0,
           b: 0.0,
         },
       },
@@ -54,11 +54,15 @@ describe("Convert to AutoLayout", () => {
     // initially they are not ordered. ConvertToAutoLayout will also order them.
     frame.children = [node2, node1];
 
+    console.log("convertToAutoLayout", convertToAutoLayout(frame));
+
+    // convertToAutoLayout is going to add padding to the parent, which justifies the h-full.
+
     // output should be HORIZONTAL
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex items-center justify-center pr-2 pb-8 w-12 h-12">
-<div class="w-1/2 h-5 self-start bg-red-700"></div>
-<div class="w-1/2 h-5 self-start bg-green-600"></div></div>`
+      `<div class="inline-flex items-start justify-end pr-2.5 pb-8 w-12 h-12">
+<div class="w-1/2 h-full bg-white"></div>
+<div class="w-1/2 h-full bg-black"></div></div>`
     );
 
     // output should be VERTICAL
@@ -68,9 +72,9 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex flex-col items-center justify-center pr-8 pb-2 w-12">
-<div class="w-full h-5 self-start bg-red-700"></div>
-<div class="w-full h-5 self-start bg-green-600"></div></div>`
+      `<div class="inline-flex flex-col items-start justify-end pr-8 pb-2.5 w-12">
+<div class="w-full h-1/2 bg-white"></div>
+<div class="w-full h-1/2 bg-black"></div></div>`
     );
 
     // horizontally align while vertical
@@ -82,9 +86,9 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex flex-col space-y-1 items-center justify-center pb-1 w-12">
-<div class="w-full h-5 bg-red-700"></div>
-<div class="w-5 h-5 self-end bg-green-600"></div></div>`
+      `<div class="inline-flex flex-col space-y-1 items-end justify-end pb-1 w-12">
+<div class="w-full h-5 bg-white"></div>
+<div class="w-5 h-5 bg-black"></div></div>`
     );
 
     // vertically align while horizontal
@@ -97,9 +101,9 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex items-center justify-center pr-2 w-12 h-12">
-<div class="w-1/2 h-12 bg-red-700"></div>
-<div class="w-1/2 h-5 self-end bg-green-600"></div></div>`
+      `<div class="inline-flex items-end justify-end pr-2.5 w-12 h-12">
+<div class="w-1/2 h-full bg-white"></div>
+<div class="w-1/2 h-5 bg-black"></div></div>`
     );
 
     node1.height = 20;
@@ -112,8 +116,8 @@ describe("Convert to AutoLayout", () => {
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
       `<div class="relative" style="width: 50px; height: 50px;">
-<div class="w-5 h-5 absolute bg-green-600" style="left: 10px; top: 10px;"></div>
-<div class="w-5 h-5 absolute left-0 top-0 bg-red-700"></div></div>`
+<div class="w-5 h-5 absolute bg-black" style="left: 10px; top: 10px;"></div>
+<div class="w-5 h-5 absolute left-0 top-0 bg-white"></div></div>`
     );
   });
 
@@ -149,11 +153,13 @@ describe("Convert to AutoLayout", () => {
     // initially they are not ordered. ConvertToAutoLayout will also order them.
     frame.children = [node3, node2, node1];
 
+    console.log(convertToAutoLayout(frame));
+
     // output should be HORIZONTAL
     expect(tailwindMain([convertToAutoLayout(frame)]))
-      .toEqual(`<div class="inline-flex items-center justify-center pb-8 w-12 h-12\">
-<div class="w-1/3 h-5 self-start"></div>
-<div class="w-1/3 h-5 self-start"></div>
-<div class="w-1/3 h-5 self-start"></div></div>`);
+      .toEqual(`<div class="inline-flex items-start justify-end pb-8 w-12 h-12">
+<div class="w-5 h-full"></div>
+<div class="w-5 h-full"></div>
+<div class="w-5 h-full"></div></div>`);
   });
 });
