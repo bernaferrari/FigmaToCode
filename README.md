@@ -42,16 +42,14 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 ### Tailwind limitations
 
-- **Width:** Tailwind has a maximum width of 256px. If an item passes this, the width will be set to `w-full` (unless it is already relative like `w-1/2`, `w-1/3`, etc). This is usually a feature, but be careful: if most layers in your project are larger than 256px, the plugin's result might be less than optimal.
-- **Height:** The plugin avoids setting the height whenever possible, because width and height work differently in CSS. `h-full` means get the full height of the parent, but the parent **must** have it, while `w-full` doesn't require it. During experiments, avoiding a fixed height, in most cases, brought improved responsiveness and avoided nondeterministic scenarios.
+- **Width:** Tailwind has a maximum width of 384px. If an item passes this, the width will be set to `w-full` (unless it is already relative like `w-1/2`, `w-1/3`, etc). This is usually a feature, but be careful: if most layers in your project are larger than 384px, the plugin's result might be less than optimal.
 
 ### Flutter limits and ideas
 
-- **Align:** currently items are aligned inside a Row/Column according to their average position. Todo: find a way to improve this.
-- **Unreadable code:** output code is not formatted, but even [dartpad](https://dartpad.dev/) offers a format button.
+- **Unformatted code:** output code is not formatted, but even [dartpad](https://dartpad.dev/) offers a format button.
 - **Stack:** in some simpler cases, a `Stack` could be replaced with a `Container` and a `BoxDecoration`. Discover those cases and optimize them.
 - **Material Styles**: text could be matched to existing Material styles (like outputting `Headline6` when text size is 20).
-- **Identify FlatButtons**: the plugin could identify specific buttons and output them instead of always using `Container` or `Material`.
+- **Identify Buttons**: the plugin could identify specific buttons and output them instead of always using `Container` or `Material`.
 
 ## How to build the project
 
