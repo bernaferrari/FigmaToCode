@@ -195,7 +195,7 @@
       </p>
     </div>
     <div class="flex space-x-4 mt-2">
-      <a href="https://codepen.io/bernardoferrari/pen/mdVBJxe" target="_blank">
+      <a href="https://codepen.io/bernardoferrari/pen/zYKOBxa" target="_blank">
         <button
           class="px-4 py-2 font-semibold text-gray-800 bg-white border
           border-gray-400 rounded shadow hover:bg-gray-50">
