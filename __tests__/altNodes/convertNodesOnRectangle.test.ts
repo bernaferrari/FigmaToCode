@@ -241,7 +241,6 @@ describe("convert node if child is big rect", () => {
     const conv = pre_conv.children[0] as AltSceneNode;
     conv.parent = null;
 
-    console.log("converted is ", conv);
     // counterAxisSizingMode is AUTO, therefore bg-black doesn't contain the size
 
     expect(tailwindMain([conv])).toEqual(

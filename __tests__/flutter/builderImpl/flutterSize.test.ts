@@ -42,8 +42,11 @@ describe("Flutter Size", () => {
     child.height = 10;
 
     child.parent = node;
+    node.children = [child];
 
-    expect(flutterSize(child)).toEqual("width: 10, height: 10, ");
+    expect(flutterSize(child)).toEqual(
+      "width: double.infinity, height: double.infinity, "
+    );
   });
 
   it("Fixed size when children are absolute", () => {
@@ -96,7 +99,9 @@ describe("Flutter Size", () => {
     parentNode.height = 48;
     parentNode.children = [node];
     node.parent = parentNode;
-    expect(flutterSize(node)).toEqual("width: 48, height: 48, ");
+    expect(flutterSize(node)).toEqual(
+      "width: double.infinity, height: double.infinity, "
+    );
     expect(flutterSize(parentNode)).toEqual("width: 48, height: 48, ");
   });
 

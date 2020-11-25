@@ -229,7 +229,6 @@ const calculateResponsiveWH = (
   let returnValue: responsive = "";
 
   if (nodeWidthHeight > 384 || childLargerThanMaxSize(node, axis)) {
-    console.log("aaaaa fu", axis);
     returnValue = "full";
   }
 
@@ -254,7 +253,6 @@ const calculateResponsiveWH = (
 
   // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
   const dividedWidth = nodeWidthHeight / parentWidthHeight;
-  console.log("dividedWidth ", dividedWidth, parentWidthHeight, node);
 
   const calculateResp = (div: number, str: responsive) => {
     if (Math.abs(dividedWidth - div) < 0.01) {

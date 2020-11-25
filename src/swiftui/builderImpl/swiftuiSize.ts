@@ -10,14 +10,14 @@ export const swiftuiSize = (node: AltSceneNode): string => {
   if (typeof size.width === "number") {
     propWidth = `width: ${numToAutoFixed(size.width)}`;
   } else if (node.parent) {
-    propWidth = `width: ${numToAutoFixed(node.parent.width)}`;
+    propWidth = `maxWidth: .infinity`;
   }
 
   let propHeight = "";
   if (typeof size.height === "number") {
     propHeight = `height: ${numToAutoFixed(size.height)}`;
   } else if (node.parent) {
-    propHeight = `height: ${numToAutoFixed(node.parent.height)}`;
+    propHeight = `maxHeight: .infinity`;
   }
 
   if (propWidth || propHeight) {

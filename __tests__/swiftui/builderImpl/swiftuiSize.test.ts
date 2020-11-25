@@ -39,7 +39,9 @@ describe("swiftui Builder", () => {
     child.parent = node;
     node.children = [child];
 
-    expect(swiftuiSize(child)).toEqual("\n.frame(width: 100, height: 100)");
+    expect(swiftuiSize(child)).toEqual(
+      "\n.frame(maxWidth: .infinity, maxHeight: .infinity)"
+    );
 
     // fail
     node.layoutMode = "VERTICAL";
@@ -100,18 +102,20 @@ describe("swiftui Builder", () => {
   it("counterAxisSizingMode is AUTO", () => {
     const node = new AltFrameNode();
     node.layoutMode = "HORIZONTAL";
-    node.counterAxisSizingMode = "AUTO";
+    node.counterAxisSizingMode = "FIXED";
+    node.primaryAxisSizingMode = "FIXED";
     node.x = 0;
     node.y = 0;
     node.width = 48;
     node.height = 48;
     node.children = [new AltRectangleNode(), new AltRectangleNode()];
 
-    expect(swiftuiSize(node)).toEqual("");
+    expect(swiftuiSize(node)).toEqual("\n.frame(width: 48, height: 48)");
 
     // responsive
     const parentNode = new AltFrameNode();
-    parentNode.counterAxisSizingMode = "FIXED";
+    parentNode.counterAxisSizingMode = "AUTO";
+    parentNode.primaryAxisSizingMode = "AUTO";
     parentNode.x = 0;
     parentNode.y = 0;
     parentNode.width = 48;
