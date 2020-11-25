@@ -185,7 +185,7 @@ Container(width: 4, height: 4, color: Colors.white, ),),],),)`);
     child2.parent = node;
 
     expect(flutterMain([node]))
-      .toEqual(`Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.min, crossAxisAlignment: CrossAxisAlignment.min, children:[
+      .toEqual(`Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children:[
 Container(width: 8, height: 8, color: Colors.white, ), SizedBox(width: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
 
@@ -203,7 +203,7 @@ Container(width: 8, height: 8, color: Colors.black, ),], ),`);
     node.counterAxisAlignItems = "MAX";
 
     expect(flutterMain([node]))
-      .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.max, crossAxisAlignment: CrossAxisAlignment.max, children:[
+      .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.end, children:[
 Container(width: 8, height: 8, color: Colors.white, ), SizedBox(height: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
   });

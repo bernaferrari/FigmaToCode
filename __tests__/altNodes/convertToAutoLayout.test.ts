@@ -54,8 +54,6 @@ describe("Convert to AutoLayout", () => {
     // initially they are not ordered. ConvertToAutoLayout will also order them.
     frame.children = [node2, node1];
 
-    console.log("convertToAutoLayout", convertToAutoLayout(frame));
-
     // convertToAutoLayout is going to add padding to the parent, which justifies the h-full.
 
     // output should be HORIZONTAL
@@ -152,8 +150,6 @@ describe("Convert to AutoLayout", () => {
 
     // initially they are not ordered. ConvertToAutoLayout will also order them.
     frame.children = [node3, node2, node1];
-
-    console.log(convertToAutoLayout(frame));
 
     // output should be HORIZONTAL
     expect(tailwindMain([convertToAutoLayout(frame)]))

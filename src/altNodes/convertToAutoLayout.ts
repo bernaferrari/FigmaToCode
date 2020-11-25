@@ -71,12 +71,8 @@ export const convertToAutoLayout = (
 
     // @ts-ignore it is never going to be undefined.
     node.primaryAxisAlignItems = mostFrequent(primaryDirection);
-    // todo THERE IS A CRITICAL BUG IN FIGMA, THESE PROPERTIES WILL GET THE WRONG VALUE.
-    console.log("primary is ", node.primaryAxisAlignItems, primaryDirection);
-
     // @ts-ignore it is never going to be undefined.
     node.counterAxisAlignItems = mostFrequent(counterDirection);
-    console.log("counter is ", node.counterAxisAlignItems, counterDirection);
 
     node.counterAxisSizingMode = "FIXED";
     node.primaryAxisSizingMode = "FIXED";
@@ -296,8 +292,6 @@ const primaryAxisDirection = (
   const parentCenteredPosY = parentNode.height / 2;
 
   const centerYPosition = nodeCenteredPosY - parentCenteredPosY;
-
-  console.log("centerX is ", centerXPosition, "centerY is ", centerYPosition);
 
   if (parentNode.layoutMode === "VERTICAL") {
     return {

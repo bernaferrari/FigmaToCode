@@ -119,13 +119,13 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   let crossAlignType;
   switch (node.counterAxisAlignItems) {
     case "MIN":
-      crossAlignType = "min";
+      crossAlignType = "start";
       break;
     case "CENTER":
       crossAlignType = "center";
       break;
     case "MAX":
-      crossAlignType = "max";
+      crossAlignType = "end";
       break;
   }
   const crossAxisAlignment = `crossAxisAlignment: CrossAxisAlignment.${crossAlignType}, `;
@@ -133,13 +133,13 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   let mainAlignType;
   switch (node.primaryAxisAlignItems) {
     case "MIN":
-      mainAlignType = "min";
+      mainAlignType = "start";
       break;
     case "CENTER":
       mainAlignType = "center";
       break;
     case "MAX":
-      mainAlignType = "max";
+      mainAlignType = "end";
       break;
     case "SPACE_BETWEEN":
       mainAlignType = "spaceBetween";
