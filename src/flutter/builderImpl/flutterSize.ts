@@ -9,14 +9,14 @@ export const flutterSize = (node: AltSceneNode): string => {
   let propWidth = "";
   if (typeof size.width === "number") {
     propWidth = `width: ${numToAutoFixed(size.width)}, `;
-  } else if (node.parent) {
+  } else if (size.width === "full") {
     propWidth = `width: double.infinity, `;
   }
 
   let propHeight = "";
   if (typeof size.height === "number") {
     propHeight = `height: ${numToAutoFixed(size.height)}, `;
-  } else if (node.parent) {
+  } else if (size.height === "full") {
     propHeight = `height: double.infinity, `;
   }
 

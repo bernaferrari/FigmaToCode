@@ -7,26 +7,22 @@ export const tailwindSize = (node: AltSceneNode): string => {
 };
 
 export const tailwindSizePartial = (node: AltSceneNode): [string, string] => {
-  const sizeResult = nodeWidthHeight(node, true);
+  const size = nodeWidthHeight(node, true);
 
   let w = "";
-  if (sizeResult.width) {
-    if (typeof sizeResult.width === "number") {
-      w += `w-${pxToLayoutSize(sizeResult.width)} `;
-    } else {
-      w += `w-${sizeResult.width} `;
-    }
+  if (typeof size.width === "number") {
+    w += `w-${pxToLayoutSize(size.width)} `;
+  } else if (typeof size.width === "string") {
+    w += `w-${size.width} `;
   }
 
   let h = "";
-  if (sizeResult.height) {
-    // console.log("sizeResults is ", sizeResult, node);
+  // console.log("sizeResults is ", sizeResult, node);
 
-    if (typeof sizeResult.height === "number") {
-      h = `h-${pxToLayoutSize(sizeResult.height)} `;
-    } else {
-      w += `h-${sizeResult.height} `;
-    }
+  if (typeof size.height === "number") {
+    h = `h-${pxToLayoutSize(size.height)} `;
+  } else if (typeof size.height === "string") {
+    w += `h-${size.height} `;
   }
 
   return [w, h];
