@@ -99,9 +99,7 @@ describe("Flutter Size", () => {
     parentNode.height = 48;
     parentNode.children = [node];
     node.parent = parentNode;
-    expect(flutterSize(node)).toEqual(
-      "width: double.infinity, height: double.infinity, "
-    );
+    expect(flutterSize(node)).toEqual("");
     expect(flutterSize(parentNode)).toEqual("width: 48, height: 48, ");
   });
 

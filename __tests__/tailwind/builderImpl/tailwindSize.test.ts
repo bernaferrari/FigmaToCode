@@ -249,9 +249,13 @@ describe("Tailwind Builder", () => {
     const node = new AltFrameNode();
     node.width = 20;
     node.height = 20;
+    node.primaryAxisSizingMode = "FIXED";
+    node.counterAxisSizingMode = "FIXED";
 
     const parentNode = new AltFrameNode();
     parentNode.layoutMode = "NONE";
+    parentNode.primaryAxisSizingMode = "FIXED";
+    parentNode.counterAxisSizingMode = "FIXED";
     parentNode.width = 20;
     parentNode.height = 20;
     parentNode.children = [node];
