@@ -109,6 +109,26 @@ const mapWidthHeightSize: Record<number, string> = {
   24: "96",
 };
 
+export const opacityValues = [
+  0,
+  5,
+  10,
+  20,
+  25,
+  30,
+  40,
+  50,
+  60,
+  70,
+  75,
+  80,
+  90,
+  95,
+];
+
+export const nearestOpacity = (nodeOpacity: number): number =>
+  nearestValue(nodeOpacity * 100, opacityValues);
+
 export const pxToLetterSpacing = (value: number): string =>
   pixelToTailwindValue(value, mapLetterSpacing);
 
