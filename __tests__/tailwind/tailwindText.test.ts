@@ -182,7 +182,7 @@ describe("Tailwind Text", () => {
     const node = new AltTextNode();
     node.characters = "";
 
-    const builder = new TailwindTextBuilder(false, node, false);
+    const builder = new TailwindTextBuilder(node, false, false);
     builder.reset();
     expect(builder.build()).toEqual("");
   });

@@ -53,8 +53,8 @@ describe("Tailwind Main", () => {
 
     expect(tailwindMain([convertToAutoLayout(node)]))
       .toEqual(`<div class="relative" style="width: 320px; height: 320px;">
-<div class="h-2 absolute bg-white" style="width: 385px; left: 9px; top: 9px;"></div>
-<div class="w-2 absolute" style="height: 385px; left: 9px; top: 9px;"></div></div>`);
+<div class="absolute bg-white" style="width: 385px; height: 8px; left: 9px; top: 9px;"></div>
+<div class="w-2 h-96 absolute" style="left: 9px; top: 9px;"></div></div>`);
   });
 
   it("Group with relative position", () => {
@@ -141,7 +141,7 @@ describe("Tailwind Main", () => {
     const node = new AltRectangleNode();
     node.name = "RECT";
 
-    const builder = new TailwindDefaultBuilder(true, node, true);
+    const builder = new TailwindDefaultBuilder(node, true, true);
 
     expect(builder.build()).toEqual(' className="RECT"');
 

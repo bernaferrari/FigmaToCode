@@ -21,7 +21,7 @@ import { tailwindPosition } from "./builderImpl/tailwindPosition";
 import { tailwindColor } from "./builderImpl/tailwindColor";
 import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
-import { parseNumJSX } from "../common/parseJSX";
+import { formatWithJSX } from "../common/parseJSX";
 import { parentCoordinates } from "../common/parentCoordinates";
 
 export class TailwindDefaultBuilder {
@@ -33,7 +33,7 @@ export class TailwindDefaultBuilder {
   name: string = "";
   hasFixedSize = false;
 
-  constructor(optIsJSX: boolean, node: AltSceneNode, showLayerName: boolean) {
+  constructor(node: AltSceneNode, showLayerName: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = "";
@@ -71,8 +71,8 @@ export class TailwindDefaultBuilder {
       const left = node.x - parentX;
       const top = node.y - parentY;
 
-      this.style += parseNumJSX("left", "left", this.isJSX, left);
-      this.style += parseNumJSX("top", "top", this.isJSX, top);
+      this.style += formatWithJSX("left", this.isJSX, left);
+      this.style += formatWithJSX("top", this.isJSX, top);
 
       this.attributes += "absolute ";
     } else {
@@ -120,33 +120,54 @@ export class TailwindDefaultBuilder {
   widthHeight(node: AltSceneNode): this {
     // if current element is relative (therefore, children are absolute)
     // or current element is one of the absoltue children and has a width or height > w/h-64
+
     if ("isRelative" in node && node.isRelative === true) {
       this.style += htmlSize(node, this.isJSX);
     } else if (
-      node.parent?.isRelative === true &&
-      (node.width > 384 || node.height > 384)
+      node.parent?.isRelative === true ||
+      node.width > 384 ||
+      node.height > 384
     ) {
       // to avoid mixing html and tailwind sizing too much, only use html sizing when absolutely necessary.
       // therefore, if only one attribute is larger than 256, only use the html size in there.
-      const [tWidth, tHeight] = tailwindSizePartial(node);
-      const [hWidth, hHeight] = htmlSizePartial(node, this.isJSX);
+      const [tailwindWidth, tailwindHeight] = tailwindSizePartial(node);
+      const [htmlWidth, htmlHeight] = htmlSizePartial(node, this.isJSX);
 
-      if (node.width > 384) {
-        this.style += hWidth;
-        this.attributes += tHeight;
-        this.hasFixedSize = hWidth !== "";
+      // when textAutoResize is NONE or WIDTH_AND_HEIGHT, it has a defined width.
+      if (node.type !== "TEXT" || node.textAutoResize !== "WIDTH_AND_HEIGHT") {
+        if (node.width > 384) {
+          this.style += htmlWidth;
+        } else {
+          this.attributes += tailwindWidth;
+        }
+
+        this.hasFixedSize = htmlWidth !== "";
       }
 
-      if (node.height > 384) {
-        this.attributes += tWidth;
-        this.style += hHeight;
-        this.hasFixedSize = tWidth !== "";
+      // when textAutoResize is NONE has a defined height.
+      if (node.type !== "TEXT" || node.textAutoResize === "NONE") {
+        if (node.width > 384) {
+          this.style += htmlHeight;
+        } else {
+          this.attributes += tailwindHeight;
+        }
+
+        this.hasFixedSize = htmlHeight !== "";
       }
     } else {
       const partial = tailwindSizePartial(node);
-      this.hasFixedSize = partial[0] !== "" && partial[1] !== "";
 
-      this.attributes += partial.join("");
+      // Width
+      if (node.type !== "TEXT" || node.textAutoResize !== "WIDTH_AND_HEIGHT") {
+        this.attributes += partial[0];
+      }
+
+      // Height
+      if (node.type !== "TEXT" || node.textAutoResize === "NONE") {
+        this.attributes += partial[1];
+      }
+
+      this.hasFixedSize = partial[0] !== "" && partial[1] !== "";
     }
     return this;
   }

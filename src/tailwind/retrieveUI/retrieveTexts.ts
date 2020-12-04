@@ -14,7 +14,7 @@ export const retrieveTailwindText = (
 
   selectedText.forEach((node) => {
     if (node.type === "TEXT") {
-      const attr = new TailwindTextBuilder(false, node, false)
+      const attr = new TailwindTextBuilder(node, false, false)
         .blend(node)
         .position(node, node.parent?.id ?? "")
         .textAutoSize(node)

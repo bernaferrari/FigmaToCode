@@ -1,5 +1,4 @@
 import { commonLineHeight } from "./../common/commonTextHeightSpacing";
-import { tailwindTextSize } from "./builderImpl/tailwindTextSize";
 import { AltTextNode } from "../altNodes/altMixins";
 import {
   pxToLetterSpacing,
@@ -10,8 +9,8 @@ import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
-  constructor(optIsJSX: boolean, node: AltTextNode, showLayerName: boolean) {
-    super(optIsJSX, node, showLayerName);
+  constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {
+    super(node, showLayerName, optIsJSX);
   }
 
   // must be called before Position method
@@ -21,7 +20,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       this.hasFixedSize = true;
     }
 
-    this.attributes += tailwindTextSize(node);
+    this.widthHeight(node);
+
     return this;
   }
 

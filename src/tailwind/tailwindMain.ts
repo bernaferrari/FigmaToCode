@@ -12,22 +12,18 @@ import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
 let parentId = "";
-
-let isJsx = false;
-
 let showLayerName = false;
 
 export const tailwindMain = (
   sceneNode: Array<AltSceneNode>,
   parentIdSrc: string = "",
-  jsx: boolean = false,
+  isJsx: boolean = false,
   layerName: boolean = false
 ): string => {
   parentId = parentIdSrc;
-  isJsx = jsx;
   showLayerName = layerName;
 
-  let result = tailwindWidgetGenerator(sceneNode);
+  let result = tailwindWidgetGenerator(sceneNode, isJsx);
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.slice(0, 1) === "\n") {
@@ -39,19 +35,22 @@ export const tailwindMain = (
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const tailwindWidgetGenerator = (
-  sceneNode: ReadonlyArray<AltSceneNode>
+  sceneNode: ReadonlyArray<AltSceneNode>,
+  isJsx: boolean
 ): string => {
   let comp = "";
 
   sceneNode.forEach((node) => {
-    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += tailwindContainer(node, "");
-    } else if (node.type === "GROUP") {
-      comp += tailwindGroup(node);
-    } else if (node.type === "FRAME") {
-      comp += tailwindFrame(node);
-    } else if (node.type === "TEXT") {
-      comp += tailwindText(node);
+    if (node.visible !== false) {
+      if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
+        comp += tailwindContainer(node, "", "", false, isJsx);
+      } else if (node.type === "GROUP") {
+        comp += tailwindGroup(node, isJsx);
+      } else if (node.type === "FRAME") {
+        comp += tailwindFrame(node, isJsx);
+      } else if (node.type === "TEXT") {
+        comp += tailwindText(node, false, isJsx);
+      }
     }
     // todo support Line
   });
@@ -59,7 +58,7 @@ const tailwindWidgetGenerator = (
   return comp;
 };
 
-const tailwindGroup = (node: AltGroupNode): string => {
+const tailwindGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -72,26 +71,30 @@ const tailwindGroup = (node: AltGroupNode): string => {
   if (vectorIfExists) return vectorIfExists;
 
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new TailwindDefaultBuilder(isJsx, node, showLayerName)
+  const builder = new TailwindDefaultBuilder(node, showLayerName, isJsx)
     .blend(node)
     .widthHeight(node)
     .position(node, parentId);
 
   if (builder.attributes || builder.style) {
     const attr = builder.build("relative ");
-    return `\n<div${attr}>${tailwindWidgetGenerator(node.children)}</div>`;
+    return `\n<div${attr}>${tailwindWidgetGenerator(
+      node.children,
+      isJsx
+    )}</div>`;
   }
 
-  return tailwindWidgetGenerator(node.children);
+  return tailwindWidgetGenerator(node.children, isJsx);
 };
 
 const tailwindText = (
   node: AltTextNode,
-  isInput: boolean = false
+  isInput: boolean,
+  isJsx: boolean
 ): string | [string, string] => {
   // follow the website order, to make it easier
 
-  const builderResult = new TailwindTextBuilder(isJsx, node, showLayerName)
+  const builderResult = new TailwindTextBuilder(node, showLayerName, isJsx)
     .blend(node)
     .textAutoSize(node)
     .position(node, parentId)
@@ -120,7 +123,7 @@ const tailwindText = (
   }
 };
 
-const tailwindFrame = (node: AltFrameNode): string => {
+const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
   const vectorIfExists = tailwindVector(node, isJsx);
   if (vectorIfExists) return vectorIfExists;
 
@@ -129,19 +132,19 @@ const tailwindFrame = (node: AltFrameNode): string => {
     node.children[0].type === "TEXT" &&
     node?.name?.toLowerCase().match("input")
   ) {
-    const [attr, char] = tailwindText(node.children[0], true);
-    return tailwindContainer(node, ` placeholder="${char}"`, attr, true);
+    const [attr, char] = tailwindText(node.children[0], true, isJsx);
+    return tailwindContainer(node, ` placeholder="${char}"`, attr, true, isJsx);
   }
 
-  const childrenStr = tailwindWidgetGenerator(node.children);
+  const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = rowColumnProps(node);
-    return tailwindContainer(node, childrenStr, rowColumn);
+    return tailwindContainer(node, childrenStr, rowColumn, false, isJsx);
   } else {
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return tailwindContainer(node, childrenStr, "relative ");
+    return tailwindContainer(node, childrenStr, "relative ", false, isJsx);
   }
 };
 
@@ -151,7 +154,8 @@ export const tailwindContainer = (
   node: AltFrameNode | AltRectangleNode | AltEllipseNode,
   children: string,
   additionalAttr: string = "",
-  isInput: boolean = false
+  isInput: boolean = false,
+  isJsx: boolean
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -160,7 +164,7 @@ export const tailwindContainer = (
     return children;
   }
 
-  const builder = new TailwindDefaultBuilder(isJsx, node, showLayerName)
+  const builder = new TailwindDefaultBuilder(node, showLayerName, isJsx)
     .blend(node)
     .autoLayoutPadding(node)
     .widthHeight(node)
@@ -171,6 +175,7 @@ export const tailwindContainer = (
     .border(node);
 
   if (isInput) {
+    // children before the > is not a typo.
     return `\n<input${builder.build(additionalAttr)}${children}></input>`;
   }
 
