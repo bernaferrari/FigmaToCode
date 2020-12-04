@@ -1,6 +1,5 @@
 import { nearestOpacity } from "./../conversionTables";
 import { nearestColorFrom } from "../../nearest-color/nearestColor";
-import { nearestValue } from "../conversionTables";
 import { retrieveFill } from "../../common/retrieveFill";
 
 // retrieve the SOLID color for tailwind
@@ -27,9 +26,6 @@ export const tailwindColor = (
     const opacity = fill.opacity ?? 1.0;
 
     // example: text-opacity-50
-    //
-    // https://tailwindcss.com/docs/opacity/
-    // default is [0, 25, 50, 75, 100]
     // ignore the 100. If opacity was changed, let it be visible.
     const opacityProp =
       opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)} ` : "";
