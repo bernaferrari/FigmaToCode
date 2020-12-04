@@ -1,5 +1,5 @@
 import { AltBlendMixin } from "../../altNodes/altMixins";
-import { nearestValue } from "../conversionTables";
+import { nearestOpacity, nearestValue } from "../conversionTables";
 import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 
 /**
@@ -11,23 +11,7 @@ import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 export const tailwindOpacity = (node: AltBlendMixin): string => {
   // [when testing] node.opacity can be undefined
   if (node.opacity !== undefined && node.opacity !== 1) {
-    const allowedValues = [
-      0,
-      5,
-      10,
-      20,
-      25,
-      30,
-      40,
-      50,
-      60,
-      70,
-      75,
-      80,
-      90,
-      95,
-    ];
-    return `opacity-${nearestValue(node.opacity * 100, allowedValues)} `;
+    return `opacity-${nearestOpacity(node.opacity)} `;
   }
   return "";
 };

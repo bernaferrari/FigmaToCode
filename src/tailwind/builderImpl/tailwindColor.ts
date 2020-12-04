@@ -1,3 +1,4 @@
+import { nearestOpacity } from "./../conversionTables";
 import { nearestColorFrom } from "../../nearest-color/nearestColor";
 import { nearestValue } from "../conversionTables";
 import { retrieveFill } from "../../common/retrieveFill";
@@ -31,9 +32,7 @@ export const tailwindColor = (
     // default is [0, 25, 50, 75, 100]
     // ignore the 100. If opacity was changed, let it be visible.
     const opacityProp =
-      opacity !== 1.0
-        ? `${kind}-opacity-${nearestValue(opacity * 100, [0, 25, 50, 75])} `
-        : "";
+      opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)} ` : "";
 
     // figma uses r,g,b in [0, 1], while nearestColor uses it in [0, 255]
     const color = {
