@@ -43,7 +43,7 @@ describe("Tailwind Text", () => {
 
     node.textAlignHorizontal = "JUSTIFIED";
     expect(tailwindMain([node])).toEqual(
-      '<p class="w-4 h-4 text-justified"></p>'
+      '<p class="w-4 h-4 text-justify"></p>'
     );
   });
   it("fontSize", () => {

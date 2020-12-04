@@ -108,12 +108,18 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     // if alignHorizontal is LEFT, don't do anything because that is native
 
     // only undefined in testing
-    if (node.textAlignHorizontal) {
-      const alignHorizontal = node.textAlignHorizontal.toString().toLowerCase();
-
+    if (node.textAlignHorizontal && node.textAlignHorizontal !== "LEFT") {
       // todo when node.textAutoResize === "WIDTH_AND_HEIGHT" and there is no \n in the text, this can be ignored.
-      if (node.textAlignHorizontal !== "LEFT") {
-        this.attributes += `text-${alignHorizontal} `;
+      switch (node.textAlignHorizontal) {
+        case "CENTER":
+          this.attributes += `text-center `;
+          break;
+        case "RIGHT":
+          this.attributes += `text-right `;
+          break;
+        case "JUSTIFIED":
+          this.attributes += `text-justify `;
+          break;
       }
     }
 
