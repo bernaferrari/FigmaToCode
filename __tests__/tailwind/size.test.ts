@@ -88,7 +88,7 @@ describe("Tailwind Size", () => {
     node.appendChild(subnode);
 
     expect(tailwindMain([frameNodeToAlt(node)]))
-      .toEqual(`<div class="inline-flex items-center justify-center p-60 w-full">
+      .toEqual(`<div class="inline-flex items-center justify-center p-60" style="width: 500px; height: 500px;">
 <div class="w-full h-full"></div></div>`);
 
     expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
