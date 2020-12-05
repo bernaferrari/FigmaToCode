@@ -40,18 +40,20 @@ const tailwindWidgetGenerator = (
 ): string => {
   let comp = "";
 
-  sceneNode.forEach((node) => {
-    if (node.visible !== false) {
-      if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-        comp += tailwindContainer(node, "", "", false, isJsx);
-      } else if (node.type === "GROUP") {
-        comp += tailwindGroup(node, isJsx);
-      } else if (node.type === "FRAME") {
-        comp += tailwindFrame(node, isJsx);
-      } else if (node.type === "TEXT") {
-        comp += tailwindText(node, false, isJsx);
-      }
+  // filter non visible nodes. This is necessary at this step because conversion already happened.
+  const visibleSceneNode = sceneNode.filter((d) => d.visible !== false);
+
+  visibleSceneNode.forEach((node) => {
+    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
+      comp += tailwindContainer(node, "", "", false, isJsx);
+    } else if (node.type === "GROUP") {
+      comp += tailwindGroup(node, isJsx);
+    } else if (node.type === "FRAME") {
+      comp += tailwindFrame(node, isJsx);
+    } else if (node.type === "TEXT") {
+      comp += tailwindText(node, false, isJsx);
     }
+
     // todo support Line
   });
 
@@ -119,7 +121,7 @@ const tailwindText = (
   if (isInput) {
     return [builderResult.attributes, charsWithLineBreak];
   } else {
-    return `<p${builderResult.build()}>${charsWithLineBreak}</p>`;
+    return `\n<p${builderResult.build()}>${charsWithLineBreak}</p>`;
   }
 };
 

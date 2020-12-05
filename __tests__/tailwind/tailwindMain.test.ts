@@ -128,7 +128,8 @@ describe("Tailwind Main", () => {
     textNode.parent = frameNode;
 
     expect(tailwindMain([frameNode])).toEqual(
-      '<div class="inline-flex items-center justify-center"><p class="text-2xl">username</p></div>'
+      `<div class="inline-flex items-center justify-center">
+<p class="text-2xl">username</p></div>`
     );
 
     frameNode.name = "this is the InPuT";
