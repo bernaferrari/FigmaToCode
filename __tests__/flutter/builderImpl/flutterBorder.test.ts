@@ -30,7 +30,7 @@ describe("Flutter Border", () => {
     node.bottomLeftRadius = 0;
     node.bottomRightRadius = 0;
     expect(flutterBorderRadius(node)).toEqual(
-      "borderRadius: BorderRadius.only(topLeft: 2, topRight: 0, bottomLeft: 0, bottomRight: 0), "
+      "borderRadius: BorderRadius.only(topLeft: Radius.circular(2), topRight: Radius.circular(0), bottomLeft: Radius.circular(0), bottomRight: Radius.circular(0), ), "
     );
 
     const ellipseNode = new AltEllipseNode();
@@ -65,7 +65,7 @@ describe("Flutter Border", () => {
     node.bottomLeftRadius = 0;
     node.bottomRightRadius = 0;
     expect(flutterShape(node)).toEqual(
-      "shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: 4, topRight: 0, bottomLeft: 0, bottomRight: 0), ),"
+      "shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(0), bottomLeft: Radius.circular(0), bottomRight: Radius.circular(0), ), ),"
     );
 
     const ellipseNode = new AltEllipseNode();

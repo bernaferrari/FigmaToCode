@@ -54,11 +54,13 @@ export const flutterBorderRadius = (
     ? `borderRadius: BorderRadius.circular(${numToAutoFixed(
         node.cornerRadius
       )}), `
-    : `borderRadius: BorderRadius.only(topLeft: ${numToAutoFixed(
+    : `borderRadius: BorderRadius.only(topLeft: Radius.circular(${numToAutoFixed(
         node.topLeftRadius
-      )}, topRight: ${numToAutoFixed(
+      )}), topRight: Radius.circular(${numToAutoFixed(
         node.topRightRadius
-      )}, bottomLeft: ${numToAutoFixed(
+      )}), bottomLeft: Radius.circular(${numToAutoFixed(
         node.bottomLeftRadius
-      )}, bottomRight: ${numToAutoFixed(node.bottomRightRadius)}), `;
+      )}), bottomRight: Radius.circular(${numToAutoFixed(
+        node.bottomRightRadius
+      )}), ), `;
 };
