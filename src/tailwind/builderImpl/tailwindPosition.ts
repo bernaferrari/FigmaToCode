@@ -17,16 +17,6 @@ export const tailwindPosition = (
     return retrieveAbsolutePos(node, hasFixedSize);
   }
 
-  // Frame, Instance, Component
-  if ("layoutMode" in node.parent && node.parent.layoutMode !== "NONE") {
-    if (node.layoutAlign === "MAX") {
-      return "self-end ";
-    } else if (node.layoutAlign === "MIN") {
-      return "self-start ";
-    }
-    // STRETCH or CENTER are already centered by the parent
-  }
-
   return "";
 };
 

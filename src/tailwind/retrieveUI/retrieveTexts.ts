@@ -2,7 +2,7 @@ import { AltSceneNode, AltTextNode } from "../../altNodes/altMixins";
 import { tailwindNearestColor } from "../builderImpl/tailwindColor";
 import { TailwindTextBuilder, convertFontWeight } from "../tailwindTextBuilder";
 import { rgbTo6hex } from "../../common/color";
-import { retrieveFill } from "../../common/retrieveFill";
+import { retrieveTopFill } from "../../common/retrieveFill";
 
 export const retrieveTailwindText = (
   sceneNode: Array<AltSceneNode>
@@ -42,7 +42,7 @@ export const retrieveTailwindText = (
 
       let contrastBlack = 21;
 
-      const fill = retrieveFill(node.fills);
+      const fill = retrieveTopFill(node.fills);
 
       if (fill?.type === "SOLID") {
         contrastBlack = calculateContrastRatio(fill.color, black);
@@ -132,7 +132,7 @@ const convertColor = (
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
 
-  const fill = retrieveFill(fills);
+  const fill = retrieveTopFill(fills);
 
   if (fill?.type === "SOLID") {
     return tailwindNearestColor(rgbTo6hex(fill.color));

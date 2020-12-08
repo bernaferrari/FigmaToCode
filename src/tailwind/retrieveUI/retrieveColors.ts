@@ -4,7 +4,7 @@ import {
   tailwindColors,
 } from "../builderImpl/tailwindColor";
 import { rgbTo6hex } from "../../common/color";
-import { retrieveFill } from "../../common/retrieveFill";
+import { retrieveTopFill } from "../../common/retrieveFill";
 
 export const retrieveTailwindColors = (
   sceneNode: Array<AltSceneNode>
@@ -53,7 +53,7 @@ const convertColor = (
 ): namedColor | null => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
-  const fill = retrieveFill(fills);
+  const fill = retrieveTopFill(fills);
 
   if (fill?.type === "SOLID") {
     const hex = rgbTo6hex(fill.color);

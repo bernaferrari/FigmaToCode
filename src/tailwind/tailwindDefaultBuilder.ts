@@ -1,5 +1,3 @@
-import { htmlSize, htmlSizePartial } from "./../htmlBuilder/htmlSize";
-import { htmlGradient } from "../htmlBuilder/htmlGradient";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   AltSceneNode,
@@ -18,11 +16,12 @@ import {
   tailwindBorderRadius,
 } from "./builderImpl/tailwindBorder";
 import { tailwindPosition } from "./builderImpl/tailwindPosition";
-import { tailwindColor } from "./builderImpl/tailwindColor";
+import { tailwindColor, tailwindGradient } from "./builderImpl/tailwindColor";
 import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
 import { formatWithJSX } from "../common/parseJSX";
 import { parentCoordinates } from "../common/parentCoordinates";
+import { htmlSize, htmlSizePartial } from "../html/builderImpl/htmlSize";
 
 export class TailwindDefaultBuilder {
   attributes: string = "";
@@ -96,10 +95,10 @@ export class TailwindDefaultBuilder {
     if (this.visible !== false) {
       let gradient = "";
       if (kind === "bg") {
-        gradient = htmlGradient(paint, this.isJSX);
+        gradient = tailwindGradient(paint);
       }
       if (gradient) {
-        this.style += gradient + this.styleSeparator;
+        this.attributes += gradient;
       } else {
         this.attributes += tailwindColor(paint, kind);
       }

@@ -206,6 +206,14 @@ Container(width: 8, height: 8, color: Colors.black, ),], ),`);
       .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.end, children:[
 Container(width: 8, height: 8, color: Colors.white, ), SizedBox(height: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
+
+    node.primaryAxisAlignItems = "SPACE_BETWEEN";
+    node.counterAxisAlignItems = "CENTER";
+
+    expect(flutterMain([node]))
+      .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children:[
+Container(width: 8, height: 8, color: Colors.white, ), SizedBox(height: 8),
+Container(width: 8, height: 8, color: Colors.black, ),], ),`);
   });
 
   it("Row with 1 children", () => {
