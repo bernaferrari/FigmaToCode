@@ -1,5 +1,5 @@
 import { rgbTo8hex, gradientAngle } from "../../common/color";
-import { retrieveFill } from "../../common/retrieveFill";
+import { retrieveTopFill } from "../../common/retrieveFill";
 import { nearestValue } from "../../tailwind/conversionTables";
 
 /**
@@ -8,7 +8,7 @@ import { nearestValue } from "../../tailwind/conversionTables";
 export const flutterColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
-  const fill = retrieveFill(fills);
+  const fill = retrieveTopFill(fills);
 
   if (fill?.type === "SOLID") {
     // todo maybe ignore text color when it is black?
@@ -22,7 +22,7 @@ export const flutterColor = (
 export const flutterBoxDecorationColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
-  const fill = retrieveFill(fills);
+  const fill = retrieveTopFill(fills);
 
   if (fill?.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;

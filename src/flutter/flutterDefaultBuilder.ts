@@ -1,5 +1,5 @@
 import { AltGroupNode } from "./../altNodes/altMixins";
-import { retrieveFill } from "./../common/retrieveFill";
+import { retrieveTopFill } from "./../common/retrieveFill";
 import { flutterPosition } from "./builderImpl/flutterPosition";
 import {
   flutterVisibility,
@@ -27,7 +27,7 @@ export class FlutterDefaultBuilder {
     node: AltRectangleNode | AltEllipseNode | AltFrameNode | AltGroupNode,
     material: boolean
   ): this {
-    const fill = node.type === "GROUP" ? null : retrieveFill(node.fills);
+    const fill = node.type === "GROUP" ? null : retrieveTopFill(node.fills);
     // fill.visible can be true or undefined (on tests)
     if (
       node.type !== "GROUP" &&

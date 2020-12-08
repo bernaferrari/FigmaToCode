@@ -1,5 +1,5 @@
-import { AltSceneNode } from "./../altNodes/altMixins";
-import { formatWithJSX } from "../common/parseJSX";
+import { formatWithJSX } from "./../../common/parseJSX";
+import { AltSceneNode } from "../../altNodes/altMixins";
 
 /**
  * https://www.w3schools.com/css/css_dimension.asp

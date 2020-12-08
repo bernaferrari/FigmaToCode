@@ -121,14 +121,14 @@ describe("Tailwind Main", () => {
     frameNode.counterAxisSizingMode = "AUTO";
     frameNode.primaryAxisSizingMode = "AUTO";
 
-    frameNode.primaryAxisAlignItems = "CENTER";
+    frameNode.primaryAxisAlignItems = "SPACE_BETWEEN";
     frameNode.counterAxisAlignItems = "CENTER";
 
     frameNode.children = [textNode];
     textNode.parent = frameNode;
 
     expect(tailwindMain([frameNode])).toEqual(
-      `<div class="inline-flex items-center justify-center">
+      `<div class="inline-flex items-center justify-between">
 <p class="text-2xl">username</p></div>`
     );
 

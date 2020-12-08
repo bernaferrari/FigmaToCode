@@ -1,6 +1,6 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { rgbTo6hex } from "../../common/color";
-import { retrieveFill } from "../../common/retrieveFill";
+import { retrieveTopFill } from "../../common/retrieveFill";
 
 export const retrieveFlutterColors = (
   sceneNode: Array<AltSceneNode>
@@ -51,7 +51,7 @@ const convertColor = (
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
 
-  const fill = retrieveFill(fills);
+  const fill = retrieveTopFill(fills);
 
   if (fill?.type === "SOLID") {
     const black = {

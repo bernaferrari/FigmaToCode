@@ -1,4 +1,4 @@
-import { retrieveFill } from "./../../common/retrieveFill";
+import { retrieveTopFill } from "./../../common/retrieveFill";
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { swiftuiColor } from "./swiftuiColor";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
@@ -19,7 +19,7 @@ export const swiftuiBorder = (node: AltSceneNode): string => {
 
   const propStrokeColor = swiftuiColor(node.strokes);
   const lW = numToAutoFixed(node.strokeWeight);
-  const fill = retrieveFill(node.fills);
+  const fill = retrieveTopFill(node.fills);
 
   if (propStrokeColor && node.strokeWeight) {
     const roundRect = swiftuiRoundedRectangle(node);
@@ -56,7 +56,7 @@ export const swiftuiShapeStroke = (node: AltSceneNode): string => {
   const lW = numToAutoFixed(node.strokeWeight);
 
   if (propStrokeColor && node.strokeWeight) {
-    const fill = retrieveFill(node.fills);
+    const fill = retrieveTopFill(node.fills);
 
     // only add stroke when there isn't a fill set.
     if (node.type === "ELLIPSE" && !fill) {

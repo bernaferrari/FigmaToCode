@@ -1,6 +1,6 @@
 import { nearestValue } from "./../../tailwind/conversionTables";
 import { numToAutoFixed } from "./../../common/numToAutoFixed";
-import { retrieveFill } from "../../common/retrieveFill";
+import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 
 /**
@@ -9,7 +9,7 @@ import { gradientAngle } from "../../common/color";
 export const swiftuiColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
-  const fill = retrieveFill(fills);
+  const fill = retrieveTopFill(fills);
 
   if (fill?.type === "SOLID") {
     // todo maybe ignore text color when it is black?

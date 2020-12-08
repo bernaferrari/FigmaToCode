@@ -27,25 +27,27 @@ describe("Flutter Text", () => {
     expect(flutterMain([node])).toEqual('Text("", ),');
   });
 
-  // it("textAlignHorizontal", () => {
-  //   const node = new AltTextNode();
-  //   node.characters = "";
-  //   node.width = 16;
-  //   node.height = 16;
+  it("textAlignHorizontal", () => {
+    const node = new AltTextNode();
+    node.characters = "";
+    node.width = 16;
+    node.height = 16;
 
-  //   node.textAutoResize = "WIDTH_AND_HEIGHT";
-  //   node.textAlignHorizontal = "LEFT";
-  //   expect(tailwindMain([node])).toEqual("<p></p>");
+    node.textAutoResize = "WIDTH_AND_HEIGHT";
+    node.textAlignHorizontal = "LEFT";
+    expect(flutterMain([node])).toEqual('Text("", ),');
 
-  //   node.textAutoResize = "NONE";
-  //   node.textAlignHorizontal = "CENTER";
-  //   expect(tailwindMain([node])).toEqual('<p class="w-4 h-4 text-center"></p>');
+    node.textAutoResize = "NONE";
+    node.textAlignHorizontal = "CENTER";
+    expect(flutterMain([node])).toEqual(
+      'SizedBox(width: 16, height: 16, child: Text("", textAlign: TextAlign.center, ), )'
+    );
 
-  //   node.textAlignHorizontal = "JUSTIFIED";
-  //   expect(tailwindMain([node])).toEqual(
-  //     '<p class="w-4 h-4 text-justified"></p>'
-  //   );
-  // });
+    node.textAlignHorizontal = "JUSTIFIED";
+    expect(flutterMain([node])).toEqual(
+      'SizedBox(width: 16, height: 16, child: Text("", textAlign: TextAlign.justify, ), )'
+    );
+  });
   it("fontSize", () => {
     const node = new AltTextNode();
     node.characters = "";

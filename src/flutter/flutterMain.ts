@@ -38,9 +38,12 @@ const flutterWidgetGenerator = (
   sceneNode: ReadonlyArray<AltSceneNode>
 ): string => {
   let comp = "";
-  const sceneLen = sceneNode.length;
 
-  sceneNode.forEach((node, index) => {
+  // filter non visible nodes. This is necessary at this step because conversion already happened.
+  const visibleSceneNode = sceneNode.filter((d) => d.visible !== false);
+  const sceneLen = visibleSceneNode.length;
+
+  visibleSceneNode.forEach((node, index) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += flutterContainer(node, "");
     }
@@ -155,26 +158,6 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   }
 
   return `${rowOrColumn}(${mainAxisSize}${mainAxisAlignment}${crossAxisAlignment}children:[${children}], ), `;
-};
-
-export const formatFlutterProperty = (
-  name: string,
-  positionedValues: Array<string>,
-  singleValue: string,
-  paddingLen: number
-): string => {
-  let returnValue = "";
-
-  returnValue += `${name}(`;
-  returnValue += positionedValues.map(
-    (d) => " ".repeat(paddingLen) + d + ",\n"
-  );
-  if (singleValue.length > 0) {
-    returnValue += " ".repeat(paddingLen) + singleValue + ",\n";
-  }
-  returnValue += "), ";
-
-  return returnValue;
 };
 
 // TODO Vector support in Flutter is complicated. Currently, AltConversion converts it in a Rectangle.

@@ -7,34 +7,6 @@ describe("Tailwind Position", () => {
     mixed: undefined,
   };
 
-  it("Frame AutoLayout Position", () => {
-    const parent = new AltFrameNode();
-    parent.width = 100;
-    parent.height = 100;
-    parent.x = 0;
-    parent.y = 0;
-    parent.layoutMode = "VERTICAL";
-
-    const node = new AltFrameNode();
-    node.width = 40;
-    node.height = 40;
-    node.parent = parent;
-
-    parent.children = [node];
-
-    // node.parent.id === parent.id, so return ""
-    expect(tailwindPosition(node, parent.id)).toEqual("");
-
-    node.layoutAlign = "MIN";
-    expect(tailwindPosition(node)).toEqual("self-start ");
-
-    node.layoutAlign = "MAX";
-    expect(tailwindPosition(node)).toEqual("self-end ");
-
-    node.layoutAlign = "CENTER";
-    expect(tailwindPosition(node)).toEqual("");
-  });
-
   it("Frame Absolute Position", () => {
     const parent = new AltFrameNode();
     parent.width = 100;
