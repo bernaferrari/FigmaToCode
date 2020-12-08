@@ -58,6 +58,7 @@ const updateChildrenXY = (node: AltSceneNode): AltSceneNode => {
     node.children.forEach((d) => {
       d.x = d.x - node.x;
       d.y = d.y - node.y;
+      updateChildrenXY(d);
     });
     return node;
   } else {

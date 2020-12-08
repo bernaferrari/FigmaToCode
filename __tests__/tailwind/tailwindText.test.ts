@@ -1,10 +1,7 @@
-import { AltFrameNode } from "./../../src/altNodes/altMixins";
-import {
-  TailwindTextBuilder,
-  convertFontWeight,
-} from "../../src/tailwind/tailwindTextBuilder";
+import { TailwindTextBuilder } from "../../src/tailwind/tailwindTextBuilder";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { AltTextNode } from "../../src/altNodes/altMixins";
+import { convertFontWeight } from "../../src/common/convertFontWeight";
 
 describe("Tailwind Text", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -164,7 +161,7 @@ describe("Tailwind Text", () => {
 
   it("weight", () => {
     expect(convertFontWeight("tHIN")).toEqual("100");
-    expect(convertFontWeight("Default")).toEqual("400");
+    expect(convertFontWeight("Default")).toEqual(null);
 
     expect(convertFontWeight("Thin")).toEqual("100");
     expect(convertFontWeight("Extra Light")).toEqual("200");

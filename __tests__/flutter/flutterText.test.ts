@@ -81,16 +81,20 @@ describe("Flutter Text", () => {
       style: "medium italic",
     };
     expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(fontStyle: FontStyle.italic, fontFamily: "inter", fontWeight: FontWeight.w400, ), ),'
+      'Text("", style: TextStyle(fontStyle: FontStyle.italic, fontFamily: "inter", fontWeight: FontWeight.w500, ), ),'
     );
 
     node.fontName = {
       family: "inter",
       style: "regular",
     };
-    expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(fontFamily: "inter", fontWeight: FontWeight.w400, ), ),'
-    );
+    expect(flutterMain([node])).toEqual('Text("", ),');
+
+    node.fontName = {
+      family: "inter",
+      style: "doesn't exist",
+    };
+    expect(flutterMain([node])).toEqual('Text("", ),');
   });
 
   it("letterSpacing", () => {

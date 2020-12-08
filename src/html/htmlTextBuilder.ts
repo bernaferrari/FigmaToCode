@@ -1,14 +1,12 @@
-import { commonLineHeight } from "./../common/commonTextHeightSpacing";
+import { commonLineHeight } from "../common/commonTextHeightSpacing";
+import { htmlTextSize as htmlTextSizeBox } from "./builderImpl/htmlTextSize";
 import { AltTextNode } from "../altNodes/altMixins";
-import {
-  pxToLetterSpacing,
-  pxToLineHeight,
-  pxToFontSize,
-} from "./conversionTables";
-import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
+import { formatWithJSX } from "../common/parseJSX";
+import { convertFontWeight } from "../common/convertFontWeight";
 
-export class TailwindTextBuilder extends TailwindDefaultBuilder {
+export class HtmlTextBuilder extends HtmlDefaultBuilder {
   constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {
     super(node, showLayerName, optIsJSX);
   }
@@ -20,8 +18,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       this.hasFixedSize = true;
     }
 
-    this.widthHeight(node);
-
+    this.style += htmlTextSizeBox(node, this.isJSX);
     return this;
   }
 
@@ -37,8 +34,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   fontSize(node: AltTextNode): this {
     // example: text-md
     if (node.fontSize !== figma.mixed) {
-      const value = pxToFontSize(node.fontSize);
-      this.attributes += `text-${value} `;
+      const value = node.fontSize;
+      this.style += formatWithJSX("font-size", this.isJSX, value);
     }
 
     return this;
@@ -54,7 +51,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       const lowercaseStyle = node.fontName.style.toLowerCase();
 
       if (lowercaseStyle.match("italic")) {
-        this.attributes += "italic ";
+        this.style += formatWithJSX("font-style", this.isJSX, "italic");
       }
 
       if (lowercaseStyle.match("regular")) {
@@ -67,7 +64,11 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         .replace(" ", "")
         .toLowerCase();
 
-      this.attributes += `font-${value} `;
+      const weight = convertFontWeight(value);
+
+      if (weight !== null && weight !== "400") {
+        this.style += formatWithJSX("font-weight", this.isJSX, weight);
+      }
     }
     return this;
   }
@@ -79,8 +80,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   letterSpacing(node: AltTextNode): this {
     const letterSpacing = commonLetterSpacing(node);
     if (letterSpacing > 0) {
-      const value = pxToLetterSpacing(letterSpacing);
-      this.attributes += `tracking-${value} `;
+      this.style += formatWithJSX("letter-spacing", this.isJSX, letterSpacing);
     }
 
     return this;
@@ -93,8 +93,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   lineHeight(node: AltTextNode): this {
     const lineHeight = commonLineHeight(node);
     if (lineHeight > 0) {
-      const value = pxToLineHeight(lineHeight);
-      this.attributes += `leading-${value} `;
+      this.style += formatWithJSX("line-height", this.isJSX, lineHeight);
     }
 
     return this;
@@ -112,13 +111,13 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       // todo when node.textAutoResize === "WIDTH_AND_HEIGHT" and there is no \n in the text, this can be ignored.
       switch (node.textAlignHorizontal) {
         case "CENTER":
-          this.attributes += `text-center `;
+          this.style += formatWithJSX("text-align", this.isJSX, "center");
           break;
         case "RIGHT":
-          this.attributes += `text-right `;
+          this.style += formatWithJSX("text-align", this.isJSX, "right");
           break;
         case "JUSTIFIED":
-          this.attributes += `text-justify `;
+          this.style += formatWithJSX("text-align", this.isJSX, "justify");
           break;
       }
     }
@@ -132,11 +131,11 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    */
   textTransform(node: AltTextNode): this {
     if (node.textCase === "LOWER") {
-      this.attributes += "lowercase ";
+      this.style += formatWithJSX("text-transform", this.isJSX, "lowercase");
     } else if (node.textCase === "TITLE") {
-      this.attributes += "capitalize ";
+      this.style += formatWithJSX("text-transform", this.isJSX, "capitalize");
     } else if (node.textCase === "UPPER") {
-      this.attributes += "uppercase ";
+      this.style += formatWithJSX("text-transform", this.isJSX, "uppercase");
     } else if (node.textCase === "ORIGINAL") {
       // default, ignore
     }
@@ -150,15 +149,15 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    */
   textDecoration(node: AltTextNode): this {
     if (node.textDecoration === "UNDERLINE") {
-      this.attributes += "underline ";
+      this.style += formatWithJSX("text-decoration", this.isJSX, "underline");
     } else if (node.textDecoration === "STRIKETHROUGH") {
-      this.attributes += "line-through ";
+      this.style += formatWithJSX(
+        "text-decoration",
+        this.isJSX,
+        "line-through"
+      );
     }
 
     return this;
-  }
-
-  reset(): void {
-    this.attributes = "";
   }
 }
