@@ -18,17 +18,6 @@ export const nodeWidthHeight = (
   //   return "";
   // }
 
-  // when parent is HORIZONTAL and node is HORIZONTAL, let the child define the size
-  // todo there is a problem... when parent becomes autolayout, children won't be responsive
-  // if (node.parent && "layoutMode" in node.parent && "layoutMode" in node) {
-  //   if (
-  //     node.layoutMode !== "NONE" &&
-  //     node.parent.layoutMode === node.layoutMode
-  //   ) {
-  //     return "";
-  //   }
-  // }
-
   if (node.layoutAlign === "STRETCH" && node.layoutGrow === 1) {
     return {
       width: "full",

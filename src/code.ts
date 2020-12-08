@@ -1,3 +1,4 @@
+import { htmlMain } from "./html/htmlMain";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
 import { flutterMain } from "./flutter/flutterMain";
@@ -49,6 +50,8 @@ const run = () => {
     result = tailwindMain(convertedSelection, parentId, isJsx, layerName);
   } else if (mode === "swiftui") {
     result = swiftuiMain(convertedSelection, parentId);
+  } else if (mode === "html") {
+    result = htmlMain(convertedSelection, parentId, isJsx, layerName);
   }
 
   console.log(result);
@@ -85,14 +88,13 @@ figma.on("selectionchange", () => {
 // efficient? No. Works? Yes.
 // todo pass data instead of relying in types
 figma.ui.onmessage = (msg) => {
-  if (msg.type === "tailwind") {
-    mode = "tailwind";
-    run();
-  } else if (msg.type === "flutter") {
-    mode = "flutter";
-    run();
-  } else if (msg.type === "swiftui") {
-    mode = "swiftui";
+  if (
+    msg.type === "tailwind" ||
+    msg.type === "flutter" ||
+    msg.type === "swiftui" ||
+    msg.type === "html"
+  ) {
+    mode = msg.type;
     run();
   } else if (msg.type === "jsx" && msg.data !== isJsx) {
     isJsx = msg.data;

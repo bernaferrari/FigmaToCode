@@ -5,9 +5,6 @@
   import "prism-theme-night-owl";
   import "prismjs/components/prism-dart";
 
-  import { GlobalCSS } from "figma-plugin-ds-svelte";
-  import { Switch } from "figma-plugin-ds-svelte";
-
   let colorData = [];
   let codeData = "";
   let emptySelection = false;
@@ -37,7 +34,7 @@
     }
   };
 
-  // import Switch from "./Switch.svelte";
+  import Switch from "./Switch.svelte";
 
   let material = false;
   $: if (material) {
@@ -211,11 +208,7 @@
 
       <div
         class="flex items-center content-center justify-end mx-2 mb-2 space-x-8">
-
-        <Switch value="value" bind:checked={material} id="material">
-          Material
-        </Switch>
-
+        <Switch bind:checked={material} id="material" text="Material" />
       </div>
     </div>
     <div class="h-2" />

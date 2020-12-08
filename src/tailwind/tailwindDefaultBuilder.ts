@@ -17,11 +17,14 @@ import {
 } from "./builderImpl/tailwindBorder";
 import { tailwindPosition } from "./builderImpl/tailwindPosition";
 import { tailwindColor, tailwindGradient } from "./builderImpl/tailwindColor";
-import { tailwindSizePartial } from "./builderImpl/tailwindSize";
+import {
+  htmlSizeForTailwind,
+  htmlSizePartialForTailwind,
+  tailwindSizePartial,
+} from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
 import { formatWithJSX } from "../common/parseJSX";
 import { parentCoordinates } from "../common/parentCoordinates";
-import { htmlSize, htmlSizePartial } from "../html/builderImpl/htmlSize";
 
 export class TailwindDefaultBuilder {
   attributes: string = "";
@@ -121,7 +124,7 @@ export class TailwindDefaultBuilder {
     // or current element is one of the absoltue children and has a width or height > w/h-64
 
     if ("isRelative" in node && node.isRelative === true) {
-      this.style += htmlSize(node, this.isJSX);
+      this.style += htmlSizeForTailwind(node, this.isJSX);
     } else if (
       node.parent?.isRelative === true ||
       node.width > 384 ||
@@ -130,7 +133,10 @@ export class TailwindDefaultBuilder {
       // to avoid mixing html and tailwind sizing too much, only use html sizing when absolutely necessary.
       // therefore, if only one attribute is larger than 256, only use the html size in there.
       const [tailwindWidth, tailwindHeight] = tailwindSizePartial(node);
-      const [htmlWidth, htmlHeight] = htmlSizePartial(node, this.isJSX);
+      const [htmlWidth, htmlHeight] = htmlSizePartialForTailwind(
+        node,
+        this.isJSX
+      );
 
       // when textAutoResize is NONE or WIDTH_AND_HEIGHT, it has a defined width.
       if (node.type !== "TEXT" || node.textAutoResize !== "WIDTH_AND_HEIGHT") {

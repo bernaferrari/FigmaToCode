@@ -5,9 +5,9 @@ import {
 } from "./builderImpl/swiftuiTextWeight";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { AltTextNode } from "../altNodes/altMixins";
-import { convertFontWeight } from "../tailwind/tailwindTextBuilder";
 import { numToAutoFixed } from "../common/numToAutoFixed";
 import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
+import { convertFontWeight } from "../common/convertFontWeight";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   reset(): void {
@@ -44,10 +44,9 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   textStyle = (node: AltTextNode): this => {
     // for some reason this must be set before the multilineTextAlignment
     if (node.fontName !== figma.mixed) {
-      const weight = swiftuiWeightMatcher(
-        convertFontWeight(node.fontName.style)
-      );
-      if (weight !== ".regular") {
+      const fontWeight = convertFontWeight(node.fontName.style);
+      if (fontWeight && fontWeight !== "400") {
+        const weight = swiftuiWeightMatcher(fontWeight);
         this.modifiers += `\n.fontWeight(${weight})`;
       }
     }

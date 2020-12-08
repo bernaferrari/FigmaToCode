@@ -62,7 +62,7 @@
   aria-selected={isSelected}
   tabindex={isSelected ? 0 : -1}
   class:svelte-tabs__selected={isSelected}
-  class="svelte-tabs__tab mr-3 {isSelected ? '-mb-px mr-1 bg-gray-50 inline-block border-l border-t border-r rounded-t py-2 px-4 text-gray-700 font-semibold' : 'mr-1 bg-white inline-block py-2 px-4 text-gray-500 hover:text-gray-800 font-semibold'}"
+  class="svelte-tabs__tab mr-1 py-2 px-3 {isSelected ? '-mb-px bg-gray-50 inline-block border-l border-t border-r rounded-t text-gray-700 font-semibold' : ' bg-white inline-block text-gray-500 hover:text-gray-800 font-semibold'}"
   on:click={() => selectTab(tab)}>
   <slot />
 </button>

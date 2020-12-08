@@ -1,9 +1,7 @@
 import { AltSceneNode, AltTextNode } from "../../altNodes/altMixins";
-import { tailwindNearestColor } from "../builderImpl/tailwindColor";
-import { TailwindTextBuilder } from "../tailwindTextBuilder";
+import { HtmlTextBuilder } from "../htmlTextBuilder";
 import { rgbTo6hex } from "../../common/color";
 import { retrieveTopFill } from "../../common/retrieveFill";
-import { convertFontWeight } from "../../common/convertFontWeight";
 
 export const retrieveTailwindText = (
   sceneNode: Array<AltSceneNode>
@@ -15,11 +13,10 @@ export const retrieveTailwindText = (
 
   selectedText.forEach((node) => {
     if (node.type === "TEXT") {
-      const attr = new TailwindTextBuilder(node, false, false)
+      const attr = new HtmlTextBuilder(node, false, false)
         .blend(node)
         .position(node, node.parent?.id ?? "")
         .textAutoSize(node)
-        .fontSize(node)
         .fontStyle(node)
         .letterSpacing(node)
         .lineHeight(node)
@@ -51,8 +48,8 @@ export const retrieveTailwindText = (
 
       textStr.push({
         name: node.name,
-        attr: attr.attributes,
-        full: `<p class="${attr.attributes}">${charsWithLineBreak}</p>`,
+        attr: attr.style,
+        full: `<p style="${attr.style}">${charsWithLineBreak}</p>`,
         style: style(node),
         contrastBlack: contrastBlack,
       });
@@ -96,10 +93,7 @@ const style = (node: AltTextNode): string => {
       .replace(" ", "")
       .toLowerCase();
 
-    const weight = convertFontWeight(value);
-    if (weight) {
-      comp += `font-weight: ${weight}; `;
-    }
+    // comp += `font-weight: ${convertFontWeight(value)}; `;
   }
 
   if (node.fontSize !== figma.mixed) {
@@ -139,7 +133,7 @@ const convertColor = (
   const fill = retrieveTopFill(fills);
 
   if (fill?.type === "SOLID") {
-    return tailwindNearestColor(rgbTo6hex(fill.color));
+    return rgbTo6hex(fill.color);
   }
 
   return undefined;

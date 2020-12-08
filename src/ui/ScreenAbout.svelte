@@ -1,46 +1,48 @@
-<script>
-  import Prism from "svelte-prism";
-  import "prism-theme-night-owl";
-  import "prismjs/components/prism-dart";
-</script>
-
 <div class="w-full px-8 py-4 bg-blue-50">
   <p class="text-xl font-bold text-center">Responsive Layout</p>
   <div class="flex items-center justify-center w-full pt-4 space-x-4">
     <div
-      class="inline-flex flex-col items-center justify-center p-5 border-2 border-red-600">
+      class="inline-flex flex-col items-center justify-center p-5 border-2
+      border-red-600">
       <div class="relative w-32 h-24">
         <div
-          p
-          class="absolute bottom-0 left-0 inline-flex items-center justify-center h-10 px-3 py-3 border-2 border-red-600">
+          class="absolute bottom-0 left-0 inline-flex items-center
+          justify-center h-10 px-3 py-3 border-2 border-red-600">
           <p class="text-xs font-medium text-center text-red-600">BAD</p>
         </div>
         <div
-          class="absolute top-0 left-0 inline-flex items-center justify-center h-10 px-3 py-3 border-2 border-red-600">
+          class="absolute top-0 left-0 inline-flex items-center justify-center
+          h-10 px-3 py-3 border-2 border-red-600">
           <p class="text-xs font-medium text-center text-red-600">BAD</p>
         </div>
         <div
-          class="absolute inset-y-0 right-0 inline-flex items-center justify-center h-10 px-3 py-3 my-auto border-2 border-red-600">
+          class="absolute inset-y-0 right-0 inline-flex items-center
+          justify-center h-10 px-3 py-3 my-auto border-2 border-red-600">
           <p class="text-xs font-medium text-center text-red-600">BAD</p>
         </div>
       </div>
     </div>
 
     <div
-      class="inline-flex items-center justify-center p-4 space-x-4 border-2 border-blue-600">
+      class="inline-flex items-center justify-center p-4 space-x-4 border-2
+      border-blue-600">
       <div
-        class="inline-flex flex-col items-center justify-center p-1 space-y-3 border-2 border-blue-600">
+        class="inline-flex flex-col items-center justify-center p-1 space-y-3
+        border-2 border-blue-600">
         <div
-          class="inline-flex items-center justify-center h-10 p-3 border-2 border-blue-600">
+          class="inline-flex items-center justify-center h-10 p-3 border-2
+          border-blue-600">
           <p class="text-xs font-medium text-center text-blue-600">GOOD</p>
         </div>
         <div
-          class="inline-flex items-center justify-center h-10 p-3 border-2 border-blue-600">
+          class="inline-flex items-center justify-center h-10 p-3 border-2
+          border-blue-600">
           <p class="text-xs font-medium text-center text-blue-600">GOOD</p>
         </div>
       </div>
       <div
-        class="inline-flex items-center justify-center h-10 p-3 border-2 border-blue-600">
+        class="inline-flex items-center justify-center h-10 p-3 border-2
+        border-blue-600">
         <p class="text-xs font-medium text-center text-blue-600">GOOD</p>
       </div>
     </div>
@@ -62,9 +64,9 @@
   <div class="h-2" />
 
   <p class="text-base text-center">
-    I have tried to think what would make sense for
-   most people. Still, bugs can and will happen; ideas will appear. Your mission, should you
-    choose to accept, is to share them with me.
+    I have tried to think what would make sense for most people. Still, bugs can
+    and will happen; ideas will appear. Your mission, should you choose to
+    accept, is to share them with me.
   </p>
 
 </div>
@@ -78,7 +80,8 @@
   <div class="flex content-center justify-center space-x-4">
     <a href="https://twitter.com/@bernaferrari" target="_blank">
       <button
-        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded-lg shadow hover:bg-gray-300">
+        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400
+        rounded-lg shadow hover:bg-gray-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -106,7 +109,8 @@
     </a>
     <a href="https://reddit.com/u/bernaferrari" target="_blank">
       <button
-        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded-lg shadow hover:bg-gray-300">
+        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400
+        rounded-lg shadow hover:bg-gray-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -140,7 +144,8 @@
     </a>
     <a href="mailto:bernaferrari2@gmail.com" target="_blank">
       <button
-        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded-lg shadow hover:bg-gray-300">
+        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400
+        rounded-lg shadow hover:bg-gray-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -161,7 +166,8 @@
     </a>
     <a href="https://github.com/bernaferrari" target="_blank">
       <button
-        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400 rounded-lg shadow hover:bg-gray-300">
+        class="p-2 font-semibold text-gray-800 bg-white border border-gray-400
+        rounded-lg shadow hover:bg-gray-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"

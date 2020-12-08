@@ -1,9 +1,9 @@
 import { commonLetterSpacing } from "./../common/commonTextHeightSpacing";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltTextNode } from "../altNodes/altMixins";
-import { convertFontWeight } from "../tailwind/tailwindTextBuilder";
 import { flutterColor } from "./builderImpl/flutterColor";
 import { numToAutoFixed } from "../common/numToAutoFixed";
+import { convertFontWeight } from "../common/convertFontWeight";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {
   constructor(optChild: string = "") {
@@ -74,21 +74,27 @@ export const getTextStyle = (node: AltTextNode): string => {
     styleBuilder += "decoration: TextDecoration.underline, ";
   }
 
-  if (
-    node.fontName !== figma.mixed &&
-    node.fontName.style.toLowerCase().match("italic")
-  ) {
-    styleBuilder += "fontStyle: FontStyle.italic, ";
-  }
-
   if (node.fontName !== figma.mixed) {
-    styleBuilder += `fontFamily: "${node.fontName.family}", `;
-  }
+    const lowercaseStyle = node.fontName.style.toLowerCase();
 
-  if (node.fontName !== figma.mixed) {
-    styleBuilder += `fontWeight: FontWeight.w${convertFontWeight(
-      node.fontName.style
-    )}, `;
+    if (lowercaseStyle.match("italic")) {
+      styleBuilder += "fontStyle: FontStyle.italic, ";
+    }
+
+    // ignore the font-style when regular (default)
+    if (!lowercaseStyle.match("regular")) {
+      const value = node.fontName.style
+        .replace("italic", "")
+        .replace(" ", "")
+        .toLowerCase();
+
+      const weight = convertFontWeight(value);
+
+      if (weight) {
+        styleBuilder += `fontFamily: "${node.fontName.family}", `;
+        styleBuilder += `fontWeight: FontWeight.w${weight}, `;
+      }
+    }
   }
 
   // todo lineSpacing

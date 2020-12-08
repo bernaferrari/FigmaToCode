@@ -166,7 +166,8 @@ describe("Tailwind Size", () => {
 
       const child = new AltFrameNode();
       child.width = 16;
-      child.height = 16;
+      child.height = 255;
+      child.layoutGrow = 1;
       child.layoutMode = "NONE";
 
       node.children = [subnode];
@@ -177,7 +178,11 @@ describe("Tailwind Size", () => {
 
       expect(tailwindSize(node)).toEqual("w-full ");
       expect(tailwindSize(subnode)).toEqual("w-full ");
-      expect(tailwindSize(child)).toEqual("w-4 h-4 ");
+      expect(tailwindSize(child)).toEqual("w-4 h-full ");
+
+      // additional test for layoutGrow
+      subnode.layoutMode = "HORIZONTAL";
+      expect(tailwindSize(child)).toEqual("w-full h-64 ");
     });
 
     it("complex autolayout example", () => {

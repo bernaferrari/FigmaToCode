@@ -106,6 +106,7 @@ describe("Tailwind Builder", () => {
     const node = new AltFrameNode();
     node.layoutMode = "HORIZONTAL";
     node.counterAxisSizingMode = "AUTO";
+    node.primaryAxisSizingMode = "AUTO";
     node.x = 0;
     node.y = 0;
     node.width = 48;
