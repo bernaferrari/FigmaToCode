@@ -1,5 +1,5 @@
 import { swiftuiMain } from "./../../../src/swiftui/swiftuiMain";
-import { swiftuiColor } from "../../../src/swiftui/builderImpl/swiftuiColor";
+import { swiftuiColorFromFills } from "../../../src/swiftui/builderImpl/swiftuiColor";
 import { AltRectangleNode, AltTextNode } from "../../../src/altNodes/altMixins";
 describe("SwiftUI Color", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -21,7 +21,7 @@ describe("SwiftUI Color", () => {
       },
     ];
 
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "Color(red: 0.94, green: 0.32, blue: 0.22)"
     );
   });
@@ -41,7 +41,7 @@ describe("SwiftUI Color", () => {
       },
     ];
 
-    expect(swiftuiColor(node.fills)).toEqual("Color.black");
+    expect(swiftuiColorFromFills(node.fills)).toEqual("Color.black");
 
     node.fills = [
       {
@@ -55,7 +55,7 @@ describe("SwiftUI Color", () => {
       },
     ];
 
-    expect(swiftuiColor(node.fills)).toEqual("Color.white");
+    expect(swiftuiColorFromFills(node.fills)).toEqual("Color.white");
   });
 
   it("opacity and visibility changes", () => {
@@ -73,7 +73,7 @@ describe("SwiftUI Color", () => {
       },
     ];
 
-    expect(swiftuiColor(node.fills)).toEqual("");
+    expect(swiftuiColorFromFills(node.fills)).toEqual("");
 
     node.fills = [
       {
@@ -89,7 +89,7 @@ describe("SwiftUI Color", () => {
     ];
 
     // this scenario should never happen in real life; figma allows undefined to be set, but not to be get.
-    expect(swiftuiColor(node.fills)).toEqual("Color.black");
+    expect(swiftuiColorFromFills(node.fills)).toEqual("Color.black");
 
     node.fills = [
       {
@@ -103,7 +103,7 @@ describe("SwiftUI Color", () => {
         visible: true,
       },
     ];
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "Color(red: 0, green: 0, blue: 0, opacity: 0)"
     );
   });
@@ -131,7 +131,7 @@ describe("SwiftUI Color", () => {
 
     node.fills = [gradientFill];
 
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .leading, endPoint: .trailing)"
     );
 
@@ -140,7 +140,7 @@ describe("SwiftUI Color", () => {
       [0.8038461208343506, 0.7035384774208069, -0.2932307720184326],
       [1.3402682542800903, -1.4652644395828247, 0.5407097935676575],
     ]);
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)"
     );
 
@@ -149,7 +149,7 @@ describe("SwiftUI Color", () => {
       [7.734507789791678e-8, -1.2339448928833008, 1.1376146078109741],
       [-2.3507132530212402, -1.0997783306265774e-7, 1.6796307563781738],
     ]);
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottom, endPoint: .top)"
     );
 
@@ -158,7 +158,7 @@ describe("SwiftUI Color", () => {
       [6.851496436866e-8, 2.085271120071411, -0.6976743936538696],
       [3.9725232124328613, -1.4210854715202004e-14, -0.8289895057678223],
     ]);
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .top, endPoint: .bottom)"
     );
 
@@ -167,7 +167,7 @@ describe("SwiftUI Color", () => {
       [1.845637559890747, 1.9779233184635814e-7, -0.45637592673301697],
       [6.030897026221282e-8, -3.364259719848633, 2.188383102416992],
     ]);
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .leading, endPoint: .trailing)"
     );
 
@@ -176,7 +176,7 @@ describe("SwiftUI Color", () => {
       [-2.3905811309814453, 0.04066795855760574, 1.707460880279541],
       [0.07747448235750198, 4.357592582702637, -1.0299113988876343],
     ]);
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .trailing, endPoint: .leading)"
     );
 
@@ -185,7 +185,7 @@ describe("SwiftUI Color", () => {
       [-1.2678464651107788, -1.9602917432785034, 1.6415824890136719],
       [-3.7344324588775635, 2.3110527992248535, 0.4661891460418701],
     ]);
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottomTrailing, endPoint: .topLeading)"
     );
 
@@ -194,7 +194,7 @@ describe("SwiftUI Color", () => {
       [0.7420053482055664, -0.6850813031196594, 0.4412658214569092],
       [-1.3051068782806396, -1.3525396585464478, 1.8345310688018799],
     ]);
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottomLeading, endPoint: .topTrailing)"
     );
 
@@ -203,7 +203,7 @@ describe("SwiftUI Color", () => {
       [-0.7061997652053833, 0.7888921499252319, 0.5180976986885071],
       [1.5028705596923828, 1.2872726917266846, -1.0877336263656616],
     ]);
-    expect(swiftuiColor(node.fills)).toEqual(
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
       "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .topTrailing, endPoint: .bottomLeading)"
     );
   });
@@ -269,6 +269,6 @@ describe("SwiftUI Color", () => {
       },
     ];
 
-    expect(swiftuiColor(node.fills)).toEqual("");
+    expect(swiftuiColorFromFills(node.fills)).toEqual("");
   });
 });

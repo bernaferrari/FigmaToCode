@@ -62,13 +62,13 @@ Material(color: Colors.transparent, child: Padding(padding: const EdgeInsets.all
       },
     ];
 
-    expect(flutterMaterial(node, ""))
-      .toEqual(`SizedBox(width: 10, height: 10, child: 
-Material(color: Colors.white, ), ), `);
+    expect(flutterMaterial(node, "")).toEqual(
+      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.white, ), ), `
+    );
 
-    expect(flutterMaterial(node, "child"))
-      .toEqual(`SizedBox(width: 10, height: 10, child: 
-Material(color: Colors.white, child: child), ), `);
+    expect(flutterMaterial(node, "child")).toEqual(
+      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.white, child: child), ), `
+    );
   });
 
   it("ellipse", () => {
@@ -76,9 +76,9 @@ Material(color: Colors.white, child: child), ), `);
     node.width = 10;
     node.height = 10;
 
-    expect(flutterMaterial(node, ""))
-      .toEqual(`SizedBox(width: 10, height: 10, child: 
-Material(color: Colors.transparent, shape: CircleBorder(), ), ), `);
+    expect(flutterMaterial(node, "")).toEqual(
+      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.transparent, shape: CircleBorder(), ), ), `
+    );
   });
 
   it("rectangle with border", () => {
@@ -97,9 +97,9 @@ Material(color: Colors.transparent, shape: CircleBorder(), ), ), `);
       },
     ];
 
-    expect(flutterMaterial(node, ""))
-      .toEqual(`SizedBox(width: 10, height: 10, child: 
-Material(color: Colors.transparent, shape: RoundedRectangleBorder(side: BorderSide(width: 4, color: Colors.white, ), ),), ), `);
+    expect(flutterMaterial(node, "")).toEqual(
+      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.transparent, shape: RoundedRectangleBorder(side: BorderSide(width: 4, color: Colors.white, ), ),), ), `
+    );
   });
 
   it("clipping", () => {
@@ -119,8 +119,7 @@ Material(color: Colors.transparent, shape: RoundedRectangleBorder(side: BorderSi
     node.children = [child];
 
     expect(flutterMaterial(node, "")).toEqual(
-      `SizedBox(width: 10, height: 10, child: 
-Material(color: Colors.transparent, borderRadius: BorderRadius.circular(10), clipBehavior: Clip.antiAlias, ), ), `
+      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.transparent, borderRadius: BorderRadius.circular(10), clipBehavior: Clip.antiAlias, ), ), `
     );
   });
 });

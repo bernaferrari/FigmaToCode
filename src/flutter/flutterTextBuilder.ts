@@ -1,7 +1,7 @@
 import { commonLetterSpacing } from "./../common/commonTextHeightSpacing";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltTextNode } from "../altNodes/altMixins";
-import { flutterColor } from "./builderImpl/flutterColor";
+import { flutterColorFromFills } from "./builderImpl/flutterColor";
 import { numToAutoFixed } from "../common/numToAutoFixed";
 import { convertFontWeight } from "../common/convertFontWeight";
 
@@ -64,7 +64,7 @@ export const getTextStyle = (node: AltTextNode): string => {
   // example: text-md
   let styleBuilder = "";
 
-  styleBuilder += flutterColor(node.fills);
+  styleBuilder += flutterColorFromFills(node.fills);
 
   if (node.fontSize !== figma.mixed) {
     styleBuilder += `fontSize: ${numToAutoFixed(node.fontSize)}, `;

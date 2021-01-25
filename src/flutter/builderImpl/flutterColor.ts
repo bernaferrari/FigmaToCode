@@ -5,7 +5,7 @@ import { nearestValue } from "../../tailwind/conversionTables";
 /**
  * Retrieve the SOLID color for Flutter when existent, otherwise ""
  */
-export const flutterColor = (
+export const flutterColorFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
   const fill = retrieveTopFill(fills);
@@ -13,7 +13,7 @@ export const flutterColor = (
   if (fill?.type === "SOLID") {
     // todo maybe ignore text color when it is black?
     const opacity = fill.opacity ?? 1.0;
-    return `color: ${rgbaToFlutterColor(fill.color, opacity)}, `;
+    return `color: ${flutterColor(fill.color, opacity)}, `;
   }
 
   return "";
@@ -26,20 +26,24 @@ export const flutterBoxDecorationColor = (
 
   if (fill?.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
-    return `color: ${rgbaToFlutterColor(fill.color, opacity)}, `;
+    return `color: ${flutterColor(fill.color, opacity)}, `;
   } else if (fill?.type === "GRADIENT_LINEAR") {
-    const direction = gradientDirection(gradientAngle(fill));
-
-    const colors = fill.gradientStops
-      .map((d) => {
-        return rgbaToFlutterColor(d.color, d.color.a);
-      })
-      .join(", ");
-
-    return `gradient: LinearGradient(${direction}, colors: [${colors}], ), `;
+    return `gradient: ${flutterGradient(fill)}, `;
   }
 
   return "";
+};
+
+export const flutterGradient = (fill: GradientPaint): string => {
+  const direction = gradientDirection(gradientAngle(fill));
+
+  const colors = fill.gradientStops
+    .map((d) => {
+      return flutterColor(d.color, d.color.a);
+    })
+    .join(", ");
+
+  return `LinearGradient(${direction}, colors: [${colors}], )`;
 };
 
 const gradientDirection = (angle: number): string => {
@@ -64,7 +68,7 @@ const gradientDirection = (angle: number): string => {
   }
 };
 
-const rgbaToFlutterColor = (color: RGB, opacity: number): string => {
+export const flutterColor = (color: RGB, opacity: number): string => {
   // todo use Colors.black.opacity()
   if (color.r + color.g + color.b === 0 && opacity === 1) {
     return "Colors.black";

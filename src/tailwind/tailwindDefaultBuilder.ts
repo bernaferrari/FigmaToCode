@@ -16,7 +16,7 @@ import {
   tailwindBorderRadius,
 } from "./builderImpl/tailwindBorder";
 import { tailwindPosition } from "./builderImpl/tailwindPosition";
-import { tailwindColor, tailwindGradient } from "./builderImpl/tailwindColor";
+import { tailwindColorFromFills, tailwindGradientFromFills } from "./builderImpl/tailwindColor";
 import {
   htmlSizeForTailwind,
   htmlSizePartialForTailwind,
@@ -98,12 +98,12 @@ export class TailwindDefaultBuilder {
     if (this.visible !== false) {
       let gradient = "";
       if (kind === "bg") {
-        gradient = tailwindGradient(paint);
+        gradient = tailwindGradientFromFills(paint);
       }
       if (gradient) {
         this.attributes += gradient;
       } else {
-        this.attributes += tailwindColor(paint, kind);
+        this.attributes += tailwindColorFromFills(paint, kind);
       }
     }
     return this;

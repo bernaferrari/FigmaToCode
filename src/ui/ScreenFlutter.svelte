@@ -1,19 +1,17 @@
 <script>
   import ItemColor from "./FlutterItemColor.svelte";
+  import SectionGradient from "./GenericGradientSection.svelte";
+  import SectionSolid from "./GenericSolidColorSection.svelte";
 
   import Prism from "svelte-prism";
   import "prism-theme-night-owl";
   import "prismjs/components/prism-dart";
 
-  let colorData = [];
   let codeData = "";
   let emptySelection = false;
 
-  $: colorObservable = colorData;
   $: codeObservable = codeData;
   $: emptyObservable = emptySelection;
-
-  console.log(`Prism ${Prism}`);
 
   onmessage = event => {
     console.log("got this from the plugin code", event.data);
@@ -25,11 +23,7 @@
       emptySelection = event.data.pluginMessage.type === "empty";
     }
 
-    if (event.data.pluginMessage.type === "colors") {
-      colorData = event.data.pluginMessage.data;
-    } else if (event.data.pluginMessage.type === "text") {
-      // textData = event.data.pluginMessage.data;
-    } else if (event.data.pluginMessage.type === "result") {
+    if (event.data.pluginMessage.type === "result") {
       codeData = event.data.pluginMessage.data;
     }
   };
@@ -53,6 +47,10 @@
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
   const clipboard = data => dispatch("clipboard", { text: data });
+
+  function handleClipboard(event) {
+    clipboard(event.detail.text);
+  }
 
   // INIT
   import { onMount } from "svelte";
@@ -167,7 +165,7 @@
     </p>
   </div>
 
-  <div class="my-1"></div>
+  <div class="my-1" />
 
   <a href="https://codepen.io/bernardoferrari/pen/pogpBLB" target="_blank">
     <button
@@ -213,28 +211,14 @@
     </div>
     <div class="h-2" />
 
-    {#if colorObservable.length > 0}
-      <div
-        class="flex flex-col space-y-2 items-center w-full p-2 mb-2 {sectionStyle}">
-        <div class="flex flex-wrap w-full">
-          <div class="w-1/2 p-1">
-            <div
-              class="flex items-center justify-center w-full h-full bg-gray-200
-              rounded-lg">
-              <p class="text-xl font-semibold">Colors</p>
-            </div>
-          </div>
+    <SectionSolid
+      {sectionStyle}
+      type="flutter"
+      on:clipboard={handleClipboard} />
 
-          {#each colorObservable as item}
-            <div class="w-1/2 p-1">
-              <ItemColor
-                {...item}
-                on:clipboard={clipboard(`Colors(0xff${item.hex})`)} />
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/if}
+    <div class="h-2" />
+
+    <SectionGradient {sectionStyle} on:clipboard={handleClipboard} />
   {/if}
 
 </div>

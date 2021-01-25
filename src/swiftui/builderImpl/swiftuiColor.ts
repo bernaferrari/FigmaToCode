@@ -6,7 +6,7 @@ import { gradientAngle } from "../../common/color";
 /**
  * Retrieve the SOLID color for SwiftUI when existent, otherwise ""
  */
-export const swiftuiColor = (
+export const swiftuiColorFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
   const fill = retrieveTopFill(fills);
@@ -16,20 +16,24 @@ export const swiftuiColor = (
 
     // opacity should only be null on set, not on get. But better be prevented.
     const opacity = fill.opacity ?? 1.0;
-    return rgbaToSwiftUIColor(fill.color, opacity);
+    return swiftuiColor(fill.color, opacity);
   } else if (fill?.type === "GRADIENT_LINEAR") {
-    const direction = gradientDirection(gradientAngle(fill));
-
-    const colors = fill.gradientStops
-      .map((d) => {
-        return rgbaToSwiftUIColor(d.color, d.color.a);
-      })
-      .join(", ");
-
-    return `LinearGradient(gradient: Gradient(colors: [${colors}]), ${direction})`;
+    return swiftuiGradient(fill);
   }
 
   return "";
+};
+
+export const swiftuiGradient = (fill: GradientPaint): string => {
+  const direction = gradientDirection(gradientAngle(fill));
+
+  const colors = fill.gradientStops
+    .map((d) => {
+      return swiftuiColor(d.color, d.color.a);
+    })
+    .join(", ");
+
+  return `LinearGradient(gradient: Gradient(colors: [${colors}]), ${direction})`;
 };
 
 const gradientDirection = (angle: number): string => {
@@ -54,7 +58,7 @@ const gradientDirection = (angle: number): string => {
   }
 };
 
-const rgbaToSwiftUIColor = (color: RGB, opacity: number): string => {
+export const swiftuiColor = (color: RGB, opacity: number): string => {
   // Using Color.black.opacity() is not reccomended, as per:
   // https://stackoverflow.com/a/56824114/4418073
   // Therefore, only use Color.black/white when opacity is 1.
@@ -70,7 +74,8 @@ const rgbaToSwiftUIColor = (color: RGB, opacity: number): string => {
   const g = "green: " + numToAutoFixed(color.g);
   const b = "blue: " + numToAutoFixed(color.b);
 
-  const opacityAttr = opacity !== 1.0 ? `, opacity: ${opacity}` : "";
+  const opacityAttr =
+    opacity !== 1.0 ? `, opacity: ${numToAutoFixed(opacity)}` : "";
 
   return `Color(${r}, ${g}, ${b}${opacityAttr})`;
 };

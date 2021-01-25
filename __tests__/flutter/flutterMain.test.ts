@@ -186,7 +186,8 @@ Container(width: 4, height: 4, color: Colors.white, ),),],),)`);
 
     expect(flutterMain([node]))
       .toEqual(`Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children:[
-Container(width: 8, height: 8, color: Colors.white, ), SizedBox(width: 8),
+Container(width: 8, height: 8, color: Colors.white, ),
+SizedBox(width: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
 
     // variations for test coverage
@@ -196,7 +197,8 @@ Container(width: 8, height: 8, color: Colors.black, ),], ),`);
 
     expect(flutterMain([node]))
       .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children:[
-Container(width: 8, height: 8, color: Colors.white, ), SizedBox(height: 8),
+Container(width: 8, height: 8, color: Colors.white, ),
+SizedBox(height: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
 
     node.primaryAxisAlignItems = "MAX";
@@ -204,7 +206,8 @@ Container(width: 8, height: 8, color: Colors.black, ),], ),`);
 
     expect(flutterMain([node]))
       .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.end, children:[
-Container(width: 8, height: 8, color: Colors.white, ), SizedBox(height: 8),
+Container(width: 8, height: 8, color: Colors.white, ),
+SizedBox(height: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
 
     node.primaryAxisAlignItems = "SPACE_BETWEEN";
@@ -212,7 +215,8 @@ Container(width: 8, height: 8, color: Colors.black, ),], ),`);
 
     expect(flutterMain([node]))
       .toEqual(`Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children:[
-Container(width: 8, height: 8, color: Colors.white, ), SizedBox(height: 8),
+Container(width: 8, height: 8, color: Colors.white, ),
+SizedBox(height: 8),
 Container(width: 8, height: 8, color: Colors.black, ),], ),`);
   });
 
@@ -225,15 +229,18 @@ Container(width: 8, height: 8, color: Colors.black, ),], ),`);
     node.x = 0;
     node.y = 0;
     node.layoutMode = "HORIZONTAL";
+    node.primaryAxisSizingMode = "FIXED";
+    node.primaryAxisAlignItems = "CENTER";
     node.counterAxisSizingMode = "AUTO";
+    node.counterAxisAlignItems = "CENTER";
     node.itemSpacing = 8;
-
-    const child1 = new AltRectangleNode();
-    child1.width = 8;
-    child1.height = 8;
-    child1.x = 0;
-    child1.y = 0;
-    child1.fills = [
+    node.paddingBottom = 0;
+    node.paddingTop = 0;
+    node.paddingLeft = 0;
+    node.paddingRight = 0;
+    node.visible = true;
+    node.layoutAlign = "INHERIT";
+    node.fills = [
       {
         type: "SOLID",
         color: {
@@ -244,12 +251,44 @@ Container(width: 8, height: 8, color: Colors.black, ),], ),`);
       },
     ];
 
-    node.children = [child1];
+    const child1 = new AltRectangleNode();
+    child1.width = 8;
+    child1.height = 8;
+    child1.x = 0;
+    child1.y = 0;
+    child1.layoutGrow = 1;
+    child1.visible = true;
+    child1.layoutAlign = "STRETCH";
+    child1.fills = [
+      {
+        type: "SOLID",
+        color: {
+          r: 1,
+          g: 1,
+          b: 1,
+        },
+      },
+    ];
     child1.parent = node;
 
+    const child2 = new AltRectangleNode();
+    child2.width = 8;
+    child2.height = 8;
+    child2.x = 12;
+    child2.y = 12;
+    child2.layoutGrow = 0;
+    child2.visible = true;
+    child2.layoutAlign = "INHERIT";
+    child2.fills = [];
+    child2.parent = node;
+
+    node.children = [child1, child2];
+
     expect(flutterMain([node], "", true)).toEqual(
-      `SizedBox(width: 8, height: 8, child: 
-Material(color: Colors.white, ), ),`
+      `SizedBox(width: 32, child: Material(color: Colors.white, child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children:[
+Expanded(child: SizedBox(height: double.infinity, child: Material(color: Colors.white, ), ), ),
+SizedBox(width: 8),
+Container(width: 8, height: 8, ),], ), ), ),`
     );
   });
 });

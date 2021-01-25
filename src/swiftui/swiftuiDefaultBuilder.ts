@@ -4,7 +4,7 @@ import {
   swiftuiCornerRadius,
   swiftuiShapeStroke,
 } from "./builderImpl/swiftuiBorder";
-import { swiftuiColor } from "./builderImpl/swiftuiColor";
+import { swiftuiColorFromFills } from "./builderImpl/swiftuiColor";
 import { swiftuiPadding } from "./builderImpl/swiftuiPadding";
 import { swiftuiSize } from "./builderImpl/swiftuiSize";
 
@@ -49,7 +49,7 @@ export class SwiftuiDefaultBuilder {
       return this;
     }
 
-    const fillColor = swiftuiColor(node.fills);
+    const fillColor = swiftuiColorFromFills(node.fills);
     if (fillColor) {
       this.modifiers += `\n.fill(${fillColor})`;
     }
@@ -62,7 +62,7 @@ export class SwiftuiDefaultBuilder {
       return this;
     }
 
-    const fillColor = swiftuiColor(node.fills);
+    const fillColor = swiftuiColorFromFills(node.fills);
     if (fillColor) {
       this.modifiers += `\n.background(${fillColor})`;
     }

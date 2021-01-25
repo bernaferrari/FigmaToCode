@@ -28,9 +28,9 @@ export const flutterContainer = (
 
   // ignore for Groups
   const propBoxDecoration = node.type === "GROUP" ? "" : getBoxDecoration(node);
-  const propWidthHeight = flutterSize(node);
+  const fSize: { size: string; isExpanded: boolean } = flutterSize(node);
 
-  // todo Image, Gradient & multiple fills
+  // todo Image & multiple fills
 
   /// if child is empty, propChild is empty
   const propChild = child ? `child: ${child}` : "";
@@ -41,15 +41,23 @@ export const flutterContainer = (
     propPadding = flutterPadding(node);
   }
 
-  if (propWidthHeight || propBoxDecoration) {
+  let result: string;
+  if (fSize.size || propBoxDecoration) {
     // Container is a container if [propWidthHeight] and [propBoxDecoration] are set.
-    return `\nContainer(${propWidthHeight}${propBoxDecoration}${propPadding}${propChild}),`;
+    result = `\nContainer(${fSize.size}${propBoxDecoration}${propPadding}${propChild}),`;
   } else if (propPadding) {
     // if there is just a padding, add Padding
-    return `\nPadding(${propPadding}${propChild}),`;
+    result = `\nPadding(${propPadding}${propChild}),`;
   } else {
-    return child;
+    result = child;
   }
+
+  // Add Expanded() when parent is a Row/Column and width is full.
+  if (fSize.isExpanded) {
+    result = `\nExpanded(child: ${result}),`;
+  }
+
+  return result;
 };
 
 const getBoxDecoration = (

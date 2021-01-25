@@ -1,10 +1,12 @@
+import { retrieveTailwindText } from "./tailwind/retrieveUI/retrieveTexts";
+import {
+  retrieveGenericLinearGradients,
+  retrieveGenericSolidUIColors,
+} from "./common/retrieveUI/retrieveColors";
 import { htmlMain } from "./html/htmlMain";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
 import { flutterMain } from "./flutter/flutterMain";
-import { retrieveFlutterColors } from "./flutter/retrieveUI/retrieveColors";
-import { retrieveTailwindColors } from "./tailwind/retrieveUI/retrieveColors";
-import { retrieveTailwindText } from "./tailwind/retrieveUI/retrieveTexts";
 import { convertIntoAltNodes } from "./altNodes/altConversion";
 
 let parentId: string;
@@ -12,13 +14,7 @@ let isJsx = false;
 let layerName = false;
 let material = true;
 
-let mode:
-  | "flutter"
-  | "swiftui"
-  | "html"
-  | "tailwind"
-  | "bootstrap"
-  | "material";
+let mode: "flutter" | "swiftui" | "html" | "tailwind";
 
 figma.showUI(__html__, { width: 450, height: 550 });
 
@@ -61,18 +57,22 @@ const run = () => {
     data: result,
   });
 
-  if (mode === "tailwind") {
+  if (
+    mode === "tailwind" ||
+    mode === "flutter" ||
+    mode === "html" ||
+    mode === "swiftui"
+  ) {
     figma.ui.postMessage({
       type: "colors",
-      data: retrieveTailwindColors(convertedSelection),
+      data: retrieveGenericSolidUIColors(convertedSelection, mode),
     });
-  } else if (mode === "flutter") {
+
     figma.ui.postMessage({
-      type: "colors",
-      data: retrieveFlutterColors(convertedSelection),
+      type: "gradients",
+      data: retrieveGenericLinearGradients(convertedSelection, mode),
     });
   }
-
   if (mode === "tailwind") {
     figma.ui.postMessage({
       type: "text",

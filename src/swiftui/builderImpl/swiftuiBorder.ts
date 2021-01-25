@@ -1,6 +1,6 @@
 import { retrieveTopFill } from "./../../common/retrieveFill";
 import { AltSceneNode } from "../../altNodes/altMixins";
-import { swiftuiColor } from "./swiftuiColor";
+import { swiftuiColorFromFills } from "./swiftuiColor";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 
 /**
@@ -17,7 +17,7 @@ export const swiftuiBorder = (node: AltSceneNode): string => {
     return "";
   }
 
-  const propStrokeColor = swiftuiColor(node.strokes);
+  const propStrokeColor = swiftuiColorFromFills(node.strokes);
   const lW = numToAutoFixed(node.strokeWeight);
   const fill = retrieveTopFill(node.fills);
 
@@ -52,7 +52,7 @@ export const swiftuiShapeStroke = (node: AltSceneNode): string => {
     return "";
   }
 
-  const propStrokeColor = swiftuiColor(node.strokes);
+  const propStrokeColor = swiftuiColorFromFills(node.strokes);
   const lW = numToAutoFixed(node.strokeWeight);
 
   if (propStrokeColor && node.strokeWeight) {

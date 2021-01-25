@@ -14,7 +14,7 @@ let parentId = "";
 let material = true;
 
 export const flutterMain = (
-  sceneNode: Array<AltSceneNode>,
+  sceneNode: ReadonlyArray<AltSceneNode>,
   parentIdSrc: string = "",
   isMaterial: boolean = false
 ): string => {
@@ -172,10 +172,12 @@ const addSpacingIfNeeded = (
     // Don't add the SizedBox at last value. In Figma, itemSpacing CAN be negative; here it can't.
     if (node.parent.itemSpacing > 0 && index < len - 1) {
       if (node.parent.layoutMode === "HORIZONTAL") {
-        return ` SizedBox(width: ${numToAutoFixed(node.parent.itemSpacing)}),`;
+        return `\nSizedBox(width: ${numToAutoFixed(node.parent.itemSpacing)}),`;
       } else {
         // node.parent.layoutMode === "VERTICAL"
-        return ` SizedBox(height: ${numToAutoFixed(node.parent.itemSpacing)}),`;
+        return `\nSizedBox(height: ${numToAutoFixed(
+          node.parent.itemSpacing
+        )}),`;
       }
     }
   }

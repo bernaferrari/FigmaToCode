@@ -266,6 +266,8 @@ const convertIntoAltText = (altNode: AltTextNode, node: TextNode) => {
   altNode.lineHeight = node.lineHeight;
 };
 
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+export function notEmpty<TValue>(
+  value: TValue | null | undefined
+): value is TValue {
   return value !== null && value !== undefined;
 }

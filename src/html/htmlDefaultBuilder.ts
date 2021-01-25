@@ -12,7 +12,7 @@ import {
   htmlOpacity,
 } from "./builderImpl/htmlBlend";
 import { htmlPosition } from "./builderImpl/htmlPosition";
-import { htmlColor, htmlGradient } from "./builderImpl/htmlColor";
+import { htmlColorFromFills, htmlGradientFromFills } from "./builderImpl/htmlColor";
 import { htmlPadding } from "./builderImpl/htmlPadding";
 import { formatWithJSX } from "../common/parseJSX";
 import { parentCoordinates } from "../common/parentCoordinates";
@@ -127,11 +127,11 @@ export class HtmlDefaultBuilder {
   ): { prop: string; kind: "solid" | "gradient" | "none" } => {
     // visible is true or undefinied (tests)
     if (this.visible !== false) {
-      const gradient = htmlGradient(paintArray);
+      const gradient = htmlGradientFromFills(paintArray);
       if (gradient) {
         return { prop: gradient, kind: "gradient" };
       } else {
-        const color = htmlColor(paintArray);
+        const color = htmlColorFromFills(paintArray);
         if (color) {
           return { prop: color, kind: "solid" };
         }

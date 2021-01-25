@@ -1,4 +1,7 @@
 <script>
+  import SectionGradient from "./GenericGradientSection.svelte";
+  import SectionSolid from "./GenericSolidColorSection.svelte";
+
   import Prism from "svelte-prism";
   import "prism-theme-night-owl";
   import "prismjs/components/prism-swift";
@@ -27,9 +30,7 @@
       emptySelection = event.data.pluginMessage.type === "empty";
     }
 
-    if (event.data.pluginMessage.type === "colors") {
-      colorData = event.data.pluginMessage.data;
-    } else if (event.data.pluginMessage.type === "text") {
+    if (event.data.pluginMessage.type === "text") {
       textData = event.data.pluginMessage.data;
     } else if (event.data.pluginMessage.type === "result") {
       codeData = event.data.pluginMessage.data;
@@ -41,6 +42,10 @@
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
   const clipboard = data => dispatch("clipboard", { text: data });
+
+  function handleClipboard(event) {
+    clipboard(event.detail.text);
+  }
 
   // INIT
   import { onMount } from "svelte";
@@ -195,6 +200,16 @@
       <Prism language="swift" source={codeObservable} />
 
     </div>
+
     <div class="h-2" />
+
+    <SectionSolid
+      {sectionStyle}
+      type="swiftui"
+      on:clipboard={handleClipboard} />
+
+    <div class="h-2" />
+
+    <SectionGradient {sectionStyle} on:clipboard={handleClipboard} />
   {/if}
 </div>
