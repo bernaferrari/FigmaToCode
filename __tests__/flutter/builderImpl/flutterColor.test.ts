@@ -1,6 +1,6 @@
 import { flutterMain } from "./../../../src/flutter/flutterMain";
 import {
-  flutterColor,
+  flutterColorFromFills,
   flutterBoxDecorationColor,
 } from "../../../src/flutter/builderImpl/flutterColor";
 import { AltRectangleNode, AltTextNode } from "../../../src/altNodes/altMixins";
@@ -24,7 +24,9 @@ describe("Flutter Color", () => {
       },
     ];
 
-    expect(flutterColor(node.fills)).toEqual("color: Color(0xffef5138), ");
+    expect(flutterColorFromFills(node.fills)).toEqual(
+      "color: Color(0xffef5138), "
+    );
   });
 
   it("check for black and white on Text", () => {
@@ -42,7 +44,7 @@ describe("Flutter Color", () => {
       },
     ];
 
-    expect(flutterColor(node.fills)).toEqual("color: Colors.black, ");
+    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.black, ");
 
     node.fills = [
       {
@@ -56,7 +58,7 @@ describe("Flutter Color", () => {
       },
     ];
 
-    expect(flutterColor(node.fills)).toEqual("color: Colors.white, ");
+    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.white, ");
   });
 
   it("opacity and visibility changes", () => {
@@ -74,7 +76,7 @@ describe("Flutter Color", () => {
       },
     ];
 
-    expect(flutterColor(node.fills)).toEqual("");
+    expect(flutterColorFromFills(node.fills)).toEqual("");
 
     node.fills = [
       {
@@ -90,7 +92,7 @@ describe("Flutter Color", () => {
     ];
 
     // this scenario should never happen in real life; figma allows undefined to be set, but not to be get.
-    expect(flutterColor(node.fills)).toEqual("color: Colors.black, ");
+    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.black, ");
 
     node.fills = [
       {
@@ -104,7 +106,9 @@ describe("Flutter Color", () => {
         visible: true,
       },
     ];
-    expect(flutterColor(node.fills)).toEqual("color: Color(0x00000000), ");
+    expect(flutterColorFromFills(node.fills)).toEqual(
+      "color: Color(0x00000000), "
+    );
   });
 
   it("Gradient Linear", () => {
@@ -266,6 +270,6 @@ describe("Flutter Color", () => {
       },
     ];
 
-    expect(flutterColor(node.fills)).toEqual("");
+    expect(flutterColorFromFills(node.fills)).toEqual("");
   });
 });

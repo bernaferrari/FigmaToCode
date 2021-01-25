@@ -1,11 +1,13 @@
 <script>
   import { createEventDispatcher } from "svelte";
 
-  export let name = "";
+  export let colorName = "";
   export let hex = "";
 
   const dispatch = createEventDispatcher();
   const clipboard = () => dispatch("clipboard");
+
+  console.log("making it with hex", hex);
 </script>
 
 <button
@@ -18,7 +20,7 @@
     class="w-4 h-8 flex-shrink-0 rounded-md"
     style="background-color:{hex}" />
   <div class="flex flex-col content-start min-w-0">
-    <p class="text-sm font-medium truncate w-full">{name}</p>
+    <p class="text-sm font-medium truncate w-full">{colorName}</p>
     <p class="text-xs tracking-wide truncate w-full">{hex}</p>
   </div>
 </button>

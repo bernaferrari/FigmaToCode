@@ -4,7 +4,7 @@ import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 
 // retrieve the SOLID color for tailwind
-export const tailwindColor = (
+export const tailwindColorFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
   kind: string
 ): string => {
@@ -14,38 +14,43 @@ export const tailwindColor = (
   const fill = retrieveTopFill(fills);
   if (fill?.type === "SOLID") {
     // don't set text color when color is black (default) and opacity is 100%
-    if (
-      kind === "text" &&
-      fill.color.r === 0.0 &&
-      fill.color.g === 0.0 &&
-      fill.color.b === 0.0 &&
-      fill.opacity === 1.0
-    ) {
-      return "";
-    }
-
-    const opacity = fill.opacity ?? 1.0;
-
-    // example: text-opacity-50
-    // ignore the 100. If opacity was changed, let it be visible.
-    const opacityProp =
-      opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)} ` : "";
-
-    // example: text-red-500
-    const colorProp = `${kind}-${getTailwindFromFigmaRGB(fill.color)} `;
-
-    // if fill isn't visible, it shouldn't be painted.
-    return `${colorProp}${opacityProp}`;
+    return tailwindSolidColor(fill, kind);
   }
 
   return "";
+};
+
+export const tailwindSolidColor = (fill: SolidPaint, kind: string): string => {
+  // don't set text color when color is black (default) and opacity is 100%
+  if (
+    kind === "text" &&
+    fill.color.r === 0.0 &&
+    fill.color.g === 0.0 &&
+    fill.color.b === 0.0 &&
+    fill.opacity === 1.0
+  ) {
+    return "";
+  }
+
+  const opacity = fill.opacity ?? 1.0;
+
+  // example: text-opacity-50
+  // ignore the 100. If opacity was changed, let it be visible.
+  const opacityProp =
+    opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)} ` : "";
+
+  // example: text-red-500
+  const colorProp = `${kind}-${getTailwindFromFigmaRGB(fill.color)} `;
+
+  // if fill isn't visible, it shouldn't be painted.
+  return `${colorProp}${opacityProp}`;
 };
 
 /**
  * https://tailwindcss.com/docs/box-shadow/
  * example: shadow
  */
-export const tailwindGradient = (
+export const tailwindGradientFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
   // [when testing] node.effects can be undefined
@@ -53,33 +58,37 @@ export const tailwindGradient = (
   const fill = retrieveTopFill(fills);
 
   if (fill?.type === "GRADIENT_LINEAR") {
-    const direction = gradientDirection(gradientAngle(fill));
-
-    if (fill.gradientStops.length === 1) {
-      const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
-
-      return `${direction} from-${fromColor} `;
-    } else if (fill.gradientStops.length === 2) {
-      const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
-      const toColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
-
-      return `${direction} from-${fromColor} to-${toColor} `;
-    } else {
-      const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
-
-      // middle (second color)
-      const viaColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
-
-      // last
-      const toColor = getTailwindFromFigmaRGB(
-        fill.gradientStops[fill.gradientStops.length - 1].color
-      );
-
-      return `${direction} from-${fromColor} via-${viaColor} to-${toColor} `;
-    }
+    return tailwindGradient(fill);
   }
 
   return "";
+};
+
+export const tailwindGradient = (fill: GradientPaint): string => {
+  const direction = gradientDirection(gradientAngle(fill));
+
+  if (fill.gradientStops.length === 1) {
+    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
+
+    return `${direction} from-${fromColor} `;
+  } else if (fill.gradientStops.length === 2) {
+    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
+    const toColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
+
+    return `${direction} from-${fromColor} to-${toColor} `;
+  } else {
+    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
+
+    // middle (second color)
+    const viaColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
+
+    // last
+    const toColor = getTailwindFromFigmaRGB(
+      fill.gradientStops[fill.gradientStops.length - 1].color
+    );
+
+    return `${direction} from-${fromColor} via-${viaColor} to-${toColor} `;
+  }
 };
 
 const gradientDirection = (angle: number): string => {

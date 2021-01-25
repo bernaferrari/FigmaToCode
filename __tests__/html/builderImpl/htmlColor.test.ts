@@ -1,7 +1,7 @@
 import { htmlMain } from "./../../../src/html/htmlMain";
 import {
-  htmlColor,
-  htmlGradient,
+  htmlColorFromFills,
+  htmlGradientFromFills,
 } from "./../../../src/html/builderImpl/htmlColor";
 import { AltRectangleNode, AltTextNode } from "../../../src/altNodes/altMixins";
 describe("HTML Color", () => {
@@ -25,7 +25,7 @@ describe("HTML Color", () => {
       },
     ];
 
-    expect(htmlColor(node.fills)).toEqual("white");
+    expect(htmlColorFromFills(node.fills)).toEqual("white");
 
     node.fills = [
       {
@@ -38,7 +38,7 @@ describe("HTML Color", () => {
         opacity: 1.0,
       },
     ];
-    expect(htmlColor(node.fills)).toEqual("black");
+    expect(htmlColorFromFills(node.fills)).toEqual("black");
   });
 
   it("opacity and visibility changes", () => {
@@ -56,7 +56,7 @@ describe("HTML Color", () => {
       },
     ];
 
-    expect(htmlColor(node.fills)).toEqual("");
+    expect(htmlColorFromFills(node.fills)).toEqual("");
 
     node.fills = [
       {
@@ -70,7 +70,7 @@ describe("HTML Color", () => {
         visible: true,
       },
     ];
-    expect(htmlColor(node.fills)).toEqual("rgba(255, 0, 0, 0)");
+    expect(htmlColorFromFills(node.fills)).toEqual("rgba(255, 0, 0, 0)");
   });
 
   it("Gradient Linear", () => {
@@ -96,14 +96,18 @@ describe("HTML Color", () => {
 
     node.fills = [gradientFill];
 
-    expect(htmlGradient(node.fills)).toEqual("linear-gradient(90deg, black)");
+    expect(htmlGradientFromFills(node.fills)).toEqual(
+      "linear-gradient(90deg, black)"
+    );
 
     // topLeft to bottomRight (135)
     Object.assign(gradientFill.gradientTransform, [
       [0.8038461208343506, 0.7035384774208069, -0.2932307720184326],
       [1.3402682542800903, -1.4652644395828247, 0.5407097935676575],
     ]);
-    expect(htmlGradient(node.fills)).toEqual("linear-gradient(131deg, black)");
+    expect(htmlGradientFromFills(node.fills)).toEqual(
+      "linear-gradient(131deg, black)"
+    );
   });
 
   it("Execute Main with Linear Gradient, corners and stroke", () => {
@@ -168,6 +172,6 @@ describe("HTML Color", () => {
       },
     ];
 
-    expect(htmlColor(node.fills)).toEqual("");
+    expect(htmlColorFromFills(node.fills)).toEqual("");
   });
 });

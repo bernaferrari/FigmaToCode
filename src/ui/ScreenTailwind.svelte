@@ -1,16 +1,16 @@
 <script>
   import ItemColor from "./TailwindItemColor.svelte";
   import ItemText from "./TailwindItemText.svelte";
+  import SectionGradient from "./GenericGradientSection.svelte";
+  import SectionSolid from "./GenericSolidColorSection.svelte";
 
   import Prism from "svelte-prism";
   import "prism-theme-night-owl";
 
-  let colorData = [];
   let textData = [];
   let codeData = "";
   let emptySelection = false;
 
-  $: colorObservable = colorData;
   $: textObservable = textData;
   $: codeObservable = codeData;
   $: emptyObservable = emptySelection;
@@ -53,9 +53,7 @@
       emptySelection = event.data.pluginMessage.type === "empty";
     }
 
-    if (event.data.pluginMessage.type === "colors") {
-      colorData = event.data.pluginMessage.data;
-    } else if (event.data.pluginMessage.type === "text") {
+    if (event.data.pluginMessage.type === "text") {
       textData = event.data.pluginMessage.data;
     } else if (event.data.pluginMessage.type === "result") {
       codeData = event.data.pluginMessage.data;
@@ -80,6 +78,10 @@
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
   const clipboard = data => dispatch("clipboard", { text: data });
+
+  function handleClipboard(event) {
+    clipboard(event.detail.text);
+  }
 
   // INIT
   import { onMount } from "svelte";
@@ -251,29 +253,6 @@
     </div>
     <div class="h-2" />
 
-    {#if colorObservable.length > 0}
-      <div
-        class="flex flex-col space-y-2 items-center w-full p-2 {sectionStyle}">
-        <div class="flex flex-wrap w-full">
-          <div class="w-1/3 p-1">
-            <div
-              class="flex items-center justify-center w-full h-full bg-gray-200
-              rounded-lg">
-              <p class="text-xl font-semibold">Colors</p>
-            </div>
-          </div>
-
-          {#each colorObservable as item}
-            <div class="w-1/3 p-1">
-              <ItemColor {...item} on:clipboard={clipboard(item.hex)} />
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/if}
-
-    <div class="h-2" />
-
     {#if textObservable.length > 0}
       <div
         class="flex flex-col space-y-2 items-center w-full p-2 mb-2 {sectionStyle}">
@@ -293,5 +272,15 @@
         </div>
       </div>
     {/if}
+    <div class="h-2" />
+
+    <SectionSolid
+      {sectionStyle}
+      type="tailwind"
+      on:clipboard={handleClipboard} />
+
+    <div class="h-2" />
+
+    <SectionGradient {sectionStyle} on:clipboard={handleClipboard} />
   {/if}
 </div>

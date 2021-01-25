@@ -8,7 +8,7 @@ import {
   AltEllipseNode,
   AltFrameNode,
 } from "../altNodes/altMixins";
-import { flutterColor } from "./builderImpl/flutterColor";
+import { flutterColorFromFills } from "./builderImpl/flutterColor";
 
 // https://api.flutter.dev/flutter/material/Material-class.html
 export const flutterMaterial = (
@@ -31,21 +31,25 @@ export const flutterMaterial = (
   const materialAttr =
     color + elevation + shadowColor + shape + clip + padChild;
 
-  const material = `\nMaterial(${materialAttr}), `;
+  let materialResult = `Material(${materialAttr}), `;
 
-  const sizedBoxAttr = flutterSize(node);
+  const fSize: { size: string; isExpanded: boolean } = flutterSize(node);
 
-  if (sizedBoxAttr) {
-    return `SizedBox(${sizedBoxAttr}child: ${material}), `;
+  if (fSize.size) {
+    materialResult = `SizedBox(${fSize.size}child: ${materialResult}), `;
   }
 
-  return material;
+  if (fSize.isExpanded) {
+    materialResult = `Expanded(child: ${materialResult}),`;
+  }
+
+  return `\n${materialResult}`;
 };
 
 const materialColor = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ): string => {
-  const color = flutterColor(node.fills);
+  const color = flutterColorFromFills(node.fills);
   if (!color) {
     return "color: Colors.transparent, ";
   }

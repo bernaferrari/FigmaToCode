@@ -1,6 +1,6 @@
 import { AltEllipseNode, AltFrameNode } from "../../altNodes/altMixins";
 import { AltSceneNode, AltRectangleNode } from "../../altNodes/altMixins";
-import { flutterColor } from "./flutterColor";
+import { flutterColorFromFills } from "./flutterColor";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 
 // generate the border, when it exists
@@ -10,7 +10,7 @@ export const flutterBorder = (node: AltSceneNode): string => {
   }
 
   // retrieve the stroke color, when existent (returns "" otherwise)
-  const propStrokeColor = flutterColor(node.strokes);
+  const propStrokeColor = flutterColorFromFills(node.strokes);
 
   // only add strokeWidth when there is a strokeColor (returns "" otherwise)
   const propStrokeWidth = `width: ${numToAutoFixed(node.strokeWeight)},`;
@@ -24,7 +24,7 @@ export const flutterBorder = (node: AltSceneNode): string => {
 export const flutterShape = (
   node: AltRectangleNode | AltEllipseNode | AltFrameNode
 ): string => {
-  const strokeColor = flutterColor(node.strokes);
+  const strokeColor = flutterColorFromFills(node.strokes);
   const side =
     strokeColor && node.strokeWeight > 0
       ? `side: BorderSide(width: ${node.strokeWeight}, ${strokeColor}), `

@@ -1,4 +1,4 @@
-import { retrieveTailwindColors } from "./../../../src/tailwind/retrieveUI/retrieveColors";
+import { retrieveGenericSolidUIColors } from "./../../../src/common/retrieveUI/retrieveColors";
 import {
   AltFrameNode,
   AltRectangleNode,
@@ -55,9 +55,21 @@ describe("Retrieve Tailwind Colors for UI", () => {
 
     child0.children = [child1, child2, child4];
 
-    expect(retrieveTailwindColors([child0])).toEqual([
-      { hex: "#000000", name: "black" },
-      { hex: "#ffffff", name: "white" },
+    expect(retrieveGenericSolidUIColors([child0], "tailwind")).toEqual([
+      {
+        colorName: "black",
+        contrastBlack: 0,
+        contrastWhite: 0,
+        exported: "bg-black ",
+        hex: "000000",
+      },
+      {
+        colorName: "white",
+        contrastBlack: 0,
+        contrastWhite: 0,
+        exported: "bg-white ",
+        hex: "ffffff",
+      },
     ]);
   });
 });

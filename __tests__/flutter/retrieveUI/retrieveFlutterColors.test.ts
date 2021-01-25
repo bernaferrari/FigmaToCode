@@ -1,8 +1,8 @@
+import { retrieveGenericSolidUIColors } from "./../../../src/common/retrieveUI/retrieveColors";
 import {
   AltFrameNode,
   AltRectangleNode,
 } from "./../../../src/altNodes/altMixins";
-import { retrieveFlutterColors } from "../../../src/flutter/retrieveUI/retrieveColors";
 
 describe("Retrieve Flutter Colors for UI", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
@@ -55,9 +55,21 @@ describe("Retrieve Flutter Colors for UI", () => {
 
     child0.children = [child1, child2, child4];
 
-    expect(retrieveFlutterColors([child0])).toEqual([
-      { contrastBlack: 1, contrastWhite: 21, hex: "000000" },
-      { contrastBlack: 21, contrastWhite: 1, hex: "ffffff" },
+    expect(retrieveGenericSolidUIColors([child0], "flutter")).toEqual([
+      {
+        colorName: "",
+        contrastBlack: 1,
+        contrastWhite: 21,
+        exported: "Colors.black",
+        hex: "000000",
+      },
+      {
+        colorName: "",
+        contrastBlack: 21,
+        contrastWhite: 1,
+        exported: "Colors.white",
+        hex: "ffffff",
+      },
     ]);
   });
 });

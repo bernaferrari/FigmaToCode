@@ -1,4 +1,4 @@
-import { htmlSolidToRgba } from "./htmlColor";
+import { htmlColor } from "./htmlColor";
 import { AltBlendMixin } from "../../altNodes/altMixins";
 
 /**
@@ -18,7 +18,7 @@ export const htmlShadow = (node: AltBlendMixin): string => {
       const shadow = dropShadow[0];
       const x = shadow.offset.x;
       const y = shadow.offset.y;
-      const color = htmlSolidToRgba(shadow.color, shadow.color.a);
+      const color = htmlColor(shadow.color, shadow.color.a);
       const blur = shadow.radius;
       const spread = shadow.spread ? `${shadow.spread}px ` : "";
       const inner = shadow.type === "INNER_SHADOW" ? " inset" : "";
