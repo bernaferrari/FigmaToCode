@@ -87,13 +87,22 @@ const convertSolidColor = (
   if (fills && fills !== figma.mixed && fills.length > 0) {
     return fills
       .map((fill) => {
-        if (fill?.type === "SOLID") {
+        if (fill.type === "SOLID") {
           let exported = "";
+          const opacity = fill.opacity ?? 1.0;
 
           if (framework === "flutter") {
-            exported = flutterColor(fill.color, fill.opacity ?? 1.0);
+            exported = flutterColor(fill.color, opacity);
+
+            return {
+              hex: rgbTo6hex(fill.color),
+              colorName: "",
+              exported: exported,
+              contrastBlack: calculateContrastRatio(fill.color, black),
+              contrastWhite: calculateContrastRatio(fill.color, white),
+            };
           } else if (framework === "html") {
-            exported = htmlColor(fill.color, fill.opacity ?? 1.0);
+            exported = htmlColor(fill.color, opacity);
           } else if (framework === "tailwind") {
             const kind = nodeType === "TEXT" ? "text" : "bg";
             exported = tailwindSolidColor(fill, kind);
@@ -110,19 +119,17 @@ const convertSolidColor = (
               contrastWhite: 0,
             };
           } else if (framework === "swiftui") {
-            exported = swiftuiColor(fill.color, fill.opacity ?? 1.0);
+            exported = swiftuiColor(fill.color, opacity);
           }
 
           return {
             hex: rgbTo6hex(fill.color),
             colorName: "",
             exported: exported,
-            contrastBlack: calculateContrastRatio(fill.color, black),
-            contrastWhite: calculateContrastRatio(fill.color, white),
+            contrastBlack: 0,
+            contrastWhite: 0,
           };
         }
-
-        return null;
       })
       .filter(notEmpty);
   }
@@ -196,16 +203,21 @@ const convertGradient = (
   if (fills && fills !== figma.mixed && fills.length > 0) {
     return fills
       .map((fill) => {
-        if (fill?.type === "GRADIENT_LINEAR") {
+        if (fill.type === "GRADIENT_LINEAR") {
           let exported = "";
-          if (framework === "flutter") {
-            exported = flutterGradient(fill);
-          } else if (framework === "html") {
-            exported = htmlGradient(fill);
-          } else if (framework === "tailwind") {
-            exported = tailwindGradient(fill);
-          } else if (framework === "swiftui") {
-            exported = swiftuiGradient(fill);
+          switch (framework) {
+            case "flutter":
+              exported = flutterGradient(fill);
+              break;
+            case "html":
+              exported = htmlGradient(fill);
+              break;
+            case "tailwind":
+              exported = tailwindGradient(fill);
+              break;
+            case "swiftui":
+              exported = swiftuiGradient(fill);
+              break;
           }
 
           return {
@@ -213,8 +225,6 @@ const convertGradient = (
             exported: exported,
           };
         }
-
-        return null;
       })
       .filter(notEmpty);
   }
