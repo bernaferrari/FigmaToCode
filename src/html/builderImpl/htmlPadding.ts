@@ -41,7 +41,7 @@ export const htmlPadding = (
     comp += formatWithJSX("padding-left", isJsx, padding.left);
   }
   if (padding.right) {
-    comp += formatWithJSX("padding-left", isJsx, padding.right);
+    comp += formatWithJSX("padding-right", isJsx, padding.right);
   }
 
   // todo use REM
