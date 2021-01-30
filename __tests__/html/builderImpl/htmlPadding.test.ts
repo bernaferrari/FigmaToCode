@@ -23,7 +23,7 @@ describe("HTML padding", () => {
     frameNode.paddingTop = 3;
     frameNode.paddingBottom = 4;
     expect(htmlPadding(frameNode, false)).toEqual(
-      "padding-top: 3px; padding-bottom: 4px; padding-left: 1px; padding-left: 2px; "
+      "padding-top: 3px; padding-bottom: 4px; padding-left: 1px; padding-right: 2px; "
     );
 
     frameNode.paddingLeft = 4;
