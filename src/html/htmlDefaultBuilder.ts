@@ -12,7 +12,10 @@ import {
   htmlOpacity,
 } from "./builderImpl/htmlBlend";
 import { htmlPosition } from "./builderImpl/htmlPosition";
-import { htmlColorFromFills, htmlGradientFromFills } from "./builderImpl/htmlColor";
+import {
+  htmlColorFromFills,
+  htmlGradientFromFills,
+} from "./builderImpl/htmlColor";
 import { htmlPadding } from "./builderImpl/htmlPadding";
 import { formatWithJSX } from "../common/parseJSX";
 import { parentCoordinates } from "../common/parentCoordinates";

@@ -46,7 +46,7 @@ describe("Tailwind Builder", () => {
     child.parent = node;
     node.children = [child];
 
-    expect(tailwindSize(child)).toEqual("w-full h-full ");
+    expect(tailwindSize(child)).toEqual("flex-1 h-full ");
 
     // fail
     node.layoutMode = "VERTICAL";
@@ -55,7 +55,7 @@ describe("Tailwind Builder", () => {
     expect(tailwindSize(child)).toEqual("w-full h-1/6 ");
 
     // child is relative, therefore it must have a value
-    expect(tailwindSize(node)).toEqual("w-24 ");
+    expect(tailwindSize(node)).toEqual("w-24 h-24 ");
   });
 
   it("Vertical layout with FIXED counterAxis", () => {

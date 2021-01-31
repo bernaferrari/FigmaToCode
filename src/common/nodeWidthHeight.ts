@@ -104,18 +104,38 @@ export const nodeWidthHeight = (
     }
   }
 
-  if (
-    ("layoutMode" in node && node.layoutMode === "VERTICAL") ||
-    ("layoutMode" in node &&
-      ((node.layoutMode === "HORIZONTAL" &&
+  if ("layoutMode" in node) {
+    if (
+      (node.layoutMode === "HORIZONTAL" &&
         node.counterAxisSizingMode === "AUTO") ||
-        (node.layoutMode === "VERTICAL" &&
-          node.primaryAxisSizingMode === "AUTO"))) ||
-    (node.type !== "RECTANGLE" && nodeHeight > 384) ||
-    childLargerThanMaxSize(node, "y")
-  ) {
-    // propHeight = "h-full ";
-    propHeight = null;
+      (node.layoutMode === "VERTICAL" && node.primaryAxisSizingMode === "AUTO")
+    ) {
+      propHeight = null;
+    }
+
+    if (
+      (node.layoutMode === "VERTICAL" &&
+        node.counterAxisSizingMode === "AUTO") ||
+      (node.layoutMode === "HORIZONTAL" &&
+        node.primaryAxisSizingMode === "AUTO")
+    ) {
+      propWidth = null;
+    }
+  }
+
+  // On Tailwind, do not let the size be larger than 384.
+  if (allowRelative) {
+    if (
+      (node.type !== "RECTANGLE" && nodeHeight > 384) ||
+      childLargerThanMaxSize(node, "y")
+    ) {
+      propHeight = null;
+    } else if (
+      (node.type !== "RECTANGLE" && nodeWidth > 384) ||
+      childLargerThanMaxSize(node, "x")
+    ) {
+      propWidth = null;
+    }
   }
 
   if ("layoutMode" in node && node.layoutMode !== "NONE") {

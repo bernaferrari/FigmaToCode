@@ -92,7 +92,7 @@ Container(width: 4, height: 4, ),),],),)`);
     child2.parent = node;
 
     expect(flutterMain([convertToAutoLayout(node)]))
-      .toEqual(`Container(width: 420, child: Stack(children:[Positioned(left: 9, top: 9, child: 
+      .toEqual(`Container(width: 420, height: 420, child: Stack(children:[Positioned(left: 9, top: 9, child: 
 Container(width: 385, height: 8, color: Colors.white, ),),Positioned(left: 9, top: 9, child: 
 Container(width: 8, height: 385, ),),],),)`);
   });

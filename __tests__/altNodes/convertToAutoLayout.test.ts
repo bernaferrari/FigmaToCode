@@ -70,7 +70,7 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex flex-col items-start justify-end pr-8 pb-2.5 w-12">
+      `<div class="inline-flex flex-col items-start justify-end pr-8 pb-2.5 w-12 h-12">
 <div class="w-full h-1/2 bg-white"></div>
 <div class="w-full h-1/2 bg-black"></div></div>`
     );
@@ -84,7 +84,7 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex flex-col space-y-1 items-end justify-end pb-1 w-12">
+      `<div class="inline-flex flex-col space-y-1 items-end justify-end pb-1 w-12 h-12">
 <div class="w-full h-5 bg-white"></div>
 <div class="w-5 h-5 bg-black"></div></div>`
     );

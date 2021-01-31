@@ -89,7 +89,7 @@ describe("Tailwind Size", () => {
 
     expect(tailwindMain([frameNodeToAlt(node)]))
       .toEqual(`<div class="inline-flex items-center justify-center p-60" style="width: 500px; height: 500px;">
-<div class="w-full h-full"></div></div>`);
+<div class="flex-1 h-full"></div></div>`);
 
     expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
   });
@@ -177,12 +177,12 @@ describe("Tailwind Size", () => {
       child.parent = subnode;
 
       expect(tailwindSize(node)).toEqual("w-full ");
-      expect(tailwindSize(subnode)).toEqual("w-full ");
-      expect(tailwindSize(child)).toEqual("w-4 h-full ");
+      expect(tailwindSize(subnode)).toEqual("");
+      expect(tailwindSize(child)).toEqual("w-4 flex-1 ");
 
       // additional test for layoutGrow
       subnode.layoutMode = "HORIZONTAL";
-      expect(tailwindSize(child)).toEqual("w-full h-64 ");
+      expect(tailwindSize(child)).toEqual("flex-1 h-64 ");
     });
 
     it("complex autolayout example", () => {
@@ -259,7 +259,7 @@ describe("Tailwind Size", () => {
       node.children = [child1, child2, child3, child4];
 
       expect(tailwindMain([node]))
-        .toEqual(`<div class="inline-flex flex-col space-y-2.5 items-center justify-center px-2.5 w-56 bg-red-600">
+        .toEqual(`<div class="inline-flex flex-col space-y-2.5 items-center justify-center px-2.5 w-56 h-72 bg-red-600">
 <div class="w-full h-5 bg-white"></div>
 <div class="w-full h-5 bg-white"></div>
 <div class="w-24 h-5 bg-white"></div>
