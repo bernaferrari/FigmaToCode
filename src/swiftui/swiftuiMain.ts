@@ -4,6 +4,7 @@ import { AltSceneNode } from "../altNodes/altMixins";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { swiftuiRoundedRectangle } from "./builderImpl/swiftuiBorder";
+import { indentString } from "../common/indentString";
 
 let parentId = "";
 
@@ -40,7 +41,7 @@ const swiftuiWidgetGenerator = (
     } else if (node.type === "FRAME") {
       comp += swiftuiFrame(node, indentLevel);
     } else if (node.type === "TEXT") {
-      comp += swiftuiText(node);
+      comp += swiftuiText(node, indentLevel);
     }
 
     // don't add a newline at last element.
@@ -95,18 +96,7 @@ export const swiftuiContainer = (
 
   // only add the newline when result is not empty
   const result = (children !== kind ? "\n" : "") + kind + modifiers;
-
-  Array(indentLevel * 4).join(" ");
-
-  // From https://github.com/sindresorhus/indent-string
-  const options = {
-    includeEmptyLines: false,
-  };
-
-  const regex = options.includeEmptyLines ? /^/gm : /^(?!\s*$)/gm;
-  const indentedResult = result.replace(regex, " ".repeat(indentLevel * 4));
-
-  return indentedResult;
+  return indentString(result, indentLevel);
 };
 
 const swiftuiGroup = (node: AltGroupNode, indentLevel: number): string => {
@@ -117,7 +107,7 @@ const swiftuiGroup = (node: AltGroupNode, indentLevel: number): string => {
   );
 };
 
-const swiftuiText = (node: AltTextNode): string => {
+const swiftuiText = (node: AltTextNode, indentLevel: number): string => {
   const builder = new SwiftuiTextBuilder();
 
   let text = node.characters;
@@ -142,7 +132,8 @@ const swiftuiText = (node: AltTextNode): string => {
     .position(node, parentId)
     .build();
 
-  return `\nText("${charsWithLineBreak}")${modifier}`;
+  const result = `\nText("${charsWithLineBreak}")${modifier}`;
+  return indentString(result, indentLevel);
 };
 
 const swiftuiFrame = (node: AltFrameNode, indentLevel: number): string => {

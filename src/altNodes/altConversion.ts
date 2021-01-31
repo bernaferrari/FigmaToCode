@@ -97,6 +97,28 @@ export const convertIntoAltNodes = (
         convertCorner(altNode, node);
 
         return altNode;
+      } else if (node.type === "LINE") {
+        const altNode = new AltRectangleNode();
+
+        altNode.id = node.id;
+        altNode.name = node.name;
+
+        if (altParent) {
+          altNode.parent = altParent;
+        }
+
+        convertDefaultShape(altNode, node);
+
+        // Lines have a height of zero, but they must have a height, so add 1.
+        altNode.height = 1;
+
+        // Let them be CENTER, since on Lines this property is ignored.
+        altNode.strokeAlign = "CENTER";
+
+        // Remove 1 since it now has a height of 1. It won't be visually perfect, but will be almost.
+        altNode.strokeWeight = altNode.strokeWeight - 1;
+
+        return altNode;
       } else if (
         node.type === "FRAME" ||
         node.type === "INSTANCE" ||
@@ -167,8 +189,19 @@ export const convertIntoAltNodes = (
 };
 
 const convertLayout = (altNode: AltLayoutMixin, node: LayoutMixin) => {
-  altNode.x = node.x;
-  altNode.y = node.y;
+  // Get the correct X/Y position when rotation is applied.
+  // This won't guarantee a perfect position, since we would still
+  // need to calculate the offset based on node width/height to compensate,
+  // which we are not currently doing. However, this is a lot better than nothing and will help LineNode.
+  if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
+    const boundingRect = getBoundingRect(node);
+    altNode.x = boundingRect.x;
+    altNode.y = boundingRect.y;
+  } else {
+    altNode.x = node.x;
+    altNode.y = node.y;
+  }
+
   altNode.width = node.width;
   altNode.height = node.height;
   altNode.rotation = node.rotation;
@@ -271,3 +304,74 @@ export function notEmpty<TValue>(
 ): value is TValue {
   return value !== null && value !== undefined;
 }
+
+const applyMatrixToPoint = (matrix: number[][], point: number[]): number[] => {
+  return [
+    point[0] * matrix[0][0] + point[1] * matrix[0][1] + matrix[0][2],
+    point[0] * matrix[1][0] + point[1] * matrix[1][1] + matrix[1][2],
+  ];
+};
+
+/**
+ *  this function return a bounding rect for an nodes
+ */
+// x/y absolute coordinates
+// height/width
+// x2/y2 bottom right coordinates
+export const getBoundingRect = (
+  node: LayoutMixin
+): {
+  x: number;
+  y: number;
+  // x2: number;
+  // y2: number;
+  // height: number;
+  // width: number;
+} => {
+  const boundingRect = {
+    x: 0,
+    y: 0,
+    // x2: 0,
+    // y2: 0,
+    // height: 0,
+    // width: 0,
+  };
+
+  const halfHeight = node.height / 2;
+  const halfWidth = node.width / 2;
+
+  const [[c0, s0, x], [s1, c1, y]] = node.absoluteTransform;
+  const matrix = [
+    [c0, s0, x + halfWidth * c0 + halfHeight * s0],
+    [s1, c1, y + halfWidth * s1 + halfHeight * c1],
+  ];
+
+  // the coordinates of the corners of the rectangle
+  const XY: {
+    x: number[];
+    y: number[];
+  } = {
+    x: [1, -1, 1, -1],
+    y: [1, -1, -1, 1],
+  };
+
+  // fill in
+  for (let i = 0; i <= 3; i++) {
+    const a = applyMatrixToPoint(matrix, [
+      XY.x[i] * halfWidth,
+      XY.y[i] * halfHeight,
+    ]);
+    XY.x[i] = a[0];
+    XY.y[i] = a[1];
+  }
+
+  XY.x.sort((a, b) => a - b);
+  XY.y.sort((a, b) => a - b);
+
+  return {
+    x: XY.x[0],
+    y: XY.y[0],
+  };
+
+  return boundingRect;
+};
