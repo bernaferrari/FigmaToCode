@@ -53,7 +53,7 @@ describe("HTML Main", () => {
     child2.parent = node;
 
     expect(htmlMain([convertToAutoLayout(node)]))
-      .toEqual(`<div style="width: 320px; position: relative;">
+      .toEqual(`<div style="width: 320px; height: 320px; position: relative;">
 <div style="width: 385px; height: 8px; left: 9px; top: 9px; position: absolute; background-color: white;"></div>
 <div style="width: 8px; height: 385px; left: 9px; top: 9px; position: absolute;"></div></div>`);
   });
@@ -337,6 +337,6 @@ describe("HTML Main", () => {
 
     expect(htmlMain([node], "", false, true))
       .toEqual(`<div class="FRAME" style="width: 32px; height: 32px; background-image: linear-gradient(131deg, rgba(0, 0, 255, 1), rgba(255, 0, 0, 1)); box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); display: inline-flex; flex-direction: row; align-items: flex-start; justify-content: flex-start;">
-<p class="TEXT" style="width: 20px; background: linear-gradient(131deg, rgba(0, 0, 255, 1), rgba(255, 0, 0, 1)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;\">gradient</p></div>`);
+<p class="TEXT" style="width: 20px; background: linear-gradient(131deg, rgba(0, 0, 255, 1), rgba(255, 0, 0, 1)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">gradient</p></div>`);
   });
 });

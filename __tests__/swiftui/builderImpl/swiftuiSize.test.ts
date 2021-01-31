@@ -43,6 +43,17 @@ describe("swiftui Builder", () => {
       "\n.frame(maxWidth: .infinity, maxHeight: .infinity)"
     );
 
+    child.layoutGrow = 0;
+    expect(swiftuiSize(child)).toEqual(
+      "\n.frame(maxWidth: 100, maxHeight: .infinity)"
+    );
+
+    child.layoutGrow = 1;
+    child.layoutAlign = "INHERIT";
+    expect(swiftuiSize(child)).toEqual(
+      "\n.frame(maxWidth: .infinity, maxHeight: 100)"
+    );
+
     // fail
     node.layoutMode = "VERTICAL";
     child.layoutAlign = "INHERIT";
@@ -52,7 +63,7 @@ describe("swiftui Builder", () => {
     expect(swiftuiSize(child)).toEqual("\n.frame(width: 16, height: 16)");
 
     // child is relative, therefore it must have a value
-    expect(swiftuiSize(node)).toEqual("\n.frame(width: 100)");
+    expect(swiftuiSize(node)).toEqual("\n.frame(width: 100, height: 100)");
   });
 
   it("Vertical layout with FIXED counterAxis", () => {
