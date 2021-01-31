@@ -52,13 +52,14 @@ describe("SwiftUI Main", () => {
     child2.parent = node;
 
     expect(swiftuiMain([convertToAutoLayout(node)])).toEqual(`ZStack {
-Rectangle()
-.fill(Color.white)
-.offset(x: -5, y: -5)
-.frame(width: 4, height: 4)
-Rectangle()
-.offset(x: -5, y: -5)
-.frame(width: 4, height: 4)
+    Rectangle()
+    .fill(Color.white)
+    .offset(x: -5, y: -5)
+    .frame(width: 4, height: 4)
+
+    Rectangle()
+    .offset(x: -5, y: -5)
+    .frame(width: 4, height: 4)
 }
 .frame(width: 32, height: 32)`);
   });
@@ -156,12 +157,13 @@ Rectangle()
 
     expect(swiftuiMain([node]))
       .toEqual(`VStack(alignment: .trailing, spacing: 8) {
-Rectangle()
-.fill(Color.white)
-.frame(width: 8, height: 8)
-Rectangle()
-.fill(Color.black)
-.frame(width: 8, height: 8)
+    Rectangle()
+    .fill(Color.white)
+    .frame(width: 8, height: 8)
+
+    Rectangle()
+    .fill(Color.black)
+    .frame(width: 8, height: 8)
 }`);
 
     // variations in layoutAlign for test coverage
@@ -170,12 +172,13 @@ Rectangle()
     node.itemSpacing = 16;
 
     expect(swiftuiMain([node])).toEqual(`VStack() {
-Rectangle()
-.fill(Color.white)
-.frame(width: 8, height: 8)
-Rectangle()
-.fill(Color.black)
-.frame(width: 8, height: 8)
+    Rectangle()
+    .fill(Color.white)
+    .frame(width: 8, height: 8)
+
+    Rectangle()
+    .fill(Color.black)
+    .frame(width: 8, height: 8)
 }`);
 
     // variations in layoutAlign and spacing for coverage
@@ -192,12 +195,13 @@ Rectangle()
 
     expect(swiftuiMain([node]))
       .toEqual(`VStack(alignment: .leading, spacing: 0) {
-Rectangle()
-.fill(Color.white)
-.frame(width: 8, height: 8)
-Rectangle()
-.fill(Color.black)
-.frame(width: 8, height: 8)
+    Rectangle()
+    .fill(Color.white)
+    .frame(width: 8, height: 8)
+
+    Rectangle()
+    .fill(Color.black)
+    .frame(width: 8, height: 8)
 }
 .background(Color.black)`);
 
@@ -207,12 +211,13 @@ Rectangle()
     node.counterAxisAlignItems = "MIN";
 
     expect(swiftuiMain([node])).toEqual(`HStack(alignment: .top, spacing: 0) {
-Rectangle()
-.fill(Color.white)
-.frame(width: 8, height: 8)
-Rectangle()
-.fill(Color.black)
-.frame(width: 8, height: 8)
+    Rectangle()
+    .fill(Color.white)
+    .frame(width: 8, height: 8)
+
+    Rectangle()
+    .fill(Color.black)
+    .frame(width: 8, height: 8)
 }
 .background(Color.black)`);
 
@@ -220,12 +225,13 @@ Rectangle()
     node.counterAxisAlignItems = "CENTER";
 
     expect(swiftuiMain([node])).toEqual(`HStack(spacing: 0) {
-Rectangle()
-.fill(Color.white)
-.frame(width: 8, height: 8)
-Rectangle()
-.fill(Color.black)
-.frame(width: 8, height: 8)
+    Rectangle()
+    .fill(Color.white)
+    .frame(width: 8, height: 8)
+
+    Rectangle()
+    .fill(Color.black)
+    .frame(width: 8, height: 8)
 }
 .background(Color.black)`);
 
@@ -234,12 +240,13 @@ Rectangle()
 
     expect(swiftuiMain([node]))
       .toEqual(`HStack(alignment: .bottom, spacing: 0) {
-Rectangle()
-.fill(Color.white)
-.frame(width: 8, height: 8)
-Rectangle()
-.fill(Color.black)
-.frame(width: 8, height: 8)
+    Rectangle()
+    .fill(Color.white)
+    .frame(width: 8, height: 8)
+
+    Rectangle()
+    .fill(Color.black)
+    .frame(width: 8, height: 8)
 }
 .background(Color.black)`);
   });
@@ -304,7 +311,7 @@ Rectangle()
     expect(conversion.match("//") !== null).toBe(true);
 
     // check the length. It is supposed to be long.
-    expect(conversion.length).toBe(4539);
+    expect(conversion.length).toBe(5429);
 
     // todo count the number of "Groups {"
   });

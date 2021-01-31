@@ -13,7 +13,7 @@ export const swiftuiMain = (
 ): string => {
   parentId = parentIdSrc;
 
-  let result = swiftuiWidgetGenerator(sceneNode);
+  let result = swiftuiWidgetGenerator(sceneNode, 0);
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.slice(0, 1) === "\n") {
@@ -24,19 +24,28 @@ export const swiftuiMain = (
 };
 
 const swiftuiWidgetGenerator = (
-  sceneNode: ReadonlyArray<AltSceneNode>
+  sceneNode: ReadonlyArray<AltSceneNode>,
+  indentLevel: number
 ): string => {
   let comp = "";
 
-  sceneNode.forEach((node) => {
+  // shortchut to avoid getting the lenght on every loop call.
+  const sceneNodeLen = sceneNode.length;
+
+  sceneNode.forEach((node, index) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += swiftuiContainer(node);
+      comp += swiftuiContainer(node, indentLevel);
     } else if (node.type === "GROUP") {
-      comp += swiftuiGroup(node);
+      comp += swiftuiGroup(node, indentLevel);
     } else if (node.type === "FRAME") {
-      comp += swiftuiFrame(node);
+      comp += swiftuiFrame(node, indentLevel);
     } else if (node.type === "TEXT") {
       comp += swiftuiText(node);
+    }
+
+    // don't add a newline at last element.
+    if (index < sceneNodeLen - 1) {
+      comp += "\n";
     }
   });
 
@@ -47,6 +56,7 @@ const swiftuiWidgetGenerator = (
 // sometimes a property might not exist, so it doesn't add ","
 export const swiftuiContainer = (
   node: AltSceneNode,
+  indentLevel: number,
   children: string = ""
 ): string => {
   // ignore the view when size is zero or less
@@ -85,13 +95,25 @@ export const swiftuiContainer = (
 
   // only add the newline when result is not empty
   const result = (children !== kind ? "\n" : "") + kind + modifiers;
-  return result;
+
+  Array(indentLevel * 4).join(" ");
+
+  // From https://github.com/sindresorhus/indent-string
+  const options = {
+    includeEmptyLines: false,
+  };
+
+  const regex = options.includeEmptyLines ? /^/gm : /^(?!\s*$)/gm;
+  const indentedResult = result.replace(regex, " ".repeat(indentLevel * 4));
+
+  return indentedResult;
 };
 
-const swiftuiGroup = (node: AltGroupNode): string => {
+const swiftuiGroup = (node: AltGroupNode, indentLevel: number): string => {
   return swiftuiContainer(
     node,
-    `\nZStack {${widgetGeneratorWithLimits(node)}\n}`
+    indentLevel,
+    `\nZStack {${widgetGeneratorWithLimits(node, indentLevel)}\n}`
   );
 };
 
@@ -123,21 +145,22 @@ const swiftuiText = (node: AltTextNode): string => {
   return `\nText("${charsWithLineBreak}")${modifier}`;
 };
 
-const swiftuiFrame = (node: AltFrameNode): string => {
-  const children = widgetGeneratorWithLimits(node);
+const swiftuiFrame = (node: AltFrameNode, indentLevel: number): string => {
+  const updatedIdentLevel = node.children.length === 1 ? 0 : indentLevel + 1;
+
+  const children = widgetGeneratorWithLimits(node, updatedIdentLevel);
 
   // if there is only one child, there is no need for a HStack of VStack.
   if (node.children.length === 1) {
-    return swiftuiContainer(node, children);
-
+    return swiftuiContainer(node, indentLevel, children);
     // return swiftuiContainer(node, rowColumn);
   } else if (node.layoutMode !== "NONE") {
     const rowColumn = wrapInDirectionalStack(node, children);
-    return swiftuiContainer(node, rowColumn);
+    return swiftuiContainer(node, indentLevel, rowColumn);
   } else {
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return swiftuiContainer(node, `\nZStack {${children}\n}`);
+    return swiftuiContainer(node, indentLevel, `\nZStack {${children}\n}`);
   }
 };
 
@@ -187,10 +210,13 @@ export const mostFrequent = (arr: Array<string>): string | undefined => {
 };
 
 // todo should the plugin manually Group items? Ideally, it would detect the similarities and allow a ForEach.
-const widgetGeneratorWithLimits = (node: AltFrameNode | AltGroupNode) => {
+const widgetGeneratorWithLimits = (
+  node: AltFrameNode | AltGroupNode,
+  indentLevel: number
+) => {
   if (node.children.length < 10) {
     // standard way
-    return swiftuiWidgetGenerator(node.children);
+    return swiftuiWidgetGenerator(node.children, indentLevel);
   }
 
   const chunk = 10;
@@ -207,7 +233,7 @@ const widgetGeneratorWithLimits = (node: AltFrameNode | AltGroupNode) => {
   // split node.children in arrays of 10, so that it can be Grouped. I feel so guilty of allowing this.
   for (let i = 0, j = slicedChildren.length; i < j; i += chunk) {
     const chunkChildren = slicedChildren.slice(i, i + chunk);
-    const strChildren = swiftuiWidgetGenerator(chunkChildren);
+    const strChildren = swiftuiWidgetGenerator(chunkChildren, indentLevel);
     strBuilder += `\nGroup {${strChildren}\n}`;
   }
 
