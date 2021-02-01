@@ -38,6 +38,9 @@ describe("Tailwind Text", () => {
     node.textAlignHorizontal = "CENTER";
     expect(tailwindMain([node])).toEqual('<p class="w-4 h-4 text-center"></p>');
 
+    node.textAlignHorizontal = "RIGHT";
+    expect(tailwindMain([node])).toEqual('<p class="w-4 h-4 text-right"></p>');
+
     node.textAlignHorizontal = "JUSTIFIED";
     expect(tailwindMain([node])).toEqual(
       '<p class="w-4 h-4 text-justify"></p>'

@@ -15,7 +15,7 @@ export const flutterPadding = (node: AltSceneNode): string => {
   }
 
   if ("all" in padding) {
-    return `padding: const EdgeInsets.all(${numToAutoFixed(padding.all)}), `;
+    return `\npadding: const EdgeInsets.all(${numToAutoFixed(padding.all)}),`;
   }
 
   // horizontal and vertical, as the default AutoLayout
@@ -33,7 +33,7 @@ export const flutterPadding = (node: AltSceneNode): string => {
         ? `vertical: ${numToAutoFixed(padding.vertical)}, `
         : "";
 
-    return `padding: const EdgeInsets.symmetric(${propHorizontalPadding}${propVerticalPadding}), `;
+    return `\npadding: const EdgeInsets.symmetric(${propHorizontalPadding}${propVerticalPadding}),`;
   }
 
   let comp = "";
@@ -53,7 +53,7 @@ export const flutterPadding = (node: AltSceneNode): string => {
   }
 
   if (comp !== "") {
-    return `padding: const EdgeInsets.only(${comp}), `;
+    return `\npadding: const EdgeInsets.only(${comp}),`;
   }
 
   return "";

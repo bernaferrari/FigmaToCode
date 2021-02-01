@@ -24,8 +24,8 @@ describe("Flutter Color", () => {
       },
     ];
 
-    expect(flutterColorFromFills(node.fills)).toEqual(
-      "color: Color(0xffef5138), "
+    expect(flutterBoxDecorationColor(node.fills)).toEqual(
+      "\ncolor: Color(0xffef5138),"
     );
   });
 
@@ -44,7 +44,7 @@ describe("Flutter Color", () => {
       },
     ];
 
-    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.black, ");
+    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.black,");
 
     node.fills = [
       {
@@ -58,7 +58,7 @@ describe("Flutter Color", () => {
       },
     ];
 
-    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.white, ");
+    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.white,");
   });
 
   it("opacity and visibility changes", () => {
@@ -92,7 +92,7 @@ describe("Flutter Color", () => {
     ];
 
     // this scenario should never happen in real life; figma allows undefined to be set, but not to be get.
-    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.black, ");
+    expect(flutterColorFromFills(node.fills)).toEqual("color: Colors.black,");
 
     node.fills = [
       {
@@ -106,8 +106,8 @@ describe("Flutter Color", () => {
         visible: true,
       },
     ];
-    expect(flutterColorFromFills(node.fills)).toEqual(
-      "color: Color(0x00000000), "
+    expect(flutterBoxDecorationColor(node.fills)).toEqual(
+      "\ncolor: Color(0x00000000),"
     );
   });
 
@@ -135,7 +135,7 @@ describe("Flutter Color", () => {
     node.fills = [gradientFill];
 
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Colors.black], ),"
     );
 
     // topLeft to bottomRight (135)
@@ -144,7 +144,7 @@ describe("Flutter Color", () => {
       [1.3402682542800903, -1.4652644395828247, 0.5407097935676575],
     ]);
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.black], ),"
     );
 
     // bottom to top (-90)
@@ -153,7 +153,7 @@ describe("Flutter Color", () => {
       [-2.3507132530212402, -1.0997783306265774e-7, 1.6796307563781738],
     ]);
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [Colors.black], ),"
     );
 
     // top to bottom (90)
@@ -162,7 +162,7 @@ describe("Flutter Color", () => {
       [3.9725232124328613, -1.4210854715202004e-14, -0.8289895057678223],
     ]);
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black], ),"
     );
 
     // left to right (0)
@@ -171,7 +171,7 @@ describe("Flutter Color", () => {
       [6.030897026221282e-8, -3.364259719848633, 2.188383102416992],
     ]);
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Colors.black], ),"
     );
 
     // right to left (180)
@@ -180,7 +180,7 @@ describe("Flutter Color", () => {
       [0.07747448235750198, 4.357592582702637, -1.0299113988876343],
     ]);
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.centerRight, end: Alignment.centerLeft, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.centerRight, end: Alignment.centerLeft, colors: [Colors.black], ),"
     );
 
     // bottom left to top right (-135)
@@ -189,7 +189,7 @@ describe("Flutter Color", () => {
       [-3.7344324588775635, 2.3110527992248535, 0.4661891460418701],
     ]);
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.bottomRight, end: Alignment.topLeft, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.bottomRight, end: Alignment.topLeft, colors: [Colors.black], ),"
     );
 
     // bottom left to top right (-45)
@@ -198,7 +198,7 @@ describe("Flutter Color", () => {
       [-1.3051068782806396, -1.3525396585464478, 1.8345310688018799],
     ]);
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.black], ),"
     );
 
     // top right to bottom left (-45)
@@ -207,7 +207,7 @@ describe("Flutter Color", () => {
       [1.5028705596923828, 1.2872726917266846, -1.0877336263656616],
     ]);
     expect(flutterBoxDecorationColor(node.fills)).toEqual(
-      "gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [Colors.black], ), "
+      "\ngradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [Colors.black], ),"
     );
   });
 
@@ -256,7 +256,15 @@ describe("Flutter Color", () => {
     node.cornerRadius = 16;
 
     expect(flutterMain([node])).toEqual(
-      `Container(width: 18, height: 18, decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: Color(0xff3f3f3f), width: 4,), gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.black, Color(0xffff0000)], ), ), )`
+      `Container(
+    width: 18,
+    height: 18,
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Color(0xff3f3f3f), width: 4, ),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.black, Color(0xffff0000)], ),
+    ),
+)`
     );
   });
 

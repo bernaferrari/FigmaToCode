@@ -1,3 +1,4 @@
+import { indentString } from "./../common/indentString";
 import {
   AltEllipseNode,
   AltFrameNode,
@@ -23,11 +24,7 @@ export const flutterMain = (
 
   let result = flutterWidgetGenerator(sceneNode);
 
-  // remove the initial \n that is made in Container.
-  if (result.length > 0 && result.slice(0, 1) === "\n") {
-    result = result.slice(1, result.length);
-  }
-
+  // remove the last ','
   result = result.slice(0, -1);
 
   return result;
@@ -58,19 +55,27 @@ const flutterWidgetGenerator = (
       comp += flutterText(node);
     }
 
-    // if the parent is an AutoLayout, and itemSpacing is set, add a SizedBox between items.
-    // on else, comp += ""
-    comp += addSpacingIfNeeded(node, index, sceneLen);
+    if (index < sceneLen - 1) {
+      // if the parent is an AutoLayout, and itemSpacing is set, add a SizedBox between items.
+      // on else, comp += ""
+      const spacing = addSpacingIfNeeded(node);
+      if (spacing) {
+        // comp += "\n";
+        comp += spacing;
+      }
+
+      // don't add a newline at last element.
+      comp += "\n";
+    }
   });
 
   return comp;
 };
 
 const flutterGroup = (node: AltGroupNode): string => {
-  return flutterContainer(
-    node,
-    `Stack(children:[${flutterWidgetGenerator(node.children)}],),`
-  );
+  const properties = `\nchildren:[${flutterWidgetGenerator(node.children)}],`;
+
+  return flutterContainer(node, `Stack(${indentString(properties)}\n),`);
 };
 
 const flutterContainer = (
@@ -111,7 +116,10 @@ const flutterFrame = (node: AltFrameNode): string => {
   } else {
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return flutterContainer(node, `Stack(children:[${children}],),`);
+
+    const properties = `\nchildren:[\n${indentString(children, 1)}\n],`;
+
+    return flutterContainer(node, `Stack(${indentString(properties)}\n),`);
   }
 };
 
@@ -131,7 +139,7 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
       crossAlignType = "end";
       break;
   }
-  const crossAxisAlignment = `crossAxisAlignment: CrossAxisAlignment.${crossAlignType}, `;
+  const crossAxisAlignment = `\ncrossAxisAlignment: CrossAxisAlignment.${crossAlignType},`;
 
   let mainAlignType;
   switch (node.primaryAxisAlignItems) {
@@ -148,29 +156,31 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
       mainAlignType = "spaceBetween";
       break;
   }
-  const mainAxisAlignment = `mainAxisAlignment: MainAxisAlignment.${mainAlignType}, `;
+  const mainAxisAlignment = `\nmainAxisAlignment: MainAxisAlignment.${mainAlignType},`;
 
   let mainAxisSize;
   if (node.layoutGrow === 1) {
-    mainAxisSize = "mainAxisSize: MainAxisSize.max, ";
+    mainAxisSize = "\nmainAxisSize: MainAxisSize.max,";
   } else {
-    mainAxisSize = "mainAxisSize: MainAxisSize.min, ";
+    mainAxisSize = "\nmainAxisSize: MainAxisSize.min,";
   }
 
-  return `${rowOrColumn}(${mainAxisSize}${mainAxisAlignment}${crossAxisAlignment}children:[${children}], ), `;
+  const properties =
+    mainAxisSize +
+    mainAxisAlignment +
+    crossAxisAlignment +
+    `\nchildren:[\n${indentString(children, 1)}\n],`;
+
+  return `${rowOrColumn}(${indentString(properties, 1)}\n),`;
 };
 
 // TODO Vector support in Flutter is complicated. Currently, AltConversion converts it in a Rectangle.
 
-const addSpacingIfNeeded = (
-  node: AltSceneNode,
-  index: number,
-  len: number
-): string => {
+const addSpacingIfNeeded = (node: AltSceneNode): string => {
   if (node.parent?.type === "FRAME" && node.parent.layoutMode !== "NONE") {
     // check if itemSpacing is set and if it isn't the last value.
     // Don't add the SizedBox at last value. In Figma, itemSpacing CAN be negative; here it can't.
-    if (node.parent.itemSpacing > 0 && index < len - 1) {
+    if (node.parent.itemSpacing > 0) {
       if (node.parent.layoutMode === "HORIZONTAL") {
         return `\nSizedBox(width: ${numToAutoFixed(node.parent.itemSpacing)}),`;
       } else {

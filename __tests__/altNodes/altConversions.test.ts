@@ -111,6 +111,26 @@ describe("AltConversions", () => {
     ).toEqual(`<div class="w-5 h-5 rounded-full"></div>`);
   });
 
+  it("Line", () => {
+    // this test requires mocking the full EllipseNode. Figma-api-stub doesn't support VectorNode.
+    class LineNode {
+      readonly type = "LINE";
+    }
+
+    interface LineNode extends DefaultShapeMixin, ConstraintMixin, CornerMixin {
+      readonly type: "LINE";
+      clone(): LineNode;
+    }
+
+    const node = new LineNode();
+    // set read-only variables
+    Object.defineProperty(node, "width", { value: 20 });
+
+    expect(
+      tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
+    ).toEqual(`<div class="w-5 h-0.5"></div>`);
+  });
+
   it("Vector", () => {
     // this test requires mocking the full VectorNode. Figma-api-stub doesn't support VectorNode.
     class VectorNode {
@@ -137,6 +157,4 @@ describe("AltConversions", () => {
       tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
     ).toEqual(`<div class="opacity-50 w-5 h-5"></div>`);
   });
-
-  // todo add a test for EllipseNode, but there is no EllipseNode in figma-api-stubs!
 });

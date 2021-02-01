@@ -70,84 +70,141 @@ describe("Flutter Position", () => {
     node.x = 37;
     node.y = 37;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.center, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.center,
+        child: child
+    ),
+),`
     );
 
     // top-left
     node.x = 0;
     node.y = 0;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.topLeft, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.topLeft,
+        child: child
+    ),
+),`
     );
 
     // top-right
     node.x = 75;
     node.y = 0;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.topRight, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.topRight,
+        child: child
+    ),
+),`
     );
 
     // bottom-left
     node.x = 0;
     node.y = 75;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.bottomLeft, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.bottomLeft,
+        child: child
+    ),
+),`
     );
 
     // bottom-right
     node.x = 75;
     node.y = 75;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.bottomRight, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.bottomRight,
+        child: child
+    ),
+),`
     );
 
     // top-center
     node.x = 37;
     node.y = 0;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.topCenter, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.topCenter,
+        child: child
+    ),
+),`
     );
 
     // left-center
     node.x = 0;
     node.y = 37;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.centerLeft, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.centerLeft,
+        child: child
+    ),
+),`
     );
 
     // bottom-center
     node.x = 37;
     node.y = 75;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.bottomCenter, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.bottomCenter,
+        child: child
+    ),
+),`
     );
 
     // right-center
     node.x = 75;
     node.y = 37;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned.fill(child: Align(alignment: Alignment.centerRight, child: child),),"
+      `Positioned.fill(
+    child: Align(
+        alignment: Alignment.centerRight,
+        child: child
+    ),
+),`
     );
 
     // center Y, random X
     node.x = 22;
     node.y = 37;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned(left: 22, top: 37, child: child),"
+      `Positioned(
+    left: 22,
+    top: 37,
+    child: child
+),`
     );
 
     // center X, random Y
     node.x = 37;
     node.y = 22;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned(left: 37, top: 22, child: child),"
+      `Positioned(
+    left: 37,
+    top: 22,
+    child: child
+),`
     );
 
     // without position
     node.x = 45;
     node.y = 88;
     expect(flutterPosition(node, "child")).toEqual(
-      "Positioned(left: 45, top: 88, child: child),"
+      `Positioned(
+    left: 45,
+    top: 88,
+    child: child
+),`
     );
   });
 

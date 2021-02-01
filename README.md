@@ -46,7 +46,6 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 ### Flutter limits and ideas
 
-- **Unformatted code:** output code is not formatted, but even [dartpad](https://dartpad.dev/) offers a format button.
 - **Stack:** in some simpler cases, a `Stack` could be replaced with a `Container` and a `BoxDecoration`. Discover those cases and optimize them.
 - **Material Styles**: text could be matched to existing Material styles (like outputting `Headline6` when text size is 20).
 - **Identify Buttons**: the plugin could identify specific buttons and output them instead of always using `Container` or `Material`.

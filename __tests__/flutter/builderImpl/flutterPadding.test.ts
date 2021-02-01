@@ -17,7 +17,7 @@ describe("Flutter Padding", () => {
     frameNode.paddingTop = 2;
     frameNode.paddingBottom = 2;
     expect(flutterPadding(frameNode)).toEqual(
-      "padding: const EdgeInsets.all(2), "
+      "\npadding: const EdgeInsets.all(2),"
     );
 
     frameNode.paddingLeft = 1;
@@ -25,7 +25,7 @@ describe("Flutter Padding", () => {
     frameNode.paddingTop = 3;
     frameNode.paddingBottom = 4;
     expect(flutterPadding(frameNode)).toEqual(
-      "padding: const EdgeInsets.only(left: 1, right: 2, top: 3, bottom: 4, ), "
+      "\npadding: const EdgeInsets.only(left: 1, right: 2, top: 3, bottom: 4, ),"
     );
 
     frameNode.paddingLeft = 2;
@@ -33,7 +33,7 @@ describe("Flutter Padding", () => {
     frameNode.paddingTop = 4;
     frameNode.paddingBottom = 4;
     expect(flutterPadding(frameNode)).toEqual(
-      "padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4, ), "
+      "\npadding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4, ),"
     );
 
     frameNode.paddingLeft = 2;
@@ -41,7 +41,7 @@ describe("Flutter Padding", () => {
     frameNode.paddingTop = 0;
     frameNode.paddingBottom = 0;
     expect(flutterPadding(frameNode)).toEqual(
-      "padding: const EdgeInsets.symmetric(horizontal: 2, ), "
+      "\npadding: const EdgeInsets.symmetric(horizontal: 2, ),"
     );
 
     frameNode.paddingLeft = 0;
@@ -49,7 +49,7 @@ describe("Flutter Padding", () => {
     frameNode.paddingTop = 2;
     frameNode.paddingBottom = 2;
     expect(flutterPadding(frameNode)).toEqual(
-      "padding: const EdgeInsets.symmetric(vertical: 2, ), "
+      "\npadding: const EdgeInsets.symmetric(vertical: 2, ),"
     );
 
     frameNode.paddingLeft = 0;

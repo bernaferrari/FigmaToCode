@@ -20,15 +20,34 @@ describe("Flutter Shadow", () => {
         radius: 4,
         visible: true,
       },
+      {
+        type: "DROP_SHADOW",
+        blendMode: "NORMAL",
+        color: { r: 1, g: 1, b: 0, a: 0.25 },
+        offset: { x: 4, y: 4 },
+        radius: 8,
+        visible: true,
+      },
     ];
 
     expect(flutterBoxShadow(node)).toEqual(
-      "boxShadow: [ BoxShadow(color: Color(0x3f000000), blurRadius: 4, offset: Offset(0, 4), ), ], "
+      `\nboxShadow: [
+    BoxShadow(
+        color: Color(0x3f000000),
+        blurRadius: 4,
+        offset: Offset(0, 4),
+    ),
+    BoxShadow(
+        color: Color(0x3fffff00),
+        blurRadius: 8,
+        offset: Offset(4, 4),
+    ),
+],`
     );
 
     const [elev, color] = flutterElevationAndShadowColor(node);
-    expect(elev).toEqual("elevation: 4, ");
-    expect(color).toEqual("color: Color(0x3f000000), ");
+    expect(elev).toEqual("\nelevation: 4, ");
+    expect(color).toEqual("\ncolor: Color(0x3f000000), ");
   });
 
   it("inner shadow", () => {
