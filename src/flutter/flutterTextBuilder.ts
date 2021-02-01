@@ -1,3 +1,4 @@
+import { indentString } from "./../common/indentString";
 import { commonLetterSpacing } from "./../common/commonTextHeightSpacing";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltTextNode } from "../altNodes/altMixins";
@@ -36,7 +37,7 @@ export const makeTextComponent = (node: AltTextNode): string => {
   // if alignHorizontal is LEFT, don't do anything because that is native
   const textAlign =
     alignHorizontal !== "left"
-      ? `textAlign: TextAlign.${alignHorizontal}, `
+      ? `\ntextAlign: TextAlign.${alignHorizontal},`
       : "";
 
   let text = node.characters;
@@ -51,13 +52,17 @@ export const makeTextComponent = (node: AltTextNode): string => {
 
   const textStyle = getTextStyle(node);
 
-  const style = textStyle ? `style: TextStyle(${textStyle}), ` : "";
+  const style = textStyle
+    ? `\nstyle: TextStyle(${indentString(textStyle)}\n),`
+    : "";
 
   const splittedChars = text.split("\n");
   const charsWithLineBreak =
     splittedChars.length > 1 ? splittedChars.join("\\n") : text;
 
-  return `Text("${charsWithLineBreak}", ${textAlign}${style}), `;
+  const properties = `\n"${charsWithLineBreak}",${textAlign}${style}`;
+
+  return `Text(${indentString(properties)}\n),`;
 };
 
 export const getTextStyle = (node: AltTextNode): string => {
@@ -67,18 +72,18 @@ export const getTextStyle = (node: AltTextNode): string => {
   styleBuilder += flutterColorFromFills(node.fills);
 
   if (node.fontSize !== figma.mixed) {
-    styleBuilder += `fontSize: ${numToAutoFixed(node.fontSize)}, `;
+    styleBuilder += `\nfontSize: ${numToAutoFixed(node.fontSize)},`;
   }
 
   if (node.textDecoration === "UNDERLINE") {
-    styleBuilder += "decoration: TextDecoration.underline, ";
+    styleBuilder += "\ndecoration: TextDecoration.underline,";
   }
 
   if (node.fontName !== figma.mixed) {
     const lowercaseStyle = node.fontName.style.toLowerCase();
 
     if (lowercaseStyle.match("italic")) {
-      styleBuilder += "fontStyle: FontStyle.italic, ";
+      styleBuilder += "\nfontStyle: FontStyle.italic,";
     }
 
     // ignore the font-style when regular (default)
@@ -91,8 +96,8 @@ export const getTextStyle = (node: AltTextNode): string => {
       const weight = convertFontWeight(value);
 
       if (weight) {
-        styleBuilder += `fontFamily: "${node.fontName.family}", `;
-        styleBuilder += `fontWeight: FontWeight.w${weight}, `;
+        styleBuilder += `\nfontFamily: "${node.fontName.family}",`;
+        styleBuilder += `\nfontWeight: FontWeight.w${weight},`;
       }
     }
   }
@@ -100,7 +105,7 @@ export const getTextStyle = (node: AltTextNode): string => {
   // todo lineSpacing
   const letterSpacing = commonLetterSpacing(node);
   if (letterSpacing > 0) {
-    styleBuilder += `letterSpacing: ${numToAutoFixed(letterSpacing)}, `;
+    styleBuilder += `\nletterSpacing: ${numToAutoFixed(letterSpacing)},`;
   }
 
   return styleBuilder;
@@ -112,13 +117,24 @@ export const wrapTextAutoResize = (
 ): string => {
   if (node.textAutoResize === "NONE") {
     // = instead of += because we want to replace it
-    return `SizedBox(width: ${numToAutoFixed(
-      node.width
-    )}, height: ${numToAutoFixed(node.height)}, child: ${child}),`;
+
+    const properties =
+      "\nwidth: " +
+      numToAutoFixed(node.width) +
+      ",\nheight: " +
+      numToAutoFixed(node.height) +
+      ",\nchild: " +
+      child;
+
+    return `SizedBox(${indentString(properties)}\n),`;
   } else if (node.textAutoResize === "HEIGHT") {
     // if HEIGHT is set, it means HEIGHT will be calculated automatically, but width won't
     // = instead of += because we want to replace it
-    return `SizedBox(width: ${numToAutoFixed(node.width)}, child: ${child}),`;
+
+    const properties =
+      "\nwidth: " + numToAutoFixed(node.width) + ",\nchild: " + child;
+
+    return `SizedBox(${indentString(properties)}\n),`;
   }
 
   return child;

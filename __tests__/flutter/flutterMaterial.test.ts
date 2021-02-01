@@ -12,8 +12,9 @@ describe("Flutter Material", () => {
     const node = new AltRectangleNode();
 
     // undefined (unitialized, only happen on tests)
-    expect(flutterMaterial(node, "")).toEqual(`
-Material(color: Colors.transparent, ), `);
+    expect(flutterMaterial(node, "")).toEqual(`Material(
+    color: Colors.transparent,
+),`);
 
     node.width = 0;
     node.height = 10;
@@ -43,8 +44,13 @@ Material(color: Colors.transparent, ), `);
     parent.children = [node];
     node.parent = parent;
 
-    expect(flutterMaterial(parent, "child")).toEqual(`
-Material(color: Colors.transparent, child: Padding(padding: const EdgeInsets.all(10), ), child: child), ), `);
+    expect(flutterMaterial(parent, "child")).toEqual(`Material(
+    color: Colors.transparent,
+    child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: child
+    ),
+),`);
   });
 
   it("standard scenario", () => {
@@ -63,11 +69,24 @@ Material(color: Colors.transparent, child: Padding(padding: const EdgeInsets.all
     ];
 
     expect(flutterMaterial(node, "")).toEqual(
-      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.white, ), ), `
+      `SizedBox(
+    width: 10,
+    height: 10,
+    child: Material(
+        color: Colors.white,
+    ),
+),`
     );
 
     expect(flutterMaterial(node, "child")).toEqual(
-      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.white, child: child), ), `
+      `SizedBox(
+    width: 10,
+    height: 10,
+    child: Material(
+        color: Colors.white,
+        child: child
+    ),
+),`
     );
   });
 
@@ -77,7 +96,14 @@ Material(color: Colors.transparent, child: Padding(padding: const EdgeInsets.all
     node.height = 10;
 
     expect(flutterMaterial(node, "")).toEqual(
-      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.transparent, shape: CircleBorder(), ), ), `
+      `SizedBox(
+    width: 10,
+    height: 10,
+    child: Material(
+        color: Colors.transparent,
+        shape: CircleBorder(),
+    ),
+),`
     );
   });
 
@@ -98,7 +124,16 @@ Material(color: Colors.transparent, child: Padding(padding: const EdgeInsets.all
     ];
 
     expect(flutterMaterial(node, "")).toEqual(
-      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.transparent, shape: RoundedRectangleBorder(side: BorderSide(width: 4, color: Colors.white, ), ),), ), `
+      `SizedBox(
+    width: 10,
+    height: 10,
+    child: Material(
+        color: Colors.transparent,
+        shape: RoundedRectangleBorder(
+            side: BorderSide(width: 4, color: Colors.white, ),
+        ),
+    ),
+),`
     );
   });
 
@@ -119,7 +154,15 @@ Material(color: Colors.transparent, child: Padding(padding: const EdgeInsets.all
     node.children = [child];
 
     expect(flutterMaterial(node, "")).toEqual(
-      `\nSizedBox(width: 10, height: 10, child: Material(color: Colors.transparent, borderRadius: BorderRadius.circular(10), clipBehavior: Clip.antiAlias, ), ), `
+      `SizedBox(
+    width: 10,
+    height: 10,
+    child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+        clipBehavior: Clip.antiAlias,
+    ),
+),`
     );
   });
 });

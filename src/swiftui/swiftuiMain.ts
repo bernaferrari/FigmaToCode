@@ -30,10 +30,11 @@ const swiftuiWidgetGenerator = (
 ): string => {
   let comp = "";
 
-  // shortchut to avoid getting the lenght on every loop call.
-  const sceneNodeLen = sceneNode.length;
+  // filter non visible nodes. This is necessary at this step because conversion already happened.
+  const visibleSceneNode = sceneNode.filter((d) => d.visible !== false);
+  const sceneLen = visibleSceneNode.length;
 
-  sceneNode.forEach((node, index) => {
+  visibleSceneNode.forEach((node, index) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += swiftuiContainer(node, indentLevel);
     } else if (node.type === "GROUP") {
@@ -45,7 +46,7 @@ const swiftuiWidgetGenerator = (
     }
 
     // don't add a newline at last element.
-    if (index < sceneNodeLen - 1) {
+    if (index < sceneLen - 1) {
       comp += "\n";
     }
   });
@@ -137,9 +138,10 @@ const swiftuiText = (node: AltTextNode, indentLevel: number): string => {
 };
 
 const swiftuiFrame = (node: AltFrameNode, indentLevel: number): string => {
-  const updatedIdentLevel = node.children.length === 1 ? 0 : indentLevel + 1;
+  // when there is a single children, indent should be zero; [swiftuiContainer] will already assign it.
+  const updatedIndentLevel = node.children.length === 1 ? 0 : indentLevel + 1;
 
-  const children = widgetGeneratorWithLimits(node, updatedIdentLevel);
+  const children = widgetGeneratorWithLimits(node, updatedIndentLevel);
 
   // if there is only one child, there is no need for a HStack of VStack.
   if (node.children.length === 1) {

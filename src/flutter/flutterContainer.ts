@@ -1,3 +1,4 @@
+import { indentString } from "./../common/indentString";
 import { AltGroupNode } from "./../altNodes/altMixins";
 import {
   flutterBorderRadius,
@@ -33,7 +34,7 @@ export const flutterContainer = (
   // todo Image & multiple fills
 
   /// if child is empty, propChild is empty
-  const propChild = child ? `child: ${child}` : "";
+  const propChild = child ? `\nchild: ${child}` : "";
 
   // [propPadding] will be "padding: const EdgeInsets.symmetric(...)" or ""
   let propPadding = "";
@@ -44,17 +45,22 @@ export const flutterContainer = (
   let result: string;
   if (fSize.size || propBoxDecoration) {
     // Container is a container if [propWidthHeight] and [propBoxDecoration] are set.
-    result = `\nContainer(${fSize.size}${propBoxDecoration}${propPadding}${propChild}),`;
+    const properties = `${fSize.size}${propBoxDecoration}${propPadding}${propChild}`;
+
+    result = `Container(${indentString(properties)}\n),`;
   } else if (propPadding) {
     // if there is just a padding, add Padding
-    result = `\nPadding(${propPadding}${propChild}),`;
+    const properties = `${propPadding}${propChild}`;
+
+    result = `Padding(${indentString(properties)}\n),`;
   } else {
     result = child;
   }
 
   // Add Expanded() when parent is a Row/Column and width is full.
   if (fSize.isExpanded) {
-    result = `\nExpanded(child: ${result}),`;
+    const properties = `\nchild: ${result}`;
+    result = `Expanded(${indentString(properties)}\n),`;
   }
 
   return result;
@@ -69,14 +75,25 @@ const getBoxDecoration = (
   const propBorderRadius = flutterBorderRadius(node);
 
   // modify the circle's shape when type is ellipse
-  const propShape = node.type === "ELLIPSE" ? "shape: BoxShape.circle, " : "";
+  const propShape = node.type === "ELLIPSE" ? "\nshape: BoxShape.circle," : "";
 
   // generate the decoration, or just the backgroundColor when color is SOLID.
-  return propBorder ||
+  if (
+    propBorder ||
     propShape ||
     propBorder ||
     propBorderRadius ||
     propBackgroundColor[0] === "g"
-    ? `decoration: BoxDecoration(${propBorderRadius}${propShape}${propBorder}${propBoxShadow}${propBackgroundColor}), `
-    : `${propBackgroundColor}`;
+  ) {
+    const properties =
+      propBorderRadius +
+      propShape +
+      propBorder +
+      propBoxShadow +
+      propBackgroundColor;
+
+    return `\ndecoration: BoxDecoration(${indentString(properties)}\n),`;
+  } else {
+    return propBackgroundColor;
+  }
 };

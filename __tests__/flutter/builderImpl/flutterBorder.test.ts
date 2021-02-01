@@ -21,7 +21,7 @@ describe("Flutter Border", () => {
 
     node.cornerRadius = 2;
     expect(flutterBorderRadius(node)).toEqual(
-      "borderRadius: BorderRadius.circular(2), "
+      "\nborderRadius: BorderRadius.circular(2),"
     );
 
     node.cornerRadius = figma.mixed;
@@ -30,7 +30,7 @@ describe("Flutter Border", () => {
     node.bottomLeftRadius = 0;
     node.bottomRightRadius = 0;
     expect(flutterBorderRadius(node)).toEqual(
-      "borderRadius: BorderRadius.only(topLeft: Radius.circular(2), topRight: Radius.circular(0), bottomLeft: Radius.circular(0), bottomRight: Radius.circular(0), ), "
+      "\nborderRadius: BorderRadius.only(topLeft: Radius.circular(2), topRight: Radius.circular(0), bottomLeft: Radius.circular(0), bottomRight: Radius.circular(0), ),"
     );
 
     const ellipseNode = new AltEllipseNode();
@@ -47,7 +47,7 @@ describe("Flutter Border", () => {
       },
     ];
     expect(flutterBorder(node)).toEqual(
-      "border: Border.all(color: Colors.black, width: 2,), "
+      "\nborder: Border.all(color: Colors.black, width: 2, ),"
     );
 
     node.strokeWeight = 0;
@@ -65,7 +65,9 @@ describe("Flutter Border", () => {
     node.bottomLeftRadius = 0;
     node.bottomRightRadius = 0;
     expect(flutterShape(node)).toEqual(
-      "shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(0), bottomLeft: Radius.circular(0), bottomRight: Radius.circular(0), ), ),"
+      `\nshape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(0), bottomLeft: Radius.circular(0), bottomRight: Radius.circular(0), ),
+),`
     );
 
     const ellipseNode = new AltEllipseNode();
@@ -77,7 +79,9 @@ describe("Flutter Border", () => {
       },
     ];
     expect(flutterShape(ellipseNode)).toEqual(
-      "shape: CircleBorder(side: BorderSide(width: 4, color: Color(0xff3f3f3f), ), ), "
+      `\nshape: CircleBorder(
+    side: BorderSide(width: 4, color: Color(0xff3f3f3f), ),
+),`
     );
   });
 });

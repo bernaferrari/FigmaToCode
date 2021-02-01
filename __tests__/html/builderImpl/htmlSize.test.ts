@@ -32,19 +32,20 @@ describe("HTML Size", () => {
 
     const child = new AltRectangleNode();
     child.layoutAlign = "STRETCH";
+    child.layoutGrow = 1;
     child.width = 100;
     child.height = 100;
 
     child.parent = node;
     node.children = [child];
 
-    expect(htmlSize(child, false)).toEqual("width: 100px; height: 100%; ");
+    expect(htmlSize(child, false)).toEqual("flex: 1 1 0%; height: 100%; ");
 
     // fail
     node.layoutMode = "VERTICAL";
     child.width = 16;
     child.height = 16;
-    expect(htmlSize(child, false)).toEqual("width: 100%; height: 16px; ");
+    expect(htmlSize(child, false)).toEqual("width: 100%; flex: 1 1 0%; ");
   });
 
   it("counterAxisSizingMode is AUTO", () => {

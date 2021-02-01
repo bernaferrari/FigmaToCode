@@ -12,7 +12,7 @@ export const flutterSize = (
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
   if (typeof size.width === "number") {
-    propWidth = `width: ${numToAutoFixed(size.width)}, `;
+    propWidth = `\nwidth: ${numToAutoFixed(size.width)},`;
   } else if (size.width === "full") {
     // When parent is a Row, child must be Expanded.
     if (
@@ -22,13 +22,13 @@ export const flutterSize = (
     ) {
       isExpanded = true;
     } else {
-      propWidth = `width: double.infinity, `;
+      propWidth = `\nwidth: double.infinity,`;
     }
   }
 
   let propHeight = "";
   if (typeof size.height === "number") {
-    propHeight = `height: ${numToAutoFixed(size.height)}, `;
+    propHeight = `\nheight: ${numToAutoFixed(size.height)},`;
   } else if (size.height === "full") {
     // When parent is a Column, child must be Expanded.
     if (
@@ -38,9 +38,9 @@ export const flutterSize = (
     ) {
       isExpanded = true;
     } else {
-      propHeight = `height: double.infinity, `;
+      propHeight = `\nheight: double.infinity,`;
     }
   }
 
-  return { size: `${propWidth}${propHeight}`, isExpanded: isExpanded };
+  return { size: propWidth + propHeight, isExpanded: isExpanded };
 };

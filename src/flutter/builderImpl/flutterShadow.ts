@@ -1,3 +1,4 @@
+import { indentString } from "./../../common/indentString";
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { rgbTo8hex } from "../../common/color";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
@@ -13,15 +14,18 @@ export const flutterBoxShadow = (node: AltSceneNode): string => {
       let boxShadow = "";
 
       dropShadow.forEach((d: ShadowEffect) => {
-        const color = `color: Color(0x${rgbTo8hex(d.color, d.color.a)}), `;
-        const radius = `blurRadius: ${numToAutoFixed(d.radius)}, `;
-        const offset = `offset: Offset(${numToAutoFixed(
+        const color = `\ncolor: Color(0x${rgbTo8hex(d.color, d.color.a)}),`;
+        const radius = `\nblurRadius: ${numToAutoFixed(d.radius)},`;
+        const offset = `\noffset: Offset(${numToAutoFixed(
           d.offset.x
-        )}, ${numToAutoFixed(d.offset.y)}), `;
-        boxShadow += `BoxShadow(${color}${radius}${offset}),`;
+        )}, ${numToAutoFixed(d.offset.y)}),`;
+
+        const property = color + radius + offset;
+
+        boxShadow += `\nBoxShadow(${indentString(property)}\n),`;
       });
 
-      propBoxShadow = `boxShadow: [ ${boxShadow} ], `;
+      propBoxShadow = `\nboxShadow: [${indentString(boxShadow)}\n],`;
     }
     // TODO inner shadow, layer blur
   }
@@ -40,11 +44,11 @@ export const flutterElevationAndShadowColor = (
     );
 
     if (dropShadow.length > 0 && dropShadow[0].type === "DROP_SHADOW") {
-      shadowColor = `color: Color(0x${rgbTo8hex(
+      shadowColor = `\ncolor: Color(0x${rgbTo8hex(
         dropShadow[0].color,
         dropShadow[0].color.a
       )}), `;
-      elevation = `elevation: ${numToAutoFixed(dropShadow[0].radius)}, `;
+      elevation = `\nelevation: ${numToAutoFixed(dropShadow[0].radius)}, `;
     }
   }
 

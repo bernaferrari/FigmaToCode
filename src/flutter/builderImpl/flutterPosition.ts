@@ -1,3 +1,4 @@
+import { indentString } from "./../../common/indentString";
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { commonPosition } from "../../common/commonPosition";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
@@ -26,7 +27,8 @@ export const flutterPosition = (
       const diffX = numToAutoFixed(node.x - parentX);
       const diffY = numToAutoFixed(node.y - parentY);
 
-      return `Positioned(left: ${diffX}, top: ${diffY}, child: ${child}),`;
+      const properties = `\nleft: ${diffX},\ntop: ${diffY},\nchild: ${child}`;
+      return `Positioned(${indentString(properties)}\n),`;
     }
   }
 
@@ -34,8 +36,11 @@ export const flutterPosition = (
 };
 
 const retrieveAbsolutePos = (node: AltSceneNode, child: string): string => {
-  const positionedAlign = (align: string) =>
-    `Positioned.fill(child: Align(alignment: Alignment.${align}, child: ${child}),),`;
+  const positionedAlign = (align: string) => {
+    const alignProp = `\nalignment: Alignment.${align},\nchild: ${child}`;
+    const positionedProp = `\nchild: Align(${indentString(alignProp)}\n),`;
+    return `Positioned.fill(${indentString(positionedProp)}\n),`;
+  };
 
   switch (commonPosition(node)) {
     case "":

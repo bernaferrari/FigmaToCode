@@ -15,16 +15,29 @@ describe("Flutter Text", () => {
 
     node.textAutoResize = "NONE";
     expect(flutterMain([node])).toEqual(
-      'SizedBox(width: 16, height: 16, child: Text("", ), )'
+      `SizedBox(
+    width: 16,
+    height: 16,
+    child: Text(
+        "",
+    ),
+)`
     );
 
     node.textAutoResize = "HEIGHT";
     expect(flutterMain([node])).toEqual(
-      'SizedBox(width: 16, child: Text("", ), )'
+      `SizedBox(
+    width: 16,
+    child: Text(
+        "",
+    ),
+)`
     );
 
     node.textAutoResize = "WIDTH_AND_HEIGHT";
-    expect(flutterMain([node])).toEqual('Text("", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+)`);
   });
 
   it("textAlignHorizontal", () => {
@@ -35,17 +48,33 @@ describe("Flutter Text", () => {
 
     node.textAutoResize = "WIDTH_AND_HEIGHT";
     node.textAlignHorizontal = "LEFT";
-    expect(flutterMain([node])).toEqual('Text("", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+)`);
 
     node.textAutoResize = "NONE";
     node.textAlignHorizontal = "CENTER";
     expect(flutterMain([node])).toEqual(
-      'SizedBox(width: 16, height: 16, child: Text("", textAlign: TextAlign.center, ), )'
+      `SizedBox(
+    width: 16,
+    height: 16,
+    child: Text(
+        "",
+        textAlign: TextAlign.center,
+    ),
+)`
     );
 
     node.textAlignHorizontal = "JUSTIFIED";
     expect(flutterMain([node])).toEqual(
-      'SizedBox(width: 16, height: 16, child: Text("", textAlign: TextAlign.justify, ), )'
+      `SizedBox(
+    width: 16,
+    height: 16,
+    child: Text(
+        "",
+        textAlign: TextAlign.justify,
+    ),
+)`
     );
   });
   it("fontSize", () => {
@@ -57,7 +86,12 @@ describe("Flutter Text", () => {
     node.textAutoResize = "WIDTH_AND_HEIGHT";
 
     expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(fontSize: 16, ), ),'
+      `Text(
+    "",
+    style: TextStyle(
+        fontSize: 16,
+    ),
+)`
     );
   });
 
@@ -72,29 +106,42 @@ describe("Flutter Text", () => {
       family: "inter",
       style: "bold",
     };
-    expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(fontFamily: "inter", fontWeight: FontWeight.w700, ), ),'
-    );
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+    style: TextStyle(
+        fontFamily: "inter",
+        fontWeight: FontWeight.w700,
+    ),
+)`);
 
     node.fontName = {
       family: "inter",
       style: "medium italic",
     };
-    expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(fontStyle: FontStyle.italic, fontFamily: "inter", fontWeight: FontWeight.w500, ), ),'
-    );
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+    style: TextStyle(
+        fontStyle: FontStyle.italic,
+        fontFamily: "inter",
+        fontWeight: FontWeight.w500,
+    ),
+)`);
 
     node.fontName = {
       family: "inter",
       style: "regular",
     };
-    expect(flutterMain([node])).toEqual('Text("", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+)`);
 
     node.fontName = {
       family: "inter",
       style: "doesn't exist",
     };
-    expect(flutterMain([node])).toEqual('Text("", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+)`);
   });
 
   it("letterSpacing", () => {
@@ -110,7 +157,13 @@ describe("Flutter Text", () => {
       unit: "PERCENT",
     };
     expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(fontSize: 24, letterSpacing: 26.40, ), ),'
+      `Text(
+    "",
+    style: TextStyle(
+        fontSize: 24,
+        letterSpacing: 26.40,
+    ),
+)`
     );
 
     node.letterSpacing = {
@@ -118,7 +171,13 @@ describe("Flutter Text", () => {
       unit: "PIXELS",
     };
     expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(fontSize: 24, letterSpacing: 10, ), ),'
+      `Text(
+    "",
+    style: TextStyle(
+        fontSize: 24,
+        letterSpacing: 10,
+    ),
+)`
     );
   });
 
@@ -133,13 +192,18 @@ describe("Flutter Text", () => {
       value: 110,
       unit: "PERCENT",
     };
-    expect(flutterMain([node])).toEqual('Text("", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+)`);
 
     node.lineHeight = {
       value: 10,
       unit: "PIXELS",
     };
-    expect(flutterMain([node])).toEqual('Text("", ),');
+
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+)`);
   });
 
   it("textCase", () => {
@@ -147,29 +211,37 @@ describe("Flutter Text", () => {
     node.characters = "aA";
 
     node.textCase = "LOWER";
-    expect(flutterMain([node])).toEqual('Text("aa", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "aa",
+)`);
 
     // todo implement it
     // node.textCase = "TITLE";
     // expect(flutterMain([node])).toEqual('Text("Aa", ),');
 
     node.textCase = "UPPER";
-    expect(flutterMain([node])).toEqual('Text("AA", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "AA",
+)`);
 
     node.textCase = "ORIGINAL";
-    expect(flutterMain([node])).toEqual('Text("aA", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "aA",
+)`);
 
     node.textAlignHorizontal = "CENTER";
     node.layoutAlign = "INHERIT";
-    expect(flutterMain([node])).toEqual(
-      'Text("aA", textAlign: TextAlign.center, ),'
-    );
+    expect(flutterMain([node])).toEqual(`Text(
+    "aA",
+    textAlign: TextAlign.center,
+)`);
 
     node.textAlignHorizontal = "JUSTIFIED";
     node.layoutAlign = "INHERIT";
-    expect(flutterMain([node])).toEqual(
-      'Text("aA", textAlign: TextAlign.justify, ),'
-    );
+    expect(flutterMain([node])).toEqual(`Text(
+    "aA",
+    textAlign: TextAlign.justify,
+)`);
   });
 
   it("textDecoration", () => {
@@ -177,14 +249,23 @@ describe("Flutter Text", () => {
     node.characters = "";
 
     node.textDecoration = "NONE";
-    expect(flutterMain([node])).toEqual('Text("", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+)`);
 
     node.textDecoration = "STRIKETHROUGH";
-    expect(flutterMain([node])).toEqual('Text("", ),');
+    expect(flutterMain([node])).toEqual(`Text(
+    "",
+)`);
 
     node.textDecoration = "UNDERLINE";
     expect(flutterMain([node])).toEqual(
-      'Text("", style: TextStyle(decoration: TextDecoration.underline, ), ),'
+      `Text(
+    "",
+    style: TextStyle(
+        decoration: TextDecoration.underline,
+    ),
+)`
     );
   });
 

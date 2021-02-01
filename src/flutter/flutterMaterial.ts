@@ -9,6 +9,7 @@ import {
   AltFrameNode,
 } from "../altNodes/altMixins";
 import { flutterColorFromFills } from "./builderImpl/flutterColor";
+import { indentString } from "../common/indentString";
 
 // https://api.flutter.dev/flutter/material/Material-class.html
 export const flutterMaterial = (
@@ -26,24 +27,26 @@ export const flutterMaterial = (
   const shape = materialShape(node);
   const clip = getClipping(node);
   const [elevation, shadowColor] = flutterElevationAndShadowColor(node);
-  const padChild = child ? `child: ${getPadding(node, child)}` : "";
+  const padChild = child ? `\nchild: ${getPadding(node, child)}` : "";
 
   const materialAttr =
     color + elevation + shadowColor + shape + clip + padChild;
 
-  let materialResult = `Material(${materialAttr}), `;
+  let materialResult = `Material(${indentString(materialAttr)}\n),`;
 
   const fSize: { size: string; isExpanded: boolean } = flutterSize(node);
 
   if (fSize.size) {
-    materialResult = `SizedBox(${fSize.size}child: ${materialResult}), `;
+    const properties = `${fSize.size}\nchild: ${materialResult}`;
+    materialResult = `SizedBox(${indentString(properties)}\n),`;
   }
 
   if (fSize.isExpanded) {
-    materialResult = `Expanded(child: ${materialResult}),`;
+    const properties = `\nchild: ${materialResult}`;
+    materialResult = `Expanded(${indentString(properties)}\n),`;
   }
 
-  return `\n${materialResult}`;
+  return materialResult;
 };
 
 const materialColor = (
@@ -51,9 +54,9 @@ const materialColor = (
 ): string => {
   const color = flutterColorFromFills(node.fills);
   if (!color) {
-    return "color: Colors.transparent, ";
+    return "\ncolor: Colors.transparent,";
   }
-  return color;
+  return "\n" + color;
 };
 
 const materialShape = (
@@ -71,7 +74,7 @@ const getClipping = (node: AltSceneNode): string => {
   if (node.type === "FRAME" && node.cornerRadius && node.cornerRadius !== 0) {
     clip = node.clipsContent;
   }
-  return clip ? "clipBehavior: Clip.antiAlias, " : "";
+  return clip ? "\nclipBehavior: Clip.antiAlias," : "";
 };
 
 const getPadding = (
@@ -80,7 +83,9 @@ const getPadding = (
 ): string => {
   const padding = flutterPadding(node);
   if (padding) {
-    return `Padding(${padding}), child: ${child}), `;
+    const properties = `${padding}\nchild: ${child}`;
+
+    return `Padding(${indentString(properties)}\n),`;
   }
 
   return child;

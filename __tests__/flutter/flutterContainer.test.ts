@@ -37,8 +37,21 @@ describe("Flutter Container", () => {
     parent.children = [node];
     node.parent = parent;
 
-    expect(flutterContainer(parent, "")).toEqual(`
-Padding(padding: const EdgeInsets.all(10), ),`);
+    expect(flutterContainer(parent, "")).toEqual(`Padding(
+    padding: const EdgeInsets.all(10),
+),`);
+
+    node.layoutGrow = 1;
+    node.layoutAlign = "STRETCH";
+
+    parent.primaryAxisSizingMode = "FIXED";
+    parent.counterAxisSizingMode = "FIXED";
+
+    expect(flutterContainer(node, "")).toEqual(`Expanded(
+    child: Container(
+        height: double.infinity,
+    ),
+),`);
   });
 
   it("standard scenario", () => {
@@ -46,11 +59,16 @@ Padding(padding: const EdgeInsets.all(10), ),`);
     node.width = 10;
     node.height = 10;
 
-    expect(flutterContainer(node, "")).toEqual(`
-Container(width: 10, height: 10, ),`);
+    expect(flutterContainer(node, "")).toEqual(`Container(
+    width: 10,
+    height: 10,
+),`);
 
-    expect(flutterContainer(node, "child")).toEqual(`
-Container(width: 10, height: 10, child: child),`);
+    expect(flutterContainer(node, "child")).toEqual(`Container(
+    width: 10,
+    height: 10,
+    child: child
+),`);
   });
 
   it("ellipse", () => {
@@ -58,7 +76,12 @@ Container(width: 10, height: 10, child: child),`);
     node.width = 10;
     node.height = 10;
 
-    expect(flutterContainer(node, "")).toEqual(`
-Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle, ), ),`);
+    expect(flutterContainer(node, "")).toEqual(`Container(
+    width: 10,
+    height: 10,
+    decoration: BoxDecoration(
+        shape: BoxShape.circle,
+    ),
+),`);
   });
 });
