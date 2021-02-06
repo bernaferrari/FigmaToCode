@@ -1,21 +1,16 @@
 import { AltTextNode } from "../../altNodes/altMixins";
-import { nodeWidthHeight } from "../../common/nodeWidthHeight";
-import { formatWithJSX } from "../../common/parseJSX";
+import { htmlSizePartial } from "./htmlSize";
 
 export const htmlTextSize = (node: AltTextNode, isJsx: boolean): string => {
-  const sizeResult = nodeWidthHeight(node, false);
+  const [width, height] = htmlSizePartial(node, isJsx);
 
   let comp = "";
-  if (sizeResult.width && node.textAutoResize !== "WIDTH_AND_HEIGHT") {
-    if (typeof sizeResult.width === "number") {
-      comp += formatWithJSX("width", isJsx, sizeResult.width);
-    }
+  if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
+    comp += width;
   }
 
-  if (sizeResult.height && node.textAutoResize === "NONE") {
-    if (typeof sizeResult.height === "number") {
-      comp += formatWithJSX("height", isJsx, sizeResult.height);
-    }
+  if (node.textAutoResize === "NONE") {
+    comp += height;
   }
 
   return comp;

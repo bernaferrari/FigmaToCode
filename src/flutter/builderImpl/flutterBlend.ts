@@ -1,3 +1,4 @@
+import { indentString } from "./../../common/indentString";
 import { AltBlendMixin } from "../../altNodes/altMixins";
 import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
@@ -7,9 +8,9 @@ import { numToAutoFixed } from "../../common/numToAutoFixed";
  */
 export const flutterOpacity = (node: AltBlendMixin, child: string): string => {
   if (node.opacity !== undefined && node.opacity !== 1 && child !== "") {
-    return `Opacity(opacity: ${numToAutoFixed(
-      node.opacity
-    )}, child: ${child}),`;
+    const prop = `\nopacity: ${numToAutoFixed(node.opacity)},\nchild: ${child}`;
+
+    return `Opacity(${indentString(prop)}\n),`;
   }
   return child;
 };
@@ -24,7 +25,9 @@ export const flutterVisibility = (
   // [when testing] node.visible can be undefined
 
   if (node.visible !== undefined && node.visible === false && child !== "") {
-    return `Visibility(visible: ${node.visible}, child: ${child}),`;
+    const prop = `\nvisible: ${node.visible},\nchild: ${child}`;
+
+    return `Visibility(${indentString(prop)}\n),`;
   }
   return child;
 };
@@ -43,9 +46,11 @@ export const flutterRotation = (
     child !== "" &&
     Math.round(node.rotation) !== 0
   ) {
-    return `Transform.rotate(angle: ${numToAutoFixed(
+    const prop = `\nangle: ${numToAutoFixed(
       node.rotation * (-3.14159 / 180)
-    )}, child: ${child})`;
+    )},\nchild: ${child}`;
+
+    return `Transform.rotate(${indentString(prop)}\n),`;
   }
   return child;
 };

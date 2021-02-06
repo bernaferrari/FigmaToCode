@@ -1,12 +1,59 @@
 import { FlutterTextBuilder } from "./../../src/flutter/flutterTextBuilder";
 import { flutterMain } from "./../../src/flutter/flutterMain";
-import { AltTextNode } from "../../src/altNodes/altMixins";
+import { AltFrameNode, AltTextNode } from "../../src/altNodes/altMixins";
 
 describe("Flutter Text", () => {
   // @ts-ignore for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };
+
+  it("inside AutoLayout", () => {
+    const node = new AltFrameNode();
+    node.width = 32;
+    node.height = 8;
+    node.x = 0;
+    node.y = 0;
+    node.layoutMode = "HORIZONTAL";
+    node.counterAxisSizingMode = "FIXED";
+    node.primaryAxisSizingMode = "FIXED";
+    node.primaryAxisAlignItems = "MIN";
+    node.counterAxisAlignItems = "MIN";
+    node.itemSpacing = 8;
+
+    const textNode = new AltTextNode();
+    textNode.characters = "";
+    textNode.width = 16;
+    textNode.height = 16;
+    textNode.layoutAlign = "STRETCH";
+    textNode.layoutGrow = 1;
+
+    node.children = [textNode];
+    textNode.parent = node;
+
+    textNode.textAutoResize = "NONE";
+    expect(flutterMain([node])).toEqual(
+      `Container(
+    width: 32,
+    height: 8,
+    child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children:[
+            Expanded(
+                child: SizedBox(
+                    height: double.infinity,
+                    child: Text(
+                        "",
+                    ),
+                ),
+            ),
+        ],
+    ),
+)`
+    );
+  });
   it("textAutoResize", () => {
     const node = new AltTextNode();
     node.characters = "";

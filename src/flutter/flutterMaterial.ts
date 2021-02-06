@@ -34,14 +34,16 @@ export const flutterMaterial = (
 
   let materialResult = `Material(${indentString(materialAttr)}\n),`;
 
-  const fSize: { size: string; isExpanded: boolean } = flutterSize(node);
+  const fSize = flutterSize(node);
+  const size = fSize.width + fSize.height;
+  const isExpanded = fSize.isExpanded;
 
-  if (fSize.size) {
-    const properties = `${fSize.size}\nchild: ${materialResult}`;
+  if (size) {
+    const properties = `${size}\nchild: ${materialResult}`;
     materialResult = `SizedBox(${indentString(properties)}\n),`;
   }
 
-  if (fSize.isExpanded) {
+  if (isExpanded) {
     const properties = `\nchild: ${materialResult}`;
     materialResult = `Expanded(${indentString(properties)}\n),`;
   }

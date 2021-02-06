@@ -1,4 +1,7 @@
-import { flutterSize } from "../../../src/flutter/builderImpl/flutterSize";
+import {
+  flutterSize,
+  flutterSizeWH,
+} from "../../../src/flutter/builderImpl/flutterSize";
 import {
   AltRectangleNode,
   AltFrameNode,
@@ -15,15 +18,15 @@ describe("Flutter Size", () => {
 
     node.width = 16;
     node.height = 16;
-    expect(flutterSize(node).size).toEqual("\nwidth: 16,\nheight: 16,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 16,\nheight: 16,");
 
     node.width = 100;
     node.height = 200;
-    expect(flutterSize(node).size).toEqual("\nwidth: 100,\nheight: 200,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 100,\nheight: 200,");
 
     node.width = 300;
     node.height = 300;
-    expect(flutterSize(node).size).toEqual("\nwidth: 300,\nheight: 300,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 300,\nheight: 300,");
   });
 
   it("STRETCH inside AutoLayout", () => {
@@ -45,13 +48,15 @@ describe("Flutter Size", () => {
     node.children = [child];
 
     const fSize1 = flutterSize(child);
-    expect(fSize1.size).toEqual("\nheight: double.infinity,");
+    expect(fSize1.width).toEqual("");
+    expect(fSize1.height).toEqual("\nheight: double.infinity,");
     expect(fSize1.isExpanded).toEqual(true);
 
     node.layoutMode = "VERTICAL";
 
     const fSize2 = flutterSize(child);
-    expect(fSize2.size).toEqual("\nwidth: double.infinity,");
+    expect(fSize2.width).toEqual("\nwidth: double.infinity,");
+    expect(fSize2.height).toEqual("");
     expect(fSize2.isExpanded).toEqual(true);
   });
 
@@ -62,7 +67,7 @@ describe("Flutter Size", () => {
     node.height = 48;
     node.children = [new AltRectangleNode(), new AltRectangleNode()];
 
-    expect(flutterSize(node).size).toEqual("\nwidth: 48,\nheight: 48,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 48,\nheight: 48,");
   });
 
   it("counterAxisSizingMode is FIXED", () => {
@@ -73,13 +78,13 @@ describe("Flutter Size", () => {
     node.children = [new AltRectangleNode(), new AltRectangleNode()];
 
     node.layoutMode = "HORIZONTAL";
-    expect(flutterSize(node).size).toEqual("\nheight: 48,");
+    expect(flutterSizeWH(node)).toEqual("\nheight: 48,");
 
     node.layoutMode = "VERTICAL";
-    expect(flutterSize(node).size).toEqual("\nwidth: 48,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 48,");
 
     node.layoutMode = "NONE";
-    expect(flutterSize(node).size).toEqual("\nwidth: 48,\nheight: 48,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 48,\nheight: 48,");
   });
 
   it("counterAxisSizingMode is AUTO", () => {
@@ -93,7 +98,7 @@ describe("Flutter Size", () => {
     node.height = 48;
     node.children = [new AltRectangleNode(), new AltRectangleNode()];
 
-    expect(flutterSize(node).size).toEqual("");
+    expect(flutterSizeWH(node)).toEqual("");
 
     // responsive
     const parentNode = new AltFrameNode();
@@ -105,8 +110,8 @@ describe("Flutter Size", () => {
     parentNode.height = 48;
     parentNode.children = [node];
     node.parent = parentNode;
-    expect(flutterSize(node).size).toEqual("");
-    expect(flutterSize(parentNode).size).toEqual("\nwidth: 48,\nheight: 48,");
+    expect(flutterSizeWH(node)).toEqual("");
+    expect(flutterSizeWH(parentNode)).toEqual("\nwidth: 48,\nheight: 48,");
   });
 
   it("width changes when there are strokes", () => {
@@ -116,7 +121,7 @@ describe("Flutter Size", () => {
     node.width = 8;
     node.height = 8;
 
-    expect(flutterSize(node).size).toEqual("\nwidth: 8,\nheight: 8,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 8,\nheight: 8,");
 
     node.strokeWeight = 4;
     node.strokes = [
@@ -127,10 +132,10 @@ describe("Flutter Size", () => {
     ];
 
     node.strokeAlign = "CENTER";
-    expect(flutterSize(node).size).toEqual("\nwidth: 12,\nheight: 12,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 12,\nheight: 12,");
 
     node.strokeAlign = "OUTSIDE";
-    expect(flutterSize(node).size).toEqual("\nwidth: 16,\nheight: 16,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 16,\nheight: 16,");
   });
 
   it("adjust parent if children's size + stroke > parent size", () => {
@@ -155,12 +160,14 @@ describe("Flutter Size", () => {
 
     const fSize1 = flutterSize(parentNode);
 
-    expect(fSize1.size).toEqual("\nwidth: 16,\nheight: 16,");
+    expect(fSize1.width).toEqual("\nwidth: 16,");
+    expect(fSize1.height).toEqual("\nheight: 16,");
     expect(fSize1.isExpanded).toEqual(false);
 
     node.strokeAlign = "CENTER";
     const fSize2 = flutterSize(parentNode);
-    expect(fSize2.size).toEqual("\nwidth: 12,\nheight: 12,");
+    expect(fSize2.width).toEqual("\nwidth: 12,");
+    expect(fSize2.height).toEqual("\nheight: 12,");
     expect(fSize2.isExpanded).toEqual(false);
   });
 
@@ -179,7 +186,7 @@ describe("Flutter Size", () => {
 
     parentNode.children = [node];
 
-    expect(flutterSize(parentNode).size).toEqual("\nwidth: 12,\nheight: 12,");
-    expect(flutterSize(node).size).toEqual("\nwidth: 12,\nheight: 12,");
+    expect(flutterSizeWH(parentNode)).toEqual("\nwidth: 12,\nheight: 12,");
+    expect(flutterSizeWH(node)).toEqual("\nwidth: 12,\nheight: 12,");
   });
 });

@@ -175,8 +175,24 @@ export const convertIntoAltNodes = (
         convertDefaultShape(altNode, node);
 
         // Vector support is still missing. Meanwhile, add placeholder.
-        altNode.radius = 16;
-        altNode.opacity = 0.5;
+        altNode.cornerRadius = 8;
+
+        if (altNode.fills === figma.mixed || altNode.fills.length === 0) {
+          // Use rose[400] from Tailwind 2 when Vector has no color.
+          altNode.fills = [
+            {
+              type: "SOLID",
+              color: {
+                r: 0.5,
+                g: 0.23,
+                b: 0.27,
+              },
+              visible: true,
+              opacity: 0.5,
+              blendMode: "NORMAL",
+            },
+          ];
+        }
 
         return altNode;
       }
@@ -214,7 +230,17 @@ const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
   altNode.primaryAxisSizingMode = node.primaryAxisSizingMode;
   altNode.counterAxisSizingMode = node.counterAxisSizingMode;
 
-  altNode.primaryAxisAlignItems = node.primaryAxisAlignItems;
+  // Fix this: https://stackoverflow.com/questions/57859754/flexbox-space-between-but-center-if-one-element
+  // It affects HTML, Tailwind, Flutter and possibly SwiftUI. So, let's be consistent.
+  if (
+    node.primaryAxisAlignItems === "SPACE_BETWEEN" &&
+    node.children.length === 1
+  ) {
+    altNode.primaryAxisAlignItems = "CENTER";
+  } else {
+    altNode.primaryAxisAlignItems = node.primaryAxisAlignItems;
+  }
+
   altNode.counterAxisAlignItems = node.counterAxisAlignItems;
 
   altNode.paddingLeft = node.paddingLeft;

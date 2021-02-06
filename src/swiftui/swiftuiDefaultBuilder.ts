@@ -90,7 +90,15 @@ export class SwiftuiDefaultBuilder {
   }
 
   widthHeight(node: AltSceneNode): this {
-    this.modifiers += swiftuiSize(node);
+    const [propWidth, propHeight] = swiftuiSize(node);
+
+    if (propWidth || propHeight) {
+      // add comma if propWidth and propHeight both exists
+      const comma = propWidth && propHeight ? ", " : "";
+
+      this.modifiers += `\n.frame(${propWidth}${comma}${propHeight})`;
+    }
+
     return this;
   }
 

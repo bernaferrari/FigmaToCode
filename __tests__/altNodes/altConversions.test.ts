@@ -1,3 +1,4 @@
+import { htmlMain } from "./../../src/html/htmlMain";
 import { AltFrameNode } from "./../../src/altNodes/altMixins";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { createFigma } from "figma-api-stub";
@@ -22,9 +23,26 @@ describe("AltConversions", () => {
   it("Frame", () => {
     const frame = figma.createFrame();
     frame.resize(20, 20);
+    frame.x = 0;
+    frame.y = 0;
+    frame.layoutMode = "HORIZONTAL";
+    frame.counterAxisAlignItems = "CENTER";
+    frame.primaryAxisAlignItems = "SPACE_BETWEEN";
+    frame.counterAxisSizingMode = "FIXED";
+    frame.primaryAxisSizingMode = "FIXED";
 
-    expect(tailwindMain(convertIntoAltNodes([frame]))).toEqual(
-      '<div class="w-5 h-5"></div>'
+    const rectangle = figma.createRectangle();
+    rectangle.resize(20, 20);
+    rectangle.x = 0;
+    rectangle.y = 0;
+    rectangle.layoutGrow = 0;
+    rectangle.layoutAlign = "INHERIT";
+    frame.appendChild(rectangle);
+
+    expect(htmlMain(convertIntoAltNodes([frame]))).toEqual(
+      `<div style="width: 20px; height: 20px;">
+    <div style="width: 20px; height: 20px;"></div>
+</div>`
     );
   });
 
@@ -155,6 +173,8 @@ describe("AltConversions", () => {
 
     expect(
       tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
-    ).toEqual(`<div class="opacity-50 w-5 h-5"></div>`);
+    ).toEqual(
+      `<div class="w-5 h-5 bg-pink-900 bg-opacity-50 rounded-lg"></div>`
+    );
   });
 });

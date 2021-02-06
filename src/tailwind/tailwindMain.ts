@@ -1,3 +1,4 @@
+import { indentString } from "./../common/indentString";
 import {
   AltFrameNode,
   AltSceneNode,
@@ -80,10 +81,10 @@ const tailwindGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
 
   if (builder.attributes || builder.style) {
     const attr = builder.build("relative ");
-    return `\n<div${attr}>${tailwindWidgetGenerator(
-      node.children,
-      isJsx
-    )}</div>`;
+
+    const generator = tailwindWidgetGenerator(node.children, isJsx);
+
+    return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }
 
   return tailwindWidgetGenerator(node.children, isJsx);
@@ -182,7 +183,13 @@ export const tailwindContainer = (
   }
 
   if (builder.attributes || additionalAttr) {
-    return `\n<div${builder.build(additionalAttr)}>${children}</div>`;
+    const build = builder.build(additionalAttr);
+
+    if (children) {
+      return `\n<div${build}>${indentString(children)}\n</div>`;
+    } else {
+      return `\n<div${build}></div>`;
+    }
   }
 
   return children;

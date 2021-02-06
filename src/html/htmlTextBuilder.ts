@@ -1,4 +1,4 @@
-import { commonLineHeight } from "../common/commonTextHeightSpacing";
+import { numToAutoFixed } from "./../common/numToAutoFixed";
 import { htmlTextSize as htmlTextSizeBox } from "./builderImpl/htmlTextSize";
 import { AltTextNode } from "../altNodes/altMixins";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
@@ -87,13 +87,29 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
   }
 
   /**
-   * https://tailwindcss.com/docs/line-height/
-   * example: leading-3
+   * Since Figma is built on top of HTML + CSS, lineHeight properties are easy to map.
    */
   lineHeight(node: AltTextNode): this {
-    const lineHeight = commonLineHeight(node);
-    if (lineHeight > 0) {
-      this.style += formatWithJSX("line-height", this.isJSX, lineHeight);
+    if (node.lineHeight !== figma.mixed) {
+      switch (node.lineHeight.unit) {
+        case "AUTO":
+          this.style += formatWithJSX("line-height", this.isJSX, "100%");
+          break;
+        case "PERCENT":
+          this.style += formatWithJSX(
+            "line-height",
+            this.isJSX,
+            `${numToAutoFixed(node.lineHeight.value)}%`
+          );
+          break;
+        case "PIXELS":
+          this.style += formatWithJSX(
+            "line-height",
+            this.isJSX,
+            node.lineHeight.value
+          );
+          break;
+      }
     }
 
     return this;
