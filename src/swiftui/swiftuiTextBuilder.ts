@@ -8,6 +8,7 @@ import { AltTextNode } from "../altNodes/altMixins";
 import { numToAutoFixed } from "../common/numToAutoFixed";
 import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
 import { convertFontWeight } from "../common/convertFontWeight";
+import { swiftuiSize } from "./builderImpl/swiftuiSize";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   reset(): void {
@@ -92,22 +93,26 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   };
 
   wrapTextAutoResize = (node: AltTextNode): string => {
-    // Tailwind and Flutter allow to set only the width, so the height is calculated automatically. Not on SwiftUI.
-    // node.textAlignHorizontal and node.textAutoResize can be undefined in tests.
-    if (
-      !node.textAlignHorizontal ||
-      !node.textAutoResize ||
-      node.textAutoResize === "WIDTH_AND_HEIGHT"
-    ) {
-      return "";
+    const [propWidth, propHeight] = swiftuiSize(node);
+
+    let comp = "";
+    if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
+      comp += propWidth;
     }
 
-    const width = `width: ${numToAutoFixed(node.width)}`;
-    const height = `height: ${numToAutoFixed(node.height)}`;
+    if (node.textAutoResize === "NONE") {
+      // if it is NONE, it isn't WIDTH_AND_HEIGHT, which means the comma must be added.
+      comp += ", ";
+      comp += propHeight;
+    }
 
-    const align = this.textAlignment(node);
+    if (comp.length > 0) {
+      const align = this.textAlignment(node);
 
-    return `\n.frame(${width}, ${height}${align})`;
+      return `\n.frame(${comp}${align})`;
+    }
+
+    return "";
   };
 
   // SwiftUI has two alignments for Text, when it is a single line and when it is multiline. This one is for single line.

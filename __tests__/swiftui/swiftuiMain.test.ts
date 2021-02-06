@@ -362,6 +362,7 @@ Rectangle()
 
     // undefined (unitialized, only happen on tests)
     expect(swiftuiMain([convertToAutoLayout(node)])).toEqual(`Text("")
+.frame(width: 10)
 .padding(.trailing, 10)
 .padding(.bottom, 10)
 .frame(width: 20, height: 20)

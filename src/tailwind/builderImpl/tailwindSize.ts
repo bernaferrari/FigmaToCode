@@ -1,4 +1,3 @@
-import { tailwindVector } from "./../vector";
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { pxToLayoutSize } from "../conversionTables";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";

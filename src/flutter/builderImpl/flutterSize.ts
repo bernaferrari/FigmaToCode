@@ -2,9 +2,16 @@ import { AltSceneNode } from "../../altNodes/altMixins";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 
+// Used in tests.
+export const flutterSizeWH = (node: AltSceneNode): string => {
+  const fSize = flutterSize(node);
+  const size = fSize.width + fSize.height;
+  return size;
+};
+
 export const flutterSize = (
   node: AltSceneNode
-): { size: string; isExpanded: boolean } => {
+): { width: string; height: string; isExpanded: boolean } => {
   const size = nodeWidthHeight(node, false);
 
   let isExpanded: boolean = false;
@@ -42,5 +49,5 @@ export const flutterSize = (
     }
   }
 
-  return { size: propWidth + propHeight, isExpanded: isExpanded };
+  return { width: propWidth, height: propHeight, isExpanded: isExpanded };
 };

@@ -2,7 +2,7 @@ import { AltSceneNode } from "../../altNodes/altMixins";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 
-export const swiftuiSize = (node: AltSceneNode): string => {
+export const swiftuiSize = (node: AltSceneNode): [string, string] => {
   const size = nodeWidthHeight(node, false);
 
   // if width is set as maxWidth, height must also be set as maxHeight (not height)
@@ -35,11 +35,5 @@ export const swiftuiSize = (node: AltSceneNode): string => {
     propHeight = `maxHeight: .infinity`;
   }
 
-  if (propWidth || propHeight) {
-    // add comma if propWidth and propHeight both exists
-    const comma = propWidth && propHeight ? ", " : "";
-    return `\n.frame(${propWidth}${comma}${propHeight})`;
-  }
-
-  return "";
+  return [propWidth, propHeight];
 };

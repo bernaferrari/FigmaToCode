@@ -107,10 +107,8 @@ const flutterText = (node: AltTextNode): string => {
 const flutterFrame = (node: AltFrameNode): string => {
   const children = flutterWidgetGenerator(node.children);
 
-  if (node.children.length === 1) {
-    // if there is only one child, there is no need for Container or Row. Padding works indepdently of them.
-    return flutterContainer(node, children);
-  } else if (node.layoutMode !== "NONE") {
+  // Ignoring when Frame has a single child was removed because Expanded only works in Row/Column and not in Container, so additional logic would be required elsewhere.
+  if (node.layoutMode !== "NONE") {
     const rowColumn = makeRowColumn(node, children);
     return flutterContainer(node, rowColumn);
   } else {

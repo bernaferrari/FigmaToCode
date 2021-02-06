@@ -9,6 +9,7 @@ import {
 import { HtmlTextBuilder } from "./htmlTextBuilder";
 import { HtmlDefaultBuilder as HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { formatWithJSX } from "../common/parseJSX";
+import { indentString } from "../common/indentString";
 
 let parentId = "";
 
@@ -84,7 +85,10 @@ const htmlGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
 
   if (builder.style) {
     const attr = builder.build(formatWithJSX("position", isJsx, "relative"));
-    return `\n<div${attr}>${htmlWidgetGenerator(node.children, isJsx)}</div>`;
+
+    const generator = htmlWidgetGenerator(node.children, isJsx);
+
+    return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }
 
   return htmlWidgetGenerator(node.children, isJsx);
@@ -188,7 +192,13 @@ export const htmlContainer = (
   }
 
   if (builder.style || additionalStyle) {
-    return `\n<div${builder.build(additionalStyle)}>${children}</div>`;
+    const build = builder.build(additionalStyle);
+
+    if (children) {
+      return `\n<div${build}>${indentString(children)}\n</div>`;
+    } else {
+      return `\n<div${build}></div>`;
+    }
   }
 
   return children;
@@ -241,9 +251,10 @@ export const rowColumnProps = (node: AltFrameNode, isJsx: boolean): string => {
       primaryAlign = "flex-end";
       break;
     case "SPACE_BETWEEN":
-      primaryAlign = "justify-between";
+      primaryAlign = "space-between";
       break;
   }
+
   primaryAlign = formatWithJSX("justify-content", isJsx, primaryAlign);
 
   // [optimization]
@@ -281,7 +292,12 @@ const addSpacingIfNeeded = (
   len: number,
   isJsx: boolean
 ): string => {
-  if (node.parent?.type === "FRAME" && node.parent.layoutMode !== "NONE") {
+  // Ignore this when SPACE_BETWEEN is set.
+  if (
+    node.parent?.type === "FRAME" &&
+    node.parent.layoutMode !== "NONE" &&
+    node.parent.primaryAxisAlignItems !== "SPACE_BETWEEN"
+  ) {
     // check if itemSpacing is set and if it isn't the last value.
     // Don't add at the last value. In Figma, itemSpacing CAN be negative; here it can't.
     if (node.parent.itemSpacing > 0 && index < len - 1) {

@@ -29,7 +29,10 @@ export const flutterContainer = (
 
   // ignore for Groups
   const propBoxDecoration = node.type === "GROUP" ? "" : getBoxDecoration(node);
-  const fSize: { size: string; isExpanded: boolean } = flutterSize(node);
+
+  const fSize = flutterSize(node);
+  const size = fSize.width + fSize.height;
+  const isExpanded = fSize.isExpanded;
 
   // todo Image & multiple fills
 
@@ -43,9 +46,9 @@ export const flutterContainer = (
   }
 
   let result: string;
-  if (fSize.size || propBoxDecoration) {
+  if (size || propBoxDecoration) {
     // Container is a container if [propWidthHeight] and [propBoxDecoration] are set.
-    const properties = `${fSize.size}${propBoxDecoration}${propPadding}${propChild}`;
+    const properties = `${size}${propBoxDecoration}${propPadding}${propChild}`;
 
     result = `Container(${indentString(properties)}\n),`;
   } else if (propPadding) {
@@ -58,7 +61,7 @@ export const flutterContainer = (
   }
 
   // Add Expanded() when parent is a Row/Column and width is full.
-  if (fSize.isExpanded) {
+  if (isExpanded) {
     const properties = `\nchild: ${result}`;
     result = `Expanded(${indentString(properties)}\n),`;
   }

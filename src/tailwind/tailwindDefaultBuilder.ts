@@ -16,7 +16,10 @@ import {
   tailwindBorderRadius,
 } from "./builderImpl/tailwindBorder";
 import { tailwindPosition } from "./builderImpl/tailwindPosition";
-import { tailwindColorFromFills, tailwindGradientFromFills } from "./builderImpl/tailwindColor";
+import {
+  tailwindColorFromFills,
+  tailwindGradientFromFills,
+} from "./builderImpl/tailwindColor";
 import {
   htmlSizeForTailwind,
   htmlSizePartialForTailwind,

@@ -155,7 +155,7 @@ describe("HTML Color", () => {
     node.cornerRadius = 16;
 
     expect(htmlMain([node])).toEqual(
-      `<div style="width: 18px; height: 18px; background-image: linear-gradient(131deg, black, rgba(255, 0, 0, 1)); border: 4px solid rgba(63.75, 63.75, 63.75, 1);"></div>`
+      `<div style="width: 18px; height: 18px; background-image: linear-gradient(131deg, black, rgba(255, 0, 0, 1)); border-radius: 16px; border: 4px solid rgba(63.75, 63.75, 63.75, 1);"></div>`
     );
   });
 

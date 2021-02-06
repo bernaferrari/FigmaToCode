@@ -53,8 +53,9 @@ describe("Tailwind Main", () => {
 
     expect(tailwindMain([convertToAutoLayout(node)]))
       .toEqual(`<div class="relative" style="width: 320px; height: 320px;">
-<div class="absolute bg-white" style="width: 385px; height: 8px; left: 9px; top: 9px;"></div>
-<div class="w-2 h-96 absolute" style="left: 9px; top: 9px;"></div></div>`);
+    <div class="absolute bg-white" style="width: 385px; height: 8px; left: 9px; top: 9px;"></div>
+    <div class="w-2 h-96 absolute" style="left: 9px; top: 9px;"></div>
+</div>`);
   });
 
   it("Group with relative position", () => {
@@ -89,7 +90,8 @@ describe("Tailwind Main", () => {
     child.parent = node;
     expect(tailwindMain([node], "", true, true))
       .toEqual(`<div className="GROUP relative" style={{width: 32, height: 32,}}>
-<div className="RECT w-1 h-1 absolute bg-white" style={{left: 9, top: 9,}}></div></div>`);
+    <div className="RECT w-1 h-1 absolute bg-white" style={{left: 9, top: 9,}}></div>
+</div>`);
   });
 
   it("ellipse with no size", () => {
@@ -127,9 +129,11 @@ describe("Tailwind Main", () => {
     frameNode.children = [textNode];
     textNode.parent = frameNode;
 
+    // In real life, justify-between would be converted to justify-center in the altConversion.
     expect(tailwindMain([frameNode])).toEqual(
       `<div class="inline-flex items-center justify-between">
-<p class="text-2xl">username</p></div>`
+    <p class="text-2xl">username</p>
+</div>`
     );
 
     frameNode.name = "this is the InPuT";
@@ -191,7 +195,8 @@ describe("Tailwind Main", () => {
 
     expect(tailwindMain([convertToAutoLayout(node)], "", true, true))
       .toEqual(`<div className="FRAME relative" style={{width: 32, height: 32,}}>
-<div className="RECT1 w-1 h-1 absolute bg-white" style={{left: 9, top: 9,}}></div>
-<div className="RECT2 w-1 h-1 absolute" style={{left: 9, top: 9,}}></div></div>`);
+    <div className="RECT1 w-1 h-1 absolute bg-white" style={{left: 9, top: 9,}}></div>
+    <div className="RECT2 w-1 h-1 absolute" style={{left: 9, top: 9,}}></div>
+</div>`);
   });
 });

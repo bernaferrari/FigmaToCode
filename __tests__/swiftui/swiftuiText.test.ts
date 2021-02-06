@@ -21,26 +21,26 @@ describe("SwiftUI Text", () => {
     node.textAlignHorizontal = "LEFT";
     node.textAlignVertical = "TOP";
     expect(swiftuiMain([node])).toEqual(`Text("")
-.frame(width: 16, height: 16, alignment: .topLeading)`);
+.frame(width: 16, alignment: .topLeading)`);
 
     node.textAlignHorizontal = "CENTER";
     node.textAlignVertical = "TOP";
     expect(swiftuiMain([node])).toEqual(`Text("")
 .multilineTextAlignment(.center)
-.frame(width: 16, height: 16, alignment: .top)`);
+.frame(width: 16, alignment: .top)`);
 
     node.textAlignHorizontal = "RIGHT";
     node.textAlignVertical = "BOTTOM";
     expect(swiftuiMain([node])).toEqual(`Text("")
 .multilineTextAlignment(.trailing)
-.frame(width: 16, height: 16, alignment: .bottomTrailing)`);
+.frame(width: 16, alignment: .bottomTrailing)`);
 
     node.textAlignHorizontal = "CENTER";
     node.textAlignVertical = "CENTER";
     expect(swiftuiMain([node])).toEqual(
       `Text("")
 .multilineTextAlignment(.center)
-.frame(width: 16, height: 16)`
+.frame(width: 16)`
     );
   });
 

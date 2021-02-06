@@ -20,6 +20,7 @@ import { htmlPadding } from "./builderImpl/htmlPadding";
 import { formatWithJSX } from "../common/parseJSX";
 import { parentCoordinates } from "../common/parentCoordinates";
 import { htmlSize, htmlSizePartial } from "./builderImpl/htmlSize";
+import { htmlBorderRadius } from "./builderImpl/htmlBorderRadius";
 
 export class HtmlDefaultBuilder {
   style: string;
@@ -47,6 +48,23 @@ export class HtmlDefaultBuilder {
   }
 
   border(node: AltGeometryMixin & AltSceneNode): this {
+    // add border-radius: 10, for example.
+    this.style += htmlBorderRadius(node, this.isJSX);
+
+    console.log(
+      "borderRadius is ",
+      htmlBorderRadius(node, this.isJSX),
+      " - for ",
+      node.name,
+      "and ",
+      node.id,
+      "which is",
+      node.type,
+      "and",
+      node
+    );
+
+    // add border: 10px solid, for example.
     if (node.strokes && node.strokes.length > 0 && node.strokeWeight > 0) {
       const fill = this.retrieveFill(node.strokes);
       const weight = node.strokeWeight;
@@ -101,7 +119,10 @@ export class HtmlDefaultBuilder {
   ): this {
     const fill = this.retrieveFill(paintArray);
     if (fill.kind === "solid") {
-      this.style += formatWithJSX(property, this.isJSX, fill.prop);
+      // When text, solid must be outputted as 'color'.
+      const prop = property === "text" ? "color" : property;
+
+      this.style += formatWithJSX(prop, this.isJSX, fill.prop);
     } else if (fill.kind === "gradient") {
       if (property === "background-color") {
         this.style += formatWithJSX("background-image", this.isJSX, fill.prop);

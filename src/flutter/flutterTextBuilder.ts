@@ -5,6 +5,7 @@ import { AltTextNode } from "../altNodes/altMixins";
 import { flutterColorFromFills } from "./builderImpl/flutterColor";
 import { numToAutoFixed } from "../common/numToAutoFixed";
 import { convertFontWeight } from "../common/convertFontWeight";
+import { flutterSize } from "./builderImpl/flutterSize";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {
   constructor(optChild: string = "") {
@@ -115,26 +116,33 @@ export const wrapTextAutoResize = (
   node: AltTextNode,
   child: string
 ): string => {
+  const fSize = flutterSize(node);
+  const width = fSize.width;
+  const height = fSize.height;
+  const isExpanded = fSize.isExpanded;
+  let result = "";
+
   if (node.textAutoResize === "NONE") {
     // = instead of += because we want to replace it
 
-    const properties =
-      "\nwidth: " +
-      numToAutoFixed(node.width) +
-      ",\nheight: " +
-      numToAutoFixed(node.height) +
-      ",\nchild: " +
-      child;
+    const properties = `${width}${height}\nchild: ${child}`;
 
-    return `SizedBox(${indentString(properties)}\n),`;
+    result = `SizedBox(${indentString(properties)}\n),`;
   } else if (node.textAutoResize === "HEIGHT") {
     // if HEIGHT is set, it means HEIGHT will be calculated automatically, but width won't
     // = instead of += because we want to replace it
 
-    const properties =
-      "\nwidth: " + numToAutoFixed(node.width) + ",\nchild: " + child;
+    const properties = `${width}\nchild: ${child}`;
 
-    return `SizedBox(${indentString(properties)}\n),`;
+    result = `SizedBox(${indentString(properties)}\n),`;
+  }
+
+  if (isExpanded) {
+    const properties = `\nchild: ${result}`;
+
+    return `Expanded(${indentString(properties)}\n),`;
+  } else if (result.length > 0) {
+    return result;
   }
 
   return child;

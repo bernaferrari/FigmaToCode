@@ -134,7 +134,7 @@ describe("HTML Text", () => {
       unit: "PERCENT",
     };
     expect(htmlMain([node])).toEqual(
-      '<p style="font-size: 24px; line-height: 26.40px;"></p>'
+      '<p style="font-size: 24px; line-height: 110%;"></p>'
     );
 
     node.lineHeight = {
@@ -143,6 +143,13 @@ describe("HTML Text", () => {
     };
     expect(htmlMain([node])).toEqual(
       '<p style="font-size: 24px; line-height: 10px;"></p>'
+    );
+
+    node.lineHeight = {
+      unit: "AUTO",
+    };
+    expect(htmlMain([node])).toEqual(
+      '<p style="font-size: 24px; line-height: 100%;"></p>'
     );
   });
 
