@@ -31,10 +31,12 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
    * https://tailwindcss.com/docs/font-size/
    * example: text-md
    */
-  fontSize(node: AltTextNode): this {
+  fontSize(node: AltTextNode, isUI: boolean = false): this {
     // example: text-md
     if (node.fontSize !== figma.mixed) {
-      const value = node.fontSize;
+      // special limit when used in UI.
+      const value = isUI ? Math.min(node.fontSize, 24) : node.fontSize;
+
       this.style += formatWithJSX("font-size", this.isJSX, value);
     }
 

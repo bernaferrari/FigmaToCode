@@ -260,7 +260,7 @@ describe("Tailwind Size", () => {
       node.children = [child1, child2, child3, child4];
 
       expect(tailwindMain([node]))
-        .toEqual(`<div class="inline-flex flex-col space-y-2.5 items-center justify-center px-2.5 w-56 h-72 bg-red-600">
+        .toEqual(`<div class="inline-flex flex-col space-y-2.5 items-center justify-center w-56 h-72 px-2.5 bg-red-600">
     <div class="w-full h-5 bg-white"></div>
     <div class="w-full h-5 bg-white"></div>
     <div class="w-24 h-5 bg-white"></div>

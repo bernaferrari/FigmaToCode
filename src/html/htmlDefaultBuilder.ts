@@ -51,27 +51,21 @@ export class HtmlDefaultBuilder {
     // add border-radius: 10, for example.
     this.style += htmlBorderRadius(node, this.isJSX);
 
-    console.log(
-      "borderRadius is ",
-      htmlBorderRadius(node, this.isJSX),
-      " - for ",
-      node.name,
-      "and ",
-      node.id,
-      "which is",
-      node.type,
-      "and",
-      node
-    );
-
     // add border: 10px solid, for example.
     if (node.strokes && node.strokes.length > 0 && node.strokeWeight > 0) {
       const fill = this.retrieveFill(node.strokes);
       const weight = node.strokeWeight;
 
-      if (fill.kind === "gradient") {
-        this.style += formatWithJSX("border", this.isJSX, `${weight}px solid`);
+      if (node.dashPattern.length > 0) {
+        this.style += formatWithJSX("border-style", this.isJSX, "dotted");
+      } else {
+        this.style += formatWithJSX("border-style", this.isJSX, "solid");
+      }
 
+      this.style += formatWithJSX("border-width", this.isJSX, weight);
+      this.style += formatWithJSX("border-style", this.isJSX, "solid");
+
+      if (fill.kind === "gradient") {
         // Gradient requires these.
         this.style += formatWithJSX("border-image-slice", this.isJSX, 1);
         this.style += formatWithJSX(
@@ -80,18 +74,18 @@ export class HtmlDefaultBuilder {
           fill.prop
         );
       } else {
-        const border = `${weight}px solid ${fill.prop}`;
-
-        // use "2px solid white" instead of splitting into three properties.
-        // This pattern seems more common than using border, borderColor and borderWidth.
-        this.style += formatWithJSX("border", this.isJSX, border);
+        this.style += formatWithJSX("border-color", this.isJSX, fill.prop);
       }
     }
 
     return this;
   }
 
-  position(node: AltSceneNode, parentId: string): this {
+  position(
+    node: AltSceneNode,
+    parentId: string,
+    isRelative: boolean = false
+  ): this {
     const position = htmlPosition(node, parentId);
 
     if (position === "absoluteManualLayout" && node.parent) {
@@ -105,7 +99,9 @@ export class HtmlDefaultBuilder {
       this.style += formatWithJSX("left", this.isJSX, left);
       this.style += formatWithJSX("top", this.isJSX, top);
 
-      this.style += formatWithJSX("position", this.isJSX, "absolute");
+      if (isRelative === false) {
+        this.style += formatWithJSX("position", this.isJSX, "absolute");
+      }
     } else {
       this.style += position;
     }

@@ -12,7 +12,7 @@ export const htmlPadding = (
   isJsx: boolean
 ): string => {
   const padding = commonPadding(node);
-  if (!padding) {
+  if (padding === null) {
     return "";
   }
 

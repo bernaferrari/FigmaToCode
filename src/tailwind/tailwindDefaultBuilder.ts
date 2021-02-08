@@ -65,7 +65,11 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  position(node: AltSceneNode, parentId: string): this {
+  position(
+    node: AltSceneNode,
+    parentId: string,
+    isRelative: boolean = false
+  ): this {
     const position = tailwindPosition(node, parentId, this.hasFixedSize);
 
     if (position === "absoluteManualLayout" && node.parent) {
@@ -79,7 +83,9 @@ export class TailwindDefaultBuilder {
       this.style += formatWithJSX("left", this.isJSX, left);
       this.style += formatWithJSX("top", this.isJSX, top);
 
-      this.attributes += "absolute ";
+      if (!isRelative) {
+        this.attributes += "absolute ";
+      }
     } else {
       this.attributes += position;
     }

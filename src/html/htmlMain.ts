@@ -94,20 +94,19 @@ const htmlGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
   return htmlWidgetGenerator(node.children, isJsx);
 };
 
-const htmlText = (
+// this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
+export const htmlBuilder = (
   node: AltTextNode,
-  isInput: boolean = false,
-  isJsx: boolean
-): string | [string, string] => {
-  // follow the website order, to make it easier
-
+  isJsx: boolean,
+  isUI: boolean = false
+): [HtmlTextBuilder, string] => {
   const builderResult = new HtmlTextBuilder(node, showLayerName, isJsx)
     .blend(node)
     .textAutoSize(node)
     .position(node, parentId)
     // todo fontFamily (via node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}`)
     // todo font smoothing
-    .fontSize(node)
+    .fontSize(node, isUI)
     .fontStyle(node)
     .letterSpacing(node)
     .lineHeight(node)
@@ -123,10 +122,21 @@ const htmlText = (
       ? node.characters.split("\n").join("<br/>")
       : node.characters;
 
+  return [builderResult, charsWithLineBreak];
+};
+
+const htmlText = (
+  node: AltTextNode,
+  isInput: boolean = false,
+  isJsx: boolean
+): string | [string, string] => {
+  // follow the website order, to make it easier
+  const [builder, charsWithLineBreak] = htmlBuilder(node, isJsx);
+
   if (isInput) {
-    return [builderResult.style, charsWithLineBreak];
+    return [builder.style, charsWithLineBreak];
   } else {
-    return `\n<p${builderResult.build()}>${charsWithLineBreak}</p>`;
+    return `\n<p${builder.build()}>${charsWithLineBreak}</p>`;
   }
 };
 
@@ -156,7 +166,9 @@ const htmlFrame = (node: AltFrameNode, isJsx: boolean = false): string => {
       node,
       childrenStr,
       formatWithJSX("position", isJsx, "relative"),
-      isJsx
+      isJsx,
+      false,
+      false
     );
   }
 };
@@ -168,7 +180,8 @@ export const htmlContainer = (
   children: string,
   additionalStyle: string = "",
   isJsx: boolean,
-  isInput: boolean = false
+  isInput: boolean = false,
+  isRelative: boolean = false
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -179,9 +192,9 @@ export const htmlContainer = (
 
   const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
     .blend(node)
-    .autoLayoutPadding(node)
     .widthHeight(node)
-    .position(node, parentId)
+    .autoLayoutPadding(node)
+    .position(node, parentId, isRelative)
     .customColor(node.fills, "background-color")
     // TODO image and gradient support (tailwind does not support gradients)
     .shadow(node)

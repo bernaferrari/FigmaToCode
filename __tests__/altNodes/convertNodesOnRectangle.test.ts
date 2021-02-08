@@ -98,7 +98,7 @@ describe("convert node if child is big rect", () => {
 
     expect(tailwindMain([invisibleConverted])).toEqual(
       `<div class="w-24 h-24">
-    <div class="inline-flex items-start justify-start pr-12 pb-12 w-full h-full">
+    <div class="inline-flex items-start justify-start w-full h-full pr-12 pb-12">
         <div class="flex-1 h-full bg-white"></div>
     </div>
 </div>`
@@ -156,7 +156,7 @@ describe("convert node if child is big rect", () => {
 
     expect(tailwindMain([converted])).toEqual(
       `<div class="w-5 h-5">
-    <div class="inline-flex items-center justify-center p-1 w-full h-full bg-black">
+    <div class="inline-flex items-center justify-center w-full h-full p-1 bg-black">
         <div class="flex-1 h-full bg-white"></div>
     </div>
 </div>`
@@ -250,7 +250,7 @@ describe("convert node if child is big rect", () => {
     // counterAxisSizingMode is AUTO, therefore bg-black doesn't contain the size
 
     expect(tailwindMain([conv])).toEqual(
-      `<div class="inline-flex items-start justify-start pr-3 pb-3 w-5 h-5 bg-black">
+      `<div class="inline-flex items-start justify-start w-5 h-5 pr-3 pb-3 bg-black">
     <div class="flex-1 h-full bg-white"></div>
 </div>`
     );
