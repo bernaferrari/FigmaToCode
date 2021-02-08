@@ -58,7 +58,7 @@ describe("Convert to AutoLayout", () => {
 
     // output should be HORIZONTAL
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex items-start justify-end pr-2.5 pb-8 w-12 h-12">
+      `<div class="inline-flex items-start justify-end w-12 h-12 pr-2.5 pb-8">
     <div class="w-1/2 h-full bg-white"></div>
     <div class="w-1/2 h-full bg-black"></div>
 </div>`
@@ -71,7 +71,7 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex flex-col items-start justify-end pr-8 pb-2.5 w-12 h-12">
+      `<div class="inline-flex flex-col items-start justify-end w-12 h-12 pr-8 pb-2.5">
     <div class="w-full h-1/2 bg-white"></div>
     <div class="w-full h-1/2 bg-black"></div>
 </div>`
@@ -86,7 +86,7 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex flex-col space-y-1 items-end justify-end pb-1 w-12 h-12">
+      `<div class="inline-flex flex-col space-y-1 items-end justify-end w-12 h-12 pb-1">
     <div class="w-full h-5 bg-white"></div>
     <div class="w-5 h-5 bg-black"></div>
 </div>`
@@ -102,7 +102,7 @@ describe("Convert to AutoLayout", () => {
     frame.children = [node2, node1];
 
     expect(tailwindMain([convertToAutoLayout(frame)])).toEqual(
-      `<div class="inline-flex items-end justify-end pr-2.5 w-12 h-12">
+      `<div class="inline-flex items-end justify-end w-12 h-12 pr-2.5">
     <div class="w-1/2 h-full bg-white"></div>
     <div class="w-1/2 h-5 bg-black"></div>
 </div>`
@@ -158,7 +158,7 @@ describe("Convert to AutoLayout", () => {
 
     // output should be HORIZONTAL
     expect(tailwindMain([convertToAutoLayout(frame)]))
-      .toEqual(`<div class="inline-flex items-start justify-end pb-8 w-12 h-12">
+      .toEqual(`<div class="inline-flex items-start justify-end w-12 h-12 pb-8">
     <div class="w-5 h-full"></div>
     <div class="w-5 h-full"></div>
     <div class="w-5 h-full"></div>

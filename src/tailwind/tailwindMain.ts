@@ -46,7 +46,13 @@ const tailwindWidgetGenerator = (
 
   visibleSceneNode.forEach((node) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += tailwindContainer(node, "", "", false, isJsx);
+      comp += tailwindContainer(
+        node,
+        "",
+        "",
+        { isRelative: false, isInput: false },
+        isJsx
+      );
     } else if (node.type === "GROUP") {
       comp += tailwindGroup(node, isJsx);
     } else if (node.type === "FRAME") {
@@ -136,18 +142,36 @@ const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
     node?.name?.toLowerCase().match("input")
   ) {
     const [attr, char] = tailwindText(node.children[0], true, isJsx);
-    return tailwindContainer(node, ` placeholder="${char}"`, attr, true, isJsx);
+    return tailwindContainer(
+      node,
+      ` placeholder="${char}"`,
+      attr,
+      { isRelative: false, isInput: true },
+      isJsx
+    );
   }
 
   const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = rowColumnProps(node);
-    return tailwindContainer(node, childrenStr, rowColumn, false, isJsx);
+    return tailwindContainer(
+      node,
+      childrenStr,
+      rowColumn,
+      { isRelative: false, isInput: false },
+      isJsx
+    );
   } else {
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return tailwindContainer(node, childrenStr, "relative ", false, isJsx);
+    return tailwindContainer(
+      node,
+      childrenStr,
+      "relative ",
+      { isRelative: true, isInput: false },
+      isJsx
+    );
   }
 };
 
@@ -156,8 +180,11 @@ const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
 export const tailwindContainer = (
   node: AltFrameNode | AltRectangleNode | AltEllipseNode,
   children: string,
-  additionalAttr: string = "",
-  isInput: boolean = false,
+  additionalAttr: string,
+  attr: {
+    isRelative: boolean;
+    isInput: boolean;
+  },
   isJsx: boolean
 ): string => {
   // ignore the view when size is zero or less
@@ -169,15 +196,15 @@ export const tailwindContainer = (
 
   const builder = new TailwindDefaultBuilder(node, showLayerName, isJsx)
     .blend(node)
-    .autoLayoutPadding(node)
     .widthHeight(node)
-    .position(node, parentId)
+    .autoLayoutPadding(node)
+    .position(node, parentId, attr.isRelative)
     .customColor(node.fills, "bg")
     // TODO image and gradient support (tailwind does not support gradients)
     .shadow(node)
     .border(node);
 
-  if (isInput) {
+  if (attr.isInput) {
     // children before the > is not a typo.
     return `\n<input${builder.build(additionalAttr)}${children}></input>`;
   }
