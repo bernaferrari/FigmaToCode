@@ -11,6 +11,7 @@ import { pxToLayoutSize } from "./conversionTables";
 import { tailwindVector } from "./vector";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+import { retrieveTopFill } from "../common/retrieveFill";
 
 let parentId = "";
 let showLayerName = false;
@@ -211,6 +212,12 @@ export const tailwindContainer = (
 
   if (builder.attributes || additionalAttr) {
     const build = builder.build(additionalAttr);
+
+    // image fill and no children -- let's emit an <img />
+    if (retrieveTopFill(node.fills)?.type === "IMAGE" && !children) {
+      const placeholder = `https://via.placeholder.com/${node.width}x${node.height}`;
+      return `\n<img${build} src="${placeholder}" />`;
+    }
 
     if (children) {
       return `\n<div${build}>${indentString(children)}\n</div>`;
