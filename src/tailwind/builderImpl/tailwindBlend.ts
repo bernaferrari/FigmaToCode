@@ -66,7 +66,7 @@ export const tailwindRotation = (node: AltLayoutMixin): string => {
       nearest = -nearest;
     }
 
-    return `${minusIfNegative}rotate-${nearest} `;
+    return `transform ${minusIfNegative}rotate-${nearest} `;
   }
   return "";
 };

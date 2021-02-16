@@ -43,21 +43,21 @@ describe("Tailwind Blend", () => {
     expect(tailwindRotation(node)).toEqual("");
 
     node.rotation = 45;
-    expect(tailwindRotation(node)).toEqual("rotate-45 ");
+    expect(tailwindRotation(node)).toEqual("transform rotate-45 ");
 
     node.rotation = 90;
-    expect(tailwindRotation(node)).toEqual("rotate-90 ");
+    expect(tailwindRotation(node)).toEqual("transform rotate-90 ");
 
     node.rotation = 180;
-    expect(tailwindRotation(node)).toEqual("rotate-180 ");
+    expect(tailwindRotation(node)).toEqual("transform rotate-180 ");
 
     node.rotation = -45;
-    expect(tailwindRotation(node)).toEqual("-rotate-45 ");
+    expect(tailwindRotation(node)).toEqual("transform -rotate-45 ");
 
     node.rotation = -90;
-    expect(tailwindRotation(node)).toEqual("-rotate-90 ");
+    expect(tailwindRotation(node)).toEqual("transform -rotate-90 ");
 
     node.rotation = -180;
-    expect(tailwindRotation(node)).toEqual("-rotate-180 ");
+    expect(tailwindRotation(node)).toEqual("transform -rotate-180 ");
   });
 });
