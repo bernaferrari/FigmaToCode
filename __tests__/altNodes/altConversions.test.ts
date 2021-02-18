@@ -16,7 +16,7 @@ describe("AltConversions", () => {
     rectangle.resize(20, 20);
 
     expect(tailwindMain(convertIntoAltNodes([rectangle]))).toEqual(
-      '<div class="w-5 h-5"></div>'
+      '<div class="w-5 h-5"/>'
     );
   });
 
@@ -41,7 +41,7 @@ describe("AltConversions", () => {
 
     expect(htmlMain(convertIntoAltNodes([frame]))).toEqual(
       `<div style="width: 20px; height: 20px;">
-    <div style="width: 20px; height: 20px;"></div>
+    <div style="width: 20px; height: 20px;"/>
 </div>`
     );
   });
@@ -126,7 +126,7 @@ describe("AltConversions", () => {
 
     expect(
       tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
-    ).toEqual(`<div class="w-5 h-5 rounded-full"></div>`);
+    ).toEqual(`<div class="w-5 h-5 rounded-full"/>`);
   });
 
   it("Line", () => {
@@ -146,7 +146,7 @@ describe("AltConversions", () => {
 
     expect(
       tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
-    ).toEqual(`<div class="w-5 h-0.5"></div>`);
+    ).toEqual(`<div class="w-5 h-0.5"/>`);
   });
 
   it("Vector", () => {
@@ -173,8 +173,6 @@ describe("AltConversions", () => {
 
     expect(
       tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
-    ).toEqual(
-      `<div class="w-5 h-5 bg-pink-900 bg-opacity-50 rounded-lg"></div>`
-    );
+    ).toEqual(`<div class="w-5 h-5 bg-pink-900 bg-opacity-50 rounded-lg"/>`);
   });
 });

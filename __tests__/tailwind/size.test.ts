@@ -89,7 +89,7 @@ describe("Tailwind Size", () => {
 
     expect(tailwindMain([frameNodeToAlt(node)]))
       .toEqual(`<div class="inline-flex items-center justify-center p-60" style="width: 500px; height: 500px;">
-    <div class="flex-1 h-full"></div>
+    <img class="flex-1 h-full rounded-full" src="https://via.placeholder.com/8x8"/>
 </div>`);
 
     expect(tailwindSize(frameNodeToAlt(subnode))).toEqual("w-2 h-2 ");
@@ -261,10 +261,10 @@ describe("Tailwind Size", () => {
 
       expect(tailwindMain([node]))
         .toEqual(`<div class="inline-flex flex-col space-y-2.5 items-center justify-center w-56 h-72 px-2.5 bg-red-600">
-    <div class="w-full h-5 bg-white"></div>
-    <div class="w-full h-5 bg-white"></div>
-    <div class="w-24 h-5 bg-white"></div>
-    <div class="w-8 h-5 bg-white"></div>
+    <div class="w-full h-5 bg-white"/>
+    <div class="w-full h-5 bg-white"/>
+    <div class="w-24 h-5 bg-white"/>
+    <div class="w-8 h-5 bg-white"/>
 </div>`);
     });
   });

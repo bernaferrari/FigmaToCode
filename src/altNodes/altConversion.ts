@@ -124,12 +124,22 @@ export const convertIntoAltNodes = (
         node.type === "INSTANCE" ||
         node.type === "COMPONENT"
       ) {
+        const iconToRect = iconToRectangle(node, altParent);
+        if (iconToRect != null) {
+          return iconToRect;
+        }
+
         return frameNodeToAlt(node, altParent);
       } else if (node.type === "GROUP") {
         if (node.children.length === 1 && node.visible !== false) {
           // if Group is visible and has only one child, Group should disappear.
           // there will be a single value anyway.
           return convertIntoAltNodes(node.children, altParent)[0];
+        }
+
+        const iconToRect = iconToRectangle(node, altParent);
+        if (iconToRect != null) {
+          return iconToRect;
         }
 
         const altNode = new AltGroupNode();
@@ -202,6 +212,53 @@ export const convertIntoAltNodes = (
   );
 
   return mapped.filter(notEmpty);
+};
+
+const iconToRectangle = (
+  node: FrameNode | InstanceNode | ComponentNode | GroupNode,
+  altParent: AltFrameNode | AltGroupNode | null
+): AltRectangleNode | null => {
+  if (node.children.every((d) => d.type === "VECTOR")) {
+    const altNode = new AltRectangleNode();
+    altNode.id = node.id;
+    altNode.name = node.name;
+
+    if (altParent) {
+      altNode.parent = altParent;
+    }
+
+    convertBlend(altNode, node);
+
+    // width, x, y
+    convertLayout(altNode, node);
+
+    // Vector support is still missing. Meanwhile, add placeholder.
+    altNode.cornerRadius = 8;
+
+    altNode.strokes = [];
+    altNode.strokeWeight = 0;
+    altNode.strokeMiterLimit = 0;
+    altNode.strokeAlign = "CENTER";
+    altNode.strokeCap = "NONE";
+    altNode.strokeJoin = "BEVEL";
+    altNode.dashPattern = [];
+    altNode.fillStyleId = "";
+    altNode.strokeStyleId = "";
+
+    altNode.fills = [
+      {
+        type: "IMAGE",
+        imageHash: "",
+        scaleMode: "FIT",
+        visible: true,
+        opacity: 0.5,
+        blendMode: "NORMAL",
+      },
+    ];
+
+    return altNode;
+  }
+  return null;
 };
 
 const convertLayout = (altNode: AltLayoutMixin, node: LayoutMixin) => {
@@ -288,7 +345,7 @@ const convertDefaultShape = (
   // opacity, visible
   convertBlend(altNode, node);
 
-  // fills, storkes
+  // fills, strokes
   convertGeometry(altNode, node);
 
   // width, x, y

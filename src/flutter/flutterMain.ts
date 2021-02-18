@@ -10,6 +10,7 @@ import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { AltSceneNode } from "../altNodes/altMixins";
 import { FlutterTextBuilder } from "./flutterTextBuilder";
 import { numToAutoFixed } from "../common/numToAutoFixed";
+import { retrieveTopFill } from "../common/retrieveFill";
 
 let parentId = "";
 let material = true;
@@ -82,7 +83,31 @@ const flutterContainer = (
   node: AltFrameNode | AltGroupNode | AltRectangleNode | AltEllipseNode,
   child: string
 ): string => {
-  const builder = new FlutterDefaultBuilder(child);
+  let propChild = "";
+
+  let image = "";
+  if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
+    // const url = `https://via.placeholder.com/${node.width}x${node.height}`;
+    // image = `Image.network("${url}"),`;
+
+    // Flutter Web currently can't render network images :(
+    image = `FlutterLogo(size: ${Math.min(node.width, node.height)}),`;
+  }
+
+  if (child.length > 0 && image.length > 0) {
+    const prop1 = `\nPositioned.fill(\n${indentString(`child: ${child}`)}\n),`;
+    const prop2 = `\nPositioned.fill(\n${indentString(`child: ${image}`)}\n),`;
+
+    const propStack = `\nchildren: [${indentString(prop1 + prop2)}\n],`;
+
+    propChild = `Stack(${indentString(propStack)}\n),`;
+  } else if (child.length > 0) {
+    propChild = child;
+  } else if (image.length > 0) {
+    propChild = image;
+  }
+
+  const builder = new FlutterDefaultBuilder(propChild);
 
   builder
     .createContainer(node, material)

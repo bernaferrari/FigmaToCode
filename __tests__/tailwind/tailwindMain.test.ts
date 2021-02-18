@@ -53,8 +53,8 @@ describe("Tailwind Main", () => {
 
     expect(tailwindMain([convertToAutoLayout(node)]))
       .toEqual(`<div class="relative" style="width: 320px; height: 320px;">
-    <div class="absolute bg-white" style="width: 385px; height: 8px; left: 9px; top: 9px;"></div>
-    <div class="w-2 h-96 absolute" style="left: 9px; top: 9px;"></div>
+    <div class="absolute bg-white" style="width: 385px; height: 8px; left: 9px; top: 9px;"/>
+    <div class="w-2 h-96 absolute" style="left: 9px; top: 9px;"/>
 </div>`);
   });
 
@@ -90,7 +90,7 @@ describe("Tailwind Main", () => {
     child.parent = node;
     expect(tailwindMain([node], "", true, true))
       .toEqual(`<div className="GROUP relative" style={{width: 32, height: 32,}}>
-    <div className="RECT w-1 h-1 absolute bg-white" style={{left: 9, top: 9,}}></div>
+    <div className="RECT w-1 h-1 absolute bg-white" style={{left: 9, top: 9,}}/>
 </div>`);
   });
 
@@ -98,7 +98,7 @@ describe("Tailwind Main", () => {
     const node = new AltEllipseNode();
 
     // undefined (unitialized, only happen on tests)
-    expect(tailwindMain([node])).toEqual('<div class="rounded-full"></div>');
+    expect(tailwindMain([node])).toEqual('<div class="rounded-full"/>');
 
     node.width = 0;
     node.height = 10;
@@ -195,8 +195,8 @@ describe("Tailwind Main", () => {
 
     expect(tailwindMain([convertToAutoLayout(node)], "", true, true))
       .toEqual(`<div className="FRAME relative" style={{width: 32, height: 32,}}>
-    <div className="RECT1 w-1 h-1 absolute bg-white" style={{left: 9, top: 9,}}></div>
-    <div className="RECT2 w-1 h-1 absolute" style={{left: 9, top: 9,}}></div>
+    <div className="RECT1 w-1 h-1 absolute bg-white" style={{left: 9, top: 9,}}/>
+    <div className="RECT2 w-1 h-1 absolute" style={{left: 9, top: 9,}}/>
 </div>`);
   });
 });

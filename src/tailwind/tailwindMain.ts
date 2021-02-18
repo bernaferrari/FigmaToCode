@@ -11,6 +11,7 @@ import { pxToLayoutSize } from "./conversionTables";
 import { tailwindVector } from "./vector";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+import { retrieveTopFill } from "../common/retrieveFill";
 
 let parentId = "";
 let showLayerName = false;
@@ -76,7 +77,7 @@ const tailwindGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
     return "";
   }
 
-  const vectorIfExists = tailwindVector(node, isJsx);
+  const vectorIfExists = tailwindVector(node, showLayerName, parentId, isJsx);
   if (vectorIfExists) return vectorIfExists;
 
   // this needs to be called after CustomNode because widthHeight depends on it
@@ -133,8 +134,8 @@ const tailwindText = (
 };
 
 const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
-  const vectorIfExists = tailwindVector(node, isJsx);
-  if (vectorIfExists) return vectorIfExists;
+  // const vectorIfExists = tailwindVector(node, isJsx);
+  // if (vectorIfExists) return vectorIfExists;
 
   if (
     node.children.length === 1 &&
@@ -212,10 +213,18 @@ export const tailwindContainer = (
   if (builder.attributes || additionalAttr) {
     const build = builder.build(additionalAttr);
 
+    // image fill and no children -- let's emit an <img />
+    let tag = "div";
+    let src = "";
+    if (retrieveTopFill(node.fills)?.type === "IMAGE") {
+      tag = "img";
+      src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+    }
+
     if (children) {
-      return `\n<div${build}>${indentString(children)}\n</div>`;
+      return `\n<${tag}${build}${src}>${indentString(children)}\n</${tag}>`;
     } else {
-      return `\n<div${build}></div>`;
+      return `\n<${tag}${build}${src}/>`;
     }
   }
 

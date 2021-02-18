@@ -19,6 +19,16 @@ export const swiftuiColorFromFills = (
     return swiftuiColor(fill.color, opacity);
   } else if (fill?.type === "GRADIENT_LINEAR") {
     return swiftuiGradient(fill);
+  } else if (fill?.type === "IMAGE") {
+    // placeholder for the image. Apparently SwiftUI doesn't support Image.network(...).
+    return swiftuiColor(
+      {
+        r: 0.5,
+        g: 0.23,
+        b: 0.27,
+      },
+      0.5
+    );
   }
 
   return "";
