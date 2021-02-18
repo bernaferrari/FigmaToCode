@@ -54,8 +54,8 @@ describe("HTML Main", () => {
 
     expect(htmlMain([convertToAutoLayout(node)]))
       .toEqual(`<div style="width: 320px; height: 320px; position: relative;">
-    <div style="width: 385px; height: 8px; left: 9px; top: 9px; position: absolute; background-color: white;"></div>
-    <div style="width: 8px; height: 385px; left: 9px; top: 9px; position: absolute;"></div>
+    <div style="width: 385px; height: 8px; left: 9px; top: 9px; position: absolute; background-color: white;"/>
+    <div style="width: 8px; height: 385px; left: 9px; top: 9px; position: absolute;"/>
 </div>`);
   });
 
@@ -91,7 +91,7 @@ describe("HTML Main", () => {
     child.parent = node;
     expect(htmlMain([node], "", true, true))
       .toEqual(`<div className="GROUP" style={{width: 32, height: 32, position: 'relative',}}>
-    <div className="RECT" style={{width: 4, height: 4, left: 9, top: 9, position: 'absolute', backgroundColor: 'white',}}></div>
+    <div className="RECT" style={{width: 4, height: 4, left: 9, top: 9, position: 'absolute', backgroundColor: 'white',}}/>
 </div>`);
   });
 
@@ -99,9 +99,7 @@ describe("HTML Main", () => {
     const node = new AltEllipseNode();
 
     // undefined (unitialized, only happen on tests)
-    expect(htmlMain([node])).toEqual(
-      '<div style="border-radius: 9999px;"></div>'
-    );
+    expect(htmlMain([node])).toEqual('<div style="border-radius: 9999px;"/>');
     // todo verify if it is working properly.
     node.x = 0;
     node.y = 0;
@@ -201,8 +199,8 @@ describe("HTML Main", () => {
 
     expect(htmlMain([convertToAutoLayout(node)], "", true, true))
       .toEqual(`<div className="FRAME" style={{width: 32, height: 32, position: 'relative',}}>
-    <div className="RECT1" style={{width: 4, height: 4, left: 9, top: 9, position: 'absolute', backgroundColor: 'white',}}></div>
-    <div className="RECT2" style={{width: 4, height: 4, left: 9, top: 9, position: 'absolute',}}></div>
+    <div className="RECT1" style={{width: 4, height: 4, left: 9, top: 9, position: 'absolute', backgroundColor: 'white',}}/>
+    <div className="RECT2" style={{width: 4, height: 4, left: 9, top: 9, position: 'absolute',}}/>
 </div>`);
   });
 
@@ -258,9 +256,9 @@ describe("HTML Main", () => {
 
     expect(htmlMain([node], "", false, true))
       .toEqual(`<div class="FRAME" style="width: 32px; height: 32px; display: inline-flex; flex-direction: row; align-items: flex-start; justify-content: flex-start;">
-    <div class="RECT1" style="width: 4px; height: 4px; background-color: white;"></div>
-    <div style="width: 4px;"></div>
-    <div class="RECT2" style="width: 4px; height: 4px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;"></div>
+    <div class="RECT1" style="width: 4px; height: 4px; background-color: white;"/>
+    <div style="width: 4px;"/>
+    <div class="RECT2" style="width: 4px; height: 4px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;"/>
 </div>`);
 
     node.primaryAxisAlignItems = "MAX";
@@ -271,9 +269,9 @@ describe("HTML Main", () => {
 
     expect(htmlMain([node], "", false, true))
       .toEqual(`<div class="FRAME" style="width: 32px; height: 32px; display: inline-flex; flex-direction: row; align-items: flex-end; justify-content: flex-end;">
-    <div class="RECT1" style="width: 4px; height: 4px; background-color: white;"></div>
-    <div style="width: 4px;"></div>
-    <div class="RECT2" style="width: 4px; height: 4px; display: inline-flex; flex-direction: column; align-items: center; justify-content: space-between;"></div>
+    <div class="RECT1" style="width: 4px; height: 4px; background-color: white;"/>
+    <div style="width: 4px;"/>
+    <div class="RECT2" style="width: 4px; height: 4px; display: inline-flex; flex-direction: column; align-items: center; justify-content: space-between;"/>
 </div>`);
   });
 

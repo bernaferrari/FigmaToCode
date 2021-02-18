@@ -1,7 +1,10 @@
 import { AltFrameNode, AltGroupNode } from "../altNodes/altMixins";
+import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
 export const tailwindVector = (
-  group: AltFrameNode | AltGroupNode,
+  node: AltFrameNode | AltGroupNode,
+  showLayerName: boolean,
+  parentId: string,
   isJsx: boolean
 ): string => {
   // TODO VECTOR

@@ -269,6 +269,8 @@ describe("SwiftUI Color", () => {
       },
     ];
 
-    expect(swiftuiColorFromFills(node.fills)).toEqual("");
+    expect(swiftuiColorFromFills(node.fills)).toEqual(
+      "Color(red: 0.50, green: 0.23, blue: 0.27, opacity: 0.50)"
+    );
   });
 });

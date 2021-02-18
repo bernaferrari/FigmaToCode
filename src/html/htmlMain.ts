@@ -1,3 +1,4 @@
+import { retrieveTopFill } from "./../common/retrieveFill";
 import {
   AltFrameNode,
   AltSceneNode,
@@ -207,10 +208,18 @@ export const htmlContainer = (
   if (builder.style || additionalStyle) {
     const build = builder.build(additionalStyle);
 
+    let tag = "div";
+    let src = "";
+    console.log("with ", node.name, "fill", retrieveTopFill(node.fills));
+    if (retrieveTopFill(node.fills)?.type === "IMAGE") {
+      tag = "img";
+      src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+    }
+
     if (children) {
-      return `\n<div${build}>${indentString(children)}\n</div>`;
+      return `\n<${tag}${build}${src}>${indentString(children)}\n</${tag}>`;
     } else {
-      return `\n<div${build}></div>`;
+      return `\n<${tag}${build}${src}/>`;
     }
   }
 
@@ -320,7 +329,7 @@ const addSpacingIfNeeded = (
       const style = new HtmlDefaultBuilder(node, false, isJsx).build(
         formatWithJSX(wh, isJsx, node.parent.itemSpacing)
       );
-      return `\n<div${style}></div>`;
+      return `\n<div${style}/>`;
     }
   }
   return "";

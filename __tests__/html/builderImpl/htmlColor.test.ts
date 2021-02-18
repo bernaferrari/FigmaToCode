@@ -156,7 +156,7 @@ describe("HTML Color", () => {
     node.dashPattern = [];
 
     expect(htmlMain([node])).toEqual(
-      `<div style="width: 18px; height: 18px; background-image: linear-gradient(131deg, black, rgba(255, 0, 0, 1)); border-radius: 16px; border-style: solid; border-width: 4px; border-style: solid; border-color: rgba(63.75, 63.75, 63.75, 1);"></div>`
+      `<div style="width: 18px; height: 18px; background-image: linear-gradient(131deg, black, rgba(255, 0, 0, 1)); border-radius: 16px; border-style: solid; border-width: 4px; border-style: solid; border-color: rgba(63.75, 63.75, 63.75, 1);"/>`
     );
   });
 

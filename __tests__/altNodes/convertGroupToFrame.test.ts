@@ -26,7 +26,7 @@ describe("Convert Group to Frame", () => {
     const converted = convertGroupToFrame(group);
     expect(tailwindMain([convertNodesOnRectangle(converted)]))
       .toEqual(`<div class="relative w-5 h-5">
-    <div class="w-full h-full"></div>
+    <div class="w-full h-full"/>
 </div>`);
   });
 

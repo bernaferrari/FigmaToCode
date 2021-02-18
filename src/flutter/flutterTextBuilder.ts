@@ -70,7 +70,10 @@ export const getTextStyle = (node: AltTextNode): string => {
   // example: text-md
   let styleBuilder = "";
 
-  styleBuilder += flutterColorFromFills(node.fills);
+  const color = flutterColorFromFills(node.fills);
+  if (color) {
+    styleBuilder += `\n${color}`;
+  }
 
   if (node.fontSize !== figma.mixed) {
     styleBuilder += `\nfontSize: ${numToAutoFixed(node.fontSize)},`;
