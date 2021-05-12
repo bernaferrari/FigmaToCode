@@ -46,7 +46,7 @@
     "file-loader": "^6.0.0",
     "jest": "^26.6.3",
     "mini-css-extract-plugin": "^0.9.0",
-    "postcss": "^7.0.32",
+    "postcss": "^8.2.10",
     "postcss-load-config": "^2.1.0",
     "postcss-loader": "^3.0.0",
     "prettier": "^2.2.1",
