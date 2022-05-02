@@ -333,7 +333,7 @@ const addSpacingIfNeeded = (
       const style = new HtmlDefaultBuilder(node, false, isJsx).build(
         formatWithJSX(wh, isJsx, node.parent.itemSpacing)
       );
-      return isJsx ? `\n<div${style}/>` : `\n<div ${style}"></div>`;
+      return isJsx ? `\n<div${style}/>` : `\n<div${style}></div>`;
     }
   }
   return "";
