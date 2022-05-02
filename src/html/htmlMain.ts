@@ -16,6 +16,8 @@ let parentId = "";
 
 let showLayerName = false;
 
+const selfClosingTags = ["img"];
+
 export const htmlMain = (
   sceneNode: Array<AltSceneNode>,
   parentIdSrc: string = "",
@@ -218,8 +220,10 @@ export const htmlContainer = (
 
     if (children) {
       return `\n<${tag}${build}${src}>${indentString(children)}\n</${tag}>`;
+    } else if (selfClosingTags.includes(tag) || isJsx) {
+      return `\n<${tag}${build}${src} />`;
     } else {
-      return `\n<${tag}${build}${src}/>`;
+      return `\n<${tag}${build}${src}></${tag}>`;
     }
   }
 
@@ -329,7 +333,7 @@ const addSpacingIfNeeded = (
       const style = new HtmlDefaultBuilder(node, false, isJsx).build(
         formatWithJSX(wh, isJsx, node.parent.itemSpacing)
       );
-      return `\n<div${style}/>`;
+      return isJsx ? `\n<div${style}/>` : `\n<div${style}></div>`;
     }
   }
   return "";
