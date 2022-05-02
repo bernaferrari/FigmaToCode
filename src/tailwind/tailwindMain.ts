@@ -16,6 +16,8 @@ import { retrieveTopFill } from "../common/retrieveFill";
 let parentId = "";
 let showLayerName = false;
 
+const selfClosingTags = ["img"];
+
 export const tailwindMain = (
   sceneNode: Array<AltSceneNode>,
   parentIdSrc: string = "",
@@ -223,8 +225,10 @@ export const tailwindContainer = (
 
     if (children) {
       return `\n<${tag}${build}${src}>${indentString(children)}\n</${tag}>`;
+    } else if (selfClosingTags.includes(tag) || isJsx) {
+      return `\n<${tag}${build}${src} />`;
     } else {
-      return `\n<${tag}${build}${src}/>`;
+      return `\n<${tag}${build}${src}></${tag}>`;
     }
   }
 
