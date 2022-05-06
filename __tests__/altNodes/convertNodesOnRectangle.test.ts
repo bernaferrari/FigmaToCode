@@ -42,7 +42,7 @@ describe("convert node if child is big rect", () => {
 
     expect(tailwindMain([converted])).toEqual(
       `<div class="w-24 h-24">
-    <div class="w-full h-full bg-black"/>
+    <div class="w-full h-full bg-black"></div>
 </div>`
     );
   });
@@ -99,7 +99,7 @@ describe("convert node if child is big rect", () => {
     expect(tailwindMain([invisibleConverted])).toEqual(
       `<div class="w-24 h-24">
     <div class="inline-flex items-start justify-start w-full h-full pr-12 pb-12">
-        <div class="flex-1 h-full bg-white"/>
+        <div class="flex-1 h-full bg-white"></div>
     </div>
 </div>`
     );
@@ -157,7 +157,7 @@ describe("convert node if child is big rect", () => {
     expect(tailwindMain([converted])).toEqual(
       `<div class="w-5 h-5">
     <div class="inline-flex items-center justify-center w-full h-full p-1 bg-black">
-        <div class="flex-1 h-full bg-white"/>
+        <div class="flex-1 h-full bg-white"></div>
     </div>
 </div>`
     );
@@ -190,8 +190,8 @@ describe("convert node if child is big rect", () => {
 
     expect(tailwindMain([convertNodesOnRectangle(group)]))
       .toEqual(`<div class="relative" style="width: 120px; height: 20px;">
-    <div class="w-24 h-24 absolute left-0 top-0"/>
-    <div class="w-5 h-28 absolute left-0 top-0"/>
+    <div class="w-24 h-24 absolute left-0 top-0"></div>
+    <div class="w-5 h-28 absolute left-0 top-0"></div>
 </div>`);
   });
   it("group with 2 children", () => {
@@ -251,7 +251,7 @@ describe("convert node if child is big rect", () => {
 
     expect(tailwindMain([conv])).toEqual(
       `<div class="inline-flex items-start justify-start w-5 h-5 pr-3 pb-3 bg-black">
-    <div class="flex-1 h-full bg-white"/>
+    <div class="flex-1 h-full bg-white"></div>
 </div>`
     );
   });

@@ -282,7 +282,7 @@ describe("Tailwind Color", () => {
     node.cornerRadius = 16;
 
     expect(tailwindMain([node])).toEqual(
-      `<div class="w-4 h-4 bg-gradient-to-br from-black to-red-600 border-4 rounded-full border-gray-700"/>`
+      `<div class="w-4 h-4 bg-gradient-to-br from-black to-red-600 border-4 rounded-full border-gray-700"></div>`
     );
   });
 
