@@ -37,13 +37,14 @@ export const tailwindSolidColor = (fill: SolidPaint, kind: string): string => {
   // example: text-opacity-50
   // ignore the 100. If opacity was changed, let it be visible.
   const opacityProp =
-    opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)} ` : "";
+    opacity !== 1.0 ? `tw-${kind}-opacity-${nearestOpacity(opacity)} ` : "";
 
   // example: text-red-500
-  const colorProp = `${kind}-${getTailwindFromFigmaRGB(fill.color)} `;
+  const colorProp = `tw-${kind}-${getTailwindFromFigmaRGB(fill.color)} `;
 
   // if fill isn't visible, it shouldn't be painted.
-  return `${colorProp}${opacityProp}`;
+  // not sure about this one
+  return `tw-${colorProp}${opacityProp}`;
 };
 
 /**
@@ -70,12 +71,12 @@ export const tailwindGradient = (fill: GradientPaint): string => {
   if (fill.gradientStops.length === 1) {
     const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
 
-    return `${direction} from-${fromColor} `;
+    return `tw-${direction} tw-from-${fromColor} `;
   } else if (fill.gradientStops.length === 2) {
     const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
     const toColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
 
-    return `${direction} from-${fromColor} to-${toColor} `;
+    return `tw-${direction} tw-gradient-from-${fromColor} tw-gradient-to-${toColor} `;
   } else {
     const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
 
@@ -87,29 +88,29 @@ export const tailwindGradient = (fill: GradientPaint): string => {
       fill.gradientStops[fill.gradientStops.length - 1].color
     );
 
-    return `${direction} from-${fromColor} via-${viaColor} to-${toColor} `;
+    return `tw-${direction} tw-from-${fromColor} tw-via-${viaColor} tw-to-${toColor} `;
   }
 };
 
 const gradientDirection = (angle: number): string => {
   switch (nearestValue(angle, [-180, -135, -90, -45, 0, 45, 90, 135, 180])) {
     case 0:
-      return "bg-gradient-to-r";
+      return "tw-bg-gradient-to-r";
     case 45:
-      return "bg-gradient-to-br";
+      return "tw-bg-gradient-to-br";
     case 90:
-      return "bg-gradient-to-b";
+      return "tw-bg-gradient-to-b";
     case 135:
-      return "bg-gradient-to-bl";
+      return "tw-bg-gradient-to-bl";
     case -45:
-      return "bg-gradient-to-tr";
+      return "tw-bg-gradient-to-tr";
     case -90:
-      return "bg-gradient-to-t";
+      return "tw-bg-gradient-to-t";
     case -135:
-      return "bg-gradient-to-tl";
+      return "tw-bg-gradient-to-tl";
     default:
       // 180 and -180
-      return "bg-gradient-to-l";
+      return "tw-bg-gradient-to-l";
   }
 };
 
