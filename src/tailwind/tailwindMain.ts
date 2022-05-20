@@ -89,7 +89,7 @@ const tailwindGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
     .position(node, parentId);
 
   if (builder.attributes || builder.style) {
-    const attr = builder.build("relative ");
+    const attr = builder.build("tw-relative ");
 
     const generator = tailwindWidgetGenerator(node.children, isJsx);
 
@@ -119,7 +119,7 @@ const tailwindText = (
     .textDecoration(node)
     // todo text lists (<li>)
     .textAlign(node)
-    .customColor(node.fills, "text")
+    .customColor(node.fills, "tw-text")
     .textTransform(node);
 
   const splittedChars = node.characters.split("\n");
@@ -147,7 +147,7 @@ const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
     const [attr, char] = tailwindText(node.children[0], true, isJsx);
     return tailwindContainer(
       node,
-      ` placeholder="${char}"`,
+      ` tw-placeholder="${char}"`, //` to fix syntax highlighting.
       attr,
       { isRelative: false, isInput: true },
       isJsx
@@ -171,7 +171,7 @@ const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
     return tailwindContainer(
       node,
       childrenStr,
-      "relative ",
+      "tw-relative ",
       { isRelative: true, isInput: false },
       isJsx
     );
@@ -202,7 +202,7 @@ export const tailwindContainer = (
     .widthHeight(node)
     .autoLayoutPadding(node)
     .position(node, parentId, attr.isRelative)
-    .customColor(node.fills, "bg")
+    .customColor(node.fills, "tw-bg")
     // TODO image and gradient support (tailwind does not support gradients)
     .shadow(node)
     .border(node);
@@ -249,7 +249,7 @@ export const rowColumnProps = (node: AltFrameNode): string => {
 
   // [optimization]
   // flex, by default, has flex-row. Therefore, it can be omitted.
-  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "flex-col ";
+  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "tw-flex-col ";
 
   // https://tailwindcss.com/docs/space/
   // space between items
@@ -259,7 +259,7 @@ export const rowColumnProps = (node: AltFrameNode): string => {
   // space is visually ignored when there is only one child or spacing is zero
   const space =
     node.children.length > 1 && spacing > 0
-      ? `space-${spaceDirection}-${spacing} `
+      ? `tw-space-${spaceDirection}-${spacing} `
       : "";
 
   // special case when there is only one children; need to position correctly in Flex.
@@ -281,16 +281,16 @@ export const rowColumnProps = (node: AltFrameNode): string => {
 
   switch (node.primaryAxisAlignItems) {
     case "MIN":
-      primaryAlign = "justify-start ";
+      primaryAlign = "tw-justify-start ";
       break;
     case "CENTER":
-      primaryAlign = "justify-center ";
+      primaryAlign = "tw-justify-center ";
       break;
     case "MAX":
-      primaryAlign = "justify-end ";
+      primaryAlign = "tw-justify-end ";
       break;
     case "SPACE_BETWEEN":
-      primaryAlign = "justify-between ";
+      primaryAlign = "tw-justify-between ";
       break;
   }
 
@@ -299,13 +299,13 @@ export const rowColumnProps = (node: AltFrameNode): string => {
   let counterAlign: string;
   switch (node.counterAxisAlignItems) {
     case "MIN":
-      counterAlign = "items-start ";
+      counterAlign = "tw-items-start ";
       break;
     case "CENTER":
-      counterAlign = "items-center ";
+      counterAlign = "tw-items-center ";
       break;
     case "MAX":
-      counterAlign = "items-end ";
+      counterAlign = "tw-items-end ";
       break;
   }
 
@@ -320,8 +320,8 @@ export const rowColumnProps = (node: AltFrameNode): string => {
     node.parent &&
     "layoutMode" in node.parent &&
     node.parent.layoutMode === node.layoutMode
-      ? "flex "
-      : "inline-flex ";
+      ? "tw-flex "
+      : "tw-inline-flex ";
 
   return `${flex}${rowOrColumn}${space}${counterAlign}${primaryAlign}`;
 };
