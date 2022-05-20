@@ -11,7 +11,7 @@ import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 export const tailwindOpacity = (node: AltBlendMixin): string => {
   // [when testing] node.opacity can be undefined
   if (node.opacity !== undefined && node.opacity !== 1) {
-    return `opacity-${nearestOpacity(node.opacity)} `;
+    return `tw-opacity-${nearestOpacity(node.opacity)} `;
   }
   return "";
 };
@@ -27,7 +27,7 @@ export const tailwindVisibility = (node: AltSceneNode): string => {
   // Therefore, instead of changing the visibility (which causes bugs in nested divs),
   // this plugin is going to ignore color and stroke
   if (node.visible !== undefined && !node.visible) {
-    return "invisible ";
+    return "tw-invisible ";
   }
   return "";
 };
@@ -66,7 +66,7 @@ export const tailwindRotation = (node: AltLayoutMixin): string => {
       nearest = -nearest;
     }
 
-    return `transform ${minusIfNegative}rotate-${nearest} `;
+    return `tw-transform ${minusIfNegative}rotate-${nearest} `;
   }
   return "";
 };
