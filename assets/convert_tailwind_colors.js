@@ -370,9 +370,26 @@ const tailwind_colors = {
   },
 };
 
+const cc_colors = {
+  "cc-teal": {
+    tint: "hsla(178, 82%, 79%, 1)",
+    base: "hsla(179, 97%, 38%, 1)",
+    50: "hsla(179, 34%, 93%, 1)",
+    100: "hsla(179, 33%, 85%, 1)",
+    200: "hsla(179, 33%, 78%, 1)",
+    300: "hsla(179, 33%, 70%, 1)",
+    400: "hsla(179, 32%, 63%, 1)",
+    500: "hsla(179, 32%, 55%, 1)",
+    600: "hsla(179, 36%, 48%, 1)",
+    700: "hsla(179, 48%, 41%, 1)",
+    800: "hsla(179, 67%, 33%, 1)",
+    900: "hsla(179, 97%, 25%, 1)",
+  },
+};
+
 // Step #2: Transform that into an array (Array(2), Array(2), ...);
 // Example: ["fuchsia", {…}] where {…} is {50: "#fdf4ff", ...}
-const colorsArr = Object.entries(tailwind_colors);
+const colorsArr = Object.entries(cc_colors);
 
 // Step #3: Transform into (Array(10), Array(10), ...) while reverting key-value;
 // Example: {#fdf4ff: "fuchsia-50"}
