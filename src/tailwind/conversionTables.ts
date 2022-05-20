@@ -16,7 +16,7 @@ const pixelToTailwindValue = (
 ) => {
   return conversionMap[
     nearestValue(
-      value / 16,
+      value / 12,
       Object.keys(conversionMap).map((d) => +d)
     )
   ];
