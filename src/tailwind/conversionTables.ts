@@ -23,11 +23,11 @@ const pixelToTailwindValue = (
 };
 
 const mapLetterSpacing: Record<number, string> = {
-  "-0.05": "tighter",
-  "-0.025": "tight",
+  // "-0.05": "tighter",
+  "-0.05": "tight",
   // 0: "normal",
-  0.025: "wide",
-  0.05: "wider",
+  0.05: "wide",
+  // 0.05: "wider",
   0.1: "widest",
 };
 
@@ -54,8 +54,8 @@ const mapFontSize: Record<number, string> = {
   1.875: "3xl",
   2.25: "4xl",
   3: "5xl",
-  3.75: "6xl",
-  4.5: "7xl",
+  4: "6xl",
+  5.5: "7xl",
   6: "8xl",
   8: "9xl",
 };
