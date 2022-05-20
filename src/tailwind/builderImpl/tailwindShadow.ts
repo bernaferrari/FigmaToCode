@@ -13,13 +13,13 @@ export const tailwindShadow = (node: AltBlendMixin): string => {
     let boxShadow = "";
     // simple shadow from tailwind
     if (dropShadow.length > 0) {
-      boxShadow = "shadow ";
+      boxShadow = "tw-shadow ";
     }
 
     const innerShadow =
       node.effects.filter((d): d is ShadowEffect => d.type === "INNER_SHADOW")
         .length > 0
-        ? "shadow-inner "
+        ? "tw-shadow-inner "
         : "";
 
     return boxShadow + innerShadow;
