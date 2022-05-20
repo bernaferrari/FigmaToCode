@@ -38,7 +38,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     // example: text-md
     if (node.fontSize !== figma.mixed) {
       const value = pxToFontSize(node.fontSize);
-      this.attributes += `text-${value} `;
+      this.attributes += `tw-text-${value} `;
     }
 
     return this;
@@ -67,7 +67,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         .replace(" ", "")
         .toLowerCase();
 
-      this.attributes += `font-${value} `;
+      this.attributes += `tw-font-${value} `;
     }
     return this;
   }
@@ -80,7 +80,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     const letterSpacing = commonLetterSpacing(node);
     if (letterSpacing > 0) {
       const value = pxToLetterSpacing(letterSpacing);
-      this.attributes += `tracking-${value} `;
+      this.attributes += `tw-tracking-${value} `;
     }
 
     return this;
@@ -94,7 +94,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     const lineHeight = commonLineHeight(node);
     if (lineHeight > 0) {
       const value = pxToLineHeight(lineHeight);
-      this.attributes += `leading-${value} `;
+      this.attributes += `tw-leading-${value} `;
     }
 
     return this;
@@ -112,13 +112,13 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       // todo when node.textAutoResize === "WIDTH_AND_HEIGHT" and there is no \n in the text, this can be ignored.
       switch (node.textAlignHorizontal) {
         case "CENTER":
-          this.attributes += `text-center `;
+          this.attributes += `tw-text-center `;
           break;
         case "RIGHT":
-          this.attributes += `text-right `;
+          this.attributes += `tw-text-right `;
           break;
         case "JUSTIFIED":
-          this.attributes += `text-justify `;
+          this.attributes += `tw-text-justify `;
           break;
       }
     }
@@ -150,9 +150,9 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    */
   textDecoration(node: AltTextNode): this {
     if (node.textDecoration === "UNDERLINE") {
-      this.attributes += "underline ";
+      this.attributes += "tw-underline ";
     } else if (node.textDecoration === "STRIKETHROUGH") {
-      this.attributes += "line-through ";
+      this.attributes += "tw-line-through ";
     }
 
     return this;
