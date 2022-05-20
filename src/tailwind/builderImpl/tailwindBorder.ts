@@ -16,7 +16,7 @@ export const tailwindBorderWidth = (node: AltGeometryMixin): string => {
       // special case
       return "border ";
     } else {
-      return `border-${nearest} `;
+      return `tw-border-${nearest} `;
     }
   }
   return "";
@@ -29,7 +29,7 @@ export const tailwindBorderWidth = (node: AltGeometryMixin): string => {
  */
 export const tailwindBorderRadius = (node: AltSceneNode): string => {
   if (node.type === "ELLIPSE") {
-    return "rounded-full ";
+    return "tw-rounded-full ";
   } else if (
     (!("cornerRadius" in node) && !("topLeftRadius" in node)) ||
     (node.cornerRadius === figma.mixed && node.topLeftRadius === undefined) ||
@@ -45,23 +45,23 @@ export const tailwindBorderRadius = (node: AltSceneNode): string => {
   if (node.cornerRadius !== figma.mixed) {
     if (node.cornerRadius >= node.height / 2) {
       // special case. If height is 90 and cornerRadius is 45, it is full.
-      comp += "rounded-full ";
+      comp += "tw-rounded-full ";
     } else {
-      comp += `rounded${pxToBorderRadius(node.cornerRadius)} `;
+      comp += `tw-rounded${pxToBorderRadius(node.cornerRadius)} `;
     }
   } else {
     // todo optimize for tr/tl/br/bl instead of t/r/l/b
     if (node.topLeftRadius !== 0) {
-      comp += `rounded-tl${pxToBorderRadius(node.topLeftRadius)} `;
+      comp += `tw-rounded-tl${pxToBorderRadius(node.topLeftRadius)} `;
     }
     if (node.topRightRadius !== 0) {
-      comp += `rounded-tr${pxToBorderRadius(node.topRightRadius)} `;
+      comp += `tw-rounded-tr${pxToBorderRadius(node.topRightRadius)} `;
     }
     if (node.bottomLeftRadius !== 0) {
-      comp += `rounded-bl${pxToBorderRadius(node.bottomLeftRadius)} `;
+      comp += `tw-rounded-bl${pxToBorderRadius(node.bottomLeftRadius)} `;
     }
     if (node.bottomRightRadius !== 0) {
-      comp += `rounded-br${pxToBorderRadius(node.bottomRightRadius)} `;
+      comp += `tw-rounded-br${pxToBorderRadius(node.bottomRightRadius)} `;
     }
   }
 
