@@ -15,17 +15,17 @@ export const tailwindPadding = (
   }
 
   if ("all" in padding) {
-    return `p-${pxToLayoutSize(padding.all)} `;
+    return `tw-p-${pxToLayoutSize(padding.all)} `;
   }
 
   let comp = "";
 
   // horizontal and vertical, as the default AutoLayout
   if (padding.horizontal) {
-    comp += `px-${pxToLayoutSize(padding.horizontal)} `;
+    comp += `tw-px-${pxToLayoutSize(padding.horizontal)} `;
   }
   if (padding.vertical) {
-    comp += `py-${pxToLayoutSize(padding.vertical)} `;
+    comp += `tw-py-${pxToLayoutSize(padding.vertical)} `;
   }
 
   // if left and right exists, verify if they are the same after [pxToLayoutSize] conversion.
@@ -34,14 +34,14 @@ export const tailwindPadding = (
     const right = pxToLayoutSize(padding.right);
 
     if (left === right) {
-      comp += `px-${left} `;
+      comp += `tw-px-${left} `;
     } else {
-      comp += `pl-${left} pr-${right} `;
+      comp += `tw-pl-${left} pr-${right} `;
     }
   } else if (padding.left) {
-    comp += `pl-${pxToLayoutSize(padding.left)} `;
+    comp += `tw-pl-${pxToLayoutSize(padding.left)} `;
   } else if (padding.right) {
-    comp += `pr-${pxToLayoutSize(padding.right)} `;
+    comp += `tw-pr-${pxToLayoutSize(padding.right)} `;
   }
 
   // if top and bottom exists, verify if they are the same after [pxToLayoutSize] conversion.
@@ -50,14 +50,14 @@ export const tailwindPadding = (
     const bottom = pxToLayoutSize(padding.bottom);
 
     if (top === bottom) {
-      comp += `py-${top} `;
+      comp += `tw-py-${top} `;
     } else {
-      comp += `pt-${top} pb-${bottom} `;
+      comp += `tw-pt-${top} pb-${bottom} `;
     }
   } else if (padding.top) {
-    comp += `pt-${pxToLayoutSize(padding.top)} `;
+    comp += `tw-pt-${pxToLayoutSize(padding.top)} `;
   } else if (padding.bottom) {
-    comp += `pb-${pxToLayoutSize(padding.bottom)} `;
+    comp += `tw-pb-${pxToLayoutSize(padding.bottom)} `;
   }
 
   return comp;
