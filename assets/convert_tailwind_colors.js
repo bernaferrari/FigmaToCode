@@ -385,6 +385,9 @@ const cc_colors = {
     800: "#1c8d8b",
     900: "#027e7c",
   },
+  "cc-red": {
+    200: "#fcdad3",
+  },
 };
 
 // Step #2: Transform that into an array (Array(2), Array(2), ...);
