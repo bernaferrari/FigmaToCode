@@ -389,7 +389,7 @@ const cc_colors = {
 
 // Step #2: Transform that into an array (Array(2), Array(2), ...);
 // Example: ["fuchsia", {…}] where {…} is {50: "#fdf4ff", ...}
-const colorsArr = Object.entries(cc_colors);
+const colorsArr = Object.entries({ ...tailwind_colors, ...cc_colors });
 
 // Step #3: Transform into (Array(10), Array(10), ...) while reverting key-value;
 // Example: {#fdf4ff: "fuchsia-50"}
