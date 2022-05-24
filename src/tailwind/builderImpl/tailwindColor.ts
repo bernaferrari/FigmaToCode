@@ -44,7 +44,7 @@ export const tailwindSolidColor = (fill: SolidPaint, kind: string): string => {
 
   // if fill isn't visible, it shouldn't be painted.
   // not sure about this one
-  return `tw-${colorProp}${opacityProp}`;
+  return `${colorProp}${opacityProp}`;
 };
 
 /**
@@ -95,22 +95,22 @@ export const tailwindGradient = (fill: GradientPaint): string => {
 const gradientDirection = (angle: number): string => {
   switch (nearestValue(angle, [-180, -135, -90, -45, 0, 45, 90, 135, 180])) {
     case 0:
-      return "tw-bg-gradient-to-r";
+      return "bg-gradient-to-r";
     case 45:
-      return "tw-bg-gradient-to-br";
+      return "bg-gradient-to-br";
     case 90:
-      return "tw-bg-gradient-to-b";
+      return "bg-gradient-to-b";
     case 135:
-      return "tw-bg-gradient-to-bl";
+      return "bg-gradient-to-bl";
     case -45:
-      return "tw-bg-gradient-to-tr";
+      return "bg-gradient-to-tr";
     case -90:
-      return "tw-bg-gradient-to-t";
+      return "bg-gradient-to-t";
     case -135:
-      return "tw-bg-gradient-to-tl";
+      return "bg-gradient-to-tl";
     default:
       // 180 and -180
-      return "tw-bg-gradient-to-l";
+      return "bg-gradient-to-l";
   }
 };
 

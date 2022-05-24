@@ -16,7 +16,7 @@ export const tailwindBorderWidth = (node: AltGeometryMixin): string => {
       // special case
       return "tw-border ";
     } else {
-      return `tw-border-${nearest} `;
+      return `border-${nearest} `;
     }
   }
   return "";

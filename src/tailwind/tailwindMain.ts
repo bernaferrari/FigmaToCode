@@ -119,7 +119,7 @@ const tailwindText = (
     .textDecoration(node)
     // todo text lists (<li>)
     .textAlign(node)
-    .customColor(node.fills, "tw-text")
+    .customColor(node.fills, "text")
     .textTransform(node);
 
   const splittedChars = node.characters.split("\n");
@@ -202,7 +202,7 @@ export const tailwindContainer = (
     .widthHeight(node)
     .autoLayoutPadding(node)
     .position(node, parentId, attr.isRelative)
-    .customColor(node.fills, "tw-bg")
+    .customColor(node.fills, "bg")
     // TODO image and gradient support (tailwind does not support gradients)
     .shadow(node)
     .border(node);
