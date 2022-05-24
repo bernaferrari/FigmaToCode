@@ -14,7 +14,7 @@ export const tailwindBorderWidth = (node: AltGeometryMixin): string => {
     const nearest = nearestValue(node.strokeWeight, allowedValues);
     if (nearest === 1) {
       // special case
-      return "border ";
+      return "tw-border ";
     } else {
       return `tw-border-${nearest} `;
     }
