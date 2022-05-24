@@ -12,7 +12,7 @@ export const tailwindSizePartial = (node: AltSceneNode): [string, string] => {
 
   let w = "";
   if (typeof size.width === "number") {
-    w += `w-${pxToLayoutSize(size.width)} `;
+    w += `tw-w-${pxToLayoutSize(size.width)} `;
   } else if (typeof size.width === "string") {
     if (
       size.width === "full" &&
@@ -20,9 +20,9 @@ export const tailwindSizePartial = (node: AltSceneNode): [string, string] => {
       "layoutMode" in node.parent &&
       node.parent.layoutMode === "HORIZONTAL"
     ) {
-      w += `flex-1 `;
+      w += `tw-flex-1 `;
     } else {
-      w += `w-${size.width} `;
+      w += `tw-w-${size.width} `;
     }
   }
 
@@ -30,7 +30,7 @@ export const tailwindSizePartial = (node: AltSceneNode): [string, string] => {
   // console.log("sizeResults is ", sizeResult, node);
 
   if (typeof size.height === "number") {
-    h = `h-${pxToLayoutSize(size.height)} `;
+    h = `tw-h-${pxToLayoutSize(size.height)} `;
   } else if (typeof size.height === "string") {
     if (
       size.height === "full" &&
@@ -38,9 +38,9 @@ export const tailwindSizePartial = (node: AltSceneNode): [string, string] => {
       "layoutMode" in node.parent &&
       node.parent.layoutMode === "VERTICAL"
     ) {
-      h += `flex-1 `;
+      h += `tw-flex-1 `;
     } else {
-      h += `h-${size.height} `;
+      h += `tw-h-${size.height} `;
     }
   }
 
