@@ -52,7 +52,7 @@ export const tailwindPadding = (
     if (top === bottom) {
       comp += `tw-py-${top} `;
     } else {
-      comp += `tw-pt-${top} pb-${bottom} `;
+      comp += `tw-pt-${top} tw-pb-${bottom} `;
     }
   } else if (padding.top) {
     comp += `tw-pt-${pxToLayoutSize(padding.top)} `;
