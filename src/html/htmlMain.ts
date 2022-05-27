@@ -204,7 +204,7 @@ export const htmlContainer = (
     .border(node);
 
   if (isInput) {
-    return `\n<input${builder.build(additionalStyle)}>${children}</input>`;
+    return `\n<input${builder.build(additionalStyle)}${children}></input>`;
   }
 
   if (builder.style || additionalStyle) {
