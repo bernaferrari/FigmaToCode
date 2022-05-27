@@ -144,7 +144,7 @@ describe("HTML Main", () => {
 
     frameNode.name = "this is the InPuT";
     expect(htmlMain([frameNode])).toEqual(
-      '<input style="font-size: 26px;"> placeholder="username"</input>'
+      '<input style="font-size: 26px;" placeholder="username"></input>'
     );
   });
 
