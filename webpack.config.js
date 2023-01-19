@@ -15,6 +15,9 @@ const commonConfig = {
         extensions: ['.tsx', '.ts', '.js', '.svelte'],
         mainFields: ['svelte', 'browser', 'module', 'main']
     },
+    optimization: {
+        minimize: prod
+    },
     module: {
         rules: [
             {
