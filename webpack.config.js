@@ -1,4 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const tailwindcss = require('tailwindcss');
 const path = require('path');
 
 const mode = process.env.NODE_ENV || 'development';
@@ -25,7 +27,7 @@ const commonConfig = {
                 use: {
                     loader: 'svelte-loader',
                     options: {
-                        // emitCss: true,
+                        emitCss: true,
                         // hotReload: true,
                         preprocess:  require('svelte-preprocess')({})
                     }
@@ -39,7 +41,16 @@ const commonConfig = {
                      * For developing, use 'style-loader' instead.
                      * */
                     prod ? MiniCssExtractPlugin.loader : 'style-loader',
-                    'css-loader'
+                    'css-loader',
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            plugins: [
+                                tailwindcss(path.join(__dirname, 'tailwind.config.js')),
+                                require('autoprefixer'),
+                            ],
+                        },
+                    },
                 ]
             },
             {
@@ -52,7 +63,7 @@ const commonConfig = {
     plugins: [
         new MiniCssExtractPlugin({
             filename: '[name].css'
-        })
+        }),
     ],
 };
 
@@ -74,7 +85,15 @@ module.exports = [
             filename: 'bundle.js',
             path: path.resolve(__dirname, 'src', 'build'),
             library: 'ui',
-            libraryTarget: 'umd'
+            libraryTarget: 'var'
         },
+        plugins: [
+            ...commonConfig.plugins,
+            new HtmlWebpackPlugin({
+                title: 'My App',
+                template: "src/template.html",
+                filename: "public/index.html",
+            })
+        ]
     },
 ];
