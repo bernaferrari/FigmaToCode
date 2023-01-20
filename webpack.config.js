@@ -33,7 +33,11 @@ const commonConfig = {
                 use: {
                     loader: 'svelte-loader',
                     options: {
-                        preprocess: require('svelte-preprocess')({}),
+                        preprocess: require('svelte-preprocess')({
+                            // crashes the build in webpack
+                            // do not use
+                            // postcss: true
+                        }),
                         compilerOptions: {
                             // NOTE Svelte's dev mode MUST be enabled for HMR to work
                             dev: !prod,
@@ -91,7 +95,6 @@ module.exports = [
         entry: './src/main.js',
         output: {
             filename: 'bundle.js',
-            // path: path.resolve(__dirname, 'src', 'build'),
             path: path.resolve(__dirname, 'public'),
             library: 'ui',
             libraryTarget: 'var',
