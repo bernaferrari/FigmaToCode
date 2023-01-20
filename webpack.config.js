@@ -4,7 +4,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 const { HotModuleReplacementPlugin } = require('webpack')
 const preprocess = require('svelte-preprocess')
-const tailwindcss = require('tailwindcss')
 
 console.log('env', process.env.NODE_ENV)
 
@@ -36,7 +35,7 @@ const commonConfig = {
                     loader: 'svelte-loader',
                     options: {
                         preprocess: preprocess({
-                            // postcss: true,
+                            postcss: true,
                         }),
                         compilerOptions: {
                             // NOTE Svelte's dev mode MUST be enabled for HMR to work
