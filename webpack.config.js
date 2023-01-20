@@ -2,7 +2,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
-const { HotModuleReplacementPlugin } = require('webpack');
 const tailwindcss = require('tailwindcss');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
@@ -24,6 +23,10 @@ const commonConfig = {
     minimize: prod,
     minimizer: ['...', new CssMinimizerPlugin({ parallel: true })],
   },
+  devServer: {
+    hot: true,
+  },
+
   module: {
     rules: [
       {
@@ -86,7 +89,6 @@ const commonConfig = {
   },
   mode,
   plugins: [
-    ...(!prod ? [new HotModuleReplacementPlugin()] : []),
     new MiniCssExtractPlugin({
       filename: '[name].css',
     }),
@@ -116,7 +118,7 @@ module.exports = [
     plugins: [
       ...commonConfig.plugins,
       new HtmlWebpackPlugin({
-        title: 'My App',
+        title: 'FigmaToCode',
         template: 'src/template.html',
         filename: path.join(__dirname, 'public/index.html'),
       }),
