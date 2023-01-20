@@ -51,7 +51,7 @@
     "style-loader": "^2.0.0",
     "svelte": "^3.35.0",
     "svelte-loader": "^3.0.0",
-    "svelte-preprocess": "^4.6.9",
+    "svelte-preprocess": "^5.0.1",
     "svg-inline-loader": "^0.8.2",
     "ts-jest": "^26.5.3",
     "ts-loader": "^8.0.17",

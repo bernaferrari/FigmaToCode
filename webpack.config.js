@@ -3,7 +3,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 const { HotModuleReplacementPlugin } = require('webpack')
-const preprocess = require('svelte-preprocess')
 
 console.log('env', process.env.NODE_ENV)
 
@@ -34,9 +33,7 @@ const commonConfig = {
                 use: {
                     loader: 'svelte-loader',
                     options: {
-                        preprocess: preprocess({
-                            postcss: true,
-                        }),
+                        preprocess: require('svelte-preprocess')({}),
                         compilerOptions: {
                             // NOTE Svelte's dev mode MUST be enabled for HMR to work
                             dev: !prod,
