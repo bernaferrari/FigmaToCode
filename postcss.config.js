@@ -1,19 +1,11 @@
-
-const production = !process.env.ROLLUP_WATCH || process.env.PRODUCTION;
-
-const tailwind = require("tailwindcss");
-
-const autoprefixer = require("autoprefixer");
-
-const purgecss = require("@fullhuman/postcss-purgecss")({
-  content: ["./src/**/*.svelte", "./src/**/*.html"],
-  whitelistPatterns: [/svelte-/],
-  whitelistPatternsChildren: [/^token/, /^Prism/, /^code/, /^pre/],
-  defaultExtractor: (content) => content.match(/[A-Za-z0-9-_:/]+/g) || [],
-})
-
-const cssnano = require("cssnano");
+/* eslint-disable @typescript-eslint/no-var-requires */
+const tailwindcss = require('tailwindcss')
+const path = require('path')
 
 module.exports = {
-  plugins: [tailwind, ...(production ? [autoprefixer, purgecss, cssnano] : [])],
+    plugins: [
+        require('postcss-import'),
+        tailwindcss(path.join(__dirname, 'tailwind.config.js')),
+        require('autoprefixer'),
+    ],
 }
