@@ -11,10 +11,11 @@ const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
 
 const commonConfig = {
+  mode,
   devtool: prod ? false : 'inline-source-map',
   resolve: {
     alias: {
-      svelte: path.resolve('node_modules', 'svelte'),
+      svelte: path.dirname(require.resolve('svelte/package.json')),
     },
     extensions: ['.tsx', '.ts', '.js', '.svelte'],
     mainFields: ['svelte', 'browser', 'module', 'main'],
@@ -42,7 +43,7 @@ const commonConfig = {
             preprocess: require('svelte-preprocess')({
               // crashes the build in webpack
               // do not use
-              // postcss: true
+              // postcss: true,
             }),
             compilerOptions: {
               // NOTE Svelte's dev mode MUST be enabled for HMR to work
@@ -81,13 +82,8 @@ const commonConfig = {
           },
         ],
       },
-      {
-        test: /\.svg$/,
-        loader: 'svg-inline-loader',
-      },
     ],
   },
-  mode,
   plugins: [
     new MiniCssExtractPlugin({
       filename: '[name].css',
