@@ -12,6 +12,13 @@ const prod = mode === 'production';
 
 const commonConfig = {
   mode,
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename],
+    },
+    cacheDirectory: path.resolve(__dirname, 'node_modules/.cache/webpack'),
+  },
   devtool: prod ? false : 'inline-source-map',
   resolve: {
     alias: {
