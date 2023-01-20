@@ -68,7 +68,7 @@ const commonConfig = {
     },
     mode,
     plugins: [
-        new HotModuleReplacementPlugin(),
+        ...(!prod ? [new HotModuleReplacementPlugin()] : []),
         new MiniCssExtractPlugin({
             filename: '[name].css',
         }),
@@ -91,7 +91,8 @@ module.exports = [
         entry: './src/main.js',
         output: {
             filename: 'bundle.js',
-            path: path.resolve(__dirname, 'src', 'build'),
+            // path: path.resolve(__dirname, 'src', 'build'),
+            path: path.resolve(__dirname, 'public'),
             library: 'ui',
             libraryTarget: 'var',
         },
