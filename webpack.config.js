@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const { HotModuleReplacementPlugin } = require('webpack');
 const tailwindcss = require('tailwindcss');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 console.log('env', process.env.NODE_ENV);
 
@@ -21,6 +22,7 @@ const commonConfig = {
   },
   optimization: {
     minimize: prod,
+    minimizer: ['...', new CssMinimizerPlugin({ parallel: true })],
   },
   module: {
     rules: [

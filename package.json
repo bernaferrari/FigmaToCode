@@ -30,6 +30,7 @@
     "@typescript-eslint/parser": "^4.17.0",
     "autoprefixer": "^10.4.13",
     "css-loader": "^6.7.3",
+    "css-minimizer-webpack-plugin": "^4.2.2",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jest": "^24.1.9",
