@@ -1,9 +1,14 @@
+const prod = process.env.NODE_ENV === 'production';
+
 module.exports = {
-    purge: ['./src/**/*.svelte', './src/**/*.html', './src/**/*.js'],
-    darkMode: false, // or 'media' or 'class'
-    theme: {
-        extend: {},
-    },
-    variants: {},
-    plugins: [],
-}
+  purge: {
+    enabled: prod,
+    content: ['./src/**/*.svelte'],
+  },
+  darkMode: false, // or 'media' or 'class'
+  theme: {
+    extend: {},
+  },
+  variants: {},
+  plugins: [],
+};

@@ -3,6 +3,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const { HotModuleReplacementPlugin } = require('webpack');
+const tailwindcss = require('tailwindcss');
 
 console.log('env', process.env.NODE_ENV);
 
@@ -61,7 +62,17 @@ const commonConfig = {
               url: false, // necessary if you use url('/path/to/some/asset.png|jpg|gif')
             },
           },
-          'postcss-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  tailwindcss(path.join(__dirname, 'tailwind.config.js')),
+                  require('autoprefixer'),
+                ],
+              },
+            },
+          },
         ],
       },
       {
