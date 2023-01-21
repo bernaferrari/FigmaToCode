@@ -1,35 +1,35 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
-const tailwindcss = require('tailwindcss');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require("path");
+const tailwindcss = require("tailwindcss");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
-console.log('env', process.env.NODE_ENV);
+console.log("env", process.env.NODE_ENV);
 
-const mode = process.env.NODE_ENV || 'development';
-const prod = mode === 'production';
+const mode = process.env.NODE_ENV || "development";
+const prod = mode === "production";
 
 const commonConfig = {
   mode,
   cache: {
-    type: 'filesystem',
+    type: "filesystem",
     buildDependencies: {
       config: [__filename],
     },
-    cacheDirectory: path.resolve(__dirname, 'node_modules/.cache/webpack'),
+    cacheDirectory: path.resolve(__dirname, "node_modules/.cache/webpack"),
   },
-  devtool: prod ? false : 'inline-source-map',
+  devtool: prod ? false : "inline-source-map",
   resolve: {
     alias: {
-      svelte: path.dirname(require.resolve('svelte/package.json')),
+      svelte: path.dirname(require.resolve("svelte/package.json")),
     },
-    extensions: ['.tsx', '.ts', '.js', '.svelte'],
-    mainFields: ['svelte', 'browser', 'module', 'main'],
+    extensions: [".tsx", ".ts", ".js", ".svelte"],
+    mainFields: ["svelte", "browser", "module", "main"],
   },
   optimization: {
     minimize: prod,
-    minimizer: ['...', new CssMinimizerPlugin({ parallel: true })],
+    minimizer: ["...", new CssMinimizerPlugin({ parallel: true })],
   },
   devServer: {
     hot: true,
@@ -39,15 +39,15 @@ const commonConfig = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
       },
       {
         test: /\.svelte$/,
         use: {
-          loader: 'svelte-loader',
+          loader: "svelte-loader",
           options: {
-            preprocess: require('svelte-preprocess')({
+            preprocess: require("svelte-preprocess")({
               // crashes the build in webpack
               // do not use
               // postcss: true,
@@ -70,19 +70,19 @@ const commonConfig = {
           MiniCssExtractPlugin.loader,
           // 'style-loader',
           {
-            loader: 'css-loader',
+            loader: "css-loader",
             options: {
               sourceMap: !prod,
               url: false, // necessary if you use url('/path/to/some/asset.png|jpg|gif')
             },
           },
           {
-            loader: 'postcss-loader',
+            loader: "postcss-loader",
             options: {
               postcssOptions: {
                 plugins: [
-                  tailwindcss(path.join(__dirname, 'tailwind.config.js')),
-                  require('autoprefixer'),
+                  tailwindcss(path.join(__dirname, "tailwind.config.js")),
+                  require("autoprefixer"),
                 ],
               },
             },
@@ -93,7 +93,7 @@ const commonConfig = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: "[name].css",
     }),
   ],
 };
@@ -101,29 +101,29 @@ const commonConfig = {
 module.exports = [
   {
     ...commonConfig,
-    name: 'code',
-    entry: './src/code.ts',
+    name: "code",
+    entry: "./src/code.ts",
     output: {
-      filename: 'code.js',
-      path: path.resolve(__dirname, 'public'),
+      filename: "code.js",
+      path: path.resolve(__dirname, "public"),
     },
   },
   {
     ...commonConfig,
-    name: 'ui',
-    entry: './src/main.js',
+    name: "ui",
+    entry: "./src/main.js",
     output: {
-      filename: 'bundle.js',
-      path: path.resolve(__dirname, 'public'),
-      library: 'ui',
-      libraryTarget: 'var',
+      filename: "bundle.js",
+      path: path.resolve(__dirname, "public"),
+      library: "ui",
+      libraryTarget: "var",
     },
     plugins: [
       ...commonConfig.plugins,
       new HtmlWebpackPlugin({
-        title: 'FigmaToCode',
-        template: 'src/template.html',
-        filename: path.join(__dirname, 'public/index.html'),
+        title: "FigmaToCode",
+        template: "src/template.html",
+        filename: path.join(__dirname, "public/index.html"),
       }),
     ],
   },
