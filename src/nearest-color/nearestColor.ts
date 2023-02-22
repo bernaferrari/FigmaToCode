@@ -57,18 +57,18 @@
 function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
   needle = parseColor(needle);
 
-  let distanceSq,
-    minDistanceSq = Infinity,
-    rgb,
-    value: ColorSpec;
+  let distanceSq;
+        let minDistanceSq = Infinity,
+         rgb,
+         value: ColorSpec;
 
   for (let i = 0; i < colors.length; ++i) {
     rgb = colors[i].rgb;
 
     distanceSq =
-      Math.pow(needle.r - rgb.r, 2) +
-      Math.pow(needle.g - rgb.g, 2) +
-      Math.pow(needle.b - rgb.b, 2);
+      (needle.r - rgb.r)**2 +
+      (needle.g - rgb.g)**2 +
+      (needle.b - rgb.b)**2;
 
     if (distanceSq < minDistanceSq) {
       minDistanceSq = distanceSq;
@@ -76,7 +76,7 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
     }
   }
 
-  // @ts-ignore this is always not null
+  // @ts-expect-error this is always not null
   return value.source;
 }
 
@@ -202,7 +202,7 @@ function parseColor(source: RGB | string): RGB {
     return { r: red, g: green, b: blue };
   }
 
-  throw Error('"' + source + '" is not a valid color');
+  throw Error(`"${  source  }" is not a valid color`);
 }
 
 type RGB = {

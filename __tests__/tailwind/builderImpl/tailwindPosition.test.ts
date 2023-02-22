@@ -2,7 +2,7 @@ import { tailwindPosition } from "../../../src/tailwind/builderImpl/tailwindPosi
 import { AltFrameNode } from "../../../src/altNodes/altMixins";
 
 describe("Tailwind Position", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

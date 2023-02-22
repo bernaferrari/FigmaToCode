@@ -5,7 +5,7 @@ import {
 import { htmlSize } from "../../../src/html/builderImpl/htmlSize";
 
 describe("HTML Size", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

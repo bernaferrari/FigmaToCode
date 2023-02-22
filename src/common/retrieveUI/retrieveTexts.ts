@@ -1,9 +1,9 @@
+import { AltSceneNode } from "../../altNodes/altMixins";
+import { retrieveTopFill } from "../retrieveFill";
 import { swiftuiMain } from "./../../swiftui/swiftuiMain";
 import { tailwindMain } from "./../../tailwind/tailwindMain";
 import { htmlBuilder, htmlMain } from "./../../html/htmlMain";
 import { flutterMain } from "./../../flutter/flutterMain";
-import { AltSceneNode } from "../../altNodes/altMixins";
-import { retrieveTopFill } from "../retrieveFill";
 import { calculateContrastRatio, deepFlatten } from "./commonUI";
 
 type exportFramework = "flutter" | "swiftui" | "html" | "tailwind";
@@ -55,9 +55,9 @@ export const retrieveGenericUIText = (
 
       textStr.push({
         name: node.name,
-        style: style,
-        code: code,
-        contrastBlack: contrastBlack,
+        style,
+        code,
+        contrastBlack,
       });
     }
   });
@@ -66,7 +66,7 @@ export const retrieveGenericUIText = (
   // from https://stackoverflow.com/a/18923480/4418073
   const unique: Record<string, boolean> = {};
   const distinct: Array<namedText> = [];
-  textStr.forEach(function (x) {
+  textStr.forEach((x) => {
     if (!unique[x.code + x.name]) {
       distinct.push(x);
       unique[x.code + x.name] = true;

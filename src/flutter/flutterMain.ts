@@ -1,16 +1,15 @@
-import { indentString } from "./../common/indentString";
 import {
   AltEllipseNode,
   AltFrameNode,
   AltRectangleNode,
   AltGroupNode,
   AltTextNode,
-} from "../altNodes/altMixins";
-import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
-import { AltSceneNode } from "../altNodes/altMixins";
-import { FlutterTextBuilder } from "./flutterTextBuilder";
+ AltSceneNode } from "../altNodes/altMixins";
 import { numToAutoFixed } from "../common/numToAutoFixed";
 import { retrieveTopFill } from "../common/retrieveFill";
+import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
+import { FlutterTextBuilder } from "./flutterTextBuilder";
+import { indentString } from "./../common/indentString";
 
 let parentId = "";
 let material = true;
@@ -38,7 +37,7 @@ const flutterWidgetGenerator = (
   let comp = "";
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible !== false);
+  const visibleSceneNode = sceneNode.filter((d) => d.visible);
   const sceneLen = visibleSceneNode.length;
 
   visibleSceneNode.forEach((node, index) => {
@@ -189,10 +188,10 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   }
 
   const properties =
-    mainAxisSize +
+    `${mainAxisSize +
     mainAxisAlignment +
-    crossAxisAlignment +
-    `\nchildren:[\n${indentString(children, 1)}\n],`;
+    crossAxisAlignment 
+    }\nchildren:[\n${indentString(children, 1)}\n],`;
 
   return `${rowOrColumn}(${indentString(properties, 1)}\n),`;
 };

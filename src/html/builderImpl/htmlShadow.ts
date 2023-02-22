@@ -1,5 +1,5 @@
-import { htmlColor } from "./htmlColor";
 import { AltBlendMixin } from "../../altNodes/altMixins";
+import { htmlColor } from "./htmlColor";
 
 /**
  * https://tailwindcss.com/docs/box-shadow/
@@ -11,7 +11,7 @@ export const htmlShadow = (node: AltBlendMixin): string => {
     const dropShadow = node.effects.filter(
       (d): d is ShadowEffect =>
         (d.type === "DROP_SHADOW" || d.type === "INNER_SHADOW") &&
-        d.visible !== false
+        d.visible
     );
     // simple shadow from tailwind
     if (dropShadow.length > 0) {

@@ -1,9 +1,9 @@
+import { AltRectangleNode } from "../../../src/altNodes/altMixins";
 import {
   htmlOpacity,
   htmlRotation,
   htmlVisibility,
 } from "./../../../src/html/builderImpl/htmlBlend";
-import { AltRectangleNode } from "../../../src/altNodes/altMixins";
 
 describe("HTML Blend", () => {
   const node = new AltRectangleNode();

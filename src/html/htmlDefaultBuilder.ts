@@ -1,4 +1,3 @@
-import { htmlShadow } from "./builderImpl/htmlShadow";
 import {
   AltSceneNode,
   AltGeometryMixin,
@@ -6,6 +5,9 @@ import {
   AltFrameMixin,
   AltDefaultShapeMixin,
 } from "../altNodes/altMixins";
+import { formatWithJSX } from "../common/parseJSX";
+import { parentCoordinates } from "../common/parentCoordinates";
+import { htmlShadow } from "./builderImpl/htmlShadow";
 import {
   htmlVisibility,
   htmlRotation,
@@ -17,8 +19,6 @@ import {
   htmlGradientFromFills,
 } from "./builderImpl/htmlColor";
 import { htmlPadding } from "./builderImpl/htmlPadding";
-import { formatWithJSX } from "../common/parseJSX";
-import { parentCoordinates } from "../common/parentCoordinates";
 import { htmlSize, htmlSizePartial } from "./builderImpl/htmlSize";
 import { htmlBorderRadius } from "./builderImpl/htmlBorderRadius";
 
@@ -99,7 +99,7 @@ export class HtmlDefaultBuilder {
       this.style += formatWithJSX("left", this.isJSX, left);
       this.style += formatWithJSX("top", this.isJSX, top);
 
-      if (isRelative === false) {
+      if (!isRelative) {
         this.style += formatWithJSX("position", this.isJSX, "absolute");
       }
     } else {
@@ -146,7 +146,7 @@ export class HtmlDefaultBuilder {
     paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"]
   ): { prop: string; kind: "solid" | "gradient" | "none" } => {
     // visible is true or undefinied (tests)
-    if (this.visible !== false) {
+    if (this.visible) {
       const gradient = htmlGradientFromFills(paintArray);
       if (gradient) {
         return { prop: gradient, kind: "gradient" };
@@ -189,7 +189,7 @@ export class HtmlDefaultBuilder {
   }
 
   removeTrailingSpace(): this {
-    if (this.style.length > 0 && this.style.slice(-1) === " ") {
+    if (this.style.length > 0 && this.style.endsWith(" ")) {
       this.style = this.style.slice(0, -1);
     }
     return this;

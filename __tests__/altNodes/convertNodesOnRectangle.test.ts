@@ -1,12 +1,10 @@
-import { AltSceneNode, AltTextNode } from "./../../src/altNodes/altMixins";
 import { tailwindSize } from "../../src/tailwind/builderImpl/tailwindSize";
-import { AltFrameNode } from "../../src/altNodes/altMixins";
+import { AltFrameNode , AltGroupNode, AltRectangleNode , AltSceneNode, AltTextNode } from "../../src/altNodes/altMixins";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
-import { AltGroupNode, AltRectangleNode } from "../../src/altNodes/altMixins";
 import { convertNodesOnRectangle } from "../../src/altNodes/convertNodesOnRectangle";
 
 describe("convert node if child is big rect", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };
@@ -244,7 +242,7 @@ describe("convert node if child is big rect", () => {
     const pre_conv = convertNodesOnRectangle(group);
 
     // force Group removal. This is done automatically in AltConversion when executed in Figma.
-    const conv = pre_conv.children[0] as AltSceneNode;
+    const conv = pre_conv.children[0] ;
     conv.parent = null;
 
     // counterAxisSizingMode is AUTO, therefore bg-black doesn't contain the size
@@ -295,7 +293,7 @@ describe("convert node if child is big rect", () => {
 
     const convert = convertNodesOnRectangle(node);
 
-    expect(convert.children.length).toEqual(1);
+    expect(convert.children).toHaveLength(1);
   });
 
   it("multiple rectangles on top of each other", () => {
@@ -367,7 +365,7 @@ describe("convert node if child is big rect", () => {
     const convert = convertNodesOnRectangle(node);
 
     // 4, because it should include even those that are not converted.
-    expect(convert.children.length).toEqual(4);
+    expect(convert.children).toHaveLength(4);
   });
 
   it("invalid when testing without id", () => {

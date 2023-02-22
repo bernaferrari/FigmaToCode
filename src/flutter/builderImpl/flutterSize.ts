@@ -49,5 +49,5 @@ export const flutterSize = (
     }
   }
 
-  return { width: propWidth, height: propHeight, isExpanded: isExpanded };
+  return { width: propWidth, height: propHeight, isExpanded };
 };

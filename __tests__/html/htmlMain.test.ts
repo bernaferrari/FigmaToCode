@@ -1,16 +1,15 @@
-import { htmlMain } from "./../../src/html/htmlMain";
-import { AltEllipseNode, AltTextNode } from "../../src/altNodes/altMixins";
-import { convertToAutoLayout } from "../../src/altNodes/convertToAutoLayout";
-import {
+import { AltEllipseNode, AltTextNode ,
   AltRectangleNode,
   AltFrameNode,
   AltGroupNode,
 } from "../../src/altNodes/altMixins";
+import { convertToAutoLayout } from "../../src/altNodes/convertToAutoLayout";
 import { TailwindDefaultBuilder } from "../../src/tailwind/tailwindDefaultBuilder";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
+import { htmlMain } from "./../../src/html/htmlMain";
 
 describe("HTML Main", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

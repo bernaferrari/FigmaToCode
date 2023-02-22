@@ -1,4 +1,9 @@
-import { AltGroupNode } from "./../altNodes/altMixins";
+import {
+  AltSceneNode,
+  AltRectangleNode,
+  AltEllipseNode,
+  AltFrameNode,
+ AltGroupNode } from "../altNodes/altMixins";
 import { retrieveTopFill } from "./../common/retrieveFill";
 import { flutterPosition } from "./builderImpl/flutterPosition";
 import {
@@ -6,12 +11,6 @@ import {
   flutterOpacity,
   flutterRotation,
 } from "./builderImpl/flutterBlend";
-import {
-  AltSceneNode,
-  AltRectangleNode,
-  AltEllipseNode,
-  AltFrameNode,
-} from "../altNodes/altMixins";
 
 import { flutterContainer } from "./flutterContainer";
 import { flutterMaterial } from "./flutterMaterial";

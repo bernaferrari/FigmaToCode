@@ -1,17 +1,19 @@
-import { commonLineHeight } from "./../common/commonTextHeightSpacing";
 import { AltTextNode } from "../altNodes/altMixins";
+import {
+  commonLetterSpacing,
+  commonLineHeight,
+} from "../common/commonTextHeightSpacing";
 import {
   pxToLetterSpacing,
   pxToLineHeight,
   pxToFontSize,
 } from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
-import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
-  constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {
-    super(node, showLayerName, optIsJSX);
-  }
+  // constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {
+  //   super(node, showLayerName, optIsJSX);
+  // }
 
   // must be called before Position method
   textAutoSize(node: AltTextNode): this {
@@ -119,6 +121,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
           break;
         case "JUSTIFIED":
           this.attributes += `text-justify `;
+          break;
+        default:
           break;
       }
     }

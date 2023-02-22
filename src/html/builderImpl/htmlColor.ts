@@ -55,7 +55,7 @@ export const htmlGradient = (fill: GradientPaint): string => {
       // only add position to fractional
       const position =
         d.position > 0 && d.position < 1
-          ? " " + (100 * d.position).toFixed(0) + "%"
+          ? ` ${  (100 * d.position).toFixed(0)  }%`
           : "";
 
       return `${htmlColor(d.color, d.color.a)}${position}`;

@@ -1,10 +1,9 @@
+import { AltFrameNode, AltGroupNode, AltTextNode , AltSceneNode } from "../altNodes/altMixins";
+import { indentString } from "../common/indentString";
 import { numToAutoFixed } from "./../common/numToAutoFixed";
-import { AltFrameNode, AltGroupNode, AltTextNode } from "../altNodes/altMixins";
-import { AltSceneNode } from "../altNodes/altMixins";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { swiftuiRoundedRectangle } from "./builderImpl/swiftuiBorder";
-import { indentString } from "../common/indentString";
 
 let parentId = "";
 
@@ -17,7 +16,7 @@ export const swiftuiMain = (
   let result = swiftuiWidgetGenerator(sceneNode, 0);
 
   // remove the initial \n that is made in Container.
-  if (result.length > 0 && result.slice(0, 1) === "\n") {
+  if (result.length > 0 && result.startsWith("\n")) {
     result = result.slice(1, result.length);
   }
 
@@ -31,7 +30,7 @@ const swiftuiWidgetGenerator = (
   let comp = "";
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible !== false);
+  const visibleSceneNode = sceneNode.filter((d) => d.visible);
   const sceneLen = visibleSceneNode.length;
 
   visibleSceneNode.forEach((node, index) => {
@@ -173,13 +172,11 @@ const wrapInDirectionalStack = (
     } else if (mostFreq === "MAX") {
       layoutAlign = "alignment: .trailing";
     }
-  } else {
-    if (mostFreq === "MIN") {
+  } else if (mostFreq === "MIN") {
       layoutAlign = "alignment: .top";
     } else if (mostFreq === "MAX") {
       layoutAlign = "alignment: .bottom";
     }
-  }
 
   // only add comma and a space if layoutAlign has a value
   const comma = layoutAlign ? ", " : "";

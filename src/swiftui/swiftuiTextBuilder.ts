@@ -1,13 +1,12 @@
-import { commonLineHeight } from "./../common/commonTextHeightSpacing";
+import { AltTextNode } from "../altNodes/altMixins";
+import { numToAutoFixed } from "../common/numToAutoFixed";
+import { commonLetterSpacing , commonLineHeight } from "../common/commonTextHeightSpacing";
+import { convertFontWeight } from "../common/convertFontWeight";
+import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import {
   swiftuiFontMatcher,
   swiftuiWeightMatcher,
 } from "./builderImpl/swiftuiTextWeight";
-import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
-import { AltTextNode } from "../altNodes/altMixins";
-import { numToAutoFixed } from "../common/numToAutoFixed";
-import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
-import { convertFontWeight } from "../common/convertFontWeight";
 import { swiftuiSize } from "./builderImpl/swiftuiSize";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {

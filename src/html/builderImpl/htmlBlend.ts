@@ -1,5 +1,4 @@
-import { AltBlendMixin } from "../../altNodes/altMixins";
-import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
+import { AltBlendMixin , AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 import { formatWithJSX } from "../../common/parseJSX";
 

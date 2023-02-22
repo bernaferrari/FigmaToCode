@@ -131,7 +131,7 @@ export const convertIntoAltNodes = (
 
         return frameNodeToAlt(node, altParent);
       } else if (node.type === "GROUP") {
-        if (node.children.length === 1 && node.visible !== false) {
+        if (node.children.length === 1 && node.visible) {
           // if Group is visible and has only one child, Group should disappear.
           // there will be a single value anyway.
           return convertIntoAltNodes(node.children, altParent)[0];
@@ -298,7 +298,10 @@ const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
     altNode.primaryAxisAlignItems = node.primaryAxisAlignItems;
   }
 
-  altNode.counterAxisAlignItems = node.counterAxisAlignItems;
+  altNode.counterAxisAlignItems =
+    node.counterAxisAlignItems === "BASELINE"
+      ? "CENTER"
+      : node.counterAxisAlignItems;
 
   altNode.paddingLeft = node.paddingLeft;
   altNode.paddingRight = node.paddingRight;
@@ -315,7 +318,7 @@ const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
 const convertGeometry = (altNode: AltGeometryMixin, node: GeometryMixin) => {
   altNode.fills = node.fills;
   altNode.strokes = node.strokes;
-  altNode.strokeWeight = node.strokeWeight;
+  altNode.strokeWeight = figma.mixed ? 0 : node.strokeWeight;
   altNode.strokeMiterLimit = node.strokeMiterLimit;
   altNode.strokeAlign = node.strokeAlign;
   altNode.strokeCap = node.strokeCap;
@@ -377,7 +380,10 @@ const convertIntoAltText = (altNode: AltTextNode, node: TextNode) => {
   altNode.textCase = node.textCase;
   altNode.textDecoration = node.textDecoration;
   altNode.letterSpacing = node.letterSpacing;
-  altNode.textAutoResize = node.textAutoResize;
+  altNode.textAutoResize =
+    node.textAutoResize === "TRUNCATE"
+      ? "WIDTH_AND_HEIGHT"
+      : node.textAutoResize;
   altNode.characters = node.characters;
   altNode.lineHeight = node.lineHeight;
 };

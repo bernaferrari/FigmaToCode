@@ -1,15 +1,14 @@
+import {
+  AltRectangleNode,
+  AltEllipseNode,
+  AltFrameNode,
+ AltGroupNode } from "../altNodes/altMixins";
 import { indentString } from "./../common/indentString";
-import { AltGroupNode } from "./../altNodes/altMixins";
 import {
   flutterBorderRadius,
   flutterBorder,
 } from "./builderImpl/flutterBorder";
 import { flutterSize } from "./builderImpl/flutterSize";
-import {
-  AltRectangleNode,
-  AltEllipseNode,
-  AltFrameNode,
-} from "../altNodes/altMixins";
 import { flutterPadding } from "./builderImpl/flutterPadding";
 import { flutterBoxShadow } from "./builderImpl/flutterShadow";
 import { flutterBoxDecorationColor } from "./builderImpl/flutterColor";
@@ -86,7 +85,7 @@ const getBoxDecoration = (
     propShape ||
     propBorder ||
     propBorderRadius ||
-    propBackgroundColor[0] === "g"
+    propBackgroundColor.startsWith("g")
   ) {
     const properties =
       propBorderRadius +

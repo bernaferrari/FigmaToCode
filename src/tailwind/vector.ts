@@ -1,5 +1,5 @@
 import { AltFrameNode, AltGroupNode } from "../altNodes/altMixins";
-import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+// import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
 export const tailwindVector = (
   node: AltFrameNode | AltGroupNode,

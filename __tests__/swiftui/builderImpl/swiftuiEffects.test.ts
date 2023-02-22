@@ -1,10 +1,10 @@
+import { AltRectangleNode } from "../../../src/altNodes/altMixins";
 import {
   swiftuiShadow,
   swiftuiBlur,
 } from "./../../../src/swiftui/builderImpl/swiftuiEffects";
-import { AltRectangleNode } from "../../../src/altNodes/altMixins";
 describe("SwiftUI Shadow and Blur", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

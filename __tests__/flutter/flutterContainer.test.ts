@@ -1,5 +1,4 @@
-import { AltFrameNode, AltEllipseNode } from "./../../src/altNodes/altMixins";
-import { AltRectangleNode } from "../../src/altNodes/altMixins";
+import { AltRectangleNode , AltFrameNode, AltEllipseNode } from "../../src/altNodes/altMixins";
 import { flutterContainer } from "../../src/flutter/flutterContainer";
 
 describe("Flutter Container", () => {

@@ -1,4 +1,3 @@
-import { indentString } from "./../common/indentString";
 import {
   AltFrameNode,
   AltSceneNode,
@@ -7,11 +6,12 @@ import {
   AltTextNode,
   AltGroupNode,
 } from "../altNodes/altMixins";
+import { retrieveTopFill } from "../common/retrieveFill";
+import { indentString } from "./../common/indentString";
 import { pxToLayoutSize } from "./conversionTables";
 import { tailwindVector } from "./vector";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
-import { retrieveTopFill } from "../common/retrieveFill";
 
 let parentId = "";
 let showLayerName = false;
@@ -30,7 +30,7 @@ export const tailwindMain = (
   let result = tailwindWidgetGenerator(sceneNode, isJsx);
 
   // remove the initial \n that is made in Container.
-  if (result.length > 0 && result.slice(0, 1) === "\n") {
+  if (result.length > 0 && result.startsWith("\n")) {
     result = result.slice(1, result.length);
   }
 
@@ -45,7 +45,7 @@ const tailwindWidgetGenerator = (
   let comp = "";
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible !== false);
+  const visibleSceneNode = sceneNode.filter((d) => d.visible);
 
   visibleSceneNode.forEach((node) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {

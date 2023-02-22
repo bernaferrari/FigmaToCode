@@ -1,7 +1,6 @@
-import { indentString } from "./../../common/indentString";
-import { AltBlendMixin } from "../../altNodes/altMixins";
-import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
+import { AltBlendMixin , AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { indentString } from "./../../common/indentString";
 
 /**
  * https://api.flutter.dev/flutter/widgets/Opacity-class.html
@@ -24,7 +23,7 @@ export const flutterVisibility = (
 ): string => {
   // [when testing] node.visible can be undefined
 
-  if (node.visible !== undefined && node.visible === false && child !== "") {
+  if (node.visible !== undefined && !node.visible && child !== "") {
     const prop = `\nvisible: ${node.visible},\nchild: ${child}`;
 
     return `Visibility(${indentString(prop)}\n),`;

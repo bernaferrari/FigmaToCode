@@ -1,8 +1,8 @@
-import { htmlMain } from "./../../src/html/htmlMain";
 import { AltTextNode } from "../../src/altNodes/altMixins";
+import { htmlMain } from "./../../src/html/htmlMain";
 
 describe("HTML Text", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

@@ -85,7 +85,7 @@ const convertRectangleToFrame = (rect: AltRectangleNode) => {
 
   // when invisible, add the layer but don't fill it; he designer might use invisible layers for alignment.
   // visible can be undefined in tests
-  if (rect.visible !== false) {
+  if (rect.visible) {
     frameNode.fills = rect.fills;
     frameNode.fillStyleId = rect.fillStyleId;
 

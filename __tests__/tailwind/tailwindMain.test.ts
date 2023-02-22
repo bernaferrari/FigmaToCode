@@ -1,15 +1,14 @@
-import { AltEllipseNode, AltTextNode } from "./../../src/altNodes/altMixins";
-import { convertToAutoLayout } from "./../../src/altNodes/convertToAutoLayout";
 import {
   AltRectangleNode,
   AltFrameNode,
   AltGroupNode,
-} from "../../src/altNodes/altMixins";
+ AltEllipseNode, AltTextNode } from "../../src/altNodes/altMixins";
 import { TailwindDefaultBuilder } from "../../src/tailwind/tailwindDefaultBuilder";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
+import { convertToAutoLayout } from "./../../src/altNodes/convertToAutoLayout";
 
 describe("Tailwind Main", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

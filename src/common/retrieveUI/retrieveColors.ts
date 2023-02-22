@@ -1,3 +1,6 @@
+import { AltSceneNode } from "../../altNodes/altMixins";
+import { rgbTo6hex } from "../../common/color";
+import { notEmpty } from "../../altNodes/altConversion";
 import {
   swiftuiColor,
   swiftuiGradient,
@@ -13,9 +16,6 @@ import {
   flutterGradient,
 } from "./../../flutter/builderImpl/flutterColor";
 import { htmlColor, htmlGradient } from "./../../html/builderImpl/htmlColor";
-import { AltSceneNode } from "../../altNodes/altMixins";
-import { rgbTo6hex } from "../../common/color";
-import { notEmpty } from "../../altNodes/altConversion";
 import {
   calculateContrastRatio,
   deepFlatten,
@@ -59,7 +59,7 @@ export const retrieveGenericSolidUIColors = (
   // from https://stackoverflow.com/a/18923480/4418073
   const unique: Record<string, boolean> = {};
   const distinct: Array<exportSolidColor> = [];
-  colorStr.forEach(function (x) {
+  colorStr.forEach((x) => {
     if (!unique[x.hex]) {
       distinct.push(x);
       unique[x.hex] = true;
@@ -100,7 +100,7 @@ const convertSolidColor = (
             return {
               hex: rgbTo6hex(fill.color),
               colorName: "",
-              exported: exported,
+              exported,
               contrastBlack: calculateContrastRatio(fill.color, black),
               contrastWhite: calculateContrastRatio(fill.color, white),
             };
@@ -115,9 +115,9 @@ const convertSolidColor = (
 
             // special case since each color has a name.
             return {
-              hex: hex,
+              hex,
               colorName: tailwindColors[hexNearestColor],
-              exported: exported,
+              exported,
               contrastBlack: 0,
               contrastWhite: 0,
             };
@@ -128,7 +128,7 @@ const convertSolidColor = (
           return {
             hex: rgbTo6hex(fill.color),
             colorName: "",
-            exported: exported,
+            exported,
             contrastBlack: 0,
             contrastWhite: 0,
           };
@@ -173,7 +173,7 @@ export const retrieveGenericLinearGradients = (
   // from https://stackoverflow.com/a/18923480/4418073
   const unique: Record<string, boolean> = {};
   const distinct: Array<exportLinearGradient> = [];
-  colorStr.forEach(function (x) {
+  colorStr.forEach((x) => {
     if (!unique[x.css]) {
       distinct.push(x);
       unique[x.css] = true;
@@ -212,7 +212,7 @@ const convertGradient = (
 
           return {
             css: htmlGradient(fill),
-            exported: exported,
+            exported,
           };
         }
       })

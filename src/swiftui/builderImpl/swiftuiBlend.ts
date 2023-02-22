@@ -1,5 +1,4 @@
-import { AltBlendMixin } from "../../altNodes/altMixins";
-import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
+import { AltBlendMixin , AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 
 /**
@@ -17,7 +16,7 @@ export const swiftuiOpacity = (node: AltBlendMixin): string => {
  */
 export const swiftuiVisibility = (node: AltSceneNode): string => {
   // [when testing] node.visible can be undefined
-  if (node.visible !== undefined && node.visible === false) {
+  if (node.visible !== undefined && !node.visible) {
     return `\n.hidden()`;
   }
   return "";

@@ -5,7 +5,7 @@ import {
 import { tailwindSize } from "../../../src/tailwind/builderImpl/tailwindSize";
 
 describe("Tailwind Builder", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

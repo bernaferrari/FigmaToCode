@@ -1,7 +1,7 @@
-import { nearestOpacity, nearestValue } from "./../conversionTables";
 import { nearestColorFrom } from "../../nearest-color/nearestColor";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
+import { nearestOpacity, nearestValue } from "./../conversionTables";
 
 // retrieve the SOLID color for tailwind
 export const tailwindColorFromFills = (

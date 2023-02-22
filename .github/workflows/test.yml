@@ -1,25 +1,23 @@
 name: CI
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install modules
-      run: yarn
-    - name: Run tests and coverage
-      run: yarn run coverage
-    - name: Run codacy-coverage-reporter
-      uses: codacy/codacy-coverage-reporter-action@master
-      with:
-        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        coverage-reports: coverage/clover.xml
-    - name: Run codecov
-      uses: codecov/codecov-action@v1
-
-
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn
+      - name: Run tests and coverage
+        run: yarn run coverage
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage/clover.xml
+      - name: Run codecov
+        uses: codecov/codecov-action@v1

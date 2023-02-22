@@ -1,10 +1,10 @@
-import { numToAutoFixed } from "./../common/numToAutoFixed";
-import { htmlTextSize as htmlTextSizeBox } from "./builderImpl/htmlTextSize";
 import { AltTextNode } from "../altNodes/altMixins";
-import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
 import { formatWithJSX } from "../common/parseJSX";
 import { convertFontWeight } from "../common/convertFontWeight";
+import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
+import { htmlTextSize as htmlTextSizeBox } from "./builderImpl/htmlTextSize";
+import { numToAutoFixed } from "./../common/numToAutoFixed";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
   constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {

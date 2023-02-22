@@ -1,11 +1,9 @@
-import { swiftuiBlendMode } from "./../../../src/swiftui/builderImpl/swiftuiBlend";
-import { swiftuiVisibility } from "../../../src/swiftui/builderImpl/swiftuiBlend";
-import { AltRectangleNode } from "../../../src/altNodes/altMixins";
-
-import {
+import { swiftuiVisibility ,
   swiftuiOpacity,
   swiftuiRotation,
-} from "../../../src/swiftui/builderImpl/swiftuiBlend";
+, swiftuiBlendMode } from "../../../src/swiftui/builderImpl/swiftuiBlend";
+import { AltRectangleNode } from "../../../src/altNodes/altMixins";
+
 
 describe("SwiftUI Blend", () => {
   const node = new AltRectangleNode();

@@ -1,7 +1,7 @@
-import { htmlShadow } from "./../../../src/html/builderImpl/htmlShadow";
 import { AltRectangleNode } from "../../../src/altNodes/altMixins";
+import { htmlShadow } from "./../../../src/html/builderImpl/htmlShadow";
 describe("HTML Shadow", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

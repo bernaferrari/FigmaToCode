@@ -1,8 +1,7 @@
-import { indentString } from "./../../common/indentString";
-import { AltEllipseNode, AltFrameNode } from "../../altNodes/altMixins";
-import { AltSceneNode, AltRectangleNode } from "../../altNodes/altMixins";
-import { flutterColorFromFills } from "./flutterColor";
+import { AltEllipseNode, AltFrameNode , AltSceneNode, AltRectangleNode } from "../../altNodes/altMixins";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { flutterColorFromFills } from "./flutterColor";
+import { indentString } from "./../../common/indentString";
 
 // generate the border, when it exists
 export const flutterBorder = (node: AltSceneNode): string => {

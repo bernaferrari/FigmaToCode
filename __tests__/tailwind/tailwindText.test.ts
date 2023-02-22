@@ -4,7 +4,7 @@ import { AltTextNode } from "../../src/altNodes/altMixins";
 import { convertFontWeight } from "../../src/common/convertFontWeight";
 
 describe("Tailwind Text", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

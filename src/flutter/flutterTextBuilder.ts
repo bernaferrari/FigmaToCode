@@ -1,10 +1,10 @@
+import { AltTextNode } from "../altNodes/altMixins";
+import { numToAutoFixed } from "../common/numToAutoFixed";
+import { convertFontWeight } from "../common/convertFontWeight";
 import { indentString } from "./../common/indentString";
 import { commonLetterSpacing } from "./../common/commonTextHeightSpacing";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
-import { AltTextNode } from "../altNodes/altMixins";
 import { flutterColorFromFills } from "./builderImpl/flutterColor";
-import { numToAutoFixed } from "../common/numToAutoFixed";
-import { convertFontWeight } from "../common/convertFontWeight";
 import { flutterSize } from "./builderImpl/flutterSize";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {

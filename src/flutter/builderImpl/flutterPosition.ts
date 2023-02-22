@@ -1,8 +1,8 @@
-import { indentString } from "./../../common/indentString";
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { commonPosition } from "../../common/commonPosition";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 import { parentCoordinates } from "../../common/parentCoordinates";
+import { indentString } from "./../../common/indentString";
 
 export const flutterPosition = (
   node: AltSceneNode,

@@ -1,8 +1,8 @@
-import { swiftuiMain } from "./../../../src/swiftui/swiftuiMain";
 import { swiftuiColorFromFills } from "../../../src/swiftui/builderImpl/swiftuiColor";
 import { AltRectangleNode, AltTextNode } from "../../../src/altNodes/altMixins";
+import { swiftuiMain } from "./../../../src/swiftui/swiftuiMain";
 describe("SwiftUI Color", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

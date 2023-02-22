@@ -1,4 +1,3 @@
-import { retrieveTopFill } from "./../common/retrieveFill";
 import {
   AltFrameNode,
   AltSceneNode,
@@ -7,10 +6,11 @@ import {
   AltTextNode,
   AltGroupNode,
 } from "../altNodes/altMixins";
-import { HtmlTextBuilder } from "./htmlTextBuilder";
-import { HtmlDefaultBuilder as HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { formatWithJSX } from "../common/parseJSX";
 import { indentString } from "../common/indentString";
+import { retrieveTopFill } from "./../common/retrieveFill";
+import { HtmlTextBuilder } from "./htmlTextBuilder";
+import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 
 let parentId = "";
 
@@ -30,7 +30,7 @@ export const htmlMain = (
   let result = htmlWidgetGenerator(sceneNode, isJsx);
 
   // remove the initial \n that is made in Container.
-  if (result.length > 0 && result.slice(0, 1) === "\n") {
+  if (result.length > 0 && result.startsWith("\n")) {
     result = result.slice(1, result.length);
   }
 
@@ -45,7 +45,7 @@ const htmlWidgetGenerator = (
   let comp = "";
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible !== false);
+  const visibleSceneNode = sceneNode.filter((d) => d.visible);
 
   const sceneLen = visibleSceneNode.length;
 

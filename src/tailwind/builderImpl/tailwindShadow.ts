@@ -8,7 +8,7 @@ export const tailwindShadow = (node: AltBlendMixin): string => {
   // [when testing] node.effects can be undefined
   if (node.effects && node.effects.length > 0) {
     const dropShadow = node.effects.filter(
-      (d): d is ShadowEffect => d.type === "DROP_SHADOW" && d.visible !== false
+      (d) => d.type === "DROP_SHADOW" && d.visible
     );
     let boxShadow = "";
     // simple shadow from tailwind
@@ -17,8 +17,7 @@ export const tailwindShadow = (node: AltBlendMixin): string => {
     }
 
     const innerShadow =
-      node.effects.filter((d): d is ShadowEffect => d.type === "INNER_SHADOW")
-        .length > 0
+      node.effects.filter((d) => d.type === "INNER_SHADOW").length > 0
         ? "shadow-inner "
         : "";
 

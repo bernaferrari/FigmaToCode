@@ -71,13 +71,13 @@
   $: if (layerName || !layerName) {
     parent.postMessage(
       { pluginMessage: { type: "layerName", data: layerName } },
-      "*"
+      "*",
     );
   }
 
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
-  const clipboard = data => dispatch("clipboard", { text: data });
+  const clipboard = (data) => dispatch("clipboard", { text: data });
 
   function handleClipboard(event) {
     clipboard(event.detail.text);
@@ -94,13 +94,13 @@
 
 <div>
   <div class="flex flex-col items-center p-4 bg-gray-50">
-
     <div class="flex">
       <svg
         class="w-1/4 h-8 m-auto"
         viewBox="0 0 273 64"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg">
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <title>Tailwind CSS</title>
         <path
           fill-rule="evenodd"
@@ -114,7 +114,8 @@
           42.6031C22.2443 45.2901 25.3081 48.4 32 48.4C39.2 48.4 43.7 44.8 45.5
           37.6C42.8 41.2 39.65 42.55 36.05 41.65C33.996 41.1365 32.5279 39.6464
           30.9029 37.9969C28.2557 35.3099 25.1919 32.2 18.5 32.2Z"
-          fill="url(#paint0_linear)" />
+          fill="url(#paint0_linear)"
+        />
         <path
           fill-rule="evenodd"
           clip-rule="evenodd"
@@ -170,7 +171,8 @@
           25.206C262 25.206 264.584 26.65 265.914 29.158L262.456 31.096C261.772
           29.614 260.442 28.93 258.884 28.93C257.402 28.93 256.11 29.576 256.11
           30.944Z"
-          fill="#2D3748" />
+          fill="#2D3748"
+        />
         <defs>
           <linearGradient
             id="paint0_linear"
@@ -178,19 +180,20 @@
             y1="16"
             x2="59"
             y2="48"
-            gradientUnits="userSpaceOnUse">
+            gradientUnits="userSpaceOnUse"
+          >
             <stop stop-color="#2298BD" />
             <stop offset="1" stop-color="#0ED7B5" />
-
           </linearGradient>
         </defs>
       </svg>
       <p class="w-3/4 mx-2 leading-tight tracking-tight text-sm">
-        Tailwind is a utility-first CSS framework for
+        Tailwind is a utility-addasadads CSS framework for
         <a
           class="font-medium text-green-500 hover:text-green-800"
           href="https://tailwindcss.com/"
-          target="_blank">
+          target="_blank"
+        >
           rapidly building custom designs and responsive pages.
         </a>
         You can test your creations by pasting them here:
@@ -200,14 +203,16 @@
       <a href="https://codepen.io/bernardoferrari/pen/zYKOBxa" target="_blank">
         <button
           class="px-4 py-2 font-semibold text-gray-800 bg-white border
-          border-gray-400 rounded shadow hover:bg-gray-50">
+          border-gray-400 rounded shadow hover:bg-gray-50"
+        >
           CodePen
         </button>
       </a>
       <a href="https://play.tailwindcss.com/" target="_blank">
         <button
           class="px-4 py-2 font-semibold text-gray-800 bg-white border
-          border-gray-400 rounded shadow hover:bg-gray-100">
+          border-gray-400 rounded shadow hover:bg-gray-100"
+        >
           Tailwind Play
         </button>
       </a>
@@ -216,10 +221,10 @@
 </div>
 
 <div class="px-2 pt-2 bg-gray-50">
-
   {#if emptySelection}
     <div
-      class="flex flex-col space-y-2 m-auto items-center justify-center p-4 {sectionStyle}">
+      class="flex flex-col space-y-2 m-auto items-center justify-center p-4 {sectionStyle}"
+    >
       <p class="text-lg font-bold">Nothing is selected</p>
       <p class="text-xs">Try selecting a layer, any layer</p>
     </div>
@@ -228,14 +233,16 @@
       <div class="flex items-center justify-between px-2 space-x-2">
         <p
           class="px-4 py-2 text-lg font-medium text-center bg-gray-200
-          rounded-lg">
+          rounded-lg"
+        >
           Code
         </p>
         <button
           class="px-4 py-2 font-semibold text-blue-700 bg-transparent border
           border-blue-500 rounded hover:bg-blue-500 hover:text-white
           hover:border-transparent"
-          on:click={clipboard(codeObservable)}>
+          on:click={clipboard(codeObservable)}
+        >
           Copy to Clipboard
         </button>
       </div>
@@ -243,24 +250,25 @@
       <Prism language="html" source={codeObservable} />
 
       <div
-        class="flex items-center content-center justify-end mx-2 mb-2 space-x-8">
-
+        class="flex items-center content-center justify-end mx-2 mb-2 space-x-8"
+      >
         <Switch bind:checked={layerName} id="layerName" text="LayerName" />
 
         <Switch bind:checked={jsx} id="jsx" text="JSX" />
-
       </div>
     </div>
     <div class="h-2" />
 
     {#if textObservable.length > 0}
       <div
-        class="flex flex-col space-y-2 items-center w-full p-2 mb-2 {sectionStyle}">
+        class="flex flex-col space-y-2 items-center w-full p-2 mb-2 {sectionStyle}"
+      >
         <div class="flex flex-wrap w-full">
           <div class="w-1/2 p-1">
             <div
               class="flex items-center justify-center w-full h-full bg-gray-200
-              rounded-lg">
+              rounded-lg"
+            >
               <p class="text-xl font-semibold">Texts</p>
             </div>
           </div>
@@ -277,7 +285,8 @@
     <SectionSolid
       {sectionStyle}
       type="tailwind"
-      on:clipboard={handleClipboard} />
+      on:clipboard={handleClipboard}
+    />
 
     <div class="h-2" />
 

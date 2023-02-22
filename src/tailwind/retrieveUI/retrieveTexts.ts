@@ -54,7 +54,7 @@ export const retrieveTailwindText = (
         attr: attr.attributes,
         full: `<p class="${attr.attributes}">${charsWithLineBreak}</p>`,
         style: style(node),
-        contrastBlack: contrastBlack,
+        contrastBlack,
       });
     }
   });
@@ -63,7 +63,7 @@ export const retrieveTailwindText = (
   // from https://stackoverflow.com/a/18923480/4418073
   const unique: Record<string, boolean> = {};
   const distinct: Array<namedText> = [];
-  textStr.forEach(function (x) {
+  textStr.forEach((x) => {
     if (!unique[x.attr + x.name]) {
       distinct.push(x);
       unique[x.attr + x.name] = true;
@@ -120,11 +120,9 @@ function deepFlatten(arr: Array<AltSceneNode>): Array<AltSceneNode> {
   arr.forEach((d) => {
     if ("children" in d) {
       result = result.concat(deepFlatten([...d.children]));
-    } else {
-      if (d.type === "TEXT") {
+    } else if (d.type === "TEXT") {
         result.push(d);
       }
-    }
   });
 
   return result;
@@ -159,9 +157,9 @@ function calculateContrastRatio(color1: RGB, color2: RGB) {
 }
 
 function luminance(color: RGB) {
-  const a = [color.r * 255, color.g * 255, color.b * 255].map(function (v) {
+  const a = [color.r * 255, color.g * 255, color.b * 255].map((v) => {
     v /= 255;
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055)**2.4;
   });
   return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
 }

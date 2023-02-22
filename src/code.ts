@@ -11,10 +11,10 @@ import { convertIntoAltNodes } from "./altNodes/altConversion";
 
 let parentId: string;
 let isJsx = false;
-let layerName = false;
-let material = true;
+let layerName = false,
+     material = true;
 
-let mode: "flutter" | "swiftui" | "html" | "tailwind";
+     let mode: "flutter" | "swiftui" | "html" | "tailwind";
 
 figma.showUI(__html__, { width: 450, height: 550 });
 
@@ -39,7 +39,7 @@ const run = () => {
     null
   );
 
-  // @ts-ignore
+  // @ts-expect-error
   if (mode === "flutter") {
     result = flutterMain(convertedSelection, parentId, material);
   } else if (mode === "tailwind") {

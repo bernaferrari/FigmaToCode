@@ -1,9 +1,8 @@
-import { AltFrameNode, AltEllipseNode } from "../../src/altNodes/altMixins";
-import { AltRectangleNode } from "../../src/altNodes/altMixins";
+import { AltFrameNode, AltEllipseNode , AltRectangleNode } from "../../src/altNodes/altMixins";
 import { flutterMaterial } from "../../src/flutter/flutterMaterial";
 
 describe("Flutter Material", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

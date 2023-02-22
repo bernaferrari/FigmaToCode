@@ -1,7 +1,7 @@
-import { nearestValue } from "./../../tailwind/conversionTables";
-import { numToAutoFixed } from "./../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
+import { nearestValue } from "./../../tailwind/conversionTables";
+import { numToAutoFixed } from "./../../common/numToAutoFixed";
 
 /**
  * Retrieve the SOLID color for SwiftUI when existent, otherwise ""
@@ -80,9 +80,9 @@ export const swiftuiColor = (color: RGB, opacity: number): string => {
     return "Color.white";
   }
 
-  const r = "red: " + numToAutoFixed(color.r);
-  const g = "green: " + numToAutoFixed(color.g);
-  const b = "blue: " + numToAutoFixed(color.b);
+  const r = `red: ${  numToAutoFixed(color.r)}`;
+  const g = `green: ${  numToAutoFixed(color.g)}`;
+  const b = `blue: ${  numToAutoFixed(color.b)}`;
 
   const opacityAttr =
     opacity !== 1.0 ? `, opacity: ${numToAutoFixed(opacity)}` : "";

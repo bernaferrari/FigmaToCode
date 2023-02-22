@@ -30,7 +30,7 @@ export const convertGroupToFrame = (node: AltGroupNode): AltFrameNode => {
   newNode.parent = node.parent;
 
   // update the children's x and y position. Modify the 'original' node, then pass them.
-  updateChildrenXY(node) as AltFrameNode;
+  updateChildrenXY(node);
   newNode.children = node.children;
 
   newNode.children.forEach((d) => {

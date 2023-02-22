@@ -1,14 +1,13 @@
-import { AltEllipseNode, AltTextNode } from "./../../src/altNodes/altMixins";
-import { swiftuiMain } from "./../../src/swiftui/swiftuiMain";
 import { convertToAutoLayout } from "../../src/altNodes/convertToAutoLayout";
 import {
   AltRectangleNode,
   AltFrameNode,
   AltGroupNode,
-} from "../../src/altNodes/altMixins";
+ AltEllipseNode, AltTextNode } from "../../src/altNodes/altMixins";
+import { swiftuiMain } from "./../../src/swiftui/swiftuiMain";
 
 describe("SwiftUI Main", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };
@@ -311,7 +310,7 @@ Rectangle()
     expect(conversion.match("//") !== null).toBe(true);
 
     // check the length. It is supposed to be long.
-    expect(conversion.length).toBe(5429);
+    expect(conversion).toHaveLength(5429);
 
     // todo count the number of "Groups {"
   });

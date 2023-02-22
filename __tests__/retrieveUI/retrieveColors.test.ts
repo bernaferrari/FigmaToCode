@@ -1,12 +1,11 @@
-import { AltTextNode } from "./../../src/altNodes/altMixins";
 import {
   retrieveGenericLinearGradients,
   retrieveGenericSolidUIColors,
 } from "../../src/common/retrieveUI/retrieveColors";
-import { AltFrameNode, AltRectangleNode } from "../../src/altNodes/altMixins";
+import { AltFrameNode, AltRectangleNode , AltTextNode } from "../../src/altNodes/altMixins";
 
 describe("Retrieve Colors for UI", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

@@ -1,9 +1,8 @@
-import { AltFrameNode, AltRectangleNode } from "./../../src/altNodes/altMixins";
-import { tailwindMain } from "./../../src/tailwind/tailwindMain";
-import { frameNodeToAlt } from "../../src/altNodes/altConversion";
 import { createFigma } from "figma-api-stub";
+import { frameNodeToAlt , convertSingleNodeToAlt } from "../../src/altNodes/altConversion";
 import { tailwindSize } from "../../src/tailwind/builderImpl/tailwindSize";
-import { convertSingleNodeToAlt } from "../../src/altNodes/altConversion";
+import { tailwindMain } from "./../../src/tailwind/tailwindMain";
+import { AltFrameNode, AltRectangleNode } from "./../../src/altNodes/altMixins";
 
 describe("Tailwind Size", () => {
   const figma = createFigma({
@@ -11,7 +10,7 @@ describe("Tailwind Size", () => {
     isWithoutTimeout: false,
   });
 
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = figma;
 
   it("rect", () => {

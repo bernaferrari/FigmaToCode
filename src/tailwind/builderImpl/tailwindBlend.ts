@@ -1,6 +1,5 @@
-import { AltBlendMixin } from "../../altNodes/altMixins";
+import { AltBlendMixin , AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 import { nearestOpacity, nearestValue } from "../conversionTables";
-import { AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
 
 /**
  * https://tailwindcss.com/docs/opacity/
@@ -42,22 +41,7 @@ export const tailwindRotation = (node: AltLayoutMixin): string => {
   // using 3.14159 as Pi for enough precision and to avoid importing math lib.
   if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
     const allowedValues = [
-      -180,
-      -90,
-      -45,
-      -12,
-      -6,
-      -3,
-      -2,
-      -1,
-      1,
-      2,
-      3,
-      6,
-      12,
-      45,
-      90,
-      180,
+      -180, -90, -45, -12, -6, -3, -2, -1, 1, 2, 3, 6, 12, 45, 90, 180,
     ];
     let nearest = nearestValue(node.rotation, allowedValues);
     let minusIfNegative = "";

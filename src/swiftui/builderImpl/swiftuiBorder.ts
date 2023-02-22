@@ -1,7 +1,7 @@
-import { retrieveTopFill } from "./../../common/retrieveFill";
 import { AltSceneNode } from "../../altNodes/altMixins";
-import { swiftuiColorFromFills } from "./swiftuiColor";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { retrieveTopFill } from "./../../common/retrieveFill";
+import { swiftuiColorFromFills } from "./swiftuiColor";
 
 /**
  * Generate border or an overlay with stroke.

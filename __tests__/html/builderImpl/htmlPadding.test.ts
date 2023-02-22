@@ -1,6 +1,5 @@
+import { AltRectangleNode , AltFrameNode } from "../../../src/altNodes/altMixins";
 import { htmlPadding } from "./../../../src/html/builderImpl/htmlPadding";
-import { AltRectangleNode } from "../../../src/altNodes/altMixins";
-import { AltFrameNode } from "../../../src/altNodes/altMixins";
 
 describe("HTML padding", () => {
   it("test html padding", () => {

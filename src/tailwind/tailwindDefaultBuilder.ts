@@ -1,4 +1,3 @@
-import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   AltSceneNode,
   AltGeometryMixin,
@@ -6,6 +5,9 @@ import {
   AltFrameMixin,
   AltDefaultShapeMixin,
 } from "../altNodes/altMixins";
+import { formatWithJSX } from "../common/parseJSX";
+import { parentCoordinates } from "../common/parentCoordinates";
+import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   tailwindVisibility,
   tailwindRotation,
@@ -26,8 +28,6 @@ import {
   tailwindSizePartial,
 } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
-import { formatWithJSX } from "../common/parseJSX";
-import { parentCoordinates } from "../common/parentCoordinates";
 
 export class TailwindDefaultBuilder {
   attributes: string = "";
@@ -45,7 +45,7 @@ export class TailwindDefaultBuilder {
     this.visible = node.visible;
 
     if (showLayerName) {
-      this.name = node.name.replace(" ", "") + " ";
+      this.name = `${node.name.replace(" ", "")  } `;
     }
   }
 
@@ -104,7 +104,7 @@ export class TailwindDefaultBuilder {
     kind: string
   ): this {
     // visible is true or undefinied (tests)
-    if (this.visible !== false) {
+    if (this.visible) {
       let gradient = "";
       if (kind === "bg") {
         gradient = tailwindGradientFromFills(paint);
@@ -192,11 +192,11 @@ export class TailwindDefaultBuilder {
   }
 
   removeTrailingSpace(): this {
-    if (this.attributes.length > 0 && this.attributes.slice(-1) === " ") {
+    if (this.attributes.length > 0 && this.attributes.endsWith(" ")) {
       this.attributes = this.attributes.slice(0, -1);
     }
 
-    if (this.style.length > 0 && this.style.slice(-1) === " ") {
+    if (this.style.length > 0 && this.style.endsWith(" ")) {
       this.style = this.style.slice(0, -1);
     }
     return this;

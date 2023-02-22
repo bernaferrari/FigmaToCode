@@ -17,11 +17,9 @@ export const formatWithJSX = (
     } else {
       return `${property}: ${numToAutoFixed(value)}px; `;
     }
-  } else {
-    if (isJsx) {
+  } else if (isJsx) {
       return `${jsx_property}: '${value}', `;
     } else {
       return `${property}: ${value}; `;
     }
-  }
 };

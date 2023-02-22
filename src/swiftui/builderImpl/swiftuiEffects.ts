@@ -7,7 +7,7 @@ export const swiftuiShadow = (node: AltSceneNode): string => {
   }
 
   const dropShadow: Array<ShadowEffect> = node.effects.filter(
-    (d): d is ShadowEffect => d.type === "DROP_SHADOW" && d.visible !== false
+    (d): d is ShadowEffect => d.type === "DROP_SHADOW" && d.visible
   );
 
   if (dropShadow.length === 0) {
@@ -55,7 +55,7 @@ export const swiftuiBlur = (node: AltSceneNode): string => {
   }
 
   const layerBlur: Array<BlurEffect> = node.effects.filter(
-    (d): d is BlurEffect => d.type === "LAYER_BLUR" && d.visible !== false
+    (d): d is BlurEffect => d.type === "LAYER_BLUR" && d.visible
   );
 
   if (layerBlur.length === 0) {

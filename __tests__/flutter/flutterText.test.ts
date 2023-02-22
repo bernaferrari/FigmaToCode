@@ -1,9 +1,9 @@
+import { AltFrameNode, AltTextNode } from "../../src/altNodes/altMixins";
 import { FlutterTextBuilder } from "./../../src/flutter/flutterTextBuilder";
 import { flutterMain } from "./../../src/flutter/flutterMain";
-import { AltFrameNode, AltTextNode } from "../../src/altNodes/altMixins";
 
 describe("Flutter Text", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

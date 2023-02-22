@@ -4,7 +4,7 @@ import { convertGroupToFrame } from "../../src/altNodes/convertGroupToFrame";
 import { convertNodesOnRectangle } from "../../src/altNodes/convertNodesOnRectangle";
 
 describe("Convert Group to Frame", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

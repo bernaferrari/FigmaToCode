@@ -57,21 +57,21 @@ export const convertToAutoLayout = (
 
     // set children to INHERIT or STRETCH
     node.children.map((d) => {
-      // @ts-ignore current node can't be AltGroupNode because it was converted into AltFrameNode
+      // @ts-expect-error current node can't be AltGroupNode because it was converted into AltFrameNode
       layoutAlignInChild(d, node);
     });
 
     const allChildrenDirection = node.children.map((d) =>
-      // @ts-ignore current node can't be AltGroupNode because it was converted into AltFrameNode
+      // @ts-expect-error current node can't be AltGroupNode because it was converted into AltFrameNode
       primaryAxisDirection(d, node)
     );
 
     const primaryDirection = allChildrenDirection.map((d) => d.primary);
     const counterDirection = allChildrenDirection.map((d) => d.counter);
 
-    // @ts-ignore it is never going to be undefined.
+    // @ts-expect-error it is never going to be undefined.
     node.primaryAxisAlignItems = mostFrequent(primaryDirection);
-    // @ts-ignore it is never going to be undefined.
+    // @ts-expect-error it is never going to be undefined.
     node.counterAxisAlignItems = mostFrequent(counterDirection);
 
     node.counterAxisSizingMode = "FIXED";
@@ -111,12 +111,10 @@ const reorderChildrenIfAligned = (
   if (visit === "VERTICAL") {
     // if all elements are horizontally aligned
     return [updateChildren.sort((a, b) => a.y - b.y), "VERTICAL", avg];
-  } else {
-    if (visit === "HORIZONTAL") {
+  } else if (visit === "HORIZONTAL") {
       // if all elements are vertically aligned
       return [updateChildren.sort((a, b) => a.x - b.x), "HORIZONTAL", avg];
     }
-  }
 
   return [updateChildren, "NONE", 0];
 };
@@ -201,10 +199,10 @@ const detectAutoLayoutPadding = (
 
     // return the smallest padding in each axis
     return {
-      left: left,
-      right: right,
-      top: top,
-      bottom: bottom,
+      left,
+      right,
+      top,
+      bottom,
     };
   } else if (node.layoutMode === "VERTICAL") {
     // top padding is first element's y value
@@ -224,10 +222,10 @@ const detectAutoLayoutPadding = (
 
     // return the smallest padding in each axis
     return {
-      left: left,
-      right: right,
-      top: top,
-      bottom: bottom,
+      left,
+      right,
+      top,
+      bottom,
     };
   } else {
     // node.layoutMode === "HORIZONTAL"
@@ -249,10 +247,10 @@ const detectAutoLayoutPadding = (
 
     // return the smallest padding in each axis
     return {
-      left: left,
-      right: right,
-      top: top,
-      bottom: bottom,
+      left,
+      right,
+      top,
+      bottom,
     };
   }
 };

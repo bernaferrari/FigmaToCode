@@ -1,15 +1,15 @@
+import { createFigma } from "figma-api-stub";
+import { tailwindMain } from "../../src/tailwind/tailwindMain";
+import { convertIntoAltNodes } from "../../src/altNodes/altConversion";
 import { htmlMain } from "./../../src/html/htmlMain";
 import { AltFrameNode } from "./../../src/altNodes/altMixins";
-import { tailwindMain } from "../../src/tailwind/tailwindMain";
-import { createFigma } from "figma-api-stub";
-import { convertIntoAltNodes } from "../../src/altNodes/altConversion";
 
 describe("AltConversions", () => {
   const figma = createFigma({
     simulateErrors: true,
     isWithoutTimeout: false,
   });
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = figma;
   it("Rectangle", () => {
     const rectangle = figma.createRectangle();

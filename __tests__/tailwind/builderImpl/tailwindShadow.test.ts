@@ -1,7 +1,7 @@
 import { tailwindShadow } from "../../../src/tailwind/builderImpl/tailwindShadow";
 import { AltRectangleNode } from "../../../src/altNodes/altMixins";
 describe("Tailwind Shadow", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

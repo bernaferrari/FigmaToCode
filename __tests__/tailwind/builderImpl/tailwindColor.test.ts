@@ -1,9 +1,8 @@
-import { tailwindMain } from "./../../../src/tailwind/tailwindMain";
-import { tailwindGradientFromFills } from "./../../../src/tailwind/builderImpl/tailwindColor";
-import { tailwindColorFromFills } from "../../../src/tailwind/builderImpl/tailwindColor";
+import { tailwindColorFromFills , tailwindGradientFromFills } from "../../../src/tailwind/builderImpl/tailwindColor";
 import { AltRectangleNode, AltTextNode } from "../../../src/altNodes/altMixins";
+import { tailwindMain } from "./../../../src/tailwind/tailwindMain";
 describe("Tailwind Color", () => {
-  // @ts-ignore for some reason, need to override this for figma.mixed to work
+  // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {
     mixed: undefined,
   };

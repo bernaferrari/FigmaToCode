@@ -1,7 +1,7 @@
-import { formatWithJSX } from "./../../common/parseJSX";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 import { AltFrameMixin, AltDefaultShapeMixin } from "../../altNodes/altMixins";
 import { commonPadding } from "../../common/commonPadding";
+import { formatWithJSX } from "./../../common/parseJSX";
 
 /**
  * https://tailwindcss.com/docs/margin/

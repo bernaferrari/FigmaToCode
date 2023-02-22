@@ -1,3 +1,4 @@
+import { AltSceneNode } from "../altNodes/altMixins";
 import { swiftuiBlur, swiftuiShadow } from "./builderImpl/swiftuiEffects";
 import {
   swiftuiBorder,
@@ -15,7 +16,6 @@ import {
   swiftuiRotation,
   swiftuiBlendMode,
 } from "./builderImpl/swiftuiBlend";
-import { AltSceneNode } from "../altNodes/altMixins";
 
 export class SwiftuiDefaultBuilder {
   modifiers: string = "";
