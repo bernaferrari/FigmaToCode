@@ -55,14 +55,10 @@ module.exports = {
           loader: "svelte-loader",
           options: {
             compilerOptions: {
-              // NOTE Svelte's dev mode MUST be enabled for HMR to work
               dev: false,
             },
-            // NOTE emitCss: true is currently not supported with HMR
-            // Enable it for production to output separate css file
             emitCss: true,
-            // Enable HMR only for dev mode
-            hotReload: !prod,
+            hotReload: false,
           },
         },
       },
@@ -101,6 +97,7 @@ module.exports = {
       template: "./src/template.html",
       filename: "index.html",
       chunks: ["ui"],
+      cache: false,
     }),
     new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/ui/]),
   ],
