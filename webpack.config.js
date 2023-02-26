@@ -4,7 +4,7 @@ const path = require("path");
 const webpack = require("webpack");
 const tailwindcss = require("tailwindcss");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const InlineChunkHtmlPlugin = require("inline-chunk-html-plugin");
+const HtmlInlineScriptPlugin = require("html-inline-script-webpack-plugin");
 
 console.log("env", process.env.NODE_ENV);
 
@@ -62,7 +62,7 @@ module.exports = {
             // Enable it for production to output separate css file
             emitCss: true,
             // Enable HMR only for dev mode
-            hotReload: !prod,
+            hotReload: false,
           },
         },
       },
@@ -102,7 +102,7 @@ module.exports = {
       filename: "index.html",
       chunks: ["ui"],
     }),
-    new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/ui/]),
+    new HtmlInlineScriptPlugin({ scriptMatchPattern: [/ui/] }),
   ],
   cache: {
     type: "filesystem",
