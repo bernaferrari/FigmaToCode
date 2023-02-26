@@ -1,23 +1,27 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
+const webpack = require("webpack");
 const tailwindcss = require("tailwindcss");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const InlineChunkHtmlPlugin = require("inline-chunk-html-plugin");
 
 console.log("env", process.env.NODE_ENV);
 
 const mode = process.env.NODE_ENV || "development";
 const prod = mode === "production";
 
-const commonConfig = {
+module.exports = {
   mode,
-  cache: {
-    type: "filesystem",
-    buildDependencies: {
-      config: [__filename],
-    },
-    cacheDirectory: path.resolve(__dirname, "node_modules/.cache/webpack"),
+  output: {
+    filename: "[name].js",
+    path: path.resolve(__dirname, "dist"), // Compile into a folder called "dist"
+    clean: true,
+    publicPath: "/",
+  },
+  entry: {
+    ui: "./src/main.js", // The entry point for UI code
+    code: "./src/code.ts", // The entry point for plugin code
   },
   devtool: prod ? false : "inline-source-map",
   resolve: {
@@ -28,18 +32,21 @@ const commonConfig = {
     mainFields: ["svelte", "browser", "module", "main"],
   },
   optimization: {
-    minimize: prod,
+    minimize: true,
     minimizer: ["...", new CssMinimizerPlugin({ parallel: true })],
   },
-  devServer: {
-    hot: true,
-  },
-
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        use: [
+          {
+            loader: "ts-loader",
+            options: {
+              transpileOnly: true,
+            },
+          },
+        ],
         exclude: /node_modules/,
       },
       {
@@ -47,18 +54,13 @@ const commonConfig = {
         use: {
           loader: "svelte-loader",
           options: {
-            preprocess: require("svelte-preprocess")({
-              // crashes the build in webpack
-              // do not use
-              // postcss: true,
-            }),
             compilerOptions: {
               // NOTE Svelte's dev mode MUST be enabled for HMR to work
-              dev: !prod,
+              dev: false,
             },
             // NOTE emitCss: true is currently not supported with HMR
             // Enable it for production to output separate css file
-            emitCss: prod,
+            emitCss: true,
             // Enable HMR only for dev mode
             hotReload: !prod,
           },
@@ -67,8 +69,7 @@ const commonConfig = {
       {
         test: /\.css$/,
         use: [
-          MiniCssExtractPlugin.loader,
-          // 'style-loader',
+          "style-loader",
           {
             loader: "css-loader",
             options: {
@@ -92,39 +93,22 @@ const commonConfig = {
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: "[name].css",
+    new webpack.DefinePlugin({
+      global: {}, // Fix missing symbol error when running in developer VM
     }),
+    new HtmlWebpackPlugin({
+      inject: "body",
+      template: "./src/template.html",
+      filename: "index.html",
+      chunks: ["ui"],
+    }),
+    new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/ui/]),
   ],
+  cache: {
+    type: "filesystem",
+    buildDependencies: {
+      config: [__filename],
+    },
+    cacheDirectory: path.resolve(__dirname, "node_modules/.cache/webpack"),
+  },
 };
-
-module.exports = [
-  {
-    ...commonConfig,
-    name: "code",
-    entry: "./src/code.ts",
-    output: {
-      filename: "code.js",
-      path: path.resolve(__dirname, "public"),
-    },
-  },
-  {
-    ...commonConfig,
-    name: "ui",
-    entry: "./src/main.js",
-    output: {
-      filename: "bundle.js",
-      path: path.resolve(__dirname, "public"),
-      library: "ui",
-      libraryTarget: "var",
-    },
-    plugins: [
-      ...commonConfig.plugins,
-      new HtmlWebpackPlugin({
-        title: "FigmaToCode",
-        template: "src/template.html",
-        filename: path.join(__dirname, "public/index.html"),
-      }),
-    ],
-  },
-];

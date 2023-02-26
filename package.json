@@ -6,11 +6,11 @@
   "scripts": {
     "watch": "rollup -c -w",
     "release": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
-    "dev": "NODE_ENV=development webpack --mode development --watch",
-    "build": "rm -rf public && NODE_ENV=production webpack --mode production",
+    "dev": "NODE_ENV=development webpack --watch",
+    "build": "rm -rf dist && NODE_ENV=production webpack --mode production",
     "test": "jest",
     "coverage": "jest --coverage",
-    "start": "sirv public",
+    "start": "sirv dist",
     "lint": "eslint . --ext .ts"
   },
   "author": "Bernardo Ferrari",
@@ -39,6 +39,7 @@
     "figma-plugin-ds-svelte": "^1.1.6",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
+    "inline-chunk-html-plugin": "^1.1.1",
     "jest": "^26.6.3",
     "mini-css-extract-plugin": "^2.7.2",
     "postcss": "^8.4.21",

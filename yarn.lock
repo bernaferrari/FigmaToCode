@@ -3541,6 +3541,11 @@ inherits@2.0.3:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
+inline-chunk-html-plugin@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/inline-chunk-html-plugin/-/inline-chunk-html-plugin-1.1.1.tgz#f64111aed16fac274d2b929f6a6a08671d82354e"
+  integrity sha512-6W1eGIj8z/Yla6xJx5il6jJfCxMZS3kVkbiLQThbbjdsDLRIWkUVmpnhfW2l6WAwCW+qfy0zoXVGBZM1E5XF3g==
+
 interpret@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-3.1.1.tgz#5be0ceed67ca79c6c4bc5cf0d7ee843dcea110c4"
