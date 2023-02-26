@@ -28,8 +28,6 @@
   import ScreenSwiftUI from "./ScreenSwiftUI.svelte";
   import ScreenHTML from "./ScreenHtml.svelte";
   import ScreenAbout from "./ScreenAbout.svelte";
-
-  import { GlobalCSS } from "figma-plugin-ds-svelte";
 </script>
 
 <style lang="postcss">

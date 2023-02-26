@@ -2,7 +2,7 @@
   "name": "Figma to Code",
   "id": "842128343887142055",
   "api": "1.0.0",
-  "main": "public/code.js",
-  "ui": "public/index.html",
+  "main": "dist/code.js",
+  "ui": "dist/index.html",
   "editorType": ["figma"]
 }
