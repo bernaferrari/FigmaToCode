@@ -7,7 +7,51 @@ type SizeResult = {
   readonly height: responsive | number | null;
 };
 
+// Update for latest Figma APIs. The old one is still being used for Tailwind.
 export const nodeWidthHeight = (
+  node: AltSceneNode,
+  allowRelative: boolean
+): SizeResult => {
+  let nodeWidth: number | null = node.width;
+  let nodeHeight: number | null = node.height;
+
+  if (node.type === "FRAME") {
+    switch (node.layoutMode) {
+      case "HORIZONTAL":
+        nodeWidth = node.primaryAxisSizingMode === "AUTO" ? null : node.width;
+        break;
+      case "VERTICAL":
+        nodeHeight = node.primaryAxisSizingMode === "AUTO" ? null : node.height;
+        break;
+      case "NONE":
+        break;
+    }
+  }
+
+  if (node.parent && node.parent.type === "FRAME") {
+    switch (node.parent.layoutMode) {
+      case "HORIZONTAL":
+        return {
+          width: node.layoutGrow === 1 ? "full" : nodeWidth,
+          height: node.layoutAlign === "STRETCH" ? "full" : nodeHeight,
+        };
+      case "VERTICAL":
+        return {
+          width: node.layoutAlign === "STRETCH" ? "full" : nodeWidth,
+          height: node.layoutGrow === 1 ? "full" : nodeHeight,
+        };
+      case "NONE":
+        break;
+    }
+  }
+
+  return {
+    width: nodeWidth,
+    height: nodeHeight,
+  };
+};
+
+export const nodeWidthHeightTailwind = (
   node: AltSceneNode,
   allowRelative: boolean
 ): SizeResult => {
@@ -39,6 +83,8 @@ export const nodeWidthHeight = (
           break;
         case "VERTICAL":
           propWidth = "full";
+          break;
+        case "NONE":
           break;
       }
     }
@@ -232,12 +278,12 @@ type responsive =
 
 const calculateResponsiveWH = (
   node: AltSceneNode,
-  nodeWidthHeight: number,
+  nodeWidthHeightNumber: number,
   axis: "x" | "y"
 ): responsive => {
   let returnValue: responsive = "";
 
-  if (nodeWidthHeight > 384 || childLargerThanMaxSize(node, axis)) {
+  if (nodeWidthHeightNumber > 384 || childLargerThanMaxSize(node, axis)) {
     returnValue = "full";
   }
 
@@ -261,7 +307,7 @@ const calculateResponsiveWH = (
   }
 
   // 0.01 of tolerance is enough for 5% of diff, i.e.: 804 / 400
-  const dividedWidth = nodeWidthHeight / parentWidthHeight;
+  const dividedWidth = nodeWidthHeightNumber / parentWidthHeight;
 
   const calculateResp = (div: number, str: responsive) => {
     if (Math.abs(dividedWidth - div) < 0.01) {

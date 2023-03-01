@@ -14,11 +14,17 @@ export const htmlBorderRadius = (
     return formatWithJSX("border-radius", isJsx, 9999);
   } else if (
     (!("cornerRadius" in node) && !("topLeftRadius" in node)) ||
-    (node.cornerRadius === figma.mixed && node.topLeftRadius === undefined) ||
-    node.cornerRadius === 0
+    ("cornerRadius" in node &&
+      node.cornerRadius === figma.mixed &&
+      node.topLeftRadius === undefined) ||
+    ("cornerRadius" in node && node.cornerRadius === 0)
   ) {
     // the second condition is used on tests. On Figma, topLeftRadius is never undefined.
     // ignore when 0, undefined or non existent
+    return "";
+  }
+
+  if (!("cornerRadius" in node)) {
     return "";
   }
 

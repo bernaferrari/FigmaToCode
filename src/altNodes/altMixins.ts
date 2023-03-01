@@ -119,11 +119,10 @@ export interface AltGroupNode
     AltLayoutMixin {}
 
 // DOCUMENT
-
-interface AltDocumentNode extends AltBaseNodeMixin, AltChildrenMixin {}
+// interface AltDocumentNode extends AltBaseNodeMixin, AltChildrenMixin {}
 
 // PAGE
-interface AltPageNode extends AltBaseNodeMixin, AltChildrenMixin {}
+// interface AltPageNode extends AltBaseNodeMixin, AltChildrenMixin {}
 
 interface AltTextMixin {
   characters: string;

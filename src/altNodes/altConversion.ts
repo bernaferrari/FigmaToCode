@@ -318,7 +318,10 @@ const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
 const convertGeometry = (altNode: AltGeometryMixin, node: GeometryMixin) => {
   altNode.fills = node.fills;
   altNode.strokes = node.strokes;
-  altNode.strokeWeight = figma.mixed ? 0 : node.strokeWeight;
+  altNode.strokeWeight = 0;
+  if (node.strokeWeight !== figma.mixed) {
+    altNode.strokeWeight = node.strokeWeight;
+  }
   altNode.strokeMiterLimit = node.strokeMiterLimit;
   altNode.strokeAlign = node.strokeAlign;
   altNode.strokeCap = node.strokeCap;

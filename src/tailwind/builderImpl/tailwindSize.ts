@@ -1,6 +1,6 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { pxToLayoutSize } from "../conversionTables";
-import { nodeWidthHeight } from "../../common/nodeWidthHeight";
+import { nodeWidthHeightTailwind } from "../../common/nodeWidthHeight";
 import { formatWithJSX } from "../../common/parseJSX";
 
 export const tailwindSize = (node: AltSceneNode): string => {
@@ -8,7 +8,7 @@ export const tailwindSize = (node: AltSceneNode): string => {
 };
 
 export const tailwindSizePartial = (node: AltSceneNode): [string, string] => {
-  const size = nodeWidthHeight(node, true);
+  const size = nodeWidthHeightTailwind(node, true);
 
   let w = "";
   if (typeof size.width === "number") {
