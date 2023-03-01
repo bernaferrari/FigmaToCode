@@ -1,4 +1,4 @@
-import { AltSceneNode , AltGeometryMixin } from "../../altNodes/altMixins";
+import { AltSceneNode, AltGeometryMixin } from "../../altNodes/altMixins";
 import { nearestValue, pxToBorderRadius } from "../conversionTables";
 
 /**
@@ -31,8 +31,10 @@ export const tailwindBorderRadius = (node: AltSceneNode): string => {
     return "rounded-full ";
   } else if (
     (!("cornerRadius" in node) && !("topLeftRadius" in node)) ||
-    (node.cornerRadius === figma.mixed && node.topLeftRadius === undefined) ||
-    node.cornerRadius === 0
+    ("cornerRadius" in node &&
+      node.cornerRadius === figma.mixed &&
+      node.topLeftRadius === undefined) ||
+    ("cornerRadius" in node && node.cornerRadius === 0)
   ) {
     // the second condition is used on tests. On Figma, topLeftRadius is never undefined.
     // ignore when 0, undefined or non existent
@@ -40,6 +42,10 @@ export const tailwindBorderRadius = (node: AltSceneNode): string => {
   }
 
   let comp = "";
+
+  if (!("cornerRadius" in node)) {
+    return "";
+  }
 
   if (node.cornerRadius !== figma.mixed) {
     if (node.cornerRadius >= node.height / 2) {

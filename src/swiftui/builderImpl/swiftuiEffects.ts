@@ -6,8 +6,8 @@ export const swiftuiShadow = (node: AltSceneNode): string => {
     return "";
   }
 
-  const dropShadow: Array<ShadowEffect> = node.effects.filter(
-    (d): d is ShadowEffect => d.type === "DROP_SHADOW" && d.visible
+  const dropShadow: Array<DropShadowEffect> = node.effects.filter(
+    (d): d is DropShadowEffect => d.type === "DROP_SHADOW" && d.visible
   );
 
   if (dropShadow.length === 0) {

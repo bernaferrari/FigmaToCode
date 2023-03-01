@@ -296,7 +296,7 @@ export const rowColumnProps = (node: AltFrameNode): string => {
 
   // [optimization]
   // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, center it.
-  let counterAlign: string;
+  let counterAlign: string = "";
   switch (node.counterAxisAlignItems) {
     case "MIN":
       counterAlign = "items-start ";

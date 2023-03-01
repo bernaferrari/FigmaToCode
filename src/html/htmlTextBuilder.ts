@@ -7,9 +7,9 @@ import { htmlTextSize as htmlTextSizeBox } from "./builderImpl/htmlTextSize";
 import { numToAutoFixed } from "./../common/numToAutoFixed";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
-  constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {
-    super(node, showLayerName, optIsJSX);
-  }
+  // constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {
+  //   super(node, showLayerName, optIsJSX);
+  // }
 
   // must be called before Position method
   textAutoSize(node: AltTextNode): this {

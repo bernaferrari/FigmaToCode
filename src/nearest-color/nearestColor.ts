@@ -58,17 +58,19 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
   needle = parseColor(needle);
 
   let distanceSq;
-        let minDistanceSq = Infinity,
-         rgb,
-         value: ColorSpec;
+  let minDistanceSq = Infinity;
+  // eslint-disable-next-line one-var
+  let rgb;
+  // eslint-disable-next-line one-var
+  let value: ColorSpec;
 
   for (let i = 0; i < colors.length; ++i) {
     rgb = colors[i].rgb;
 
     distanceSq =
-      (needle.r - rgb.r)**2 +
-      (needle.g - rgb.g)**2 +
-      (needle.b - rgb.b)**2;
+      (needle.r - rgb.r) ** 2 +
+      (needle.g - rgb.g) ** 2 +
+      (needle.b - rgb.b) ** 2;
 
     if (distanceSq < minDistanceSq) {
       minDistanceSq = distanceSq;
@@ -202,7 +204,7 @@ function parseColor(source: RGB | string): RGB {
     return { r: red, g: green, b: blue };
   }
 
-  throw Error(`"${  source  }" is not a valid color`);
+  throw Error(`"${source}" is not a valid color`);
 }
 
 type RGB = {
@@ -211,12 +213,12 @@ type RGB = {
   b: number;
 };
 
-type ColorMatch = {
-  name: string;
-  value: string;
-  rgb: RGB;
-  distance: number;
-};
+// type ColorMatch = {
+//   name: string;
+//   value: string;
+//   rgb: RGB;
+//   distance: number;
+// };
 
 type ColorSpec = {
   source: string;

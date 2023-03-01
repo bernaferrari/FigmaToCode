@@ -7,7 +7,7 @@ const config = {
     complexity: "off",
     "default-case": "off",
     "no-use-before-define": "off",
-    "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-unnecessary-condition": "off",
     "space-before-function-paren": [
       "error",

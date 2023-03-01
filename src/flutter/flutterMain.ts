@@ -4,7 +4,8 @@ import {
   AltRectangleNode,
   AltGroupNode,
   AltTextNode,
- AltSceneNode } from "../altNodes/altMixins";
+  AltSceneNode,
+} from "../altNodes/altMixins";
 import { numToAutoFixed } from "../common/numToAutoFixed";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
@@ -163,7 +164,7 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   }
   const crossAxisAlignment = `\ncrossAxisAlignment: CrossAxisAlignment.${crossAlignType},`;
 
-  let mainAlignType;
+  let mainAlignType = "";
   switch (node.primaryAxisAlignItems) {
     case "MIN":
       mainAlignType = "start";
@@ -180,18 +181,16 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   }
   const mainAxisAlignment = `\nmainAxisAlignment: MainAxisAlignment.${mainAlignType},`;
 
-  let mainAxisSize;
+  let mainAxisSize = "";
   if (node.layoutGrow === 1) {
     mainAxisSize = "\nmainAxisSize: MainAxisSize.max,";
   } else {
     mainAxisSize = "\nmainAxisSize: MainAxisSize.min,";
   }
 
-  const properties =
-    `${mainAxisSize +
-    mainAxisAlignment +
-    crossAxisAlignment 
-    }\nchildren:[\n${indentString(children, 1)}\n],`;
+  const properties = `${
+    mainAxisSize + mainAxisAlignment + crossAxisAlignment
+  }\nchildren:[\n${indentString(children, 1)}\n],`;
 
   return `${rowOrColumn}(${indentString(properties, 1)}\n),`;
 };

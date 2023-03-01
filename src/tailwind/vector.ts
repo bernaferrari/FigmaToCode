@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AltFrameNode, AltGroupNode } from "../altNodes/altMixins";
 // import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
