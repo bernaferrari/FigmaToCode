@@ -5,6 +5,7 @@ const config = {
     "max-len": "off",
     "no-negated-condition": "off",
     complexity: "off",
+    "default-case": "off",
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": "warn",
     "@typescript-eslint/no-unnecessary-condition": "off",
