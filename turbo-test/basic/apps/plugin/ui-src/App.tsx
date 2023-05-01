@@ -1,12 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Button } from "ui";
+import { PluginUI } from "plugin-ui";
 
 export default function App() {
   return (
-    <div>
-      <h1>Web</h1>
-      <Button />
+    <div className="bg-red-500">
+      <PluginUI code={""} />
     </div>
   );
 }

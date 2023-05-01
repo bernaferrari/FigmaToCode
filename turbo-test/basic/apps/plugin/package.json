@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "npm run build:ui && npm run build:main -- --minify",
-    "build:main": "esbuild plugin-src/code.js --bundle --outfile=dist/code.js",
+    "build:main": "esbuild plugin-src/code.ts --bundle --outfile=dist/code.js",
     "build:ui": "npx vite build --minify esbuild --emptyOutDir=false",
     "build:watch": "concurrently -n widget,iframe \"npm run build:main -- --watch\" \"npm run build:ui -- --watch\"",
     "dev": "concurrently -n build,vite 'npm:build:watch' 'vite'"
@@ -12,7 +12,9 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "ui": "workspace:*"
+    "@figma/plugin-typings": "github:figma/plugin-typings#readonly-preview",
+    "plugin-ui": "workspace:*",
+    "backend": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^17.0.12",
@@ -21,12 +23,15 @@
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
     "@vitejs/plugin-react-swc": "^3.3.0",
+    "autoprefixer": "^10.4.14",
     "concurrently": "^8.0.1",
     "esbuild": "^0.17.18",
     "eslint-config-custom": "workspace:*",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.0",
+    "postcss": "^8.4.23",
     "tsconfig": "workspace:*",
+    "tailwindcss": "3.3.2",
     "typescript": "^5.0.2",
     "vite": "^4.3.2",
     "vite-plugin-singlefile": "^0.13.3"

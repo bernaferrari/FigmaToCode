@@ -1,8 +1,10 @@
 {
-  "name": "Figma to Code",
+  "name": "Figma to Code [Inspect]",
   "id": "842128343887142055",
   "api": "1.0.0",
-  "main": "public/code.js",
-  "ui": "public/index.html",
-  "editorType": ["figma"]
+  "main": "dist/code.js",
+  "ui": "dist/index.html",
+  "editorType": ["figma", "inspect"],
+  "capabilities": ["panel", "codegen"],
+  "permissions": []
 }

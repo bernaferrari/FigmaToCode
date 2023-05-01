@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "typeRoots": ["../node_modules/@figma"]
+  }
+}
