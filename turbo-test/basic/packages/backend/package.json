@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "license": "GPL-3",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "build:watch": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "lint": "eslint \"**/*.ts*\""
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "github:figma/plugin-typings#readonly-preview",
+    "eslint": "^8.36.0",
+    "eslint-config-custom": "workspace:*",
+    "tsconfig": "workspace:*",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.2"
+  }
+}

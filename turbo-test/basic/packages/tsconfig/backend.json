@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Backend",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
+  },
+  "exclude": ["node_modules"]
+}
