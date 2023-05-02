@@ -54,7 +54,7 @@ export const makeTextComponent = (node: AltTextNode): string => {
   const textStyle = getTextStyle(node);
 
   const style = textStyle
-    ? `\nstyle: TextStyle(${indentString(textStyle)}\n),`
+    ? `\nstyle: TextStyle(${indentString(textStyle, 2)}\n),`
     : "";
 
   const splittedChars = text.split("\n");
@@ -63,7 +63,7 @@ export const makeTextComponent = (node: AltTextNode): string => {
 
   const properties = `\n"${charsWithLineBreak}",${textAlign}${style}`;
 
-  return `Text(${indentString(properties)}\n),`;
+  return `Text(${indentString(properties, 2)}\n),`;
 };
 
 export const getTextStyle = (node: AltTextNode): string => {

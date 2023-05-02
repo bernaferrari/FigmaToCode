@@ -1,0 +1,30 @@
+{
+  "name": "debug",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "build:watch": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "backend": "workspace:*",
+    "plugin-ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.3",
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "autoprefixer": "^10.4.14",
+    "eslint-config-custom": "workspace:*",
+    "postcss": "^8.4.21",
+    "tsconfig": "workspace:*",
+    "tailwindcss": "3.2.7",
+    "typescript": "^5.0.2"
+  }
+}

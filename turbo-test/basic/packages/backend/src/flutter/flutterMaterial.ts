@@ -31,7 +31,7 @@ export const flutterMaterial = (
   const materialAttr =
     color + elevation + shadowColor + shape + clip + padChild;
 
-  let materialResult = `Material(${indentString(materialAttr)}\n),`;
+  let materialResult = `Material(${indentString(materialAttr, 2)}\n),`;
 
   const fSize = flutterSize(node);
   const size = fSize.width + fSize.height;
@@ -39,12 +39,12 @@ export const flutterMaterial = (
 
   if (size) {
     const properties = `${size}\nchild: ${materialResult}`;
-    materialResult = `SizedBox(${indentString(properties)}\n),`;
+    materialResult = `SizedBox(${indentString(properties, 2)}\n),`;
   }
 
   if (isExpanded) {
     const properties = `\nchild: ${materialResult}`;
-    materialResult = `Expanded(${indentString(properties)}\n),`;
+    materialResult = `Expanded(${indentString(properties, 2)}\n),`;
   }
 
   return materialResult;

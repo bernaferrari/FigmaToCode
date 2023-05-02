@@ -3,7 +3,8 @@ import {
   AltRectangleNode,
   AltEllipseNode,
   AltFrameNode,
- AltGroupNode } from "../altNodes/altMixins";
+  AltGroupNode,
+} from "../altNodes/altMixins";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { flutterPosition } from "./builderImpl/flutterPosition";
 import {
@@ -28,17 +29,17 @@ export class FlutterDefaultBuilder {
   ): this {
     const fill = node.type === "GROUP" ? null : retrieveTopFill(node.fills);
     // fill.visible can be true or undefined (on tests)
-    if (
-      node.type !== "GROUP" &&
-      material &&
-      fill &&
-      fill.visible !== false &&
-      fill.type === "SOLID"
-    ) {
-      this.child = flutterMaterial(node, this.child);
-    } else {
-      this.child = flutterContainer(node, this.child);
-    }
+    // if (
+    //   node.type !== "GROUP" &&
+    //   material &&
+    //   fill &&
+    //   fill.visible !== false &&
+    //   fill.type === "SOLID"
+    // ) {
+    // this.child = flutterMaterial(node, this.child);
+    // } else {
+    this.child = flutterContainer(node, this.child);
+    // }
     return this;
   }
 

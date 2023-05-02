@@ -49,12 +49,12 @@ export const flutterContainer = (
     // Container is a container if [propWidthHeight] and [propBoxDecoration] are set.
     const properties = `${size}${propBoxDecoration}${propPadding}${propChild}`;
 
-    result = `Container(${indentString(properties)}\n),`;
+    result = `Container(${indentString(properties, 2)}\n),`;
   } else if (propPadding) {
     // if there is just a padding, add Padding
     const properties = `${propPadding}${propChild}`;
 
-    result = `Padding(${indentString(properties)}\n),`;
+    result = `Padding(${indentString(properties, 2)}\n),`;
   } else {
     result = child;
   }
@@ -62,7 +62,7 @@ export const flutterContainer = (
   // Add Expanded() when parent is a Row/Column and width is full.
   if (isExpanded) {
     const properties = `\nchild: ${result}`;
-    result = `Expanded(${indentString(properties)}\n),`;
+    result = `Expanded(${indentString(properties, 2)}\n),`;
   }
 
   return result;
@@ -94,7 +94,7 @@ const getBoxDecoration = (
       propBoxShadow +
       propBackgroundColor;
 
-    return `\ndecoration: BoxDecoration(${indentString(properties)}\n),`;
+    return `\ndecoration: BoxDecoration(${indentString(properties, 2)}\n),`;
   } else {
     return propBackgroundColor;
   }

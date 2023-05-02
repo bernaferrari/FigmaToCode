@@ -2,7 +2,7 @@ import { AltSceneNode } from "../../altNodes/altMixins";
 import { commonPosition } from "../../common/commonPosition";
 import { numToAutoFixed } from "../../common/numToAutoFixed";
 import { parentCoordinates } from "../../common/parentCoordinates";
-import { indentString } from "../../common/indentString";
+import { indentString, indentStringFlutter } from "../../common/indentString";
 
 export const flutterPosition = (
   node: AltSceneNode,
@@ -28,7 +28,7 @@ export const flutterPosition = (
       const diffY = numToAutoFixed(node.y - parentY);
 
       const properties = `\nleft: ${diffX},\ntop: ${diffY},\nchild: ${child}`;
-      return `Positioned(${indentString(properties)}\n),`;
+      return `Positioned(${indentStringFlutter(properties)}\n),`;
     }
   }
 
@@ -38,8 +38,8 @@ export const flutterPosition = (
 const retrieveAbsolutePos = (node: AltSceneNode, child: string): string => {
   const positionedAlign = (align: string) => {
     const alignProp = `\nalignment: Alignment.${align},\nchild: ${child}`;
-    const positionedProp = `\nchild: Align(${indentString(alignProp)}\n),`;
-    return `Positioned.fill(${indentString(positionedProp)}\n),`;
+    const positionedProp = `\nchild: Align(${indentStringFlutter(alignProp)}\n),`;
+    return `Positioned.fill(${indentStringFlutter(positionedProp)}\n),`;
   };
 
   switch (commonPosition(node)) {

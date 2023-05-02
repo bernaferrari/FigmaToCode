@@ -76,7 +76,7 @@ const flutterWidgetGenerator = (
 const flutterGroup = (node: AltGroupNode): string => {
   const properties = `\nchildren:[${flutterWidgetGenerator(node.children)}],`;
 
-  return flutterContainer(node, `Stack(${indentString(properties)}\n),`);
+  return flutterContainer(node, `Stack(${indentString(properties,)}\n),`);
 };
 
 const flutterContainer = (
@@ -95,12 +95,12 @@ const flutterContainer = (
   }
 
   if (child.length > 0 && image.length > 0) {
-    const prop1 = `\nPositioned.fill(\n${indentString(`child: ${child}`)}\n),`;
-    const prop2 = `\nPositioned.fill(\n${indentString(`child: ${image}`)}\n),`;
+    const prop1 = `\nPositioned.fill(\n${indentString(`child: ${child}`, 2)}\n),`;
+    const prop2 = `\nPositioned.fill(\n${indentString(`child: ${image}`, 2)}\n),`;
 
-    const propStack = `\nchildren: [${indentString(prop1 + prop2)}\n],`;
+    const propStack = `\nchildren: [${indentString(prop1 + prop2, 2)}\n],`;
 
-    propChild = `Stack(${indentString(propStack)}\n),`;
+    propChild = `Stack(${indentString(propStack, 2)}\n),`;
   } else if (child.length > 0) {
     propChild = child;
   } else if (image.length > 0) {
@@ -140,9 +140,9 @@ const flutterFrame = (node: AltFrameNode): string => {
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
 
-    const properties = `\nchildren:[\n${indentString(children, 1)}\n],`;
+    const properties = `\nchildren:[\n${indentString(children, 2)}\n],`;
 
-    return flutterContainer(node, `Stack(${indentString(properties)}\n),`);
+    return flutterContainer(node, `Stack(${indentString(properties, 2)}\n),`);
   }
 };
 
@@ -190,9 +190,9 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
 
   const properties = `${
     mainAxisSize + mainAxisAlignment + crossAxisAlignment
-  }\nchildren:[\n${indentString(children, 1)}\n],`;
+  }\nchildren:[\n${indentString(children, 2)}\n],`;
 
-  return `${rowOrColumn}(${indentString(properties, 1)}\n),`;
+  return `${rowOrColumn}(${indentString(properties, 2)}\n),`;
 };
 
 // TODO Vector support in Flutter is complicated. Currently, AltConversion converts it in a Rectangle.
