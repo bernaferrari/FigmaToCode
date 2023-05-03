@@ -4,31 +4,24 @@
   "private": true,
   "license": "MIT",
   "sideEffects": false,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist/**"
-  ],
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
   "scripts": {
-    "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
-    "clean": "rm -rf dist",
-    "dev": "tsup src/index.tsx --format esm,cjs --watch --dts --external react",
     "lint": "eslint \"src/**/*.ts*\"",
     "test": "jest"
   },
   "dependencies": {
     "react": "^18.2.0",
-    "tailwindcss": "3.2.7",
+    "tailwindcss": "3.3.2",
     "react-syntax-highlighter": "^15.5.0"
   },
   "devDependencies": {
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "eslint": "^8.36.0",
+    "@types/react": "^18.2.1",
+    "@types/react-dom": "^18.2.2",
+    "@types/react-syntax-highlighter": "15.5.6",
+    "eslint": "^8.39.0",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
-    "tsup": "^6.7.0",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.4"
   }
 }

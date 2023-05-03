@@ -188,7 +188,7 @@ export const convertIntoAltNodes = (
         altNode.cornerRadius = 8;
 
         if (altNode.fills === figma.mixed || altNode.fills.length === 0) {
-          // Use rose[400] from Tailwind 2 when Vector has no color.
+          // Use rose[400] from Tailwind 3 when Vector has no color.
           altNode.fills = [
             {
               type: "SOLID",

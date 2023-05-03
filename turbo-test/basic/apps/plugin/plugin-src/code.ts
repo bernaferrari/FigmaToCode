@@ -9,15 +9,36 @@ import {
 switch (figma.mode) {
   case "default":
   case "panel":
+    let mode: "flutter" | "swiftui" | "html" | "tailwind";
+    let isJsx = false;
+    let layerName = false;
+
     figma.showUI(__html__, { width: 450, height: 550, themeColors: true });
     figma.on("selectionchange", () => {
-      run();
+      run(mode);
     });
+    figma.ui.onmessage = (msg) => {
+      if (
+        msg.type === "tailwind" ||
+        msg.type === "flutter" ||
+        msg.type === "swiftui" ||
+        msg.type === "html"
+      ) {
+        mode = msg.type;
+        run(mode);
+      } else if (msg.type === "jsx" && msg.data !== isJsx) {
+        isJsx = msg.data;
+        run(mode);
+      } else if (msg.type === "layerName" && msg.data !== layerName) {
+        layerName = msg.data;
+        run(mode);
+      }
+    };
     break;
   case "codegen":
     figma.on("codegen", ({ node }) => {
       const convertedSelection = convertIntoAltNodes([node], null);
-      const blocks: CodegenResult = [
+      const blocks: CodegenResult[] = [
         {
           title: `Tailwind Code`,
           code: tailwindMain(

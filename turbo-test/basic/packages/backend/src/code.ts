@@ -1,26 +1,21 @@
-import { flutterMain, tailwindMain, swiftuiMain, htmlMain } from "../dist";
 import { convertIntoAltNodes } from "./altNodes/altConversion";
 import {
   retrieveGenericSolidUIColors,
   retrieveGenericLinearGradients,
 } from "./common/retrieveUI/retrieveColors";
+import { flutterMain } from "./flutter/flutterMain";
+import { htmlMain } from "./html/htmlMain";
+import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { retrieveTailwindText } from "./tailwind/retrieveUI/retrieveTexts";
+import { tailwindMain } from "./tailwind/tailwindMain";
 
 let parentId: string;
 let isJsx = false;
 let layerName = false,
   material = true;
 
-let mode: "flutter" | "swiftui" | "html" | "tailwind";
-
-figma.showUI(__html__, { width: 450, height: 550 });
-
-figma.on("selectionchange", () => {
-  run();
-});
-
-export const run = () => {
-  console.log("selected!");
+export const run = (mode: "flutter" | "swiftui" | "html" | "tailwind") => {
+  console.log("run is being run", mode);
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
@@ -54,7 +49,7 @@ export const run = () => {
   console.log(result);
 
   figma.ui.postMessage({
-    type: "result",
+    type: "code",
     data: result,
   });
 
@@ -84,23 +79,23 @@ export const run = () => {
 
 // efficient? No. Works? Yes.
 // todo pass data instead of relying in types
-figma.ui.onmessage = (msg) => {
-  if (
-    msg.type === "tailwind" ||
-    msg.type === "flutter" ||
-    msg.type === "swiftui" ||
-    msg.type === "html"
-  ) {
-    mode = msg.type;
-    run();
-  } else if (msg.type === "jsx" && msg.data !== isJsx) {
-    isJsx = msg.data;
-    run();
-  } else if (msg.type === "layerName" && msg.data !== layerName) {
-    layerName = msg.data;
-    run();
-  } else if (msg.type === "material" && msg.data !== material) {
-    material = msg.data;
-    run();
-  }
-};
+// figma.ui.onmessage = (msg) => {
+//   if (
+//     msg.type === "tailwind" ||
+//     msg.type === "flutter" ||
+//     msg.type === "swiftui" ||
+//     msg.type === "html"
+//   ) {
+//     mode = msg.type;
+//     run();
+//   } else if (msg.type === "jsx" && msg.data !== isJsx) {
+//     isJsx = msg.data;
+//     run();
+//   } else if (msg.type === "layerName" && msg.data !== layerName) {
+//     layerName = msg.data;
+//     run();
+//   } else if (msg.type === "material" && msg.data !== material) {
+//     material = msg.data;
+//     run();
+//   }
+// };

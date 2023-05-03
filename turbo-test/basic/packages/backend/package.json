@@ -4,16 +4,12 @@
   "private": true,
   "license": "GPT-3",
   "sideEffects": false,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "files": [
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --external react",
-    "clean": "rm -rf dist",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
     "lint": "eslint \"src/**/*.ts*\"",
     "test": "jest"
   },
