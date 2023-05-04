@@ -1,6 +1,9 @@
 import { AltTextNode } from "../altNodes/altMixins";
-import { numToAutoFixed } from "../common/numToAutoFixed";
-import { commonLetterSpacing , commonLineHeight } from "../common/commonTextHeightSpacing";
+import { sliceNum } from "../common/numToAutoFixed";
+import {
+  commonLetterSpacing,
+  commonLineHeight,
+} from "../common/commonTextHeightSpacing";
 import { convertFontWeight } from "../common/convertFontWeight";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import {
@@ -73,7 +76,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   letterSpacing = (node: AltTextNode): this => {
     const letterSpacing = commonLetterSpacing(node);
     if (letterSpacing > 0) {
-      this.modifiers += `\n.tracking(${numToAutoFixed(letterSpacing)})`;
+      this.modifiers += `\n.tracking(${sliceNum(letterSpacing)})`;
     }
 
     return this;
@@ -85,7 +88,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     const letterHeight = commonLineHeight(node);
 
     if (letterHeight > 0) {
-      this.modifiers += `\n.lineSpacing(${numToAutoFixed(letterHeight)})`;
+      this.modifiers += `\n.lineSpacing(${sliceNum(letterHeight)})`;
     }
 
     return this;

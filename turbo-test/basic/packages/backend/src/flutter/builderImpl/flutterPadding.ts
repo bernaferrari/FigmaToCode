@@ -1,5 +1,5 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
 
 // Add padding if necessary!
@@ -14,8 +14,8 @@ export const flutterPadding = (node: AltSceneNode): string => {
     return "";
   }
 
-  if ("all" in padding) {
-    return `\npadding: const EdgeInsets.all(${numToAutoFixed(padding.all)}),`;
+  if ("all" in padding && padding.all !== 0) {
+    return `const EdgeInsets.all(${sliceNum(padding.all)})`;
   }
 
   // horizontal and vertical, as the default AutoLayout
@@ -25,13 +25,11 @@ export const flutterPadding = (node: AltSceneNode): string => {
   ) {
     const propHorizontalPadding =
       padding.horizontal > 0
-        ? `horizontal: ${numToAutoFixed(padding.horizontal)}, `
+        ? `horizontal: ${sliceNum(padding.horizontal)}, `
         : "";
 
     const propVerticalPadding =
-      padding.vertical > 0
-        ? `vertical: ${numToAutoFixed(padding.vertical)}, `
-        : "";
+      padding.vertical > 0 ? `vertical: ${sliceNum(padding.vertical)}, ` : "";
 
     return `\npadding: const EdgeInsets.symmetric(${propHorizontalPadding}${propVerticalPadding}),`;
   }
@@ -40,16 +38,16 @@ export const flutterPadding = (node: AltSceneNode): string => {
 
   // if left and right exists, verify if they are the same after [pxToLayoutSize] conversion.
   if (padding.left) {
-    comp += `left: ${numToAutoFixed(padding.left)}, `;
+    comp += `left: ${sliceNum(padding.left)}, `;
   }
   if (padding.right) {
-    comp += `right: ${numToAutoFixed(padding.right)}, `;
+    comp += `right: ${sliceNum(padding.right)}, `;
   }
   if (padding.top) {
-    comp += `top: ${numToAutoFixed(padding.top)}, `;
+    comp += `top: ${sliceNum(padding.top)}, `;
   }
   if (padding.bottom) {
-    comp += `bottom: ${numToAutoFixed(padding.bottom)}, `;
+    comp += `bottom: ${sliceNum(padding.bottom)}, `;
   }
 
   if (comp !== "") {

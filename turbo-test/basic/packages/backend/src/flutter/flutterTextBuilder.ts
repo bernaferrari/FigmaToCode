@@ -1,5 +1,5 @@
 import { AltTextNode } from "../altNodes/altMixins";
-import { numToAutoFixed } from "../common/numToAutoFixed";
+import { sliceNum } from "../common/numToAutoFixed";
 import { convertFontWeight } from "../common/convertFontWeight";
 import { indentString } from "../common/indentString";
 import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
@@ -76,7 +76,7 @@ export const getTextStyle = (node: AltTextNode): string => {
   }
 
   if (node.fontSize !== figma.mixed) {
-    styleBuilder += `\nfontSize: ${numToAutoFixed(node.fontSize)},`;
+    styleBuilder += `\nfontSize: ${sliceNum(node.fontSize)},`;
   }
 
   if (node.textDecoration === "UNDERLINE") {
@@ -109,7 +109,7 @@ export const getTextStyle = (node: AltTextNode): string => {
   // todo lineSpacing
   const letterSpacing = commonLetterSpacing(node);
   if (letterSpacing > 0) {
-    styleBuilder += `\nletterSpacing: ${numToAutoFixed(letterSpacing)},`;
+    styleBuilder += `\nletterSpacing: ${sliceNum(letterSpacing)},`;
   }
 
   return styleBuilder;

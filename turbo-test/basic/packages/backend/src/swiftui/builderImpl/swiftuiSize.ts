@@ -1,6 +1,6 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { sliceNum } from "../../common/numToAutoFixed";
 
 export const swiftuiSize = (node: AltSceneNode): [string, string] => {
   const size = nodeWidthHeight(node, false);
@@ -11,7 +11,7 @@ export const swiftuiSize = (node: AltSceneNode): [string, string] => {
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
   if (typeof size.width === "number") {
-    const w = numToAutoFixed(size.width);
+    const w = sliceNum(size.width);
 
     if (shouldExtend) {
       propWidth = `maxWidth: ${w}`;
@@ -24,7 +24,7 @@ export const swiftuiSize = (node: AltSceneNode): [string, string] => {
 
   let propHeight = "";
   if (typeof size.height === "number") {
-    const h = numToAutoFixed(size.height);
+    const h = sliceNum(size.height);
 
     if (shouldExtend) {
       propHeight = `maxHeight: ${h}`;

@@ -121,8 +121,8 @@ function deepFlatten(arr: Array<AltSceneNode>): Array<AltSceneNode> {
     if ("children" in d) {
       result = result.concat(deepFlatten([...d.children]));
     } else if (d.type === "TEXT") {
-        result.push(d);
-      }
+      result.push(d);
+    }
   });
 
   return result;
@@ -159,7 +159,7 @@ function calculateContrastRatio(color1: RGB, color2: RGB) {
 function luminance(color: RGB) {
   const a = [color.r * 255, color.g * 255, color.b * 255].map((v) => {
     v /= 255;
-    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055)**2.4;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
   });
   return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
 }

@@ -1,28 +1,44 @@
-import React, { useEffect } from "react";
-import { PluginUI } from "plugin-ui";
+import { useEffect, useState } from "react";
+import { FrameworkTypes, PluginUI } from "plugin-ui";
 
 export default function App() {
-  const [code, setCode] = React.useState("");
+  const [code, setCode] = useState("");
+  const [selectedFramework, setSelectedFramework] =
+    useState<FrameworkTypes>("HTML");
 
-  // useEffect(() => {
-  //   // Add event listener for messages from Figma plugin
-  //   window.onmessage = (event: MessageEvent) => {
-  //     const message = event.data.pluginMessage;
+  useEffect(() => {
+    // Add event listener for messages from Figma plugin
+    window.onmessage = (event: MessageEvent) => {
+      const message = event.data.pluginMessage;
 
-  //     if (message.type === "code") {
-  //       setCode(message.code);
-  //     }
-  //   };
+      if (message.type === "code") {
+        setCode(message.data);
+      } else if (message.type === "empty") {
+        setCode("empty");
+      }
+    };
 
-  //   // Clean up the event listener when the component is unmounted
-  //   return () => {
-  //     window.onmessage = null;
-  //   };
-  // }, []);
+    parent.postMessage({ pluginMessage: { type: "html" } }, "*");
+
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      window.onmessage = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log("pushing message");
+    parent.postMessage({ pluginMessage: { type: selectedFramework } }, "*");
+  }, [selectedFramework]);
 
   return (
     <div className="">
-      <PluginUI code={code} />
+      <PluginUI
+        code={code}
+        emptySelection={false}
+        selectedFramework={selectedFramework}
+        setSelectedFramework={setSelectedFramework}
+      />
     </div>
   );
 }

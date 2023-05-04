@@ -1,4 +1,8 @@
-import { AltBlendMixin , AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
+import {
+  AltBlendMixin,
+  AltLayoutMixin,
+  AltSceneNode,
+} from "../../altNodes/altMixins";
 import { nearestOpacity, nearestValue } from "../conversionTables";
 
 /**

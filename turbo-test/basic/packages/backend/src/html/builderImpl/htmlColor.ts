@@ -1,5 +1,5 @@
 import { gradientAngle } from "../../common/color";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { sliceNum } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 
 // retrieve the SOLID color on HTML
@@ -19,10 +19,10 @@ export const htmlColorFromFills = (
 };
 
 export const htmlColor = (color: RGB, alpha: number = 1): string => {
-  const r = numToAutoFixed(color.r * 255);
-  const g = numToAutoFixed(color.g * 255);
-  const b = numToAutoFixed(color.b * 255);
-  const a = numToAutoFixed(alpha ?? 1);
+  const r = sliceNum(color.r * 255);
+  const g = sliceNum(color.g * 255);
+  const b = sliceNum(color.b * 255);
+  const a = sliceNum(alpha ?? 1);
 
   if (color.r === 1 && color.g === 1 && color.b === 1 && alpha === 1) {
     return "white";
@@ -55,7 +55,7 @@ export const htmlGradient = (fill: GradientPaint): string => {
       // only add position to fractional
       const position =
         d.position > 0 && d.position < 1
-          ? ` ${  (100 * d.position).toFixed(0)  }%`
+          ? ` ${(100 * d.position).toFixed(0)}%`
           : "";
 
       return `${htmlColor(d.color, d.color.a)}${position}`;

@@ -116,7 +116,9 @@ export const convertIntoAltNodes = (
         altNode.strokeAlign = "CENTER";
 
         // Remove 1 since it now has a height of 1. It won't be visually perfect, but will be almost.
-        altNode.strokeWeight = altNode.strokeWeight - 1;
+        if (altNode.strokeWeight != figma.mixed) {
+          altNode.strokeWeight = altNode.strokeWeight - 1;
+        }
 
         return altNode;
       } else if (

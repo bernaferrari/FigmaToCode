@@ -1,5 +1,5 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { sliceNum } from "../../common/numToAutoFixed";
 
 export const swiftuiShadow = (node: AltSceneNode): string => {
   if (!node.effects || node.effects.length === 0) {
@@ -20,21 +20,21 @@ export const swiftuiShadow = (node: AltSceneNode): string => {
 
   const color = shadow.color;
   // set color when not black with 0.25 of opacity, which is the Figma default. Round the alpha now to avoid rounding issues.
-  const a = numToAutoFixed(color.a);
+  const a = sliceNum(color.a);
   if (color.r + color.g + color.b === 0 && a !== "0.25") {
-    const r = numToAutoFixed(color.r);
-    const g = numToAutoFixed(color.g);
-    const b = numToAutoFixed(color.b);
+    const r = sliceNum(color.r);
+    const g = sliceNum(color.g);
+    const b = sliceNum(color.b);
     comp += `color: Color(red: ${r}, green: ${g}, blue: ${b}, opacity: ${a}), `;
   }
 
-  comp += `radius: ${numToAutoFixed(shadow.radius)}`;
+  comp += `radius: ${sliceNum(shadow.radius)}`;
 
   if (shadow.offset.x !== shadow.offset.y) {
     const x =
-      shadow.offset.x > 0 ? `x: ${numToAutoFixed(shadow.offset.x)}` : "";
+      shadow.offset.x > 0 ? `x: ${sliceNum(shadow.offset.x)}` : "";
     const y =
-      shadow.offset.y > 0 ? `y: ${numToAutoFixed(shadow.offset.y)}` : "";
+      shadow.offset.y > 0 ? `y: ${sliceNum(shadow.offset.y)}` : "";
 
     // add initial comma since this is an optional paramater and radius must come first.
     comp += ", ";
@@ -64,5 +64,5 @@ export const swiftuiBlur = (node: AltSceneNode): string => {
 
   // retrieve first blur.
   const blur = layerBlur[0].radius;
-  return `\n.blur(radius: ${numToAutoFixed(blur)})`;
+  return `\n.blur(radius: ${sliceNum(blur)})`;
 };

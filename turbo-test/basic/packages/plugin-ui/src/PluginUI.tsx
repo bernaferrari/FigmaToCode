@@ -1,60 +1,66 @@
-import * as React from "react";
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-
+import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Description } from "./description";
+
+export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
 
 type PluginUIProps = {
   code: string;
-  onNodeSelected?: (node: string) => void;
-  // onSelectionChange?: (selection: string) => void;
+  emptySelection: boolean;
+  selectedFramework: FrameworkTypes;
+  setSelectedFramework: (framework: FrameworkTypes) => void;
 };
 
-export type exportTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
-
 export const PluginUI = (props: PluginUIProps) => {
-  const [selectedNode, setSelectedNode] = React.useState<exportTypes>("HTML");
-
   return (
-    <div className="flex flex-col px-2 mt-2 dark:text-white">
-      <div className="grid grid-cols-4 gap-1">
+    <div className="flex flex-col h-full dark:text-white">
+      <div className="p-2 grid grid-cols-4 gap-1">
         {["HTML", "Tailwind", "Flutter", "SwiftUI"].map((tab) => (
           <button
             className={`w-full p-1 text-sm ${
-              selectedNode === tab
+              props.selectedFramework === tab
                 ? "bg-green-400 dark:bg-emerald-600 dark:text-white bg-opacity-50 rounded text-gray-700 font-semibold"
                 : "bg-green-50 dark:bg-green-600 dark:bg-opacity-25 border-[1px] border-green-500 border-opacity-20 dark:text-white dark:border-green-500 dark:border-opacity-25 rounded hover:text-gray-800 dark:hover:hover:text-gray-200 font-semibold"
             }`}
             onClick={() => {
-              setSelectedNode(tab as exportTypes);
+              props.setSelectedFramework(tab as FrameworkTypes);
             }}
           >
             {tab}
           </button>
         ))}
       </div>
-      <div className="flex flex-col items-center py-2 bg-gray-50 dark:bg-transparent">
-        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-800 rounded">
-          <Description selected={selectedNode} />
-        </div>
+      <div
+        style={{
+          height: 1,
+          width: "100%",
+          backgroundColor: "rgba(255,255,255,0.12)",
+        }}
+      ></div>
+      <div className="flex flex-col h-full overflow-y-auto">
+        <div className="flex flex-col items-center px-2 py-2 bg-gray-50 dark:bg-transparent">
+          <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-800 rounded">
+            <Description selected={props.selectedFramework} />
+          </div>
 
-        <div className="h-2"></div>
+          <div className="h-2"></div>
 
-        {/* <ResponsiveGrade /> */}
+          {/* <ResponsiveGrade /> */}
 
-        {/* <div className="h-2"></div>
+          {/* <div className="h-2"></div>
         <div className="flex justify-end w-full mb-1">
           <button className="px-4 py-2 text-sm font-semibold text-white bg-gray-900 rounded-lg ring-1 ring-gray-700 hover:bg-gray-700 focus:outline-none">
             Copy
           </button>
         </div> */}
 
-        {/* Code View */}
-        <CodeWindow code={props.code} />
+          {/* Code View */}
+          <CodeWindow code={props.code} />
 
-        <div className="text-xs">
-          Other things go here, such as color, tokens, etc.
+          <div className="text-xs">
+            Other things go here, such as color, tokens, etc.
+          </div>
         </div>
       </div>
     </div>
@@ -114,7 +120,7 @@ export const CodeWindow = (props: { code: string }) => {
 
         <SyntaxHighlighter
           language="dart"
-          style={materialDark}
+          style={theme}
           customStyle={{
             fontSize: 12,
             borderRadius: 8,

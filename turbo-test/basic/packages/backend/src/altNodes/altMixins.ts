@@ -6,17 +6,13 @@ export type AltSceneNode =
   | AltEllipseNode
   | AltTextNode;
 
-export interface AltGeometryMixin {
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
-  strokes: ReadonlyArray<Paint>;
-  strokeWeight: number;
-  strokeMiterLimit: number;
-  strokeAlign: "CENTER" | "INSIDE" | "OUTSIDE";
+export interface AltGeometryMixin
+  extends MinimalStrokesMixin,
+    MinimalFillsMixin {
   strokeCap: StrokeCap | PluginAPI["mixed"];
-  strokeJoin: StrokeJoin | PluginAPI["mixed"];
-  dashPattern: ReadonlyArray<number>;
-  fillStyleId: string | PluginAPI["mixed"];
-  strokeStyleId: string;
+  strokeMiterLimit: number;
+  outlineStroke(): VectorNode | null;
+  fillGeometry: VectorPaths;
 }
 
 export interface AltCornerMixin {
@@ -98,7 +94,8 @@ export interface AltDefaultShapeMixin
 export interface AltRectangleNode
   extends AltDefaultShapeMixin,
     AltCornerMixin,
-    AltRectangleCornerMixin {}
+    AltRectangleCornerMixin,
+    IndividualStrokesMixin {}
 
 export interface AltEllipseNode extends AltDefaultShapeMixin, AltCornerMixin {}
 

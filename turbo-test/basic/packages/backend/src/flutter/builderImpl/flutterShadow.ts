@@ -1,32 +1,30 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { rgbTo8hex } from "../../common/color";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
 import { indentString } from "../../common/indentString";
 
-export const flutterBoxShadow = (node: AltSceneNode): string => {
+export const flutterShadow = (
+  node: AltSceneNode,
+  propertyName: "boxShadow" | "shadows"
+): string => {
   let propBoxShadow = "";
   if (node.effects?.length > 0) {
     const dropShadow: Array<DropShadowEffect> = node.effects.filter(
-      (d): d is DropShadowEffect =>
-        d.type === "DROP_SHADOW" && d.visible
+      (d): d is DropShadowEffect => d.type === "DROP_SHADOW" && d.visible
     );
 
     if (dropShadow.length > 0) {
       let boxShadow = "";
 
       dropShadow.forEach((d: DropShadowEffect) => {
-        const color = `\ncolor: Color(0x${rgbTo8hex(d.color, d.color.a)}),`;
-        const radius = `\nblurRadius: ${numToAutoFixed(d.radius)},`;
-        const offset = `\noffset: Offset(${numToAutoFixed(
-          d.offset.x
-        )}, ${numToAutoFixed(d.offset.y)}),`;
-
-        const property = color + radius + offset;
-
-        boxShadow += `\nBoxShadow(${indentString(property)}\n),`;
+        boxShadow += generateWidgetCode("BoxShadow", {
+          color: `Color(0x${rgbTo8hex(d.color, d.color.a)})`,
+          blurRadius: sliceNum(d.radius),
+          offset: `Offset(${sliceNum(d.offset.x)}, ${sliceNum(d.offset.y)})`,
+        });
       });
 
-      propBoxShadow = `\nboxShadow: [${indentString(boxShadow)}\n],`;
+      propBoxShadow = `\n${propertyName}: [${indentString(boxShadow)}\n],`;
     }
     // TODO inner shadow, layer blur
   }
@@ -41,8 +39,7 @@ export const flutterElevationAndShadowColor = (
 
   if (node.effects.length > 0) {
     const dropShadow: Array<DropShadowEffect> = node.effects.filter(
-      (d): d is DropShadowEffect =>
-        d.type === "DROP_SHADOW" && d.visible
+      (d): d is DropShadowEffect => d.type === "DROP_SHADOW" && d.visible
     );
 
     if (dropShadow.length > 0 && dropShadow[0].type === "DROP_SHADOW") {
@@ -50,7 +47,7 @@ export const flutterElevationAndShadowColor = (
         dropShadow[0].color,
         dropShadow[0].color.a
       )}), `;
-      elevation = `\nelevation: ${numToAutoFixed(dropShadow[0].radius)}, `;
+      elevation = `\nelevation: ${sliceNum(dropShadow[0].radius)}, `;
     }
   }
 

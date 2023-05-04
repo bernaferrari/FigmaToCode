@@ -6,7 +6,7 @@ import {
   AltTextNode,
   AltSceneNode,
 } from "../altNodes/altMixins";
-import { numToAutoFixed } from "../common/numToAutoFixed";
+import { generateWidgetCode, sliceNum } from "../common/numToAutoFixed";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { FlutterTextBuilder } from "./flutterTextBuilder";
@@ -74,9 +74,12 @@ const flutterWidgetGenerator = (
 };
 
 const flutterGroup = (node: AltGroupNode): string => {
-  const properties = `\nchildren:[${flutterWidgetGenerator(node.children)}],`;
-
-  return flutterContainer(node, `Stack(${indentString(properties,)}\n),`);
+  return flutterContainer(
+    node,
+    generateWidgetCode("Stack", {
+      children: `[${flutterWidgetGenerator(node.children)}]`,
+    })
+  );
 };
 
 const flutterContainer = (
@@ -95,12 +98,16 @@ const flutterContainer = (
   }
 
   if (child.length > 0 && image.length > 0) {
-    const prop1 = `\nPositioned.fill(\n${indentString(`child: ${child}`, 2)}\n),`;
-    const prop2 = `\nPositioned.fill(\n${indentString(`child: ${image}`, 2)}\n),`;
+    const prop1 = generateWidgetCode("Positioned.fill", {
+      child: child,
+    });
+    const prop2 = generateWidgetCode("Positioned.fill", {
+      child: image,
+    });
 
-    const propStack = `\nchildren: [${indentString(prop1 + prop2, 2)}\n],`;
-
-    propChild = `Stack(${indentString(propStack, 2)}\n),`;
+    propChild = generateWidgetCode("Stack", {
+      children: `[${indentString(prop1 + prop2, 2)}\n]`,
+    });
   } else if (child.length > 0) {
     propChild = child;
   } else if (image.length > 0) {
@@ -139,10 +146,12 @@ const flutterFrame = (node: AltFrameNode): string => {
   } else {
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-
-    const properties = `\nchildren:[\n${indentString(children, 2)}\n],`;
-
-    return flutterContainer(node, `Stack(${indentString(properties, 2)}\n),`);
+    return flutterContainer(
+      node,
+      generateWidgetCode("Stack", {
+        children: `[${indentString(children, 2)}\n]`,
+      })
+    );
   }
 };
 
@@ -162,7 +171,7 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
       crossAlignType = "end";
       break;
   }
-  const crossAxisAlignment = `\ncrossAxisAlignment: CrossAxisAlignment.${crossAlignType},`;
+  const crossAxisAlignment = `CrossAxisAlignment.${crossAlignType}`;
 
   let mainAlignType = "";
   switch (node.primaryAxisAlignItems) {
@@ -179,20 +188,21 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
       mainAlignType = "spaceBetween";
       break;
   }
-  const mainAxisAlignment = `\nmainAxisAlignment: MainAxisAlignment.${mainAlignType},`;
+  const mainAxisAlignment = `MainAxisAlignment.${mainAlignType}`;
 
   let mainAxisSize = "";
   if (node.layoutGrow === 1) {
-    mainAxisSize = "\nmainAxisSize: MainAxisSize.max,";
+    mainAxisSize = "MainAxisSize.max,";
   } else {
-    mainAxisSize = "\nmainAxisSize: MainAxisSize.min,";
+    mainAxisSize = "MainAxisSize.min,";
   }
 
-  const properties = `${
-    mainAxisSize + mainAxisAlignment + crossAxisAlignment
-  }\nchildren:[\n${indentString(children, 2)}\n],`;
-
-  return `${rowOrColumn}(${indentString(properties, 2)}\n),`;
+  return generateWidgetCode(rowOrColumn, {
+    nmainAxisSize: mainAxisSize,
+    mainAxisAlignment: mainAxisAlignment,
+    crossAxisAlignment: crossAxisAlignment,
+    children: `[${indentString(children, 2)}\n]`,
+  });
 };
 
 // TODO Vector support in Flutter is complicated. Currently, AltConversion converts it in a Rectangle.
@@ -203,12 +213,14 @@ const addSpacingIfNeeded = (node: AltSceneNode): string => {
     // Don't add the SizedBox at last value. In Figma, itemSpacing CAN be negative; here it can't.
     if (node.parent.itemSpacing > 0) {
       if (node.parent.layoutMode === "HORIZONTAL") {
-        return `\nSizedBox(width: ${numToAutoFixed(node.parent.itemSpacing)}),`;
+        return generateWidgetCode("SizedBox", {
+          width: sliceNum(node.parent.itemSpacing),
+        });
       } else {
         // node.parent.layoutMode === "VERTICAL"
-        return `\nSizedBox(height: ${numToAutoFixed(
-          node.parent.itemSpacing
-        )}),`;
+        return generateWidgetCode("SizedBox", {
+          height: sliceNum(node.parent.itemSpacing),
+        });
       }
     }
   }

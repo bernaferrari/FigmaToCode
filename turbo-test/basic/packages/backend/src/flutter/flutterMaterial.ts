@@ -1,4 +1,5 @@
-import { AltSceneNode ,
+import {
+  AltSceneNode,
   AltRectangleNode,
   AltEllipseNode,
   AltFrameNode,
@@ -57,7 +58,7 @@ const materialColor = (
   if (!color) {
     return "\ncolor: Colors.transparent,";
   }
-  return `\n${  color}`;
+  return `\n${color}`;
 };
 
 const materialShape = (

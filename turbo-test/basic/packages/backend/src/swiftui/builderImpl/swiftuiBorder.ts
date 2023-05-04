@@ -1,5 +1,5 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { sliceNum } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { swiftuiColorFromFills } from "./swiftuiColor";
 
@@ -18,7 +18,7 @@ export const swiftuiBorder = (node: AltSceneNode): string => {
   }
 
   const propStrokeColor = swiftuiColorFromFills(node.strokes);
-  const lW = numToAutoFixed(node.strokeWeight);
+  const lW = sliceNum(node.strokeWeight);
   const fill = retrieveTopFill(node.fills);
 
   if (propStrokeColor && node.strokeWeight) {
@@ -53,7 +53,7 @@ export const swiftuiShapeStroke = (node: AltSceneNode): string => {
   }
 
   const propStrokeColor = swiftuiColorFromFills(node.strokes);
-  const lW = numToAutoFixed(node.strokeWeight);
+  const lW = sliceNum(node.strokeWeight);
 
   if (propStrokeColor && node.strokeWeight) {
     const fill = retrieveTopFill(node.fills);
@@ -86,7 +86,7 @@ export const swiftuiCornerRadius = (node: AltSceneNode): string => {
     node.cornerRadius !== figma.mixed &&
     node.cornerRadius > 0
   ) {
-    return numToAutoFixed(node.cornerRadius);
+    return sliceNum(node.cornerRadius);
   } else {
     if (!("topLeftRadius" in node)) {
       return "";
@@ -101,7 +101,7 @@ export const swiftuiCornerRadius = (node: AltSceneNode): string => {
     );
 
     if (maxBorder > 0) {
-      return numToAutoFixed(maxBorder);
+      return sliceNum(maxBorder);
     }
   }
 

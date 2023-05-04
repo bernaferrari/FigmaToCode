@@ -21,7 +21,7 @@ export default function Web() {
 
         <div className="dark bg-gray-100 bg- p-2 rounded-md">
           <div className="bg-black w-96 shadow-md rounded-md">
-          <PluginFigmaToolbar variant="(Dark)" />
+            <PluginFigmaToolbar variant="(Dark)" />
             <PluginUI code={"code goes hereeeee"} />
           </div>
         </div>

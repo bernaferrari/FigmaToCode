@@ -1,5 +1,9 @@
-import { AltBlendMixin , AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import {
+  AltBlendMixin,
+  AltLayoutMixin,
+  AltSceneNode,
+} from "../../altNodes/altMixins";
+import { sliceNum } from "../../common/numToAutoFixed";
 import { formatWithJSX } from "../../common/parseJSX";
 
 /**
@@ -13,9 +17,9 @@ export const htmlOpacity = (node: AltBlendMixin, isJsx: boolean): string => {
   if (node.opacity !== undefined && node.opacity !== 1) {
     // formatWithJSX is not called here because opacity unit doesn't end in px.
     if (isJsx) {
-      return `opacity: ${numToAutoFixed(node.opacity)}, `;
+      return `opacity: ${sliceNum(node.opacity)}, `;
     } else {
-      return `opacity: ${numToAutoFixed(node.opacity)}; `;
+      return `opacity: ${sliceNum(node.opacity)}; `;
     }
   }
   return "";
@@ -49,7 +53,7 @@ export const htmlRotation = (node: AltLayoutMixin, isJsx: boolean): string => {
     return formatWithJSX(
       "transform",
       isJsx,
-      `rotate(${numToAutoFixed(node.rotation)}deg)`
+      `rotate(${sliceNum(node.rotation)}deg)`
     );
   }
   return "";

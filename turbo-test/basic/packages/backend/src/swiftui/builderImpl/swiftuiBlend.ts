@@ -1,12 +1,16 @@
-import { AltBlendMixin , AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import {
+  AltBlendMixin,
+  AltLayoutMixin,
+  AltSceneNode,
+} from "../../altNodes/altMixins";
+import { sliceNum } from "../../common/numToAutoFixed";
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/opacity(_:)
  */
 export const swiftuiOpacity = (node: AltBlendMixin): string => {
   if (node.opacity !== undefined && node.opacity !== 1) {
-    return `\n.opacity(${numToAutoFixed(node.opacity)})`;
+    return `\n.opacity(${sliceNum(node.opacity)})`;
   }
   return "";
 };
@@ -27,7 +31,7 @@ export const swiftuiVisibility = (node: AltSceneNode): string => {
  */
 export const swiftuiRotation = (node: AltLayoutMixin): string => {
   if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
-    return `.rotationEffect(.degrees(${numToAutoFixed(node.rotation)}))`;
+    return `.rotationEffect(.degrees(${sliceNum(node.rotation)}))`;
   }
   return "";
 };

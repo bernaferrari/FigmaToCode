@@ -1,7 +1,5 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 
-export type exportFramework = "flutter" | "swiftui" | "html" | "tailwind";
-
 // from https://dev.to/alvaromontoro/building-your-own-color-contrast-checker-4j7o
 export const calculateContrastRatio = (color1: RGB, color2: RGB): number => {
   const color1luminance = luminance(color1);
@@ -18,7 +16,7 @@ export const calculateContrastRatio = (color1: RGB, color2: RGB): number => {
 function luminance(color: RGB) {
   const a = [color.r * 255, color.g * 255, color.b * 255].map((v) => {
     v /= 255;
-    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055)**2.4;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
   });
   return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
 }

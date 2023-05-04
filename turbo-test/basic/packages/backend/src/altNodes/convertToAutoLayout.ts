@@ -112,9 +112,9 @@ const reorderChildrenIfAligned = (
     // if all elements are horizontally aligned
     return [updateChildren.sort((a, b) => a.y - b.y), "VERTICAL", avg];
   } else if (visit === "HORIZONTAL") {
-      // if all elements are vertically aligned
-      return [updateChildren.sort((a, b) => a.x - b.x), "HORIZONTAL", avg];
-    }
+    // if all elements are vertically aligned
+    return [updateChildren.sort((a, b) => a.x - b.x), "HORIZONTAL", avg];
+  }
 
   return [updateChildren, "NONE", 0];
 };

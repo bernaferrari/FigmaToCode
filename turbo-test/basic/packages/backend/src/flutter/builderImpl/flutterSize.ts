@@ -1,6 +1,6 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { sliceNum } from "../../common/numToAutoFixed";
 
 // Used in tests.
 export const flutterSizeWH = (node: AltSceneNode): string => {
@@ -19,7 +19,7 @@ export const flutterSize = (
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
   if (typeof size.width === "number") {
-    propWidth = `\nwidth: ${numToAutoFixed(size.width)},`;
+    propWidth = sliceNum(size.width);
   } else if (size.width === "full") {
     // When parent is a Row, child must be Expanded.
     if (
@@ -29,13 +29,13 @@ export const flutterSize = (
     ) {
       isExpanded = true;
     } else {
-      propWidth = `\nwidth: double.infinity,`;
+      propWidth = `double.infinity`;
     }
   }
 
   let propHeight = "";
   if (typeof size.height === "number") {
-    propHeight = `\nheight: ${numToAutoFixed(size.height)},`;
+    propHeight = sliceNum(size.height);
   } else if (size.height === "full") {
     // When parent is a Column, child must be Expanded.
     if (
@@ -45,7 +45,7 @@ export const flutterSize = (
     ) {
       isExpanded = true;
     } else {
-      propHeight = `\nheight: double.infinity,`;
+      propHeight = `double.infinity`;
     }
   }
 

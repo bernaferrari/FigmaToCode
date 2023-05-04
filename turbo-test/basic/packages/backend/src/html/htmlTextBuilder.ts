@@ -4,7 +4,7 @@ import { formatWithJSX } from "../common/parseJSX";
 import { convertFontWeight } from "../common/convertFontWeight";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlTextSize as htmlTextSizeBox } from "./builderImpl/htmlTextSize";
-import { numToAutoFixed } from "../common/numToAutoFixed";
+import { sliceNum } from "../common/numToAutoFixed";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
   // constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {
@@ -101,7 +101,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
           this.style += formatWithJSX(
             "line-height",
             this.isJSX,
-            `${numToAutoFixed(node.lineHeight.value)}%`
+            `${sliceNum(node.lineHeight.value)}%`
           );
           break;
         case "PIXELS":

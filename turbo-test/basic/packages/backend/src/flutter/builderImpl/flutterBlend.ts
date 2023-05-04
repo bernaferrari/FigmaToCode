@@ -1,5 +1,9 @@
-import { AltBlendMixin , AltLayoutMixin, AltSceneNode } from "../../altNodes/altMixins";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import {
+  AltBlendMixin,
+  AltLayoutMixin,
+  AltSceneNode,
+} from "../../altNodes/altMixins";
+import { sliceNum } from "../../common/numToAutoFixed";
 import { indentString } from "../../common/indentString";
 
 /**
@@ -7,7 +11,7 @@ import { indentString } from "../../common/indentString";
  */
 export const flutterOpacity = (node: AltBlendMixin, child: string): string => {
   if (node.opacity !== undefined && node.opacity !== 1 && child !== "") {
-    const prop = `\nopacity: ${numToAutoFixed(node.opacity)},\nchild: ${child}`;
+    const prop = `\nopacity: ${sliceNum(node.opacity)},\nchild: ${child}`;
 
     return `Opacity(${indentString(prop)}\n),`;
   }
@@ -45,7 +49,7 @@ export const flutterRotation = (
     child !== "" &&
     Math.round(node.rotation) !== 0
   ) {
-    const prop = `\nangle: ${numToAutoFixed(
+    const prop = `\nangle: ${sliceNum(
       node.rotation * (-3.14159 / 180)
     )},\nchild: ${child}`;
 

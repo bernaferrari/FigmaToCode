@@ -1,6 +1,11 @@
-import { AltFrameNode, AltGroupNode, AltTextNode , AltSceneNode } from "../altNodes/altMixins";
+import {
+  AltFrameNode,
+  AltGroupNode,
+  AltTextNode,
+  AltSceneNode,
+} from "../altNodes/altMixins";
 import { indentString } from "../common/indentString";
-import { numToAutoFixed } from "../common/numToAutoFixed";
+import { sliceNum } from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { swiftuiRoundedRectangle } from "./builderImpl/swiftuiBorder";
@@ -173,17 +178,17 @@ const wrapInDirectionalStack = (
       layoutAlign = "alignment: .trailing";
     }
   } else if (mostFreq === "MIN") {
-      layoutAlign = "alignment: .top";
-    } else if (mostFreq === "MAX") {
-      layoutAlign = "alignment: .bottom";
-    }
+    layoutAlign = "alignment: .top";
+  } else if (mostFreq === "MAX") {
+    layoutAlign = "alignment: .bottom";
+  }
 
   // only add comma and a space if layoutAlign has a value
   const comma = layoutAlign ? ", " : "";
   // default spacing for SwiftUI is 16.
   const spacing =
     Math.round(node.itemSpacing) !== 16
-      ? `${comma}spacing: ${numToAutoFixed(node.itemSpacing)}`
+      ? `${comma}spacing: ${sliceNum(node.itemSpacing)}`
       : "";
 
   return `\n${rowOrColumn}(${layoutAlign}${spacing}) {${children}\n}`;

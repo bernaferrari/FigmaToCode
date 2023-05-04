@@ -1,5 +1,5 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { sliceNum } from "../../common/numToAutoFixed";
 import { parentCoordinates } from "../../common/parentCoordinates";
 
 export const swiftuiPosition = (
@@ -29,8 +29,8 @@ export const swiftuiPosition = (
     ) {
       return "";
     } else {
-      const x = numToAutoFixed(pointX - parentCenterX);
-      const y = numToAutoFixed(pointY - parentCenterY);
+      const x = sliceNum(pointX - parentCenterX);
+      const y = sliceNum(pointY - parentCenterY);
       return `\n.offset(x: ${x}, y: ${y})`;
     }
   }

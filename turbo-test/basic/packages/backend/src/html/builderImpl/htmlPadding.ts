@@ -1,4 +1,4 @@
-import { numToAutoFixed } from "../../common/numToAutoFixed";
+import { sliceNum } from "../../common/numToAutoFixed";
 import { AltFrameMixin, AltDefaultShapeMixin } from "../../altNodes/altMixins";
 import { commonPadding } from "../../common/commonPadding";
 import { formatWithJSX } from "../../common/parseJSX";

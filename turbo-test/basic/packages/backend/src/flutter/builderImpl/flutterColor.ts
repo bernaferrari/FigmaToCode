@@ -1,4 +1,5 @@
 import { rgbTo8hex, gradientAngle } from "../../common/color";
+import { printPropertyIfNotDefault } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { nearestValue } from "../../tailwind/conversionTables";
 
@@ -19,19 +20,36 @@ export const flutterColorFromFills = (
   return "";
 };
 
-export const flutterBoxDecorationColor = (
+export const flutterColorFromFills2 = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
   const fill = retrieveTopFill(fills);
 
   if (fill?.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
-    return `\ncolor: ${flutterColor(fill.color, opacity)},`;
-  } else if (fill?.type === "GRADIENT_LINEAR") {
-    return `\ngradient: ${flutterGradient(fill)},`;
+    return printPropertyIfNotDefault(
+      "color",
+      flutterColor(fill.color, opacity),
+      "Colors(0xff000000)"
+    );
   }
 
   return "";
+};
+
+export const flutterBoxDecorationColor = (
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+): Record<string, string> => {
+  const fill = retrieveTopFill(fills);
+
+  if (fill?.type === "SOLID") {
+    const opacity = fill.opacity ?? 1.0;
+    return { color: flutterColor(fill.color, opacity) };
+  } else if (fill?.type === "GRADIENT_LINEAR") {
+    return { gradient: flutterGradient(fill) };
+  }
+
+  return {};
 };
 
 export const flutterGradient = (fill: GradientPaint): string => {

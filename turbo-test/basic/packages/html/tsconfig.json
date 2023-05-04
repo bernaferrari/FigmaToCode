@@ -1,6 +1,9 @@
 {
   "extends": "tsconfig/base.json",
   "compilerOptions": {
-    "typeRoots": ["../figma-to-html/node_modules/@types", "../figma-to-html/node_modules/@figma"]
+    "typeRoots": [
+      "../figma-to-html/node_modules/@types",
+      "../figma-to-html/node_modules/@figma"
+    ]
   }
 }

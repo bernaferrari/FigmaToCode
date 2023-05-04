@@ -10,8 +10,7 @@ export const htmlShadow = (node: AltBlendMixin): string => {
   if (node.effects && node.effects.length > 0) {
     const dropShadow = node.effects.filter(
       (d): d is ShadowEffect =>
-        (d.type === "DROP_SHADOW" || d.type === "INNER_SHADOW") &&
-        d.visible
+        (d.type === "DROP_SHADOW" || d.type === "INNER_SHADOW") && d.visible
     );
     // simple shadow from tailwind
     if (dropShadow.length > 0) {

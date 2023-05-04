@@ -4,12 +4,13 @@ import {
   tailwindMain,
   swiftuiMain,
   convertIntoAltNodes,
+  FrameworkTypes,
 } from "backend";
 
 switch (figma.mode) {
   case "default":
   case "panel":
-    let mode: "flutter" | "swiftui" | "html" | "tailwind";
+    let mode: FrameworkTypes;
     let isJsx = false;
     let layerName = false;
 
@@ -19,10 +20,10 @@ switch (figma.mode) {
     });
     figma.ui.onmessage = (msg) => {
       if (
-        msg.type === "tailwind" ||
-        msg.type === "flutter" ||
-        msg.type === "swiftui" ||
-        msg.type === "html"
+        msg.type === "Tailwind" ||
+        msg.type === "Flutter" ||
+        msg.type === "SwiftUI" ||
+        msg.type === "HTML"
       ) {
         mode = msg.type;
         run(mode);

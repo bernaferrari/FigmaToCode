@@ -16,11 +16,8 @@ import {
   flutterGradient,
 } from "../../flutter/builderImpl/flutterColor";
 import { htmlColor, htmlGradient } from "../../html/builderImpl/htmlColor";
-import {
-  calculateContrastRatio,
-  deepFlatten,
-  exportFramework,
-} from "./commonUI";
+import { calculateContrastRatio, deepFlatten } from "./commonUI";
+import { FrameworkTypes } from "../../code";
 
 // For Tailwind, show the name and don't show the contrast.
 type exportSolidColor = {
@@ -33,7 +30,7 @@ type exportSolidColor = {
 
 export const retrieveGenericSolidUIColors = (
   sceneNode: Array<AltSceneNode>,
-  framework: exportFramework
+  framework: FrameworkTypes
 ): Array<exportSolidColor> => {
   const selectedChildren = deepFlatten(sceneNode);
 
@@ -71,7 +68,7 @@ export const retrieveGenericSolidUIColors = (
 
 const convertSolidColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
-  framework: exportFramework,
+  framework: FrameworkTypes,
   nodeType: string
 ): Array<exportSolidColor> | null => {
   // shortcut to be used for calculateContrastRatio.
@@ -94,7 +91,7 @@ const convertSolidColor = (
           let exported = "";
           const opacity = fill.opacity ?? 1.0;
 
-          if (framework === "flutter") {
+          if (framework === "Flutter") {
             exported = flutterColor(fill.color, opacity);
 
             return {
@@ -104,9 +101,9 @@ const convertSolidColor = (
               contrastBlack: calculateContrastRatio(fill.color, black),
               contrastWhite: calculateContrastRatio(fill.color, white),
             };
-          } else if (framework === "html") {
+          } else if (framework === "HTML") {
             exported = htmlColor(fill.color, opacity);
-          } else if (framework === "tailwind") {
+          } else if (framework === "Tailwind") {
             const kind = nodeType === "TEXT" ? "text" : "bg";
             exported = tailwindSolidColor(fill, kind);
 
@@ -121,7 +118,7 @@ const convertSolidColor = (
               contrastBlack: 0,
               contrastWhite: 0,
             };
-          } else if (framework === "swiftui") {
+          } else if (framework === "SwiftUI") {
             exported = swiftuiColor(fill.color, opacity);
           }
 
@@ -147,7 +144,7 @@ type exportLinearGradient = {
 
 export const retrieveGenericLinearGradients = (
   sceneNode: Array<AltSceneNode>,
-  framework: exportFramework
+  framework: FrameworkTypes
 ): Array<exportLinearGradient> => {
   const selectedChildren = deepFlatten(sceneNode);
 
@@ -185,7 +182,7 @@ export const retrieveGenericLinearGradients = (
 
 const convertGradient = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
-  framework: exportFramework
+  framework: FrameworkTypes
 ): Array<exportLinearGradient> | null => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
@@ -196,16 +193,16 @@ const convertGradient = (
         if (fill.type === "GRADIENT_LINEAR") {
           let exported = "";
           switch (framework) {
-            case "flutter":
+            case "Flutter":
               exported = flutterGradient(fill);
               break;
-            case "html":
+            case "HTML":
               exported = htmlGradient(fill);
               break;
-            case "tailwind":
+            case "Tailwind":
               exported = tailwindGradient(fill);
               break;
-            case "swiftui":
+            case "SwiftUI":
               exported = swiftuiGradient(fill);
               break;
           }

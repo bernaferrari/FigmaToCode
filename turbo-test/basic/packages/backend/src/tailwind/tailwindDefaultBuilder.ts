@@ -45,7 +45,7 @@ export class TailwindDefaultBuilder {
     this.visible = node.visible;
 
     if (showLayerName) {
-      this.name = `${node.name.replace(" ", "")  } `;
+      this.name = `${node.name.replace(" ", "")} `;
     }
   }
 

@@ -14,7 +14,9 @@ let isJsx = false;
 let layerName = false,
   material = true;
 
-export const run = (mode: "flutter" | "swiftui" | "html" | "tailwind") => {
+export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
+
+export const run = (mode: FrameworkTypes) => {
   console.log("run is being run", mode);
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
@@ -36,13 +38,13 @@ export const run = (mode: "flutter" | "swiftui" | "html" | "tailwind") => {
     null
   );
 
-  if (mode === "flutter") {
+  if (mode === "Flutter") {
     result = flutterMain(convertedSelection, parentId, material);
-  } else if (mode === "tailwind") {
+  } else if (mode === "Tailwind") {
     result = tailwindMain(convertedSelection, parentId, isJsx, layerName);
-  } else if (mode === "swiftui") {
+  } else if (mode === "SwiftUI") {
     result = swiftuiMain(convertedSelection, parentId);
-  } else if (mode === "html") {
+  } else if (mode === "HTML") {
     result = htmlMain(convertedSelection, parentId, isJsx, layerName);
   }
 
@@ -54,10 +56,10 @@ export const run = (mode: "flutter" | "swiftui" | "html" | "tailwind") => {
   });
 
   if (
-    mode === "tailwind" ||
-    mode === "flutter" ||
-    mode === "html" ||
-    mode === "swiftui"
+    mode === "Tailwind" ||
+    mode === "Flutter" ||
+    mode === "HTML" ||
+    mode === "SwiftUI"
   ) {
     figma.ui.postMessage({
       type: "colors",
@@ -69,7 +71,7 @@ export const run = (mode: "flutter" | "swiftui" | "html" | "tailwind") => {
       data: retrieveGenericLinearGradients(convertedSelection, mode),
     });
   }
-  if (mode === "tailwind") {
+  if (mode === "Tailwind") {
     figma.ui.postMessage({
       type: "text",
       data: retrieveTailwindText(convertedSelection),
