@@ -3,17 +3,17 @@ import {
   AltLayoutMixin,
   AltSceneNode,
 } from "../../altNodes/altMixins";
-import { sliceNum } from "../../common/numToAutoFixed";
-import { indentString } from "../../common/indentString";
+import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
 
 /**
  * https://api.flutter.dev/flutter/widgets/Opacity-class.html
  */
 export const flutterOpacity = (node: AltBlendMixin, child: string): string => {
   if (node.opacity !== undefined && node.opacity !== 1 && child !== "") {
-    const prop = `\nopacity: ${sliceNum(node.opacity)},\nchild: ${child}`;
-
-    return `Opacity(${indentString(prop)}\n),`;
+    return generateWidgetCode("Opacity", {
+      opacity: sliceNum(node.opacity),
+      child: child,
+    });
   }
   return child;
 };
@@ -28,9 +28,10 @@ export const flutterVisibility = (
   // [when testing] node.visible can be undefined
 
   if (node.visible !== undefined && !node.visible && child !== "") {
-    const prop = `\nvisible: ${node.visible},\nchild: ${child}`;
-
-    return `Visibility(${indentString(prop)}\n),`;
+    return generateWidgetCode("Visibility", {
+      visible: `${node.visible}`,
+      child: child,
+    });
   }
   return child;
 };
@@ -49,11 +50,10 @@ export const flutterRotation = (
     child !== "" &&
     Math.round(node.rotation) !== 0
   ) {
-    const prop = `\nangle: ${sliceNum(
-      node.rotation * (-3.14159 / 180)
-    )},\nchild: ${child}`;
-
-    return `Transform.rotate(${indentString(prop)}\n),`;
+    return generateWidgetCode("Transform.rotate", {
+      angle: sliceNum(node.rotation * (-3.14159 / 180)),
+      child: child,
+    });
   }
   return child;
 };

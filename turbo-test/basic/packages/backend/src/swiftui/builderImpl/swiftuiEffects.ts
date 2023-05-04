@@ -31,10 +31,8 @@ export const swiftuiShadow = (node: AltSceneNode): string => {
   comp += `radius: ${sliceNum(shadow.radius)}`;
 
   if (shadow.offset.x !== shadow.offset.y) {
-    const x =
-      shadow.offset.x > 0 ? `x: ${sliceNum(shadow.offset.x)}` : "";
-    const y =
-      shadow.offset.y > 0 ? `y: ${sliceNum(shadow.offset.y)}` : "";
+    const x = shadow.offset.x > 0 ? `x: ${sliceNum(shadow.offset.x)}` : "";
+    const y = shadow.offset.y > 0 ? `y: ${sliceNum(shadow.offset.y)}` : "";
 
     // add initial comma since this is an optional paramater and radius must come first.
     comp += ", ";

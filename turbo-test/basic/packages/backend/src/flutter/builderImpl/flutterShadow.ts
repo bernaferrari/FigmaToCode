@@ -31,25 +31,25 @@ export const flutterShadow = (
   return propBoxShadow;
 };
 
-export const flutterElevationAndShadowColor = (
-  node: AltSceneNode
-): [string, string] => {
-  let elevation = "";
-  let shadowColor = "";
+// export const flutterElevationAndShadowColor = (
+//   node: AltSceneNode
+// ): [string, string] => {
+//   let elevation = "";
+//   let shadowColor = "";
 
-  if (node.effects.length > 0) {
-    const dropShadow: Array<DropShadowEffect> = node.effects.filter(
-      (d): d is DropShadowEffect => d.type === "DROP_SHADOW" && d.visible
-    );
+//   if (node.effects.length > 0) {
+//     const dropShadow: Array<DropShadowEffect> = node.effects.filter(
+//       (d): d is DropShadowEffect => d.type === "DROP_SHADOW" && d.visible
+//     );
 
-    if (dropShadow.length > 0 && dropShadow[0].type === "DROP_SHADOW") {
-      shadowColor = `\ncolor: Color(0x${rgbTo8hex(
-        dropShadow[0].color,
-        dropShadow[0].color.a
-      )}), `;
-      elevation = `\nelevation: ${sliceNum(dropShadow[0].radius)}, `;
-    }
-  }
+//     if (dropShadow.length > 0 && dropShadow[0].type === "DROP_SHADOW") {
+//       shadowColor = `\ncolor: Color(0x${rgbTo8hex(
+//         dropShadow[0].color,
+//         dropShadow[0].color.a
+//       )}), `;
+//       elevation = `\nelevation: ${sliceNum(dropShadow[0].radius)}, `;
+//     }
+//   }
 
-  return [elevation, shadowColor];
-};
+//   return [elevation, shadowColor];
+// };

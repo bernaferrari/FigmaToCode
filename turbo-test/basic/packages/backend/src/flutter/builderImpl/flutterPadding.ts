@@ -18,11 +18,15 @@ export const flutterPadding = (node: AltSceneNode): string => {
     return `const EdgeInsets.all(${sliceNum(padding.all)})`;
   }
 
-  // horizontal and vertical, as the default AutoLayout
+  if (!("horizontal" in padding)) {
+    return "";
+  }
+
   if (
     padding.horizontal + padding.vertical !== 0 &&
     padding.top + padding.bottom + padding.left + padding.right === 0
   ) {
+    // horizontal and vertical, as the default AutoLayout
     const propHorizontalPadding =
       padding.horizontal > 0
         ? `horizontal: ${sliceNum(padding.horizontal)}, `
@@ -31,27 +35,34 @@ export const flutterPadding = (node: AltSceneNode): string => {
     const propVerticalPadding =
       padding.vertical > 0 ? `vertical: ${sliceNum(padding.vertical)}, ` : "";
 
-    return `\npadding: const EdgeInsets.symmetric(${propHorizontalPadding}${propVerticalPadding}),`;
+    return `const EdgeInsets.symmetric(${propHorizontalPadding}${propVerticalPadding})`;
   }
 
   let comp = "";
 
   // if left and right exists, verify if they are the same after [pxToLayoutSize] conversion.
-  if (padding.left) {
-    comp += `left: ${sliceNum(padding.left)}, `;
-  }
-  if (padding.right) {
-    comp += `right: ${sliceNum(padding.right)}, `;
-  }
-  if (padding.top) {
-    comp += `top: ${sliceNum(padding.top)}, `;
-  }
-  if (padding.bottom) {
-    comp += `bottom: ${sliceNum(padding.bottom)}, `;
-  }
+  // if (padding.left) {
+  //   comp += `left: ${sliceNum(padding.left)}, `;
+  // }
+  // if (padding.right) {
+  //   comp += `right: ${sliceNum(padding.right)}, `;
+  // }
+  // if (padding.top) {
+  //   comp += `top: ${sliceNum(padding.top)}, `;
+  // }
+  // if (padding.bottom) {
+  //   comp += `bottom: ${sliceNum(padding.bottom)}, `;
+  // }
+
+  generateWidgetCode("const EdgeInsets.only", {
+    left: padding.left && padding.left > 0 ? sliceNum(padding.left) : "0",
+    right: sliceNum(padding.right),
+    top: padding.top && padding.top > 0 ? sliceNum(padding.top) : "0",
+    bottom: sliceNum(padding.bottom),
+  });
 
   if (comp !== "") {
-    return `\npadding: const EdgeInsets.only(${comp}),`;
+    return `const EdgeInsets.only(${comp}),`;
   }
 
   return "";

@@ -1,8 +1,8 @@
 import { AltSceneNode } from "../../altNodes/altMixins";
 import { commonPosition } from "../../common/commonPosition";
-import { sliceNum } from "../../common/numToAutoFixed";
+import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
 import { parentCoordinates } from "../../common/parentCoordinates";
-import { indentString, indentStringFlutter } from "../../common/indentString";
+import { indentStringFlutter } from "../../common/indentString";
 
 export const flutterPosition = (
   node: AltSceneNode,
@@ -27,8 +27,11 @@ export const flutterPosition = (
       const diffX = sliceNum(node.x - parentX);
       const diffY = sliceNum(node.y - parentY);
 
-      const properties = `\nleft: ${diffX},\ntop: ${diffY},\nchild: ${child}`;
-      return `Positioned(${indentStringFlutter(properties)}\n),`;
+      return generateWidgetCode("Positioned", {
+        left: diffX,
+        top: diffY,
+        child: child,
+      });
     }
   }
 

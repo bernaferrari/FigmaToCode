@@ -109,17 +109,20 @@ export const flutterContainer = (
     });
   } else if (propPadding) {
     // if there is just a padding, add Padding
-    const properties = `${propPadding}${propChild}`;
-
-    result = `Padding(${indentString(properties, 2)}\n),`;
+    result = generateWidgetCode("Padding", {
+      padding: propPadding,
+      child: propChild,
+    });
   } else {
     result = child;
   }
 
   // Add Expanded() when parent is a Row/Column and width is full.
   if (isExpanded) {
-    const properties = `\nchild: ${result}`;
-    result = `Expanded(${indentString(properties, 2)}\n),`;
+    result = generateWidgetCode("Expanded", {
+      padding: propPadding,
+      child: result,
+    });
   }
 
   return result;

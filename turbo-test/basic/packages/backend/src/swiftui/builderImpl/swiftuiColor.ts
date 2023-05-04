@@ -84,8 +84,7 @@ export const swiftuiColor = (color: RGB, opacity: number): string => {
   const g = `green: ${sliceNum(color.g)}`;
   const b = `blue: ${sliceNum(color.b)}`;
 
-  const opacityAttr =
-    opacity !== 1.0 ? `, opacity: ${sliceNum(opacity)}` : "";
+  const opacityAttr = opacity !== 1.0 ? `, opacity: ${sliceNum(opacity)}` : "";
 
   return `Color(${r}, ${g}, ${b}${opacityAttr})`;
 };
