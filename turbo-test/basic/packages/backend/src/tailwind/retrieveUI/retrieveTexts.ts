@@ -45,7 +45,7 @@ export const retrieveTailwindText = (
 
       const fill = retrieveTopFill(node.fills);
 
-      if (fill?.type === "SOLID") {
+      if (fill && fill.type === "SOLID") {
         contrastBlack = calculateContrastRatio(fill.color, black);
       }
 
@@ -136,7 +136,7 @@ const convertColor = (
 
   const fill = retrieveTopFill(fills);
 
-  if (fill?.type === "SOLID") {
+  if (fill && fill.type === "SOLID") {
     return tailwindNearestColor(rgbTo6hex(fill.color));
   }
 

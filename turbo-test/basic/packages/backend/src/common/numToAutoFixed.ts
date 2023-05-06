@@ -16,6 +16,16 @@ export const printPropertyIfNotDefault = (
   return `${propertyName}: ${propertyValue}`;
 };
 
+export const propertyIfNotDefault = (
+  propertyValue: any,
+  defaultProperty: any
+): string => {
+  if (propertyValue === defaultProperty) {
+    return "";
+  }
+  return propertyValue;
+};
+
 export const generateWidgetCode = (
   className: string,
   properties: Record<string, string>
@@ -25,5 +35,8 @@ export const generateWidgetCode = (
     .map(([key, value]) => `${key}: ${value},`)
     .join("\n");
 
+  if (printedProperties === "") {
+    return `${className}()`;
+  }
   return `${className}(\n${indentStringFlutter(printedProperties)}\n)`;
 };

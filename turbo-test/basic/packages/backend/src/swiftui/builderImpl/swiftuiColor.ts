@@ -11,7 +11,7 @@ export const swiftuiColorFromFills = (
 ): string => {
   const fill = retrieveTopFill(fills);
 
-  if (fill?.type === "SOLID") {
+  if (fill && fill.type === "SOLID") {
     // todo maybe ignore text color when it is black?
 
     // opacity should only be null on set, not on get. But better be prevented.

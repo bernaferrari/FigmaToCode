@@ -22,8 +22,8 @@ export const commonPosition = (node: AltSceneNode): position => {
   let hPadding = 0;
   let vPadding = 0;
   if (node.parent && "layoutMode" in node.parent) {
-    hPadding = (node.parent.paddingLeft ?? 0) + (node.parent.paddingRight ?? 0);
-    vPadding = (node.parent.paddingTop ?? 0) + (node.parent.paddingBottom ?? 0);
+    hPadding = node.parent.paddingLeft + node.parent.paddingRight;
+    vPadding = node.parent.paddingTop + node.parent.paddingBottom;
   }
 
   if (

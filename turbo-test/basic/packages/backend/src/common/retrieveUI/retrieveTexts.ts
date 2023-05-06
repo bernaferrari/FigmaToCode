@@ -49,7 +49,7 @@ export const retrieveGenericUIText = (
 
       const fill = retrieveTopFill(node.fills);
 
-      if (fill?.type === "SOLID") {
+      if (fill && fill.type === "SOLID") {
         contrastBlack = calculateContrastRatio(fill.color, black);
       }
 

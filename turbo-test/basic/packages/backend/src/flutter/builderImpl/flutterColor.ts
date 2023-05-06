@@ -11,7 +11,7 @@ export const flutterColorFromFills = (
 ): string => {
   const fill = retrieveTopFill(fills);
 
-  if (fill?.type === "SOLID") {
+  if (fill && fill.type === "SOLID") {
     // todo maybe ignore text color when it is black?
     const opacity = fill.opacity ?? 1.0;
     return `color: ${flutterColor(fill.color, opacity)},`;
@@ -25,13 +25,9 @@ export const flutterColorFromFills2 = (
 ): string => {
   const fill = retrieveTopFill(fills);
 
-  if (fill?.type === "SOLID") {
+  if (fill && fill.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
-    return printPropertyIfNotDefault(
-      "color",
-      flutterColor(fill.color, opacity),
-      "Colors(0xff000000)"
-    );
+    return flutterColor(fill.color, opacity);
   }
 
   return "";
@@ -42,7 +38,7 @@ export const flutterBoxDecorationColor = (
 ): Record<string, string> => {
   const fill = retrieveTopFill(fills);
 
-  if (fill?.type === "SOLID") {
+  if (fill && fill.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
     return { color: flutterColor(fill.color, opacity) };
   } else if (fill?.type === "GRADIENT_LINEAR") {

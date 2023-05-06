@@ -1,6 +1,7 @@
 import {
   generateWidgetCode,
   printPropertyIfNotDefault,
+  propertyIfNotDefault,
 } from "./../../common/numToAutoFixed";
 import {
   AltEllipseNode,
@@ -28,7 +29,10 @@ export const flutterBorder = (node: AltSceneNode): string => {
       break;
   }
 
-  const color = flutterColorFromFills2(node.strokes);
+  const color = propertyIfNotDefault(
+    flutterColorFromFills2(node.strokes),
+    "Colors.black"
+  );
 
   if ("strokeTopWeight" in node) {
     if (
@@ -72,7 +76,7 @@ export const flutterBorder = (node: AltSceneNode): string => {
   // only add strokeWidth when there is a strokeColor (returns "" otherwise)
   let propStrokeWidth: string = "";
   if (node.strokeWeight !== figma.mixed && node.strokeWeight !== 0) {
-    propStrokeWidth = printPropertyIfNotDefault("width", node.strokeWeight, 1);
+    propStrokeWidth = sliceNum(node.strokeWeight); // default is 1.
   }
 
   return generateWidgetCode("Border.all", {

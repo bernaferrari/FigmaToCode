@@ -10,7 +10,7 @@ export const htmlColorFromFills = (
   // [when testing] fills can be undefined
 
   const fill = retrieveTopFill(fills);
-  if (fill?.type === "SOLID") {
+  if (fill && fill.type === "SOLID") {
     // if fill isn't visible, it shouldn't be painted.
     return htmlColor(fill.color, fill.opacity);
   }

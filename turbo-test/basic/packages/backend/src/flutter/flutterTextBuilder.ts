@@ -1,5 +1,5 @@
 import { AltTextNode } from "../altNodes/altMixins";
-import { sliceNum } from "../common/numToAutoFixed";
+import { generateWidgetCode, sliceNum } from "../common/numToAutoFixed";
 import { convertFontWeight } from "../common/convertFontWeight";
 import { indentString } from "../common/indentString";
 import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
@@ -70,18 +70,12 @@ export const getTextStyle = (node: AltTextNode): string => {
   // example: text-md
   let styleBuilder = "";
 
-  const color = flutterColorFromFills(node.fills);
-  if (color) {
-    styleBuilder += `\n${color}`;
-  }
-
-  if (node.fontSize !== figma.mixed) {
-    styleBuilder += `\nfontSize: ${sliceNum(node.fontSize)},`;
-  }
-
-  if (node.textDecoration === "UNDERLINE") {
-    styleBuilder += "\ndecoration: TextDecoration.underline,";
-  }
+  styleBuilder = generateWidgetCode("TextStyle", {
+    color: flutterColorFromFills(node.fills),
+    fontSize: node.fontSize !== figma.mixed ? sliceNum(node.fontSize) : "",
+    decoration:
+      node.textDecoration === "UNDERLINE" ? "TextDecoration.underline" : "",
+  });
 
   if (node.fontName !== figma.mixed) {
     const lowercaseStyle = node.fontName.style.toLowerCase();
@@ -128,22 +122,25 @@ export const wrapTextAutoResize = (
   if (node.textAutoResize === "NONE") {
     // = instead of += because we want to replace it
 
-    const properties = `${width}${height}\nchild: ${child}`;
-
-    result = `SizedBox(${indentString(properties)}\n),`;
+    result = generateWidgetCode("SizedBox", {
+      width: width,
+      height: height,
+      child: child,
+    });
   } else if (node.textAutoResize === "HEIGHT") {
     // if HEIGHT is set, it means HEIGHT will be calculated automatically, but width won't
     // = instead of += because we want to replace it
 
-    const properties = `${width}\nchild: ${child}`;
-
-    result = `SizedBox(${indentString(properties)}\n),`;
+    result = generateWidgetCode("SizedBox", {
+      width: width,
+      child: child,
+    });
   }
 
   if (isExpanded) {
-    const properties = `\nchild: ${result}`;
-
-    return `Expanded(${indentString(properties)}\n),`;
+    return generateWidgetCode("Expanded", {
+      child: result,
+    });
   } else if (result.length > 0) {
     return result;
   }

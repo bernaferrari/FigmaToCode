@@ -35,7 +35,7 @@ export const flutterMain = (
 const flutterWidgetGenerator = (
   sceneNode: ReadonlyArray<AltSceneNode>
 ): string => {
-  let comp = "";
+  let comp: string[] = [];
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
@@ -43,17 +43,17 @@ const flutterWidgetGenerator = (
 
   visibleSceneNode.forEach((node, index) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += flutterContainer(node, "");
+      comp.push(flutterContainer(node, ""));
     }
     //  else if (node.type === "VECTOR") {
     // comp = flutterVector(node);
     // }
     else if (node.type === "GROUP") {
-      comp += flutterGroup(node);
+      comp.push(flutterGroup(node));
     } else if (node.type === "FRAME") {
-      comp += flutterFrame(node);
+      comp.push(flutterFrame(node));
     } else if (node.type === "TEXT") {
-      comp += flutterText(node);
+      comp.push(flutterText(node));
     }
 
     if (index < sceneLen - 1) {
@@ -62,15 +62,12 @@ const flutterWidgetGenerator = (
       const spacing = addSpacingIfNeeded(node);
       if (spacing) {
         // comp += "\n";
-        comp += spacing;
+        comp.push(spacing);
       }
-
-      // don't add a newline at last element.
-      comp += "\n";
     }
   });
 
-  return comp;
+  return comp.join(",\n");
 };
 
 const flutterGroup = (node: AltGroupNode): string => {
@@ -149,7 +146,7 @@ const flutterFrame = (node: AltFrameNode): string => {
     return flutterContainer(
       node,
       generateWidgetCode("Stack", {
-        children: `[${indentString(children, 2)}\n]`,
+        children: `[\n${indentString(children, 2)}\n]`,
       })
     );
   }
@@ -201,7 +198,7 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
     nmainAxisSize: mainAxisSize,
     mainAxisAlignment: mainAxisAlignment,
     crossAxisAlignment: crossAxisAlignment,
-    children: `[${indentString(children, 2)}\n]`,
+    children: `[\n${indentString(children, 2)}\n]`,
   });
 };
 

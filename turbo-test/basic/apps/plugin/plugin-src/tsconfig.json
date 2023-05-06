@@ -1,6 +1,6 @@
 {
+  "extends": "tsconfig/base.json",
   "compilerOptions": {
-    "strict": false,
-    "typeRoots": ["../node_modules/@figma"]
+    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
   }
 }

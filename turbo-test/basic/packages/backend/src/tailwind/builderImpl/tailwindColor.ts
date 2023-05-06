@@ -12,7 +12,7 @@ export const tailwindColorFromFills = (
   // [when testing] fills can be undefined
 
   const fill = retrieveTopFill(fills);
-  if (fill?.type === "SOLID") {
+  if (fill && fill.type === "SOLID") {
     // don't set text color when color is black (default) and opacity is 100%
     return tailwindSolidColor(fill, kind);
   }
