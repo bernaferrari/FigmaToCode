@@ -1,4 +1,5 @@
 # build output
+public
 dist
 .next
 out/
