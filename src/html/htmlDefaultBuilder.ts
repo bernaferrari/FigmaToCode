@@ -56,7 +56,7 @@ export class HtmlDefaultBuilder {
       const fill = this.retrieveFill(node.strokes);
       const weight = node.strokeWeight;
 
-      if (node.dashPattern.length > 0) {
+      if (node.dashPattern && node.dashPattern.length > 0) {
         this.style += formatWithJSX("border-style", this.isJSX, "dotted");
       } else {
         this.style += formatWithJSX("border-style", this.isJSX, "solid");

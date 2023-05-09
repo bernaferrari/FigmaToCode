@@ -14,7 +14,7 @@ export interface AltGeometryMixin {
   strokeAlign: "CENTER" | "INSIDE" | "OUTSIDE";
   strokeCap: StrokeCap | PluginAPI["mixed"];
   strokeJoin: StrokeJoin | PluginAPI["mixed"];
-  dashPattern: ReadonlyArray<number>;
+  dashPattern?: ReadonlyArray<number>;
   fillStyleId: string | PluginAPI["mixed"];
   strokeStyleId: string;
 }
