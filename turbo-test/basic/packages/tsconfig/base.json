@@ -15,7 +15,8 @@
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
   },
   "exclude": ["node_modules"]
 }

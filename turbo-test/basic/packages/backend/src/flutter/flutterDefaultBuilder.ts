@@ -14,7 +14,6 @@ import {
 } from "./builderImpl/flutterBlend";
 
 import { flutterContainer } from "./flutterContainer";
-import { flutterMaterial } from "./flutterMaterial";
 
 export class FlutterDefaultBuilder {
   child: string;
@@ -24,22 +23,9 @@ export class FlutterDefaultBuilder {
   }
 
   createContainer(
-    node: AltRectangleNode | AltEllipseNode | AltFrameNode | AltGroupNode,
-    material: boolean
+    node: AltRectangleNode | AltEllipseNode | AltFrameNode | AltGroupNode
   ): this {
-    const fill = node.type === "GROUP" ? null : retrieveTopFill(node.fills);
-    // fill.visible can be true or undefined (on tests)
-    // if (
-    //   node.type !== "GROUP" &&
-    //   material &&
-    //   fill &&
-    //   fill.visible !== false &&
-    //   fill.type === "SOLID"
-    // ) {
-    // this.child = flutterMaterial(node, this.child);
-    // } else {
     this.child = flutterContainer(node, this.child);
-    // }
     return this;
   }
 

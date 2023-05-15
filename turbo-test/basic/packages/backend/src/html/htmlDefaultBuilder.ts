@@ -23,7 +23,7 @@ import { htmlSize, htmlSizePartial } from "./builderImpl/htmlSize";
 import { htmlBorderRadius } from "./builderImpl/htmlBorderRadius";
 
 export class HtmlDefaultBuilder {
-  style: string;
+  style: Array<string>;
   isJSX: boolean;
   visible: boolean;
   name: string = "";
@@ -31,7 +31,7 @@ export class HtmlDefaultBuilder {
 
   constructor(node: AltSceneNode, showLayerName: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
-    this.style = "";
+    this.style = [];
     this.visible = node.visible;
 
     if (showLayerName) {
@@ -40,16 +40,18 @@ export class HtmlDefaultBuilder {
   }
 
   blend(node: AltSceneNode): this {
-    this.style += htmlVisibility(node, this.isJSX);
-    this.style += htmlRotation(node, this.isJSX);
-    this.style += htmlOpacity(node, this.isJSX);
+    this.style.push(
+      htmlVisibility(node, this.isJSX),
+      htmlRotation(node, this.isJSX),
+      htmlOpacity(node, this.isJSX)
+    );
 
     return this;
   }
 
   border(node: AltGeometryMixin & AltSceneNode): this {
     // add border-radius: 10, for example.
-    this.style += htmlBorderRadius(node, this.isJSX);
+    this.style.push(htmlBorderRadius(node, this.isJSX));
 
     // add border: 10px solid, for example.
     if (node.strokes && node.strokes.length > 0 && node.strokeWeight > 0) {
@@ -57,24 +59,22 @@ export class HtmlDefaultBuilder {
       const weight = node.strokeWeight;
 
       if (node.dashPattern.length > 0) {
-        this.style += formatWithJSX("border-style", this.isJSX, "dotted");
+        this.style.push(formatWithJSX("border-style", this.isJSX, "dotted"));
       } else {
-        this.style += formatWithJSX("border-style", this.isJSX, "solid");
+        this.style.push(formatWithJSX("border-style", this.isJSX, "solid"));
       }
 
-      this.style += formatWithJSX("border-width", this.isJSX, weight);
-      this.style += formatWithJSX("border-style", this.isJSX, "solid");
+      this.style.push(formatWithJSX("border-width", this.isJSX, weight));
+      this.style.push(formatWithJSX("border-style", this.isJSX, "solid"));
 
       if (fill.kind === "gradient") {
         // Gradient requires these.
-        this.style += formatWithJSX("border-image-slice", this.isJSX, 1);
-        this.style += formatWithJSX(
-          "border-image-source",
-          this.isJSX,
-          fill.prop
+        this.style.push(
+          formatWithJSX("border-image-slice", this.isJSX, 1),
+          formatWithJSX("border-image-source", this.isJSX, fill.prop)
         );
       } else {
-        this.style += formatWithJSX("border-color", this.isJSX, fill.prop);
+        this.style.push(formatWithJSX("border-color", this.isJSX, fill.prop));
       }
     }
 
@@ -96,14 +96,16 @@ export class HtmlDefaultBuilder {
       const left = node.x - parentX;
       const top = node.y - parentY;
 
-      this.style += formatWithJSX("left", this.isJSX, left);
-      this.style += formatWithJSX("top", this.isJSX, top);
+      this.style.push(
+        formatWithJSX("left", this.isJSX, left),
+        formatWithJSX("top", this.isJSX, top)
+      );
 
       if (!isRelative) {
-        this.style += formatWithJSX("position", this.isJSX, "absolute");
+        this.style.push(formatWithJSX("position", this.isJSX, "absolute"));
       }
     } else {
-      this.style += position;
+      this.style.push(position);
     }
 
     return this;
@@ -118,23 +120,17 @@ export class HtmlDefaultBuilder {
       // When text, solid must be outputted as 'color'.
       const prop = property === "text" ? "color" : property;
 
-      this.style += formatWithJSX(prop, this.isJSX, fill.prop);
+      this.style.push(formatWithJSX(prop, this.isJSX, fill.prop));
     } else if (fill.kind === "gradient") {
       if (property === "background-color") {
-        this.style += formatWithJSX("background-image", this.isJSX, fill.prop);
-      } else if (property === "text") {
-        this.style += formatWithJSX("background", this.isJSX, fill.prop);
-
-        this.style += formatWithJSX(
-          "-webkit-background-clip",
-          this.isJSX,
-          "text"
+        this.style.push(
+          formatWithJSX("background-image", this.isJSX, fill.prop)
         );
-
-        this.style += formatWithJSX(
-          "-webkit-text-fill-color",
-          this.isJSX,
-          "transparent"
+      } else if (property === "text") {
+        this.style.push(
+          formatWithJSX("background", this.isJSX, fill.prop),
+          formatWithJSX("-webkit-background-clip", this.isJSX, "text"),
+          formatWithJSX("-webkit-text-fill-color", this.isJSX, "transparent")
         );
       }
     }
@@ -163,7 +159,9 @@ export class HtmlDefaultBuilder {
   shadow(node: AltBlendMixin): this {
     const shadow = htmlShadow(node);
     if (shadow) {
-      this.style += formatWithJSX("box-shadow", this.isJSX, htmlShadow(node));
+      this.style.push(
+        formatWithJSX("box-shadow", this.isJSX, htmlShadow(node))
+      );
     }
     return this;
   }
@@ -173,44 +171,44 @@ export class HtmlDefaultBuilder {
     // if current element is relative (therefore, children are absolute)
     // or current element is one of the absoltue children and has a width or height > w/h-64
     if ("isRelative" in node && node.isRelative === true) {
-      this.style += htmlSize(node, this.isJSX);
+      this.style.push(htmlSize(node, this.isJSX));
     } else {
       const partial = htmlSizePartial(node, this.isJSX);
       this.hasFixedSize = partial[0] !== "" && partial[1] !== "";
 
-      this.style += partial.join("");
+      partial.join("");
     }
     return this;
   }
 
   autoLayoutPadding(node: AltFrameMixin | AltDefaultShapeMixin): this {
-    this.style += htmlPadding(node, this.isJSX);
+    this.style.push(htmlPadding(node, this.isJSX));
     return this;
   }
 
   removeTrailingSpace(): this {
-    if (this.style.length > 0 && this.style.endsWith(" ")) {
-      this.style = this.style.slice(0, -1);
-    }
     return this;
   }
 
-  build(additionalStyle: string = ""): string {
-    this.style += additionalStyle;
+  build(additionalStyle: Array<string> = []): string {
+    this.style.push(...additionalStyle);
     this.removeTrailingSpace();
 
+    let formattedStyle = "";
     if (this.style) {
       if (this.isJSX) {
-        this.style = ` style={{${this.style}}}`;
+        formattedStyle = ` style={{${this.style
+          .map((s) => s.trim())
+          .join(",")}}}`;
       } else {
-        this.style = ` style="${this.style}"`;
+        formattedStyle = ` style="${this.style.join(";")}"`;
       }
     }
     if (this.name.length > 0) {
       const classOrClassName = this.isJSX ? "className" : "class";
-      return ` ${classOrClassName}="${this.name}"${this.style}`;
+      return ` ${classOrClassName}="${this.name}"${formattedStyle}`;
     } else {
-      return this.style;
+      return formattedStyle;
     }
   }
 }

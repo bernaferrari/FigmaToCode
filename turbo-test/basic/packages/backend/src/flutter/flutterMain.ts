@@ -67,7 +67,7 @@ const flutterWidgetGenerator = (
     }
   });
 
-  return comp.join(",\n");
+  return comp.join(",\n") + ",";
 };
 
 const flutterGroup = (node: AltGroupNode): string => {
@@ -111,10 +111,8 @@ const flutterContainer = (
     propChild = image;
   }
 
-  const builder = new FlutterDefaultBuilder(propChild);
-
-  builder
-    .createContainer(node, material)
+  const builder = new FlutterDefaultBuilder(propChild)
+    .createContainer(node)
     .blendAttr(node)
     .position(node, parentId);
 
@@ -122,6 +120,18 @@ const flutterContainer = (
 };
 
 const flutterText = (node: AltTextNode): string => {
+  const builder = new FlutterTextBuilder();
+
+  builder
+    .createText(node)
+    .blendAttr(node)
+    .textAutoSize(node)
+    .position(node, parentId);
+
+  return builder.child;
+};
+
+const flutterStar = (node: AltTextNode): string => {
   const builder = new FlutterTextBuilder();
 
   builder
@@ -156,50 +166,37 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   // ROW or COLUMN
   const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
-  let crossAlignType;
-  switch (node.counterAxisAlignItems) {
-    case "MIN":
-      crossAlignType = "start";
-      break;
-    case "CENTER":
-      crossAlignType = "center";
-      break;
-    case "MAX":
-      crossAlignType = "end";
-      break;
-  }
-  const crossAxisAlignment = `CrossAxisAlignment.${crossAlignType}`;
-
-  let mainAlignType = "";
-  switch (node.primaryAxisAlignItems) {
-    case "MIN":
-      mainAlignType = "start";
-      break;
-    case "CENTER":
-      mainAlignType = "center";
-      break;
-    case "MAX":
-      mainAlignType = "end";
-      break;
-    case "SPACE_BETWEEN":
-      mainAlignType = "spaceBetween";
-      break;
-  }
-  const mainAxisAlignment = `MainAxisAlignment.${mainAlignType}`;
-
-  let mainAxisSize = "";
-  if (node.layoutGrow === 1) {
-    mainAxisSize = "MainAxisSize.max,";
-  } else {
-    mainAxisSize = "MainAxisSize.min,";
-  }
-
   return generateWidgetCode(rowOrColumn, {
-    nmainAxisSize: mainAxisSize,
-    mainAxisAlignment: mainAxisAlignment,
-    crossAxisAlignment: crossAxisAlignment,
+    mainAxisSize:
+      node.layoutGrow === 1 ? "MainAxisSize.max" : "MainAxisSize.min",
+    mainAxisAlignment: getMainAxisAlignment(node),
+    crossAxisAlignment: getCrossAxisAlignment(node),
     children: `[\n${indentString(children, 2)}\n]`,
   });
+};
+
+const getMainAxisAlignment = (node: AltFrameNode): string => {
+  switch (node.primaryAxisAlignItems) {
+    case "MIN":
+      return "MainAxisAlignment.start";
+    case "CENTER":
+      return "MainAxisAlignment.center";
+    case "MAX":
+      return "MainAxisAlignment.end";
+    case "SPACE_BETWEEN":
+      return "MainAxisAlignment.spaceBetween";
+  }
+};
+
+const getCrossAxisAlignment = (node: AltFrameNode): string => {
+  switch (node.counterAxisAlignItems) {
+    case "MIN":
+      return "CrossAxisAlignment.start";
+    case "CENTER":
+      return "CrossAxisAlignment.center";
+    case "MAX":
+      return "CrossAxisAlignment.end";
+  }
 };
 
 // TODO Vector support in Flutter is complicated. Currently, AltConversion converts it in a Rectangle.

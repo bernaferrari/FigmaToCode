@@ -1,6 +1,6 @@
-import { exportTypes } from "./PluginUI";
+import { FrameworkTypes } from "./PluginUI";
 
-export const Description = (props: { selected: exportTypes }) => {
+export const Description = (props: { selected: FrameworkTypes }) => {
   switch (props.selected) {
     case "HTML":
       return (

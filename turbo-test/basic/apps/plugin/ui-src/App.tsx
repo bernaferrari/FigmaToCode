@@ -4,7 +4,7 @@ import { FrameworkTypes, PluginUI } from "plugin-ui";
 export default function App() {
   const [code, setCode] = useState("");
   const [selectedFramework, setSelectedFramework] =
-    useState<FrameworkTypes>("HTML");
+    useState<FrameworkTypes | null>(null);
 
   useEffect(() => {
     // Add event listener for messages from Figma plugin
@@ -13,12 +13,11 @@ export default function App() {
 
       if (message.type === "code") {
         setCode(message.data);
+        setSelectedFramework(message.framework);
       } else if (message.type === "empty") {
         setCode("empty");
       }
     };
-
-    parent.postMessage({ pluginMessage: { type: "html" } }, "*");
 
     // Clean up the event listener when the component is unmounted
     return () => {
@@ -26,10 +25,40 @@ export default function App() {
     };
   }, []);
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Only show loading if it takes too long to load.
   useEffect(() => {
-    console.log("pushing message");
-    parent.postMessage({ pluginMessage: { type: selectedFramework } }, "*");
+    if (selectedFramework === null) {
+      const timer = setTimeout(() => {
+        setIsLoading(true);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    } else {
+      setIsLoading(false);
+    }
   }, [selectedFramework]);
+
+  if (selectedFramework === null) {
+    if (isLoading) {
+      return (
+        <div className="w-full h-96 justify-center text-center items-center dark:text-white text-lg">
+          Opening Plugin...
+        </div>
+      );
+    } else {
+      return <></>;
+    }
+  }
+
+  const handleFrameworkChange = (newFramework: FrameworkTypes) => {
+    setSelectedFramework(newFramework);
+    parent.postMessage(
+      { pluginMessage: { type: "tabChange", data: newFramework } },
+      "*"
+    );
+  };
 
   return (
     <div className="">
@@ -37,7 +66,7 @@ export default function App() {
         code={code}
         emptySelection={false}
         selectedFramework={selectedFramework}
-        setSelectedFramework={setSelectedFramework}
+        setSelectedFramework={handleFrameworkChange}
       />
     </div>
   );

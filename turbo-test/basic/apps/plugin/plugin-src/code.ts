@@ -5,66 +5,160 @@ import {
   swiftuiMain,
   convertIntoAltNodes,
   FrameworkTypes,
+  htmlMain,
 } from "backend";
+
+const settings: {
+  framework: FrameworkTypes;
+} = {
+  framework: "HTML",
+};
+
+const initSettings = () => {
+  figma.clientStorage.getAsync("settings").then((clientSettings) => {
+    if (clientSettings && clientSettings.lastSelected) {
+      settings.framework = clientSettings.lastSelected;
+    } else {
+      settings.framework = "HTML";
+    }
+    console.log("settings.mode", settings);
+    run(settings.framework);
+  });
+};
 
 switch (figma.mode) {
   case "default":
   case "panel":
-    let mode: FrameworkTypes;
     let isJsx = false;
     let layerName = false;
 
+    initSettings();
+
     figma.showUI(__html__, { width: 450, height: 550, themeColors: true });
     figma.on("selectionchange", () => {
-      run(mode);
+      run(settings.framework);
     });
     figma.ui.onmessage = (msg) => {
-      if (
-        msg.type === "Tailwind" ||
-        msg.type === "Flutter" ||
-        msg.type === "SwiftUI" ||
-        msg.type === "HTML"
-      ) {
-        mode = msg.type;
-        run(mode);
-      } else if (msg.type === "jsx" && msg.data !== isJsx) {
-        isJsx = msg.data;
-        run(mode);
-      } else if (msg.type === "layerName" && msg.data !== layerName) {
-        layerName = msg.data;
-        run(mode);
+      if (msg.type === "tabChange") {
+        console.log("tabChange with", msg);
+        // get from storage
+        figma.clientStorage.setAsync("settings", {
+          whenOpen: "lastSelected",
+          lastSelected: msg.data,
+        });
+
+        settings.framework = msg.data;
+
+        // if (
+        //   msg.type === "Tailwind" ||
+        //   msg.type === "Flutter" ||
+        //   msg.type === "SwiftUI" ||
+        //   msg.type === "HTML"
+        // ) {
+        //   mode = msg.type;
+        //   run(mode);
+        // } else if (msg.type === "jsx" && msg.data !== isJsx) {
+        //   isJsx = msg.data;
+        //   run(mode);
+        // } else if (msg.type === "layerName" && msg.data !== layerName) {
+        //   layerName = msg.data;
+        //   run(mode);
+        // }
+        run(settings.framework);
       }
     };
     break;
   case "codegen":
-    figma.on("codegen", ({ node }) => {
+    initSettings();
+    figma.codegen.on("generate", ({ language, node }) => {
       const convertedSelection = convertIntoAltNodes([node], null);
+
+      switch (language) {
+        case "html":
+          return [
+            {
+              title: `HTML`,
+              code: htmlMain(convertedSelection, node.parent?.id, true),
+              language: "HTML",
+            },
+          ];
+        case "tailwind":
+          return [
+            {
+              title: `Whole Code`,
+              code: tailwindMain(
+                convertedSelection,
+                node.parent?.id,
+                true,
+                false
+              ),
+              language: "HTML",
+            },
+            {
+              title: `Layout`,
+              code: tailwindMain(
+                convertedSelection,
+                node.parent?.id,
+                true,
+                false
+              ),
+              language: "HTML",
+            },
+            {
+              title: `Style`,
+              code: tailwindMain(
+                convertedSelection,
+                node.parent?.id,
+                true,
+                false
+              ),
+              language: "HTML",
+            },
+            {
+              title: `Colors`,
+              code: tailwindMain(
+                convertedSelection,
+                node.parent?.id,
+                true,
+                false
+              ),
+              language: "HTML",
+            },
+          ];
+        case "flutter":
+          return [
+            {
+              title: `Flutter`,
+              code: flutterMain(convertedSelection, node.parent?.id, true),
+              language: "SWIFT",
+            },
+          ];
+        case "swiftui":
+          return [
+            {
+              title: `SwiftUI`,
+              code: swiftuiMain(convertedSelection, node.parent?.id),
+              language: "SWIFT",
+            },
+          ];
+        default:
+          break;
+      }
+
       const blocks: CodegenResult[] = [
         {
           title: `Tailwind Code`,
-          code: tailwindMain(
-            convertedSelection,
-            node.parent ? node.parent.id : null,
-            true,
-            false
-          ),
+          code: tailwindMain(convertedSelection, node.parent?.id, true, false),
           language: "HTML",
         },
         {
           title: `Flutter`,
-          code: flutterMain(
-            convertedSelection,
-            node.parent ? node.parent.id : null,
-            true
-          ),
+          code: flutterMain(convertedSelection, node.parent?.id, true),
           language: "SWIFT",
         },
         {
           title: `SwiftUI`,
-          code: swiftuiMain(
-            convertedSelection,
-            node.parent ? node.parent.id : null
-          ),
+          code: swiftuiMain(convertedSelection, node.parent?.id),
           language: "SWIFT",
         },
         {

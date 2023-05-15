@@ -13,8 +13,14 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "test": "jest"
   },
-  "devDependencies": {
+  "dependencies": {
     "@figma/plugin-typings": "github:figma/plugin-typings#readonly-preview",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
     "eslint": "^8.36.0",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",

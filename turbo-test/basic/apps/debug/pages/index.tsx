@@ -1,4 +1,4 @@
-import { PluginUI } from "plugin-ui";
+import { FrameworkTypes, PluginUI } from "plugin-ui";
 import * as React from "react";
 
 export default function Web() {
@@ -15,6 +15,9 @@ export default function Web() {
               code={
                 "backend:dev: CJS dist/index.js 105.74 KB backend:dev: CJS ⚡️ Build        success in 419ms plugin:dev: warn - Port 3000 is in use, trying 3001        instead. plugin:dev: warn - Port 3001 is in use, trying 3002 instead."
               }
+              emptySelection={false}
+              selectedFramework={"HTML"}
+              setSelectedFramework={() => {}}
             />
           </div>
         </div>
@@ -22,7 +25,12 @@ export default function Web() {
         <div className="dark bg-gray-100 bg- p-2 rounded-md">
           <div className="bg-black w-96 shadow-md rounded-md">
             <PluginFigmaToolbar variant="(Dark)" />
-            <PluginUI code={"code goes hereeeee"} />
+            <PluginUI
+              code={"code goes hereeeee"}
+              selectedFramework={"HTML"}
+              setSelectedFramework={() => {}}
+              emptySelection={false}
+            />
           </div>
         </div>
       </div>

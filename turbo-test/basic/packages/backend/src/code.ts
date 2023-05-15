@@ -16,8 +16,8 @@ let layerName = false,
 
 export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 
-export const run = (mode: FrameworkTypes) => {
-  console.log("run is being run", mode);
+export const run = (framework: FrameworkTypes) => {
+  console.log("run is being run", framework);
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
@@ -38,13 +38,13 @@ export const run = (mode: FrameworkTypes) => {
     null
   );
 
-  if (mode === "Flutter") {
+  if (framework === "Flutter") {
     result = flutterMain(convertedSelection, parentId, material);
-  } else if (mode === "Tailwind") {
+  } else if (framework === "Tailwind") {
     result = tailwindMain(convertedSelection, parentId, isJsx, layerName);
-  } else if (mode === "SwiftUI") {
+  } else if (framework === "SwiftUI") {
     result = swiftuiMain(convertedSelection, parentId);
-  } else if (mode === "HTML") {
+  } else if (framework === "HTML") {
     result = htmlMain(convertedSelection, parentId, isJsx, layerName);
   }
 
@@ -52,26 +52,27 @@ export const run = (mode: FrameworkTypes) => {
 
   figma.ui.postMessage({
     type: "code",
+    framework: framework,
     data: result,
   });
 
   if (
-    mode === "Tailwind" ||
-    mode === "Flutter" ||
-    mode === "HTML" ||
-    mode === "SwiftUI"
+    framework === "Tailwind" ||
+    framework === "Flutter" ||
+    framework === "HTML" ||
+    framework === "SwiftUI"
   ) {
     figma.ui.postMessage({
       type: "colors",
-      data: retrieveGenericSolidUIColors(convertedSelection, mode),
+      data: retrieveGenericSolidUIColors(convertedSelection, framework),
     });
 
     figma.ui.postMessage({
       type: "gradients",
-      data: retrieveGenericLinearGradients(convertedSelection, mode),
+      data: retrieveGenericLinearGradients(convertedSelection, framework),
     });
   }
-  if (mode === "Tailwind") {
+  if (framework === "Tailwind") {
     figma.ui.postMessage({
       type: "text",
       data: retrieveTailwindText(convertedSelection),

@@ -6,5 +6,11 @@
   "ui": "dist/index.html",
   "editorType": ["figma", "inspect"],
   "capabilities": ["panel", "codegen"],
-  "permissions": []
+  "permissions": [],
+  "codegenLanguages": [
+    { "label": "HTML / React", "value": "html" },
+    { "label": "Tailwind", "value": "tailwind" },
+    { "label": "Flutter", "value": "flutter" },
+    { "label": "SwiftUI", "value": "swiftUI" }
+  ]
 }

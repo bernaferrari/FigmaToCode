@@ -7,7 +7,7 @@ export default defineConfig({
   root: "./ui-src",
   plugins: [react(), viteSingleFile()],
   build: {
-    target: "esnext",
+    target: "ES2017",
     assetsInlineLimit: 100000000,
     chunkSizeWarningLimit: 100000000,
     cssCodeSplit: false,

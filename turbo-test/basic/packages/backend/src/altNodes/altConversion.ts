@@ -23,6 +23,27 @@ export const convertSingleNodeToAlt = (
   return convertIntoAltNodes([node], parent)[0];
 };
 
+const cloneNode = <T extends BaseNode>(node: T): T => {
+  const cloned: any = {};
+
+  for (const prop in node) {
+    if (prop === "parent" || prop === "children") {
+      continue;
+    }
+
+    if (typeof node[prop] === "object") {
+      cloned[prop] = JSON.parse(JSON.stringify(node[prop]));
+    } else {
+      cloned[prop] = node[prop];
+    }
+  }
+
+  // Set the correct prototype for the cloned object
+  Object.setPrototypeOf(cloned, Object.getPrototypeOf(node));
+
+  return cloned as T;
+};
+
 export const frameNodeToAlt = (
   node: FrameNode | InstanceNode | ComponentNode,
   altParent: AltFrameNode | AltGroupNode | null = null
@@ -69,6 +90,15 @@ const frameToRectangleNode = (
   convertRectangleCorner(newNode, node);
   convertCorner(newNode, node);
   return newNode;
+};
+
+const assignParent = (
+  altNode: SceneNode,
+  altParent: SceneNode | AltSceneNode | undefined
+) => {
+  if (altParent) {
+    Object.assign(altNode, { parent: altParent });
+  }
 };
 
 export const convertIntoAltNodes = (
@@ -163,17 +193,16 @@ export const convertIntoAltNodes = (
         // also, Group will always have at least 2 children.
         return convertNodesOnRectangle(altNode);
       } else if (node.type === "TEXT") {
-        const altNode = new AltTextNode();
-
-        altNode.id = node.id;
-        altNode.name = node.name;
-
+        const altNode = cloneNode(node);
         if (altParent) {
-          altNode.parent = altParent;
+          assignParent(altNode, altParent);
         }
-
-        convertDefaultShape(altNode, node);
-        convertIntoAltText(altNode, node);
+        return altNode;
+      } else if (node.type === "STAR" || node.type === "POLYGON") {
+        const altNode = cloneNode(node);
+        if (altParent) {
+          assignParent(altNode, altParent);
+        }
         return altNode;
       } else if (node.type === "VECTOR") {
         const altNode = new AltRectangleNode();
@@ -277,73 +306,89 @@ const convertLayout = (altNode: AltLayoutMixin, node: LayoutMixin) => {
     altNode.y = node.y;
   }
 
-  altNode.width = node.width;
-  altNode.height = node.height;
-  altNode.rotation = node.rotation;
-  altNode.layoutAlign = node.layoutAlign;
-  altNode.layoutGrow = node.layoutGrow;
+  copyProperties(altNode, node, [
+    "width",
+    "height",
+    "rotation",
+    "layoutAlign",
+    "layoutGrow",
+  ]);
 };
 
 const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
-  altNode.layoutMode = node.layoutMode;
-  altNode.primaryAxisSizingMode = node.primaryAxisSizingMode;
-  altNode.counterAxisSizingMode = node.counterAxisSizingMode;
-
-  // Fix this: https://stackoverflow.com/questions/57859754/flexbox-space-between-but-center-if-one-element
-  // It affects HTML, Tailwind, Flutter and possibly SwiftUI. So, let's be consistent.
+  copyProperties(altNode, node, [
+    "layoutMode",
+    "primaryAxisSizingMode",
+    "counterAxisSizingMode",
+    "primaryAxisAlignItems",
+    "counterAxisAlignItems",
+    "paddingLeft",
+    "paddingRight",
+    "paddingTop",
+    "paddingBottom",
+    "itemSpacing",
+    "layoutGrids",
+    "gridStyleId",
+    "clipsContent",
+    "guides",
+  ]);
   if (
     node.primaryAxisAlignItems === "SPACE_BETWEEN" &&
     node.children.length === 1
   ) {
     altNode.primaryAxisAlignItems = "CENTER";
-  } else {
-    altNode.primaryAxisAlignItems = node.primaryAxisAlignItems;
   }
-
   altNode.counterAxisAlignItems =
     node.counterAxisAlignItems === "BASELINE"
       ? "CENTER"
       : node.counterAxisAlignItems;
+};
 
-  altNode.paddingLeft = node.paddingLeft;
-  altNode.paddingRight = node.paddingRight;
-  altNode.paddingTop = node.paddingTop;
-  altNode.paddingBottom = node.paddingBottom;
+// Helper function to copy properties
+type AnyObject = { [key: string]: any };
 
-  altNode.itemSpacing = node.itemSpacing;
-  altNode.layoutGrids = node.layoutGrids;
-  altNode.gridStyleId = node.gridStyleId;
-  altNode.clipsContent = node.clipsContent;
-  altNode.guides = node.guides;
+const copyProperties = <T extends AnyObject, U extends AnyObject>(
+  source: T,
+  target: U,
+  properties: (keyof T & keyof U)[]
+): void => {
+  properties.forEach((property) => {
+    (target as any)[property] = source[property];
+  });
 };
 
 const convertGeometry = (altNode: AltGeometryMixin, node: GeometryMixin) => {
-  altNode.fills = node.fills;
-  altNode.strokes = node.strokes;
-  altNode.strokeWeight = 0;
-  if (node.strokeWeight !== figma.mixed) {
-    altNode.strokeWeight = node.strokeWeight;
+  copyProperties(node, altNode, [
+    "fills",
+    "strokes",
+    "strokeWeight",
+    "strokeMiterLimit",
+    "strokeAlign",
+    "strokeCap",
+    "strokeJoin",
+    "dashPattern",
+    "fillStyleId",
+    "strokeStyleId",
+  ]);
+
+  // Handle the special case for strokeWeight
+  if (node.strokeWeight === figma.mixed) {
+    altNode.strokeWeight = 0;
   }
-  altNode.strokeMiterLimit = node.strokeMiterLimit;
-  altNode.strokeAlign = node.strokeAlign;
-  altNode.strokeCap = node.strokeCap;
-  altNode.strokeJoin = node.strokeJoin;
-  altNode.dashPattern = node.dashPattern;
-  altNode.fillStyleId = node.fillStyleId;
-  altNode.strokeStyleId = node.strokeStyleId;
 };
 
 const convertBlend = (
   altNode: AltBlendMixin,
   node: BlendMixin & SceneNodeMixin
 ) => {
-  altNode.opacity = node.opacity;
-  altNode.blendMode = node.blendMode;
-  altNode.isMask = node.isMask;
-  altNode.effects = node.effects;
-  altNode.effectStyleId = node.effectStyleId;
-
-  altNode.visible = node.visible;
+  copyProperties(node, altNode, [
+    "opacity",
+    "blendMode",
+    "isMask",
+    "effects",
+    "effectStyleId",
+    "visible",
+  ]);
 };
 
 const convertDefaultShape = (
@@ -361,36 +406,40 @@ const convertDefaultShape = (
 };
 
 const convertCorner = (altNode: AltCornerMixin, node: CornerMixin) => {
-  altNode.cornerRadius = node.cornerRadius;
-  altNode.cornerSmoothing = node.cornerSmoothing;
+  copyProperties(node, altNode, ["cornerRadius", "cornerSmoothing"]);
 };
 
 const convertRectangleCorner = (
   altNode: AltRectangleCornerMixin,
   node: RectangleCornerMixin
 ) => {
-  altNode.topLeftRadius = node.topLeftRadius;
-  altNode.topRightRadius = node.topRightRadius;
-  altNode.bottomLeftRadius = node.bottomLeftRadius;
-  altNode.bottomRightRadius = node.bottomRightRadius;
+  copyProperties(node, altNode, [
+    "topLeftRadius",
+    "topRightRadius",
+    "bottomLeftRadius",
+    "bottomRightRadius",
+  ]);
 };
 
 const convertIntoAltText = (altNode: AltTextNode, node: TextNode) => {
-  altNode.textAlignHorizontal = node.textAlignHorizontal;
-  altNode.textAlignVertical = node.textAlignVertical;
-  altNode.paragraphIndent = node.paragraphIndent;
-  altNode.paragraphSpacing = node.paragraphSpacing;
-  altNode.fontSize = node.fontSize;
-  altNode.fontName = node.fontName;
-  altNode.textCase = node.textCase;
-  altNode.textDecoration = node.textDecoration;
-  altNode.letterSpacing = node.letterSpacing;
+  copyProperties(altNode, node, [
+    "textAlignHorizontal",
+    "textAlignVertical",
+    "paragraphIndent",
+    "paragraphSpacing",
+    "fontSize",
+    "fontName",
+    "textCase",
+    "textDecoration",
+    "letterSpacing",
+    "textAutoResize",
+    "characters",
+    "lineHeight",
+  ]);
   altNode.textAutoResize =
     node.textAutoResize === "TRUNCATE"
       ? "WIDTH_AND_HEIGHT"
       : node.textAutoResize;
-  altNode.characters = node.characters;
-  altNode.lineHeight = node.lineHeight;
 };
 
 export function notEmpty<TValue>(
