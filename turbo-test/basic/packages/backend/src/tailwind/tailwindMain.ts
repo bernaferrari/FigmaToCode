@@ -1,11 +1,3 @@
-import {
-  AltFrameNode,
-  AltSceneNode,
-  AltRectangleNode,
-  AltEllipseNode,
-  AltTextNode,
-  AltGroupNode,
-} from "../altNodes/altMixins";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { indentString } from "../common/indentString";
 import { pxToLayoutSize } from "./conversionTables";
@@ -19,7 +11,7 @@ let showLayerName = false;
 const selfClosingTags = ["img"];
 
 export const tailwindMain = (
-  sceneNode: Array<AltSceneNode>,
+  sceneNode: Array<SceneNode>,
   parentIdSrc: string = "",
   isJsx: boolean = false,
   layerName: boolean = false
@@ -39,7 +31,7 @@ export const tailwindMain = (
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const tailwindWidgetGenerator = (
-  sceneNode: ReadonlyArray<AltSceneNode>,
+  sceneNode: ReadonlyArray<SceneNode>,
   isJsx: boolean
 ): string => {
   let comp = "";
@@ -61,7 +53,7 @@ const tailwindWidgetGenerator = (
     } else if (node.type === "FRAME") {
       comp += tailwindFrame(node, isJsx);
     } else if (node.type === "TEXT") {
-      comp += tailwindText(node, false, isJsx);
+      comp += tailwindText(node, isJsx);
     }
 
     // todo support Line
@@ -70,7 +62,7 @@ const tailwindWidgetGenerator = (
   return comp;
 };
 
-const tailwindGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
+const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -89,7 +81,7 @@ const tailwindGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
     .position(node, parentId);
 
   if (builder.attributes || builder.style) {
-    const attr = builder.build("relative ");
+    const attr = builder.build("relative");
 
     const generator = tailwindWidgetGenerator(node.children, isJsx);
 
@@ -99,60 +91,47 @@ const tailwindGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
   return tailwindWidgetGenerator(node.children, isJsx);
 };
 
-const tailwindText = (
-  node: AltTextNode,
-  isInput: boolean,
-  isJsx: boolean
-): string | [string, string] => {
-  // follow the website order, to make it easier
-
-  const builderResult = new TailwindTextBuilder(node, showLayerName, isJsx)
+export const tailwindText = (node: TextNode, isJsx: boolean): string => {
+  let layoutBuilder = new TailwindTextBuilder(node, showLayerName, isJsx)
     .blend(node)
-    .textAutoSize(node)
     .position(node, parentId)
-    // todo fontFamily (via node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}`)
-    // todo font smoothing
-    .fontSize(node)
-    .fontStyle(node)
-    .letterSpacing(node)
-    .lineHeight(node)
-    .textDecoration(node)
-    // todo text lists (<li>)
+    .textShapeSize(node)
     .textAlign(node)
-    .customColor(node.fills, "text")
     .textTransform(node);
 
-  const splittedChars = node.characters.split("\n");
-  const charsWithLineBreak =
-    splittedChars.length > 1
-      ? node.characters.split("\n").join("<br/>")
-      : node.characters;
+  const styledHtml = layoutBuilder.getTextSegments(node.id);
 
-  if (isInput) {
-    return [builderResult.attributes, charsWithLineBreak];
+  let content = "";
+  if (styledHtml.length === 1) {
+    layoutBuilder.addAttributes(styledHtml[0].style);
+    content = styledHtml[0].text;
   } else {
-    return `\n<p${builderResult.build()}>${charsWithLineBreak}</p>`;
+    content = styledHtml
+      .map((style) => `<span style="${style.style}">${style.text}</span>`)
+      .join("");
   }
+
+  return `\n<div${layoutBuilder.build()}>${content}</p>`;
 };
 
-const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
+const tailwindFrame = (node: FrameNode, isJsx: boolean): string => {
   // const vectorIfExists = tailwindVector(node, isJsx);
   // if (vectorIfExists) return vectorIfExists;
 
-  if (
-    node.children.length === 1 &&
-    node.children[0].type === "TEXT" &&
-    node?.name?.toLowerCase().match("input")
-  ) {
-    const [attr, char] = tailwindText(node.children[0], true, isJsx);
-    return tailwindContainer(
-      node,
-      ` placeholder="${char}"`,
-      attr,
-      { isRelative: false, isInput: true },
-      isJsx
-    );
-  }
+  // if (
+  //   node.children.length === 1 &&
+  //   node.children[0].type === "TEXT" &&
+  //   node?.name?.toLowerCase().match("input")
+  // ) {
+  //   const [attr, char] = tailwindText(node.children[0], true, isJsx);
+  //   return tailwindContainer(
+  //     node,
+  //     ` placeholder="${char}"`,
+  //     attr,
+  //     { isRelative: false, isInput: true },
+  //     isJsx
+  //   );
+  // }
 
   const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
 
@@ -171,7 +150,7 @@ const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
     return tailwindContainer(
       node,
       childrenStr,
-      "relative ",
+      "relative",
       { isRelative: true, isInput: false },
       isJsx
     );
@@ -181,7 +160,7 @@ const tailwindFrame = (node: AltFrameNode, isJsx: boolean): string => {
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const tailwindContainer = (
-  node: AltFrameNode | AltRectangleNode | AltEllipseNode,
+  node: FrameNode | RectangleNode | EllipseNode,
   children: string,
   additionalAttr: string,
   attr: {
@@ -197,15 +176,26 @@ export const tailwindContainer = (
     return children;
   }
 
-  const builder = new TailwindDefaultBuilder(node, showLayerName, isJsx)
+  let builder = new TailwindDefaultBuilder(node, showLayerName, isJsx)
     .blend(node)
-    .widthHeight(node)
-    .autoLayoutPadding(node)
+    .widthHeight(node);
+
+  if ("paddingLeft" in node) {
+    builder = builder.autoLayoutPadding(node);
+  }
+
+  builder = builder
     .position(node, parentId, attr.isRelative)
     .customColor(node.fills, "bg")
     // TODO image and gradient support (tailwind does not support gradients)
     .shadow(node)
     .border(node);
+
+  if (node.type === "ELLIPSE") {
+    builder = builder.radiusEllipse(node);
+  } else {
+    builder = builder.radiusRectangle(node);
+  }
 
   if (attr.isInput) {
     // children before the > is not a typo.
@@ -235,7 +225,7 @@ export const tailwindContainer = (
   return children;
 };
 
-export const rowColumnProps = (node: AltFrameNode): string => {
+export const rowColumnProps = (node: FrameNode): string => {
   // ROW or COLUMN
 
   // ignore current node when it has only one child and it has the same size
@@ -249,7 +239,7 @@ export const rowColumnProps = (node: AltFrameNode): string => {
 
   // [optimization]
   // flex, by default, has flex-row. Therefore, it can be omitted.
-  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "flex-col ";
+  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "flex-col";
 
   // https://tailwindcss.com/docs/space/
   // space between items
@@ -281,16 +271,16 @@ export const rowColumnProps = (node: AltFrameNode): string => {
 
   switch (node.primaryAxisAlignItems) {
     case "MIN":
-      primaryAlign = "justify-start ";
+      primaryAlign = "justify-start";
       break;
     case "CENTER":
-      primaryAlign = "justify-center ";
+      primaryAlign = "justify-center";
       break;
     case "MAX":
-      primaryAlign = "justify-end ";
+      primaryAlign = "justify-end";
       break;
     case "SPACE_BETWEEN":
-      primaryAlign = "justify-between ";
+      primaryAlign = "justify-between";
       break;
   }
 
@@ -313,15 +303,15 @@ export const rowColumnProps = (node: AltFrameNode): string => {
   //   node.layoutMode === "VERTICAL" &&
   //   node.children.every((d) => d.layoutAlign === "STRETCH")
   //     ? ""
-  //     : `items-center ${justify} `;
+  //     : `items-center ${justify}`;
 
   // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
   const flex =
     node.parent &&
     "layoutMode" in node.parent &&
     node.parent.layoutMode === node.layoutMode
-      ? "flex "
-      : "inline-flex ";
+      ? "flex"
+      : "inline-flex";
 
   return `${flex}${rowOrColumn}${space}${counterAlign}${primaryAlign}`;
 };

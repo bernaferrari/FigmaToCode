@@ -1,4 +1,3 @@
-import { AltSceneNode, AltTextNode } from "../../altNodes/altMixins";
 import { tailwindNearestColor } from "../builderImpl/tailwindColor";
 import { TailwindTextBuilder } from "../tailwindTextBuilder";
 import { rgbTo6hex } from "../../common/color";
@@ -6,9 +5,9 @@ import { retrieveTopFill } from "../../common/retrieveFill";
 import { convertFontWeight } from "../../common/convertFontWeight";
 
 export const retrieveTailwindText = (
-  sceneNode: Array<AltSceneNode>
+  sceneNode: Array<SceneNode>
 ): Array<namedText> => {
-  // convert to AltNode and then flatten it. Conversion is necessary because of [tailwindText]
+  // convert to Node and then flatten it. Conversion is necessary because of [tailwindText]
   const selectedText = deepFlatten(sceneNode);
 
   const textStr: Array<namedText> = [];
@@ -18,7 +17,7 @@ export const retrieveTailwindText = (
       const attr = new TailwindTextBuilder(node, false, false)
         .blend(node)
         .position(node, node.parent?.id ?? "")
-        .textAutoSize(node)
+        .textShapeSize(node)
         .fontSize(node)
         .fontStyle(node)
         .letterSpacing(node)
@@ -26,8 +25,7 @@ export const retrieveTailwindText = (
         .textDecoration(node)
         .textAlign(node)
         .customColor(node.fills, "text")
-        .textTransform(node)
-        .removeTrailingSpace();
+        .textTransform(node);
 
       const splittedChars = node.characters.split("\n");
       const charsWithLineBreak =
@@ -51,7 +49,7 @@ export const retrieveTailwindText = (
 
       textStr.push({
         name: node.name,
-        attr: attr.attributes,
+        attr: attr.attributes.join(" "),
         full: `<p class="${attr.attributes}">${charsWithLineBreak}</p>`,
         style: style(node),
         contrastBlack,
@@ -81,7 +79,7 @@ type namedText = {
   contrastBlack: number;
 };
 
-const style = (node: AltTextNode): string => {
+const style = (node: TextNode): string => {
   let comp = "";
 
   if (node.fontName !== figma.mixed) {
@@ -98,24 +96,24 @@ const style = (node: AltTextNode): string => {
 
     const weight = convertFontWeight(value);
     if (weight) {
-      comp += `font-weight: ${weight}; `;
+      comp += `font-weight: ${weight};`;
     }
   }
 
   if (node.fontSize !== figma.mixed) {
-    comp += `font-size: ${Math.min(node.fontSize, 24)}; `;
+    comp += `font-size: ${Math.min(node.fontSize, 24)};`;
   }
 
   const color = convertColor(node.fills);
   if (color) {
-    comp += `color: ${color}; `;
+    comp += `color: ${color};`;
   }
 
   return comp;
 };
 
-function deepFlatten(arr: Array<AltSceneNode>): Array<AltSceneNode> {
-  let result: Array<AltSceneNode> = [];
+function deepFlatten(arr: Array<SceneNode>): Array<SceneNode> {
+  let result: Array<SceneNode> = [];
 
   arr.forEach((d) => {
     if ("children" in d) {

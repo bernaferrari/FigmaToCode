@@ -1,111 +1,106 @@
-import {
-  AltSceneNode,
-  AltGeometryMixin,
-  AltBlendMixin,
-  AltFrameMixin,
-  AltDefaultShapeMixin,
-} from "../altNodes/altMixins";
 import { formatWithJSX } from "../common/parseJSX";
-import { parentCoordinates } from "../common/parentCoordinates";
 import { htmlShadow } from "./builderImpl/htmlShadow";
 import {
   htmlVisibility,
   htmlRotation,
   htmlOpacity,
 } from "./builderImpl/htmlBlend";
-import { htmlPosition } from "./builderImpl/htmlPosition";
 import {
   htmlColorFromFills,
   htmlGradientFromFills,
 } from "./builderImpl/htmlColor";
 import { htmlPadding } from "./builderImpl/htmlPadding";
-import { htmlSize, htmlSizePartial } from "./builderImpl/htmlSize";
+import { htmlSizePartial } from "./builderImpl/htmlSize";
 import { htmlBorderRadius } from "./builderImpl/htmlBorderRadius";
+import { commonIsAbsolutePosition } from "../common/commonPosition";
 
 export class HtmlDefaultBuilder {
-  style: Array<string>;
+  styles: Array<string>;
   isJSX: boolean;
   visible: boolean;
   name: string = "";
   hasFixedSize = false;
 
-  constructor(node: AltSceneNode, showLayerName: boolean, optIsJSX: boolean) {
+  constructor(node: SceneNode, showLayerName: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
-    this.style = [];
+    this.styles = [];
     this.visible = node.visible;
-
-    if (showLayerName) {
-      this.name = node.name.replace(" ", "");
-    }
+    if (showLayerName) this.name = node.name.replace(" ", "");
   }
 
-  blend(node: AltSceneNode): this {
-    this.style.push(
-      htmlVisibility(node, this.isJSX),
-      htmlRotation(node, this.isJSX),
-      htmlOpacity(node, this.isJSX)
-    );
-
+  commonPositionStyles(
+    node: SceneNode & LayoutMixin & MinimalBlendMixin
+  ): this {
+    this.widthHeight(node);
+    this.autoLayoutPadding(node);
+    this.position(node);
+    this.blend(node);
     return this;
   }
 
-  border(node: AltGeometryMixin & AltSceneNode): this {
-    // add border-radius: 10, for example.
-    this.style.push(htmlBorderRadius(node, this.isJSX));
+  commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): this {
+    this.customColor(node.fills, "background-color");
+    this.shadow(node);
+    this.border(node);
+    if ("clipsContent" in node && node.clipsContent === true) {
+      this.addStyles(formatWithJSX("overflow", this.isJSX, "hidden"));
+    }
+    return this;
+  }
 
-    // add border: 10px solid, for example.
-    if (node.strokes && node.strokes.length > 0 && node.strokeWeight > 0) {
+  addStyles = (...newStyles: string[]) => {
+    this.styles.push(...newStyles.filter((style) => style !== ""));
+  };
+
+  blend(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
+    this.addStyles(
+      htmlVisibility(node, this.isJSX),
+      ...htmlRotation(node, this.isJSX),
+      htmlOpacity(node, this.isJSX)
+    );
+    return this;
+  }
+
+  border(node: GeometryMixin & SceneNode): this {
+    this.addStyles(htmlBorderRadius(node, this.isJSX));
+    if (
+      node.strokes &&
+      node.strokes.length > 0 &&
+      node.strokeWeight !== figma.mixed &&
+      node.strokeWeight > 0
+    ) {
       const fill = this.retrieveFill(node.strokes);
       const weight = node.strokeWeight;
-
-      if (node.dashPattern.length > 0) {
-        this.style.push(formatWithJSX("border-style", this.isJSX, "dotted"));
-      } else {
-        this.style.push(formatWithJSX("border-style", this.isJSX, "solid"));
-      }
-
-      this.style.push(formatWithJSX("border-width", this.isJSX, weight));
-      this.style.push(formatWithJSX("border-style", this.isJSX, "solid"));
+      const borderStyle = node.dashPattern.length > 0 ? "dotted" : "solid";
 
       if (fill.kind === "gradient") {
-        // Gradient requires these.
-        this.style.push(
+        this.addStyles(
+          formatWithJSX("border", this.isJSX, `${weight}px ${borderStyle}`)
+        );
+        this.addStyles(
           formatWithJSX("border-image-slice", this.isJSX, 1),
           formatWithJSX("border-image-source", this.isJSX, fill.prop)
         );
       } else {
-        this.style.push(formatWithJSX("border-color", this.isJSX, fill.prop));
+        this.addStyles(
+          formatWithJSX(
+            "border",
+            this.isJSX,
+            `${weight}px ${borderStyle} ${fill.prop}`
+          )
+        );
       }
     }
-
     return this;
   }
 
-  position(
-    node: AltSceneNode,
-    parentId: string,
-    isRelative: boolean = false
-  ): this {
-    const position = htmlPosition(node, parentId);
-
-    if (position === "absoluteManualLayout" && node.parent) {
-      // tailwind can't deal with absolute layouts.
-
-      const [parentX, parentY] = parentCoordinates(node.parent);
-
-      const left = node.x - parentX;
-      const top = node.y - parentY;
-
-      this.style.push(
-        formatWithJSX("left", this.isJSX, left),
-        formatWithJSX("top", this.isJSX, top)
+  position(node: SceneNode): this {
+    if (commonIsAbsolutePosition(node)) {
+      this.addStyles(
+        formatWithJSX("left", this.isJSX, node.x),
+        formatWithJSX("top", this.isJSX, node.y),
+        formatWithJSX("position", this.isJSX, "absolute")
       );
-
-      if (!isRelative) {
-        this.style.push(formatWithJSX("position", this.isJSX, "absolute"));
-      }
-    } else {
-      this.style.push(position);
     }
 
     return this;
@@ -117,72 +112,56 @@ export class HtmlDefaultBuilder {
   ): this {
     const fill = this.retrieveFill(paintArray);
     if (fill.kind === "solid") {
-      // When text, solid must be outputted as 'color'.
       const prop = property === "text" ? "color" : property;
-
-      this.style.push(formatWithJSX(prop, this.isJSX, fill.prop));
+      this.addStyles(formatWithJSX(prop, this.isJSX, fill.prop));
     } else if (fill.kind === "gradient") {
       if (property === "background-color") {
-        this.style.push(
+        this.addStyles(
           formatWithJSX("background-image", this.isJSX, fill.prop)
         );
       } else if (property === "text") {
-        this.style.push(
+        this.addStyles(
           formatWithJSX("background", this.isJSX, fill.prop),
           formatWithJSX("-webkit-background-clip", this.isJSX, "text"),
           formatWithJSX("-webkit-text-fill-color", this.isJSX, "transparent")
         );
       }
     }
-
     return this;
   }
 
   retrieveFill = (
     paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"]
   ): { prop: string; kind: "solid" | "gradient" | "none" } => {
-    // visible is true or undefinied (tests)
     if (this.visible) {
       const gradient = htmlGradientFromFills(paintArray);
-      if (gradient) {
-        return { prop: gradient, kind: "gradient" };
-      } else {
-        const color = htmlColorFromFills(paintArray);
-        if (color) {
-          return { prop: color, kind: "solid" };
-        }
-      }
+      if (gradient) return { prop: gradient, kind: "gradient" };
+
+      const color = htmlColorFromFills(paintArray);
+      if (color) return { prop: color, kind: "solid" };
     }
     return { prop: "", kind: "none" };
   };
 
-  shadow(node: AltBlendMixin): this {
+  shadow(node: BlendMixin): this {
     const shadow = htmlShadow(node);
     if (shadow) {
-      this.style.push(
-        formatWithJSX("box-shadow", this.isJSX, htmlShadow(node))
-      );
+      this.addStyles(formatWithJSX("box-shadow", this.isJSX, htmlShadow(node)));
     }
     return this;
   }
 
-  // must be called before Position, because of the hasFixedSize attribute.
-  widthHeight(node: AltSceneNode): this {
-    // if current element is relative (therefore, children are absolute)
-    // or current element is one of the absoltue children and has a width or height > w/h-64
-    if ("isRelative" in node && node.isRelative === true) {
-      this.style.push(htmlSize(node, this.isJSX));
-    } else {
-      const partial = htmlSizePartial(node, this.isJSX);
-      this.hasFixedSize = partial[0] !== "" && partial[1] !== "";
-
-      partial.join("");
-    }
+  widthHeight(node: SceneNode): this {
+    const partial = htmlSizePartial(node, this.isJSX);
+    this.hasFixedSize = partial.width !== "" && partial.height !== "";
+    this.addStyles(partial.width, partial.height);
     return this;
   }
 
-  autoLayoutPadding(node: AltFrameMixin | AltDefaultShapeMixin): this {
-    this.style.push(htmlPadding(node, this.isJSX));
+  autoLayoutPadding(node: SceneNode): this {
+    if ("paddingLeft" in node) {
+      this.addStyles(...htmlPadding(node, this.isJSX));
+    }
     return this;
   }
 
@@ -191,17 +170,16 @@ export class HtmlDefaultBuilder {
   }
 
   build(additionalStyle: Array<string> = []): string {
-    this.style.push(...additionalStyle);
+    this.addStyles(...additionalStyle);
     this.removeTrailingSpace();
 
+    const formattedStyles = this.styles.map((s) => s.trim());
     let formattedStyle = "";
-    if (this.style) {
+    if (this.styles.length > 0) {
       if (this.isJSX) {
-        formattedStyle = ` style={{${this.style
-          .map((s) => s.trim())
-          .join(",")}}}`;
+        formattedStyle = ` style={{${formattedStyles.join(", ")}}}`;
       } else {
-        formattedStyle = ` style="${this.style.join(";")}"`;
+        formattedStyle = ` style="${formattedStyles.join("; ")}"`;
       }
     }
     if (this.name.length > 0) {

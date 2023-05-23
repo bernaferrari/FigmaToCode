@@ -1,4 +1,4 @@
-import { convertIntoAltNodes } from "./altNodes/altConversion";
+import { convertIntoNodes } from "./altNodes/altConversion";
 import {
   retrieveGenericSolidUIColors,
   retrieveGenericLinearGradients,
@@ -17,7 +17,6 @@ let layerName = false,
 export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 
 export const run = (framework: FrameworkTypes) => {
-  console.log("run is being run", framework);
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
@@ -27,16 +26,13 @@ export const run = (framework: FrameworkTypes) => {
   }
 
   // check [ignoreStackParent] description
-  if (figma.currentPage.selection.length > 0) {
-    parentId = figma.currentPage.selection[0].parent?.id ?? "";
-  }
+
+  const firstSelection = figma.currentPage.selection[0];
+  parentId = firstSelection.parent?.id ?? "";
 
   let result = "";
 
-  const convertedSelection = convertIntoAltNodes(
-    figma.currentPage.selection,
-    null
-  );
+  const convertedSelection = convertIntoNodes([firstSelection], null);
 
   if (framework === "Flutter") {
     result = flutterMain(convertedSelection, parentId, material);
@@ -54,6 +50,13 @@ export const run = (framework: FrameworkTypes) => {
     type: "code",
     framework: framework,
     data: result,
+    htmlPreview: {
+      size: convertedSelection.map((node) => ({
+        width: node.width,
+        height: node.height,
+      }))[0],
+      content: htmlMain(convertedSelection, parentId, false, layerName, true),
+    },
   });
 
   if (

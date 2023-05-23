@@ -1,28 +1,53 @@
-import { AltBlendMixin } from "../../altNodes/altMixins";
 import { htmlColor } from "./htmlColor";
 
 /**
  * https://tailwindcss.com/docs/box-shadow/
  * example: shadow
  */
-export const htmlShadow = (node: AltBlendMixin): string => {
+export const htmlShadow = (node: BlendMixin): string => {
   // [when testing] node.effects can be undefined
   if (node.effects && node.effects.length > 0) {
-    const dropShadow = node.effects.filter(
-      (d): d is ShadowEffect =>
-        (d.type === "DROP_SHADOW" || d.type === "INNER_SHADOW") && d.visible
+    const shadowEffects = node.effects.filter(
+      (d) =>
+        (d.type === "DROP_SHADOW" ||
+          d.type === "INNER_SHADOW" ||
+          d.type === "LAYER_BLUR") &&
+        d.visible
     );
     // simple shadow from tailwind
-    if (dropShadow.length > 0) {
-      const shadow = dropShadow[0];
-      const x = shadow.offset.x;
-      const y = shadow.offset.y;
-      const color = htmlColor(shadow.color, shadow.color.a);
-      const blur = shadow.radius;
-      const spread = shadow.spread ? `${shadow.spread}px ` : "";
-      const inner = shadow.type === "INNER_SHADOW" ? " inset" : "";
+    if (shadowEffects.length > 0) {
+      const shadow = shadowEffects[0];
+      let x = 0;
+      let y = 0;
+      let blur = 0;
+      let spread = "";
+      let inner = "";
+      let type = "";
+      let color = "";
 
-      return `${x}px ${y}px ${blur}px ${spread}${color}${inner}`;
+      if (shadow.type === "DROP_SHADOW" || shadow.type === "INNER_SHADOW") {
+        x = shadow.offset.x;
+        y = shadow.offset.y;
+        blur = shadow.radius;
+        spread = shadow.spread ? `${shadow.spread}px ` : "";
+        inner = shadow.type === "INNER_SHADOW" ? " inset" : "";
+        type =
+          shadow.type === "DROP_SHADOW"
+            ? "DropShadowEffect"
+            : "InnerShadowEffect";
+        color = htmlColor(shadow.color, shadow.color.a);
+      } else if (shadow.type === "LAYER_BLUR") {
+        x = shadow.radius;
+        y = shadow.radius;
+        blur = shadow.radius;
+        type = "BlurEffect";
+      }
+
+      return `${type} { BlurRadius: ${blur}px; ${
+        type === "BlurEffect"
+          ? `Size: ${x}px;`
+          : `OffsetX: ${x}px; OffsetY: ${y}px; Spread: ${spread}; Inner: ${inner}`
+      }}`;
     }
   }
   return "";

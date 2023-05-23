@@ -1,15 +1,18 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
 import { formatWithJSX } from "../../common/parseJSX";
-
-export const htmlSize = (node: AltSceneNode, isJSX: boolean): string => {
-  return htmlSizePartial(node, isJSX).join("");
-};
+import { isPreviewGlobal } from "../htmlMain";
 
 export const htmlSizePartial = (
-  node: AltSceneNode,
+  node: SceneNode,
   isJsx: boolean
-): [string, string] => {
+): { width: string; height: string } => {
+  if (isPreviewGlobal && node.parent === undefined) {
+    return {
+      width: formatWithJSX("width", isJsx, "100%"),
+      height: formatWithJSX("height", isJsx, "100%"),
+    };
+  }
+
   const size = nodeWidthHeight(node, false);
 
   let w = "";
@@ -42,5 +45,5 @@ export const htmlSizePartial = (
     }
   }
 
-  return [w, h];
+  return { width: w, height: h };
 };

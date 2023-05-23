@@ -1,59 +1,83 @@
 import { useEffect, useState } from "react";
 import { FrameworkTypes, PluginUI } from "plugin-ui";
 
+interface AppState {
+  code: string;
+  selectedFramework: FrameworkTypes | null;
+  isLoading: boolean;
+  htmlPreview: {
+    size: { width: number; height: number };
+    content: string;
+  } | null;
+}
+
 export default function App() {
-  const [code, setCode] = useState("");
-  const [selectedFramework, setSelectedFramework] =
-    useState<FrameworkTypes | null>(null);
+  const [state, setState] = useState<AppState>({
+    code: "",
+    selectedFramework: null,
+    isLoading: false,
+    htmlPreview: null,
+  });
 
   useEffect(() => {
-    // Add event listener for messages from Figma plugin
     window.onmessage = (event: MessageEvent) => {
       const message = event.data.pluginMessage;
 
       if (message.type === "code") {
-        setCode(message.data);
-        setSelectedFramework(message.framework);
+        setState((prevState) => ({
+          ...prevState,
+          code: message.data,
+          selectedFramework: message.framework,
+          htmlPreview: message.htmlPreview,
+        }));
+      } else if (message.type === "tabChange") {
+        setState((prevState) => ({
+          ...prevState,
+          selectedFramework: message.data,
+        }));
       } else if (message.type === "empty") {
-        setCode("empty");
+        setState((prevState) => ({
+          ...prevState,
+          code: "empty",
+        }));
+      } else if (message.type === "error") {
+        setState((prevState) => ({
+          ...prevState,
+          code: `Error :(\n// ${message.data}`,
+        }));
       }
     };
 
-    // Clean up the event listener when the component is unmounted
     return () => {
       window.onmessage = null;
     };
   }, []);
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Only show loading if it takes too long to load.
   useEffect(() => {
-    if (selectedFramework === null) {
-      const timer = setTimeout(() => {
-        setIsLoading(true);
-      }, 300);
-
+    if (state.selectedFramework === null) {
+      const timer = setTimeout(
+        () => setState((prevState) => ({ ...prevState, isLoading: true })),
+        300
+      );
       return () => clearTimeout(timer);
     } else {
-      setIsLoading(false);
+      setState((prevState) => ({ ...prevState, isLoading: false }));
     }
-  }, [selectedFramework]);
+  }, [state.selectedFramework]);
 
-  if (selectedFramework === null) {
-    if (isLoading) {
-      return (
-        <div className="w-full h-96 justify-center text-center items-center dark:text-white text-lg">
-          Opening Plugin...
-        </div>
-      );
-    } else {
-      return <></>;
-    }
+  if (state.selectedFramework === null) {
+    return state.isLoading ? (
+      <div className="w-full h-96 justify-center text-center items-center dark:text-white text-lg">
+        Loading Plugin...
+      </div>
+    ) : null;
   }
 
   const handleFrameworkChange = (newFramework: FrameworkTypes) => {
-    setSelectedFramework(newFramework);
+    setState((prevState) => ({
+      ...prevState,
+      selectedFramework: newFramework,
+    }));
     parent.postMessage(
       { pluginMessage: { type: "tabChange", data: newFramework } },
       "*"
@@ -61,13 +85,12 @@ export default function App() {
   };
 
   return (
-    <div className="">
-      <PluginUI
-        code={code}
-        emptySelection={false}
-        selectedFramework={selectedFramework}
-        setSelectedFramework={handleFrameworkChange}
-      />
-    </div>
+    <PluginUI
+      code={state.code}
+      emptySelection={false}
+      selectedFramework={state.selectedFramework}
+      setSelectedFramework={handleFrameworkChange}
+      htmlPreview={state.htmlPreview}
+    />
   );
 }

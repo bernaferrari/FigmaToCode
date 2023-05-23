@@ -1,5 +1,4 @@
 import { sliceNum } from "../../common/numToAutoFixed";
-import { AltFrameMixin, AltDefaultShapeMixin } from "../../altNodes/altMixins";
 import { commonPadding } from "../../common/commonPadding";
 import { formatWithJSX } from "../../common/parseJSX";
 
@@ -7,43 +6,47 @@ import { formatWithJSX } from "../../common/parseJSX";
  * https://tailwindcss.com/docs/margin/
  * example: px-2 py-8
  */
-export const htmlPadding = (
-  node: AltFrameMixin | AltDefaultShapeMixin,
-  isJsx: boolean
-): string => {
+export const htmlPadding = (node: BaseFrameMixin, isJsx: boolean): string[] => {
   const padding = commonPadding(node);
   if (padding === null) {
-    return "";
+    return [];
   }
 
   if ("all" in padding) {
-    return formatWithJSX("padding", isJsx, padding.all);
+    if (padding.all !== 0) {
+      return [formatWithJSX("padding", isJsx, padding.all)];
+    } else {
+      return [];
+    }
   }
 
-  let comp = "";
+  let comp: string[] = [];
 
   // horizontal and vertical, as the default AutoLayout
-  if (padding.horizontal) {
-    comp += formatWithJSX("padding-left", isJsx, padding.horizontal);
-    comp += formatWithJSX("padding-right", isJsx, padding.horizontal);
-  }
-  if (padding.vertical) {
-    comp += formatWithJSX("padding-top", isJsx, padding.vertical);
-    comp += formatWithJSX("padding-bottom", isJsx, padding.vertical);
-  }
-  if (padding.top) {
-    comp += formatWithJSX("padding-top", isJsx, padding.top);
-  }
-  if (padding.bottom) {
-    comp += formatWithJSX("padding-bottom", isJsx, padding.bottom);
-  }
-  if (padding.left) {
-    comp += formatWithJSX("padding-left", isJsx, padding.left);
-  }
-  if (padding.right) {
-    comp += formatWithJSX("padding-right", isJsx, padding.right);
+  if ("horizontal" in padding) {
+    if (padding.horizontal !== 0) {
+      comp.push(formatWithJSX("padding-left", isJsx, padding.horizontal));
+      comp.push(formatWithJSX("padding-right", isJsx, padding.horizontal));
+    }
+    if (padding.vertical !== 0) {
+      comp.push(formatWithJSX("padding-top", isJsx, padding.vertical));
+      comp.push(formatWithJSX("padding-bottom", isJsx, padding.vertical));
+    }
+    return comp;
   }
 
+  if (padding.top !== 0) {
+    comp.push(formatWithJSX("padding-top", isJsx, padding.top));
+  }
+  if (padding.bottom !== 0) {
+    comp.push(formatWithJSX("padding-bottom", isJsx, padding.bottom));
+  }
+  if (padding.left !== 0) {
+    comp.push(formatWithJSX("padding-left", isJsx, padding.left));
+  }
+  if (padding.right !== 0) {
+    comp.push(formatWithJSX("padding-right", isJsx, padding.right));
+  }
   // todo use REM
 
   return comp;

@@ -1,11 +1,3 @@
-import {
-  AltEllipseNode,
-  AltFrameNode,
-  AltRectangleNode,
-  AltGroupNode,
-  AltTextNode,
-  AltSceneNode,
-} from "../altNodes/altMixins";
 import { generateWidgetCode, sliceNum } from "../common/numToAutoFixed";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
@@ -13,15 +5,13 @@ import { FlutterTextBuilder } from "./flutterTextBuilder";
 import { indentString } from "../common/indentString";
 
 let parentId = "";
-let material = true;
 
 export const flutterMain = (
-  sceneNode: ReadonlyArray<AltSceneNode>,
+  sceneNode: ReadonlyArray<SceneNode>,
   parentIdSrc: string = "",
   isMaterial: boolean = false
 ): string => {
   parentId = parentIdSrc;
-  material = isMaterial;
 
   let result = flutterWidgetGenerator(sceneNode);
 
@@ -31,9 +21,8 @@ export const flutterMain = (
   return result;
 };
 
-// todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const flutterWidgetGenerator = (
-  sceneNode: ReadonlyArray<AltSceneNode>
+  sceneNode: ReadonlyArray<SceneNode>
 ): string => {
   let comp: string[] = [];
 
@@ -42,55 +31,55 @@ const flutterWidgetGenerator = (
   const sceneLen = visibleSceneNode.length;
 
   visibleSceneNode.forEach((node, index) => {
-    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp.push(flutterContainer(node, ""));
-    }
-    //  else if (node.type === "VECTOR") {
-    // comp = flutterVector(node);
-    // }
-    else if (node.type === "GROUP") {
-      comp.push(flutterGroup(node));
-    } else if (node.type === "FRAME") {
-      comp.push(flutterFrame(node));
-    } else if (node.type === "TEXT") {
-      comp.push(flutterText(node));
+    switch (node.type) {
+      case "RECTANGLE":
+      case "ELLIPSE":
+      case "STAR":
+      case "POLYGON":
+        comp.push(flutterContainer(node, ""));
+        break;
+      case "GROUP":
+        comp.push(flutterGroup(node));
+        break;
+      case "FRAME":
+        comp.push(flutterFrame(node));
+        break;
+      case "TEXT":
+        comp.push(flutterText(node));
+        break;
+      default:
+      // do nothing
     }
 
-    if (index < sceneLen - 1) {
-      // if the parent is an AutoLayout, and itemSpacing is set, add a SizedBox between items.
-      // on else, comp += ""
-      const spacing = addSpacingIfNeeded(node);
-      if (spacing) {
-        // comp += "\n";
-        comp.push(spacing);
-      }
+    const spacing = addSpacingIfNeeded(node);
+    if (spacing) {
+      comp.push(spacing);
     }
   });
 
   return comp.join(",\n") + ",";
 };
 
-const flutterGroup = (node: AltGroupNode): string => {
+const flutterGroup = (node: GroupNode): string => {
   return flutterContainer(
     node,
     generateWidgetCode("Stack", {
-      children: `[${flutterWidgetGenerator(node.children)}]`,
+      children: `[\n${indentString(
+        flutterWidgetGenerator(node.children),
+        2
+      )}\n]`,
     })
   );
 };
 
 const flutterContainer = (
-  node: AltFrameNode | AltGroupNode | AltRectangleNode | AltEllipseNode,
+  node: SceneNode & BlendMixin & LayoutMixin,
   child: string
 ): string => {
   let propChild = "";
 
   let image = "";
   if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
-    // const url = `https://via.placeholder.com/${node.width}x${node.height}`;
-    // image = `Image.network("${url}"),`;
-
-    // Flutter Web currently can't render network images :(
     image = `FlutterLogo(size: ${Math.min(node.width, node.height)}),`;
   }
 
@@ -103,7 +92,7 @@ const flutterContainer = (
     });
 
     propChild = generateWidgetCode("Stack", {
-      children: `[${indentString(prop1 + prop2, 2)}\n]`,
+      children: `[\n${indentString(prop1 + prop2, 2)}\n]`,
     });
   } else if (child.length > 0) {
     propChild = child;
@@ -119,7 +108,7 @@ const flutterContainer = (
   return builder.child;
 };
 
-const flutterText = (node: AltTextNode): string => {
+const flutterText = (node: TextNode): string => {
   const builder = new FlutterTextBuilder();
 
   builder
@@ -131,28 +120,13 @@ const flutterText = (node: AltTextNode): string => {
   return builder.child;
 };
 
-const flutterStar = (node: AltTextNode): string => {
-  const builder = new FlutterTextBuilder();
-
-  builder
-    .createText(node)
-    .blendAttr(node)
-    .textAutoSize(node)
-    .position(node, parentId);
-
-  return builder.child;
-};
-
-const flutterFrame = (node: AltFrameNode): string => {
+const flutterFrame = (node: FrameNode): string => {
   const children = flutterWidgetGenerator(node.children);
 
-  // Ignoring when Frame has a single child was removed because Expanded only works in Row/Column and not in Container, so additional logic would be required elsewhere.
   if (node.layoutMode !== "NONE") {
     const rowColumn = makeRowColumn(node, children);
     return flutterContainer(node, rowColumn);
   } else {
-    // node.layoutMode === "NONE" && node.children.length > 1
-    // children needs to be absolute
     return flutterContainer(
       node,
       generateWidgetCode("Stack", {
@@ -162,8 +136,7 @@ const flutterFrame = (node: AltFrameNode): string => {
   }
 };
 
-const makeRowColumn = (node: AltFrameNode, children: string): string => {
-  // ROW or COLUMN
+const makeRowColumn = (node: FrameNode, children: string): string => {
   const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
   return generateWidgetCode(rowOrColumn, {
@@ -175,7 +148,7 @@ const makeRowColumn = (node: AltFrameNode, children: string): string => {
   });
 };
 
-const getMainAxisAlignment = (node: AltFrameNode): string => {
+const getMainAxisAlignment = (node: FrameNode): string => {
   switch (node.primaryAxisAlignItems) {
     case "MIN":
       return "MainAxisAlignment.start";
@@ -188,7 +161,7 @@ const getMainAxisAlignment = (node: AltFrameNode): string => {
   }
 };
 
-const getCrossAxisAlignment = (node: AltFrameNode): string => {
+const getCrossAxisAlignment = (node: FrameNode): string => {
   switch (node.counterAxisAlignItems) {
     case "MIN":
       return "CrossAxisAlignment.start";
@@ -196,24 +169,22 @@ const getCrossAxisAlignment = (node: AltFrameNode): string => {
       return "CrossAxisAlignment.center";
     case "MAX":
       return "CrossAxisAlignment.end";
+    case "BASELINE":
+      return "";
   }
+  return "";
 };
 
-// TODO Vector support in Flutter is complicated. Currently, AltConversion converts it in a Rectangle.
-
-const addSpacingIfNeeded = (node: AltSceneNode): string => {
+const addSpacingIfNeeded = (node: SceneNode): string => {
   if (node.parent?.type === "FRAME" && node.parent.layoutMode !== "NONE") {
-    // check if itemSpacing is set and if it isn't the last value.
-    // Don't add the SizedBox at last value. In Figma, itemSpacing CAN be negative; here it can't.
     if (node.parent.itemSpacing > 0) {
       if (node.parent.layoutMode === "HORIZONTAL") {
         return generateWidgetCode("SizedBox", {
-          width: sliceNum(node.parent.itemSpacing),
+          width: node.parent.itemSpacing,
         });
       } else {
-        // node.parent.layoutMode === "VERTICAL"
         return generateWidgetCode("SizedBox", {
-          height: sliceNum(node.parent.itemSpacing),
+          height: node.parent.itemSpacing,
         });
       }
     }

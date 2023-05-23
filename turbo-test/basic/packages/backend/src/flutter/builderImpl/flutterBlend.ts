@@ -1,14 +1,12 @@
-import {
-  AltBlendMixin,
-  AltLayoutMixin,
-  AltSceneNode,
-} from "../../altNodes/altMixins";
 import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
 
 /**
  * https://api.flutter.dev/flutter/widgets/Opacity-class.html
  */
-export const flutterOpacity = (node: AltBlendMixin, child: string): string => {
+export const flutterOpacity = (
+  node: MinimalBlendMixin,
+  child: string
+): string => {
   if (node.opacity !== undefined && node.opacity !== 1 && child !== "") {
     return generateWidgetCode("Opacity", {
       opacity: sliceNum(node.opacity),
@@ -21,10 +19,7 @@ export const flutterOpacity = (node: AltBlendMixin, child: string): string => {
 /**
  * https://api.flutter.dev/flutter/widgets/Visibility-class.html
  */
-export const flutterVisibility = (
-  node: AltSceneNode,
-  child: string
-): string => {
+export const flutterVisibility = (node: SceneNode, child: string): string => {
   // [when testing] node.visible can be undefined
 
   if (node.visible !== undefined && !node.visible && child !== "") {
@@ -41,10 +36,7 @@ export const flutterVisibility = (
  * that's how you convert angles to clockwise radians: angle * -pi/180
  * using 3.14159 as Pi for enough precision and to avoid importing math lib.
  */
-export const flutterRotation = (
-  node: AltLayoutMixin,
-  child: string
-): string => {
+export const flutterRotation = (node: LayoutMixin, child: string): string => {
   if (
     node.rotation !== undefined &&
     child !== "" &&

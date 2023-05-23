@@ -1,4 +1,3 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { sliceNum } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { swiftuiColorFromFills } from "./swiftuiColor";
@@ -12,7 +11,7 @@ import { swiftuiColorFromFills } from "./swiftuiColor";
  * @param node with hopefully a fill object in [node.strokes].
  * @returns a string with overlay, when there node has a corner radius, or just border. If no color is found in node.strokes, return "".
  */
-export const swiftuiBorder = (node: AltSceneNode): string => {
+export const swiftuiBorder = (node: SceneNode): string => {
   if (node.type === "GROUP" || !node.strokes || node.strokes.length === 0) {
     return "";
   }
@@ -47,7 +46,7 @@ export const swiftuiBorder = (node: AltSceneNode): string => {
 
 // .stroke() must be called near the shape declaration, but .overlay() must be called after frame().
 // Stroke and Border were split. This method deals with stroke, and the other one with overlay.
-export const swiftuiShapeStroke = (node: AltSceneNode): string => {
+export const swiftuiShapeStroke = (node: SceneNode): string => {
   if (node.type === "GROUP" || !node.strokes || node.strokes.length === 0) {
     return "";
   }
@@ -80,7 +79,7 @@ export const swiftuiShapeStroke = (node: AltSceneNode): string => {
  * @param node with cornerRadius and topLeftRadius properties.
  * @returns a string with RoundedRectangle, if node has a corner larger than zero; else "".
  */
-export const swiftuiCornerRadius = (node: AltSceneNode): string => {
+export const swiftuiCornerRadius = (node: SceneNode): string => {
   if (
     "cornerRadius" in node &&
     node.cornerRadius !== figma.mixed &&
@@ -116,7 +115,7 @@ export const swiftuiCornerRadius = (node: AltSceneNode): string => {
  * @param node with cornerRadius and topLeftRadius properties.
  * @returns a string with RoundedRectangle, if node has a corner larger than zero; else "".
  */
-export const swiftuiRoundedRectangle = (node: AltSceneNode): string => {
+export const swiftuiRoundedRectangle = (node: SceneNode): string => {
   const corner = swiftuiCornerRadius(node);
   if (corner) {
     return `RoundedRectangle(cornerRadius: ${corner})`;

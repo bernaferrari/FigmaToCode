@@ -16,6 +16,16 @@ export const printPropertyIfNotDefault = (
   return `${propertyName}: ${propertyValue}`;
 };
 
+export const skipDefaultProperty = <T>(
+  propertyValue: T,
+  defaultProperty: T
+): T | string => {
+  if (propertyValue === defaultProperty) {
+    return "";
+  }
+  return propertyValue;
+};
+
 export const propertyIfNotDefault = (
   propertyValue: any,
   defaultProperty: any
@@ -28,11 +38,16 @@ export const propertyIfNotDefault = (
 
 export const generateWidgetCode = (
   className: string,
-  properties: Record<string, string>
+  properties: Record<string, number | string>
 ): string => {
   const propertiesArray = Object.entries(properties)
     .filter(([, value]) => value !== "")
-    .map(([key, value]) => `${key}: ${value},`);
+    .map(([key, value]) => {
+      if (typeof value === "number") {
+        return `${key}: ${sliceNum(value)},`;
+      }
+      return `${key}: ${value},`;
+    });
 
   if (propertiesArray.length === 0) {
     return `${className}()`;

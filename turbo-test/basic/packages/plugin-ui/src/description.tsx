@@ -247,7 +247,7 @@ export const Description = (props: { selected: FrameworkTypes }) => {
             </svg>
 
             <p className="w-3/4 mx-2 text-sm leading-tight tracking-tight">
-              Flutter is Google's UI toolkit for building applications for
+              Flutter is {"Google's"} UI toolkit for building applications for
               <a
                 className="font-medium text-blue-500 hover:text-blue-800"
                 href="https://flutter.dev/"

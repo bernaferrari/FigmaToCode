@@ -1,11 +1,3 @@
-import {
-  AltFrameNode,
-  AltSceneNode,
-  AltRectangleNode,
-  AltEllipseNode,
-  AltTextNode,
-  AltGroupNode,
-} from "../altNodes/altMixins";
 import { formatWithJSX } from "../common/parseJSX";
 import { indentString } from "../common/indentString";
 import { retrieveTopFill } from "../common/retrieveFill";
@@ -18,14 +10,20 @@ let showLayerName = false;
 
 const selfClosingTags = ["img"];
 
+export let isPreviewGlobal = false;
+
 export const htmlMain = (
-  sceneNode: Array<AltSceneNode>,
+  sceneNode: Array<SceneNode>,
   parentIdSrc: string = "",
   isJsx: boolean = false,
-  layerName: boolean = false
+  layerName: boolean = false,
+  isPreview: boolean = false
 ): string => {
   parentId = parentIdSrc;
   showLayerName = layerName;
+  isPreviewGlobal = isPreview;
+
+  console.log("HTML MAIN");
 
   let result = htmlWidgetGenerator(sceneNode, isJsx);
 
@@ -39,7 +37,7 @@ export const htmlMain = (
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const htmlWidgetGenerator = (
-  sceneNode: ReadonlyArray<AltSceneNode>,
+  sceneNode: ReadonlyArray<SceneNode>,
   isJsx: boolean
 ): string => {
   let comp = "";
@@ -51,13 +49,15 @@ const htmlWidgetGenerator = (
 
   visibleSceneNode.forEach((node, index) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += htmlContainer(node, "", "", isJsx);
+      comp += htmlContainer(node, "", [], isJsx);
     } else if (node.type === "GROUP") {
       comp += htmlGroup(node, isJsx);
     } else if (node.type === "FRAME") {
       comp += htmlFrame(node, isJsx);
     } else if (node.type === "TEXT") {
-      comp += htmlText(node, false, isJsx);
+      comp += htmlText(node, isJsx);
+    } else if (node.type === "LINE") {
+      comp += htmlLine(node, isJsx);
     }
 
     comp += addSpacingIfNeeded(node, index, sceneLen, isJsx);
@@ -68,7 +68,7 @@ const htmlWidgetGenerator = (
   return comp;
 };
 
-const htmlGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
+const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -81,13 +81,14 @@ const htmlGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
   // if (vectorIfExists) return vectorIfExists;
 
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
-    .blend(node)
-    .widthHeight(node)
-    .position(node, parentId);
+  const builder = new HtmlDefaultBuilder(
+    node,
+    showLayerName,
+    isJsx
+  ).commonPositionStyles(node);
 
-  if (builder.style) {
-    const attr = builder.build(formatWithJSX("position", isJsx, "relative"));
+  if (builder.styles) {
+    const attr = builder.build([formatWithJSX("position", isJsx, "relative")]);
 
     const generator = htmlWidgetGenerator(node.children, isJsx);
 
@@ -98,64 +99,46 @@ const htmlGroup = (node: AltGroupNode, isJsx: boolean = false): string => {
 };
 
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
-export const htmlBuilder = (
-  node: AltTextNode,
-  isJsx: boolean,
-  isUI: boolean = false
-): [HtmlTextBuilder, string] => {
-  const builderResult = new HtmlTextBuilder(node, showLayerName, isJsx)
-    .blend(node)
-    .textAutoSize(node)
-    .position(node, parentId)
-    // todo fontFamily (via node.fontName !== figma.mixed ? `fontFamily: ${node.fontName.family}`)
-    // todo font smoothing
-    .fontSize(node, isUI)
-    .fontStyle(node)
-    .letterSpacing(node)
-    .lineHeight(node)
-    .textDecoration(node)
-    // todo text lists (<li>)
+export const htmlText = (node: TextNode, isJsx: boolean): string => {
+  let layoutBuilder = new HtmlTextBuilder(node, showLayerName, isJsx)
+    .commonPositionStyles(node)
     .textAlign(node)
-    .customColor(node.fills, "text")
     .textTransform(node);
 
-  const splittedChars = node.characters.split("\n");
-  const charsWithLineBreak =
-    splittedChars.length > 1
-      ? node.characters.split("\n").join("<br/>")
-      : node.characters;
+  const styledHtml = layoutBuilder.getTextSegments(node.id);
 
-  return [builderResult, charsWithLineBreak];
-};
-
-const htmlText = (
-  node: AltTextNode,
-  isInput: boolean = false,
-  isJsx: boolean
-): string | [string, string] => {
-  // follow the website order, to make it easier
-  const [builder, charsWithLineBreak] = htmlBuilder(node, isJsx);
-
-  if (isInput) {
-    return [builder.style, charsWithLineBreak];
+  let content = "";
+  if (styledHtml.length === 1) {
+    layoutBuilder.addStyles(styledHtml[0].style);
+    content = styledHtml[0].text;
   } else {
-    return `\n<p${builder.build()}>${charsWithLineBreak}</p>`;
+    content = styledHtml
+      .map((style) => `<span style="${style.style}">${style.text}</span>`)
+      .join("");
   }
+
+  return `\n<p${layoutBuilder.build()}>${content}</p>`;
 };
 
-const htmlFrame = (node: AltFrameNode, isJsx: boolean = false): string => {
+const htmlFrame = (node: FrameNode, isJsx: boolean = false): string => {
   // const vectorIfExists = tailwindVector(node, isJsx);
   // if (vectorIfExists) return vectorIfExists;
 
-  if (
-    node.children.length === 1 &&
-    node.children[0].type === "TEXT" &&
-    node?.name?.toLowerCase().match("input")
-  ) {
-    const isInput = true;
-    const [attr, char] = htmlText(node.children[0], isInput, isJsx);
-    return htmlContainer(node, ` placeholder="${char}"`, attr, isJsx, isInput);
-  }
+  // if (
+  //   node.children.length === 1 &&
+  //   node.children[0].type === "TEXT" &&
+  //   node?.name?.toLowerCase().match("input")
+  // ) {
+  //   const isInput = true;
+  //   const [attr, char] = htmlText(node.children[0], isInput, isJsx);
+  //   return htmlContainer(
+  //     node,
+  //     ` placeholder="${char}"`,
+  //     [attr],
+  //     isJsx,
+  //     isInput
+  //   );
+  // }
 
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
 
@@ -168,7 +151,7 @@ const htmlFrame = (node: AltFrameNode, isJsx: boolean = false): string => {
     return htmlContainer(
       node,
       childrenStr,
-      formatWithJSX("position", isJsx, "relative"),
+      [formatWithJSX("position", isJsx, "relative")],
       isJsx,
       false,
       false
@@ -179,9 +162,9 @@ const htmlFrame = (node: AltFrameNode, isJsx: boolean = false): string => {
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const htmlContainer = (
-  node: AltFrameNode | AltRectangleNode | AltEllipseNode,
+  node: FrameNode | RectangleNode | EllipseNode,
   children: string,
-  additionalStyle: string = "",
+  additionalStyles: string[] = [],
   isJsx: boolean,
   isInput: boolean = false,
   isRelative: boolean = false
@@ -194,25 +177,18 @@ export const htmlContainer = (
   }
 
   const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
-    .blend(node)
-    .widthHeight(node)
-    .autoLayoutPadding(node)
-    .position(node, parentId, isRelative)
-    .customColor(node.fills, "background-color")
-    // TODO image and gradient support (tailwind does not support gradients)
-    .shadow(node)
-    .border(node);
+    .commonPositionStyles(node)
+    .commonShapeStyles(node);
 
-  if (isInput) {
-    return `\n<input${builder.build(additionalStyle)}${children}></input>`;
-  }
+  // if (isInput) {
+  //   return `\n<input${builder.build(additionalStyle)}${children}></input>`;
+  // }
 
-  if (builder.style || additionalStyle) {
-    const build = builder.build(additionalStyle);
+  if (builder.styles || additionalStyles) {
+    const build = builder.build(additionalStyles);
 
     let tag = "div";
     let src = "";
-    console.log("with ", node.name, "fill", retrieveTopFill(node.fills));
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
       tag = "img";
       src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
@@ -230,7 +206,15 @@ export const htmlContainer = (
   return children;
 };
 
-export const rowColumnProps = (node: AltFrameNode, isJsx: boolean): string => {
+export const htmlLine = (node: LineNode, isJsx: boolean): string => {
+  const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
+    .commonPositionStyles(node)
+    .commonShapeStyles(node);
+
+  return `\n<div${builder.build()}></div>`;
+};
+
+export const rowColumnProps = (node: FrameNode, isJsx: boolean): string[] => {
   // ROW or COLUMN
 
   // ignore current node when it has only one child and it has the same size
@@ -239,7 +223,7 @@ export const rowColumnProps = (node: AltFrameNode, isJsx: boolean): string => {
     node.children[0].width === node.width &&
     node.children[0].height === node.height
   ) {
-    return "";
+    return [];
   }
 
   // [optimization]
@@ -296,6 +280,8 @@ export const rowColumnProps = (node: AltFrameNode, isJsx: boolean): string => {
     case "MAX":
       counterAlign = "flex-end";
       break;
+    case "BASELINE":
+      break;
   }
   counterAlign = formatWithJSX("align-items", isJsx, counterAlign);
 
@@ -309,11 +295,11 @@ export const rowColumnProps = (node: AltFrameNode, isJsx: boolean): string => {
 
   flex = formatWithJSX("display", isJsx, flex);
 
-  return `${flex}${rowOrColumn}${counterAlign}${primaryAlign}`;
+  return [flex, rowOrColumn, counterAlign, primaryAlign];
 };
 
 const addSpacingIfNeeded = (
-  node: AltSceneNode,
+  node: SceneNode,
   index: number,
   len: number,
   isJsx: boolean
@@ -330,9 +316,9 @@ const addSpacingIfNeeded = (
       const wh = node.parent.layoutMode === "HORIZONTAL" ? "width" : "height";
 
       // don't show the layer name in these separators.
-      const style = new HtmlDefaultBuilder(node, false, isJsx).build(
-        formatWithJSX(wh, isJsx, node.parent.itemSpacing)
-      );
+      const style = new HtmlDefaultBuilder(node, false, isJsx).build([
+        formatWithJSX(wh, isJsx, node.parent.itemSpacing),
+      ]);
       return isJsx ? `\n<div${style}/>` : `\n<div${style}></div>`;
     }
   }

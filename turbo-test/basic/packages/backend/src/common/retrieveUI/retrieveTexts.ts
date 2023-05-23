@@ -1,4 +1,3 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { retrieveTopFill } from "../retrieveFill";
 import { swiftuiMain } from "../../swiftui/swiftuiMain";
 import { tailwindMain } from "../../tailwind/tailwindMain";
@@ -9,10 +8,10 @@ import { calculateContrastRatio, deepFlatten } from "./commonUI";
 type exportFramework = "flutter" | "swiftui" | "html" | "tailwind";
 
 export const retrieveGenericUIText = (
-  sceneNode: Array<AltSceneNode>,
+  sceneNode: Array<SceneNode>,
   framework: exportFramework
 ): Array<namedText> => {
-  // convert to AltNode and then flatten it. Conversion is necessary because of [tailwindText]
+  // convert to Node and then flatten it. Conversion is necessary because of [tailwindText]
   const selectedText = deepFlatten(sceneNode);
 
   const textStr: Array<namedText> = [];

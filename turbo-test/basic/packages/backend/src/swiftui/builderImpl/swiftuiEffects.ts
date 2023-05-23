@@ -1,7 +1,6 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { sliceNum } from "../../common/numToAutoFixed";
 
-export const swiftuiShadow = (node: AltSceneNode): string => {
+export const swiftuiShadow = (node: SceneNode): string => {
   if (!node.effects || node.effects.length === 0) {
     return "";
   }
@@ -47,7 +46,7 @@ export const swiftuiShadow = (node: AltSceneNode): string => {
   return `\n.shadow(${comp})`;
 };
 
-export const swiftuiBlur = (node: AltSceneNode): string => {
+export const swiftuiBlur = (node: SceneNode): string => {
   if (!node.effects || node.effects.length === 0) {
     return "";
   }

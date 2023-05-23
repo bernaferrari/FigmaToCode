@@ -1,5 +1,3 @@
-import { AltSceneNode } from "../altNodes/altMixins";
-
 export const magicMargin = 32;
 
 type SizeResult = {
@@ -9,7 +7,7 @@ type SizeResult = {
 
 // Update for latest Figma APIs. The old one is still being used for Tailwind.
 export const nodeWidthHeight = (
-  node: AltSceneNode,
+  node: SceneNode,
   allowRelative: boolean
 ): SizeResult => {
   let nodeWidth: number | null = node.width;
@@ -28,7 +26,7 @@ export const nodeWidthHeight = (
     }
   }
 
-  if (node.parent && node.parent.type === "FRAME") {
+  if (node.parent && node.parent.type === "FRAME" && "layoutGrow" in node) {
     switch (node.parent.layoutMode) {
       case "HORIZONTAL":
         return {
@@ -52,7 +50,7 @@ export const nodeWidthHeight = (
 };
 
 export const nodeWidthHeightTailwind = (
-  node: AltSceneNode,
+  node: LayoutMixin,
   allowRelative: boolean
 ): SizeResult => {
   /// WIDTH AND HEIGHT
@@ -186,7 +184,7 @@ export const nodeWidthHeightTailwind = (
 
   if ("layoutMode" in node && node.layoutMode !== "NONE") {
     // there is an edge case: frame with no children, layoutMode !== NONE and counterAxis = AUTO, but:
-    // in [altConversions] it is already solved: Frame without children becomes a Rectangle.
+    // in [Conversions] it is already solved: Frame without children becomes a Rectangle.
     switch (node.layoutMode) {
       case "HORIZONTAL":
         return {
@@ -208,7 +206,9 @@ export const nodeWidthHeightTailwind = (
 };
 
 // makes the view size bigger when there is a stroke
-const getNodeSizeWithStrokes = (node: AltSceneNode): Array<number> => {
+const getNodeSizeWithStrokes = (
+  node: MinimalStrokesMixin & DimensionAndPositionMixin
+): Array<number> => {
   let nodeHeight = node.height;
   let nodeWidth = node.width;
 
@@ -252,7 +252,7 @@ const getNodeSizeWithStrokes = (node: AltSceneNode): Array<number> => {
   return [nodeWidth, nodeHeight];
 };
 
-const childLargerThanMaxSize = (node: AltSceneNode, axis: "x" | "y") => {
+const childLargerThanMaxSize = (node: SceneNode, axis: "x" | "y") => {
   if ("children" in node && node.children.length > 0) {
     const widthHeight: "width" | "height" = axis === "x" ? "width" : "height";
     const lastChild = node.children[node.children.length - 1];
@@ -277,7 +277,7 @@ type responsive =
   | "5/6";
 
 const calculateResponsiveWH = (
-  node: AltSceneNode,
+  node: SceneNode,
   nodeWidthHeightNumber: number,
   axis: "x" | "y"
 ): responsive => {
@@ -347,7 +347,7 @@ const calculateResponsiveWH = (
 
 // set the width to max if the view is near the corner
 // export const isWidthFull = (
-//   node: AltSceneNode,
+//   node: SceneNode,
 //   nodeWidth: number,
 //   parentWidth: number
 // ): boolean => {

@@ -1,11 +1,3 @@
-import {
-  AltSceneNode,
-  AltRectangleNode,
-  AltEllipseNode,
-  AltFrameNode,
-  AltGroupNode,
-} from "../altNodes/altMixins";
-import { retrieveTopFill } from "../common/retrieveFill";
 import { flutterPosition } from "./builderImpl/flutterPosition";
 import {
   flutterVisibility,
@@ -14,6 +6,8 @@ import {
 } from "./builderImpl/flutterBlend";
 
 import { flutterContainer } from "./flutterContainer";
+import { commonIsAbsolutePosition } from "../common/commonPosition";
+import { generateWidgetCode, sliceNum } from "../common/numToAutoFixed";
 
 export class FlutterDefaultBuilder {
   child: string;
@@ -22,23 +16,29 @@ export class FlutterDefaultBuilder {
     this.child = optChild;
   }
 
-  createContainer(
-    node: AltRectangleNode | AltEllipseNode | AltFrameNode | AltGroupNode
-  ): this {
+  createContainer(node: SceneNode): this {
     this.child = flutterContainer(node, this.child);
     return this;
   }
 
-  blendAttr(node: AltSceneNode): this {
+  blendAttr(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
     this.child = flutterVisibility(node, this.child);
     this.child = flutterRotation(node, this.child);
     this.child = flutterOpacity(node, this.child);
-
     return this;
   }
 
-  position(node: AltSceneNode, parentId: string): this {
-    this.child = flutterPosition(node, this.child, parentId);
+  position(node: SceneNode, rootParentId: string): this {
+    if (commonIsAbsolutePosition(node, rootParentId)) {
+      this.child = generateWidgetCode("Positioned", {
+        left: node.x,
+        top: node.y,
+        child: this.child,
+      });
+    }
     return this;
+
+    // TODO see if necessary.
+    // return this.child = flutterPosition(node, this.child, parentId);
   }
 }

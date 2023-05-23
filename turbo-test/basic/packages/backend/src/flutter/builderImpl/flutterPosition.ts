@@ -1,11 +1,9 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { commonPosition } from "../../common/commonPosition";
 import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
 import { parentCoordinates } from "../../common/parentCoordinates";
-import { indentStringFlutter } from "../../common/indentString";
 
 export const flutterPosition = (
-  node: AltSceneNode,
+  node: SceneNode,
   child: string,
   parentId: string = ""
 ): string => {
@@ -15,30 +13,34 @@ export const flutterPosition = (
   }
 
   // check if view is in a stack. Group and Frames must have more than 1 element
-  if (node.parent.isRelative === true) {
-    const pos = retrieveAbsolutePos(node, child);
-    if (pos !== "Absolute") {
-      return pos;
-    } else {
-      // this is necessary because Group have absolute position, while Frame is relative.
-      // output is always going to be relative to the parent.
-      const [parentX, parentY] = parentCoordinates(node.parent);
-
-      const diffX = sliceNum(node.x - parentX);
-      const diffY = sliceNum(node.y - parentY);
-
-      return generateWidgetCode("Positioned", {
-        left: diffX,
-        top: diffY,
-        child: child,
-      });
+  // if (node.parent.isRelative === true) {
+  const pos = retrieveAbsolutePos(node, child);
+  if (pos !== "Absolute") {
+    return pos;
+  } else {
+    const parentNode = node.parent;
+    if (!("x" in parentNode)) {
+      return child;
     }
+    // this is necessary because Group have absolute position, while Frame is relative.
+    // output is always going to be relative to the parent.
+    const [parentX, parentY] = parentCoordinates(parentNode);
+
+    const diffX = sliceNum(node.x - parentX);
+    const diffY = sliceNum(node.y - parentY);
+
+    return generateWidgetCode("Positioned", {
+      left: diffX,
+      top: diffY,
+      child: child,
+    });
   }
+  // }
 
   return child;
 };
 
-const retrieveAbsolutePos = (node: AltSceneNode, child: string): string => {
+const retrieveAbsolutePos = (node: SceneNode, child: string): string => {
   const positionedAlign = (align: string) => {
     return generateWidgetCode("Positioned.fill", {
       child: generateWidgetCode("Align", {

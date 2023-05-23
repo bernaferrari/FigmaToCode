@@ -1,4 +1,3 @@
-import { AltSceneNode } from "../altNodes/altMixins";
 import { swiftuiBlur, swiftuiShadow } from "./builderImpl/swiftuiEffects";
 import {
   swiftuiBorder,
@@ -18,53 +17,61 @@ import {
 } from "./builderImpl/swiftuiBlend";
 
 export class SwiftuiDefaultBuilder {
-  modifiers: string = "";
+  modifiers: string[] = [];
 
-  blend(node: AltSceneNode): this {
-    this.modifiers += swiftuiVisibility(node);
-    this.modifiers += swiftuiRotation(node);
-    this.modifiers += swiftuiOpacity(node);
-    this.modifiers += swiftuiBlendMode(node);
+  blend(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
+    this.modifiers.push(
+      swiftuiVisibility(node),
+      swiftuiRotation(node),
+      swiftuiOpacity(node),
+      swiftuiBlendMode(node)
+    );
 
     return this;
   }
-
-  position(node: AltSceneNode, parentId: string): this {
-    this.modifiers += swiftuiPosition(node, parentId);
+  position(node: SceneNode, parentId: string): this {
+    // TODO Fix this.
+    // if (commonIsAbsolutePosition(node)) {
+    //   this.addStyles(
+    //     formatWithJSX("left", this.isJSX, node.x),
+    //     formatWithJSX("top", this.isJSX, node.y)
+    //   );
+    // }
+    this.modifiers.push(swiftuiPosition(node, parentId));
     return this;
   }
 
-  shapeBorder(node: AltSceneNode): this {
-    this.modifiers += swiftuiShapeStroke(node);
+  shapeBorder(node: SceneNode): this {
+    this.modifiers.push(swiftuiShapeStroke(node));
     return this;
   }
 
-  layerBorder(node: AltSceneNode): this {
-    this.modifiers += swiftuiBorder(node);
+  layerBorder(node: SceneNode): this {
+    this.modifiers.push(swiftuiBorder(node));
     return this;
   }
 
-  shapeBackground(node: AltSceneNode): this {
+  shapeBackground(node: SceneNode): this {
     if (node.type !== "ELLIPSE" && node.type !== "RECTANGLE") {
       return this;
     }
 
     const fillColor = swiftuiColorFromFills(node.fills);
     if (fillColor) {
-      this.modifiers += `\n.fill(${fillColor})`;
+      this.modifiers.push(`.fill(${fillColor})`);
     }
 
     return this;
   }
 
-  layerBackground(node: AltSceneNode): this {
+  layerBackground(node: SceneNode): this {
     if (node.type !== "FRAME") {
       return this;
     }
 
     const fillColor = swiftuiColorFromFills(node.fills);
     if (fillColor) {
-      this.modifiers += `\n.background(${fillColor})`;
+      this.modifiers.push(`.background(${fillColor})`);
     }
 
     // add corner to the background. It needs to come after the Background, and since we already in the if, let's add it here.
@@ -72,42 +79,42 @@ export class SwiftuiDefaultBuilder {
 
     // it seems this is necessary even in RoundedRectangle
     if (corner) {
-      this.modifiers += `\n.cornerRadius(${corner})`;
+      this.modifiers.push(`.cornerRadius(${corner})`);
     }
 
     return this;
   }
 
-  effects(node: AltSceneNode): this {
+  effects(node: SceneNode): this {
     if (node.type === "GROUP") {
       return this;
     }
 
-    this.modifiers += swiftuiBlur(node);
-    this.modifiers += swiftuiShadow(node);
+    this.modifiers.push(swiftuiBlur(node));
+    this.modifiers.push(swiftuiShadow(node));
 
     return this;
   }
 
-  widthHeight(node: AltSceneNode): this {
+  widthHeight(node: SceneNode): this {
     const [propWidth, propHeight] = swiftuiSize(node);
 
     if (propWidth || propHeight) {
       // add comma if propWidth and propHeight both exists
       const comma = propWidth && propHeight ? ", " : "";
 
-      this.modifiers += `\n.frame(${propWidth}${comma}${propHeight})`;
+      this.modifiers.push(`.frame(${propWidth}${comma}${propHeight})`);
     }
 
     return this;
   }
 
-  autoLayoutPadding(node: AltSceneNode): this {
-    this.modifiers += swiftuiPadding(node);
+  autoLayoutPadding(node: SceneNode): this {
+    this.modifiers.push(swiftuiPadding(node));
     return this;
   }
 
   build(): string {
-    return this.modifiers;
+    return this.modifiers.join("");
   }
 }

@@ -1,16 +1,15 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
 import { sliceNum } from "../../common/numToAutoFixed";
 
 // Used in tests.
-export const flutterSizeWH = (node: AltSceneNode): string => {
+export const flutterSizeWH = (node: SceneNode): string => {
   const fSize = flutterSize(node);
   const size = fSize.width + fSize.height;
   return size;
 };
 
 export const flutterSize = (
-  node: AltSceneNode
+  node: SceneNode
 ): { width: string; height: string; isExpanded: boolean } => {
   const size = nodeWidthHeight(node, false);
 

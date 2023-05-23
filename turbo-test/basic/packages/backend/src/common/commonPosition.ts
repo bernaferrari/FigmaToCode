@@ -1,4 +1,3 @@
-import { AltSceneNode } from "../altNodes/altMixins";
 import { parentCoordinates } from "./parentCoordinates";
 
 type position =
@@ -14,7 +13,9 @@ type position =
   | "BottomCenter"
   | "BottomEnd";
 
-export const commonPosition = (node: AltSceneNode): position => {
+export const commonPosition = (
+  node: SceneNode & DimensionAndPositionMixin
+): position => {
   // if node is same size as height, position is not necessary
 
   // detect if Frame's width is same as Child when Frame has Padding.
@@ -28,6 +29,7 @@ export const commonPosition = (node: AltSceneNode): position => {
 
   if (
     !node.parent ||
+    !("width" in node.parent) ||
     (node.width === node.parent.width - hPadding &&
       node.height === node.parent.height - vPadding)
   ) {
@@ -100,4 +102,25 @@ export const commonPosition = (node: AltSceneNode): position => {
   }
 
   return "Absolute";
+};
+
+export const commonIsAbsolutePosition = (node: SceneNode) => {
+  if ("layoutAlign" in node) {
+    if (!node.parent || node.parent === undefined) {
+      return this;
+    }
+
+    const parentLayoutIsNone =
+      "layoutMode" in node.parent && node.parent.layoutMode === "NONE";
+    const hasNoLayoutMode = !("layoutMode" in node.parent);
+
+    if (
+      node.layoutPositioning === "ABSOLUTE" ||
+      parentLayoutIsNone ||
+      hasNoLayoutMode
+    ) {
+      return true;
+    }
+  }
+  return false;
 };

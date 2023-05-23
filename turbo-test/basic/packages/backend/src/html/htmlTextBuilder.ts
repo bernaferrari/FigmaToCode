@@ -1,59 +1,115 @@
-import { AltTextNode } from "../altNodes/altMixins";
-import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
 import { formatWithJSX } from "../common/parseJSX";
 import { convertFontWeight } from "../common/convertFontWeight";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
-import { htmlTextSize as htmlTextSizeBox } from "./builderImpl/htmlTextSize";
-import { sliceNum } from "../common/numToAutoFixed";
+import { globalTextStyleSegments } from "../altNodes/altConversion";
+import { htmlColorFromFills } from "./builderImpl/htmlColor";
+import { htmlSizePartial } from "./builderImpl/htmlSize";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
-  // constructor(node: AltTextNode, showLayerName: boolean, optIsJSX: boolean) {
-  //   super(node, showLayerName, optIsJSX);
-  // }
+  constructor(node: TextNode, showLayerName: boolean, optIsJSX: boolean) {
+    super(node, showLayerName, optIsJSX);
+  }
 
-  // must be called before Position method
-  textAutoSize(node: AltTextNode): this {
-    if (node.textAutoResize === "NONE") {
-      // going to be used for position
-      this.hasFixedSize = true;
+  getTextSegments(id: string): { style: string; text: string }[] {
+    const segments = globalTextStyleSegments[id];
+    if (!segments) {
+      return [];
     }
 
-    this.style += htmlTextSizeBox(node, this.isJSX);
+    return segments.map((segment) => {
+      const color = htmlColorFromFills(segment.fills);
+      const textDecoration = this.getTextDecoration(segment.textDecoration);
+      const textTransform = this.getTextTransform(segment.textCase);
+      const lineHeightStyle = this.getLineHeightStyle(segment.lineHeight);
+      const letterSpacingStyle = this.getLetterSpacingStyle(
+        segment.letterSpacing
+      );
+
+      const styleAttributes = [
+        `color: ${color}`,
+        `font-size: ${segment.fontSize}px`,
+        `font-family: ${segment.fontName.family}`,
+        `font-style: ${segment.fontName.style}`,
+        `font-weight: ${segment.fontWeight}`,
+        `text-decoration: ${textDecoration}`,
+        `text-transform: ${textTransform}`,
+        `word-wrap: break-word`,
+        lineHeightStyle,
+        letterSpacingStyle,
+        `text-indent: ${segment.indentation}`,
+      ].join("; ");
+
+      return { style: styleAttributes, text: segment.characters };
+    });
+  }
+
+  fontSize(node: TextNode, isUI = false): this {
+    if (node.fontSize !== figma.mixed) {
+      const value = isUI ? Math.min(node.fontSize, 24) : node.fontSize;
+      this.addStyles(formatWithJSX("font-size", this.isJSX, value));
+    }
     return this;
   }
 
-  // todo fontFamily
-  //  fontFamily(node: AltTextNode): this {
-  //    return this;
-  //  }
+  getTextDecoration = (textDecoration: string) => {
+    return textDecoration === "STRIKETHROUGH"
+      ? "line-through"
+      : textDecoration === "UNDERLINE"
+      ? "underline"
+      : "none";
+  };
+
+  getTextTransform = (textCase: string) => {
+    return textCase === "UPPER"
+      ? "uppercase"
+      : textCase === "LOWER"
+      ? "lowercase"
+      : "none";
+  };
+
+  getLineHeightStyle = (lineHeight: any) => {
+    if (lineHeight.unit === "AUTO") {
+      return "line-height: normal";
+    } else if (lineHeight.unit === "PIXELS") {
+      return `line-height: ${lineHeight.value}px`;
+    } else if (lineHeight.unit === "PERCENT") {
+      return `line-height: ${lineHeight.value}%`;
+    }
+  };
+
+  getLetterSpacingStyle = (letterSpacing: any) => {
+    return letterSpacing.unit === "PIXELS"
+      ? `letter-spacing: ${letterSpacing.value}px`
+      : `letter-spacing: ${letterSpacing.value * 100}%`;
+  };
 
   /**
    * https://tailwindcss.com/docs/font-size/
    * example: text-md
    */
-  fontSize(node: AltTextNode, isUI: boolean = false): this {
-    // example: text-md
-    if (node.fontSize !== figma.mixed) {
-      // special limit when used in UI.
-      const value = isUI ? Math.min(node.fontSize, 24) : node.fontSize;
+  // fontSize(node: TextNode, isUI = false): this {
+  //   // example: text-md
+  //   if (node.fontSize !== figma.mixed) {
+  //     // special limit when used in UI.
+  //     const value = isUI ? Math.min(node.fontSize, 24) : node.fontSize;
 
-      this.style += formatWithJSX("font-size", this.isJSX, value);
-    }
+  //     this.addStyles(formatWithJSX("font-size", this.isJSX, value));
+  //   }
 
-    return this;
-  }
+  //   return this;
+  // }
 
   /**
    * https://tailwindcss.com/docs/font-style/
    * example: font-extrabold
    * example: italic
    */
-  fontStyle(node: AltTextNode): this {
+  fontStyle(node: TextNode): this {
     if (node.fontName !== figma.mixed) {
       const lowercaseStyle = node.fontName.style.toLowerCase();
 
       if (lowercaseStyle.match("italic")) {
-        this.style += formatWithJSX("font-style", this.isJSX, "italic");
+        this.addStyles(formatWithJSX("font-style", this.isJSX, "italic"));
       }
 
       if (lowercaseStyle.match("regular")) {
@@ -69,59 +125,61 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       const weight = convertFontWeight(value);
 
       if (weight !== null && weight !== "400") {
-        this.style += formatWithJSX("font-weight", this.isJSX, weight);
+        this.addStyles(formatWithJSX("font-weight", this.isJSX, weight));
       }
     }
     return this;
   }
 
-  /**
-   * https://tailwindcss.com/docs/letter-spacing/
-   * example: tracking-widest
-   */
-  letterSpacing(node: AltTextNode): this {
-    const letterSpacing = commonLetterSpacing(node);
-    if (letterSpacing > 0) {
-      this.style += formatWithJSX("letter-spacing", this.isJSX, letterSpacing);
-    }
+  // /**
+  //  * https://tailwindcss.com/docs/letter-spacing/
+  //  * example: tracking-widest
+  //  */
+  // letterSpacing(node: TextNode): this {
+  //   const letterSpacing = commonLetterSpacing(node);
+  //   if (letterSpacing > 0) {
+  //     this.addStyles(
+  //       formatWithJSX("letter-spacing", this.isJSX, letterSpacing)
+  //     );
+  //   }
 
-    return this;
-  }
+  //   return this;
+  // }
 
-  /**
-   * Since Figma is built on top of HTML + CSS, lineHeight properties are easy to map.
-   */
-  lineHeight(node: AltTextNode): this {
-    if (node.lineHeight !== figma.mixed) {
-      switch (node.lineHeight.unit) {
-        case "AUTO":
-          this.style += formatWithJSX("line-height", this.isJSX, "100%");
-          break;
-        case "PERCENT":
-          this.style += formatWithJSX(
-            "line-height",
-            this.isJSX,
-            `${sliceNum(node.lineHeight.value)}%`
-          );
-          break;
-        case "PIXELS":
-          this.style += formatWithJSX(
-            "line-height",
-            this.isJSX,
-            node.lineHeight.value
-          );
-          break;
-      }
-    }
+  // /**
+  //  * Since Figma is built on top of HTML + CSS, lineHeight properties are easy to map.
+  //  */
+  // lineHeight(node: TextNode): this {
+  //   if (node.lineHeight !== figma.mixed) {
+  //     switch (node.lineHeight.unit) {
+  //       case "AUTO":
+  //         this.addStyles(formatWithJSX("line-height", this.isJSX, "100%"));
+  //         break;
+  //       case "PERCENT":
+  //         this.addStyles(
+  //           formatWithJSX(
+  //             "line-height",
+  //             this.isJSX,
+  //             `${sliceNum(node.lineHeight.value)}%`
+  //           )
+  //         );
+  //         break;
+  //       case "PIXELS":
+  //         this.addStyles(
+  //           formatWithJSX("line-height", this.isJSX, node.lineHeight.value)
+  //         );
+  //         break;
+  //     }
+  //   }
 
-    return this;
-  }
+  //   return this;
+  // }
 
   /**
    * https://tailwindcss.com/docs/text-align/
    * example: text-justify
    */
-  textAlign(node: AltTextNode): this {
+  textAlign(node: TextNode): this {
     // if alignHorizontal is LEFT, don't do anything because that is native
 
     // only undefined in testing
@@ -129,13 +187,13 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       // todo when node.textAutoResize === "WIDTH_AND_HEIGHT" and there is no \n in the text, this can be ignored.
       switch (node.textAlignHorizontal) {
         case "CENTER":
-          this.style += formatWithJSX("text-align", this.isJSX, "center");
+          this.addStyles(formatWithJSX("text-align", this.isJSX, "center"));
           break;
         case "RIGHT":
-          this.style += formatWithJSX("text-align", this.isJSX, "right");
+          this.addStyles(formatWithJSX("text-align", this.isJSX, "right"));
           break;
         case "JUSTIFIED":
-          this.style += formatWithJSX("text-align", this.isJSX, "justify");
+          this.addStyles(formatWithJSX("text-align", this.isJSX, "justify"));
           break;
       }
     }
@@ -147,13 +205,13 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
    * https://tailwindcss.com/docs/text-transform/
    * example: uppercase
    */
-  textTransform(node: AltTextNode): this {
+  textTransform(node: TextNode): this {
     if (node.textCase === "LOWER") {
-      this.style += formatWithJSX("text-transform", this.isJSX, "lowercase");
+      this.addStyles(formatWithJSX("text-transform", this.isJSX, "lowercase"));
     } else if (node.textCase === "TITLE") {
-      this.style += formatWithJSX("text-transform", this.isJSX, "capitalize");
+      this.addStyles(formatWithJSX("text-transform", this.isJSX, "capitalize"));
     } else if (node.textCase === "UPPER") {
-      this.style += formatWithJSX("text-transform", this.isJSX, "uppercase");
+      this.addStyles(formatWithJSX("text-transform", this.isJSX, "uppercase"));
     } else if (node.textCase === "ORIGINAL") {
       // default, ignore
     }
@@ -165,17 +223,29 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
    * https://tailwindcss.com/docs/text-decoration/
    * example: underline
    */
-  textDecoration(node: AltTextNode): this {
-    if (node.textDecoration === "UNDERLINE") {
-      this.style += formatWithJSX("text-decoration", this.isJSX, "underline");
-    } else if (node.textDecoration === "STRIKETHROUGH") {
-      this.style += formatWithJSX(
-        "text-decoration",
-        this.isJSX,
-        "line-through"
-      );
+  // textDecoration(node: TextNode): this {
+  //   if (node.textDecoration === "UNDERLINE") {
+  //     this.addStyles(formatWithJSX("text-decoration", this.isJSX, "underline"));
+  //   } else if (node.textDecoration === "STRIKETHROUGH") {
+  //     this.addStyles(
+  //       formatWithJSX("text-decoration", this.isJSX, "line-through")
+  //     );
+  //   }
+
+  //   return this;
+  // }
+
+  textShapeSize = (node: TextNode, isJsx: boolean): this => {
+    const { width, height } = htmlSizePartial(node, isJsx);
+
+    if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
+      this.addStyles(width);
+    }
+
+    if (node.textAutoResize === "NONE") {
+      this.addStyles(height);
     }
 
     return this;
-  }
+  };
 }

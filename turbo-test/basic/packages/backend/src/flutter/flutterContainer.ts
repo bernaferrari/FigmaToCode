@@ -1,30 +1,18 @@
 import {
-  AltRectangleNode,
-  AltEllipseNode,
-  AltFrameNode,
-  AltGroupNode,
-} from "../altNodes/altMixins";
-import {
   flutterBorderRadius,
   flutterBorder,
 } from "./builderImpl/flutterBorder";
 import { flutterSize } from "./builderImpl/flutterSize";
 import { flutterPadding } from "./builderImpl/flutterPadding";
 import { flutterShadow } from "./builderImpl/flutterShadow";
-import {
-  flutterBoxDecorationColor,
-  flutterColorFromFills,
-} from "./builderImpl/flutterColor";
+import { flutterBoxDecorationColor } from "./builderImpl/flutterColor";
 import {
   generateWidgetCode,
-  propertyIfNotDefault,
+  skipDefaultProperty,
 } from "../common/numToAutoFixed";
 import { sliceNum } from "../common/numToAutoFixed";
 
-export const flutterContainer = (
-  node: AltRectangleNode | AltEllipseNode | AltFrameNode | AltGroupNode,
-  child: string
-): string => {
+export const flutterContainer = (node: SceneNode, child: string): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -33,7 +21,8 @@ export const flutterContainer = (
   }
 
   // ignore for Groups
-  const propBoxDecoration = node.type === "GROUP" ? "" : getDecoration(node);
+  const propBoxDecoration =
+    node.type === "GROUP" || !("effects" in node) ? "" : getDecoration(node);
   const fSize = flutterSize(node);
   const isExpanded = fSize.isExpanded;
 
@@ -51,7 +40,7 @@ export const flutterContainer = (
       width: fSize.width,
       height: fSize.height,
       padding: propPadding,
-      decoration: propertyIfNotDefault(propBoxDecoration, "BoxDecoration()"),
+      decoration: skipDefaultProperty(propBoxDecoration, "ShapeDecoration()"),
       child: child,
     });
   } else if (propPadding) {
@@ -75,23 +64,14 @@ export const flutterContainer = (
   return result;
 };
 
-const getDecoration = (
-  node: AltRectangleNode | AltEllipseNode | AltFrameNode
-): string => {
-  const propBackgroundColor = flutterBoxDecorationColor(node.fills);
+const getDecoration = (node: SceneNode): string => {
+  if (!("fills" in node)) {
+    return "";
+  }
 
-  
-  // TODO Bernardo: add support for shapeDecoration
-  // if (
-  //   node.type === "ELLIPSE" ||
-  //   node.type === "STAR" ||
-  //   node.type === "POLYGON"
-  // ) {
-  //   return `\ndecoration: ShapeDecoration(${indentString(
-  //     propBorderRadius + propBorder + propBoxShadow,
-  //     2
-  //   )}\n),`;
-  // }
+  const propBoxShadow = flutterShadow(node);
+  const propBorderRadius = flutterBorderRadius(node);
+  const decorationBackground = flutterBoxDecorationColor(node.fills);
 
   let shapeDecorationBorder = "";
   if (node.type === "STAR") {
@@ -100,45 +80,51 @@ const getDecoration = (
     shapeDecorationBorder = generatePolygonBorder(node);
   } else if (node.type === "ELLIPSE") {
     shapeDecorationBorder = generateOvalBorder(node);
+  } else if ("strokeWeight" in node && node.strokeWeight !== figma.mixed) {
+    shapeDecorationBorder = generateRoundedRectangleBorder(node);
   }
 
-  const propBorder = flutterBorder(node);
-  const propBoxShadow = flutterShadow(node, "boxShadow");
-  const propBorderRadius = flutterBorderRadius(node);
-  const color = flutterBoxDecorationColor(node.fills);
-  console.log("color", color);
-
-  if (shapeDecorationBorder !== "") {
-    const properties = {
+  if (shapeDecorationBorder) {
+    return generateWidgetCode("ShapeDecoration", {
+      ...decorationBackground,
       borderRadius: propBorderRadius,
-      boxShadow: propBoxShadow,
-      border: propBorder,
-      shape: shapeDecorationBorder,
-      // ...color,
-    };
-
-    return generateWidgetCode("ShapeDecoration", properties);
+      shape: skipDefaultProperty(
+        shapeDecorationBorder,
+        "RoundedRectangleBorder()"
+      ),
+      shadows: propBoxShadow,
+    });
   }
 
-  // generate the decoration, or just the backgroundColor when color is SOLID.
-
-  const properties = {
+  // if ("strokes" in node && node.strokeWeight === figma.mixed) {
+  return generateWidgetCode("BoxDecoration", {
+    ...decorationBackground,
     borderRadius: propBorderRadius,
+    border: flutterBorder(node),
     boxShadow: propBoxShadow,
-    border: propBorder,
-    // ...color,
-  };
-
-  const mergedProperties = Object.assign({}, properties, color);
-  return generateWidgetCode("BoxDecoration", mergedProperties);
+  });
+  // }
 };
 
-const generateRoundedRectangleBorder = (node: RectangleNode): string => {
-  const cornerRadius = node.cornerRadius;
-  const borderRadius = cornerRadius === figma.mixed ? 0 : cornerRadius;
+const generateRoundedRectangleBorder = (
+  node: SceneNode & MinimalStrokesMixin
+): string => {
+  const borderRadius =
+    "cornerRadius" in node &&
+    node.cornerRadius !== figma.mixed &&
+    node.cornerRadius !== undefined
+      ? node.cornerRadius
+      : 0;
 
   return generateWidgetCode("RoundedRectangleBorder", {
-    borderRadius: `BorderRadius.circular(${sliceNum(borderRadius)})`,
+    borderRadius: skipDefaultProperty(
+      `BorderRadius.circular(${sliceNum(borderRadius)})`,
+      "BorderRadius.circular(0)"
+    ),
+    strokeAlign: skipDefaultProperty(
+      getStrokeAlign(node),
+      "BorderSide.strokeAlignInside"
+    ),
   });
 };
 
@@ -162,6 +148,19 @@ const generateStarBorder = (node: StarNode): string => {
   });
 };
 
+export const getStrokeAlign = (node: MinimalStrokesMixin): string => {
+  switch (node.strokeAlign) {
+    case "CENTER":
+      return "BorderSide.strokeAlignCenter";
+    case "OUTSIDE":
+      return "BorderSide.strokeAlignOutside";
+    case "INSIDE":
+      return "BorderSide.strokeAlignInside";
+    default:
+      return "";
+  }
+};
+
 const generateOvalBorder = (node: EllipseNode): string => {
   return generateWidgetCode("OvalBorder", {});
 };
@@ -173,6 +172,9 @@ const generatePolygonBorder = (node: PolygonNode): string => {
 
   return generateWidgetCode("StarBorder.polygon", {
     sides: sliceNum(points),
-    borderRadius: `BorderRadius.circular(${sliceNum(borderRadius)})`,
+    borderRadius: skipDefaultProperty(
+      `BorderRadius.circular(${sliceNum(borderRadius)})`,
+      "BorderRadius.circular(0)"
+    ),
   });
 };

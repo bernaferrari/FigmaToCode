@@ -1,445 +1,232 @@
 import { convertNodesOnRectangle } from "./convertNodesOnRectangle";
-import {
-  AltSceneNode,
-  AltRectangleNode,
-  AltFrameNode,
-  AltTextNode,
-  AltGroupNode,
-  AltLayoutMixin,
-  AltFrameMixin,
-  AltGeometryMixin,
-  AltBlendMixin,
-  AltCornerMixin,
-  AltRectangleCornerMixin,
-  AltDefaultShapeMixin,
-  AltEllipseNode,
-} from "./altMixins";
-import { convertToAutoLayout } from "./convertToAutoLayout";
 
-export const convertSingleNodeToAlt = (
-  node: SceneNode,
-  parent: AltFrameNode | AltGroupNode | null = null
-): AltSceneNode => {
-  return convertIntoAltNodes([node], parent)[0];
+type ParentType = (BaseNode & ChildrenMixin) | null;
+
+export let globalTextStyleSegments: Record<string, StyledTextSegment[]> = {};
+
+// export const convertSingleNodeTo = (
+//   node: SceneNode,
+//   parent: ParentType = null
+// ): SceneNode => {
+//   globalTextStyleSegments = {};
+//   return convertIntoNodes([node], parent)[0];
+// };
+
+const assignProperty = (
+  target: any,
+  source: any,
+  prop: string,
+  descriptor: PropertyDescriptor
+) => {
+  const value =
+    typeof source[prop] === "object"
+      ? JSON.parse(JSON.stringify(source[prop]))
+      : source[prop];
+  Object.defineProperty(target, prop, { ...descriptor, value });
 };
 
-const cloneNode = <T extends BaseNode>(node: T): T => {
-  const cloned: any = {};
+export const cloneNode = <T extends BaseNode>(node: T): T => {
+  // Create the cloned object with the correct prototype
+  const cloned = {} as T;
 
+  // Create a new object with only the desired descriptors (excluding 'parent' and 'children')
   for (const prop in node) {
-    if (prop === "parent" || prop === "children") {
-      continue;
-    }
-
-    if (typeof node[prop] === "object") {
-      cloned[prop] = JSON.parse(JSON.stringify(node[prop]));
-    } else {
-      cloned[prop] = node[prop];
+    if (
+      prop !== "parent" &&
+      prop !== "children" &&
+      prop !== "horizontalPadding" &&
+      prop !== "verticalPadding"
+    ) {
+      cloned[prop as keyof T] = node[prop as keyof T];
     }
   }
 
-  // Set the correct prototype for the cloned object
-  Object.setPrototypeOf(cloned, Object.getPrototypeOf(node));
-
-  return cloned as T;
+  return cloned;
 };
 
-export const frameNodeToAlt = (
+export const frameNodeTo = (
   node: FrameNode | InstanceNode | ComponentNode,
-  altParent: AltFrameNode | AltGroupNode | null = null
-): AltRectangleNode | AltFrameNode | AltGroupNode => {
+  parent: ParentType
+): RectangleNode | FrameNode | InstanceNode | ComponentNode | GroupNode => {
   if (node.children.length === 0) {
     // if it has no children, convert frame to rectangle
-    return frameToRectangleNode(node, altParent);
+    return frameToRectangleNode(node, parent);
   }
-
-  const altNode = new AltFrameNode();
-
-  altNode.id = node.id;
-  altNode.name = node.name;
-
-  if (altParent) {
-    altNode.parent = altParent;
-  }
-
-  convertDefaultShape(altNode, node);
-  convertFrame(altNode, node);
-  convertCorner(altNode, node);
-  convertRectangleCorner(altNode, node);
-
-  altNode.children = convertIntoAltNodes(node.children, altNode);
-
-  return convertToAutoLayout(convertNodesOnRectangle(altNode));
+  const clone = standardClone(node, parent);
+  overrideReadonlyProperty(
+    clone,
+    "children",
+    convertIntoNodes(node.children, clone)
+  );
+  return convertNodesOnRectangle(clone);
 };
 
 // auto convert Frame to Rectangle when Frame has no Children
 const frameToRectangleNode = (
   node: FrameNode | InstanceNode | ComponentNode,
-  altParent: AltFrameNode | AltGroupNode | null
-): AltRectangleNode => {
-  const newNode = new AltRectangleNode();
-
-  newNode.id = node.id;
-  newNode.name = node.name;
-
-  if (altParent) {
-    newNode.parent = altParent;
+  parent: ParentType
+): RectangleNode => {
+  const clonedNode = cloneNode(node);
+  if (parent) {
+    assignParent(clonedNode, parent);
   }
+  overrideReadonlyProperty(clonedNode, "type", "RECTANGLE");
 
-  convertDefaultShape(newNode, node);
-  convertRectangleCorner(newNode, node);
-  convertCorner(newNode, node);
-  return newNode;
+  return clonedNode as unknown as RectangleNode;
 };
 
-const assignParent = (
-  altNode: SceneNode,
-  altParent: SceneNode | AltSceneNode | undefined
-) => {
-  if (altParent) {
-    Object.assign(altNode, { parent: altParent });
+export const overrideReadonlyProperty = <T, K extends keyof T>(
+  obj: T,
+  prop: K,
+  value: any
+): void => {
+  Object.defineProperty(obj, prop, {
+    value: value,
+    writable: true,
+    configurable: true,
+  });
+};
+
+const assignParent = (node: SceneNode, parent: ParentType) => {
+  if (parent) {
+    overrideReadonlyProperty(node, "parent", parent);
   }
 };
 
-export const convertIntoAltNodes = (
+const standardClone = <T extends SceneNode>(node: T, parent: ParentType): T => {
+  const clonedNode = cloneNode(node);
+  if (parent !== null) {
+    assignParent(clonedNode, parent);
+  }
+  return clonedNode;
+};
+
+export const convertIntoNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
-  altParent: AltFrameNode | AltGroupNode | null = null
-): Array<AltSceneNode> => {
-  const mapped: Array<AltSceneNode | null> = sceneNode.map(
-    (node: SceneNode) => {
-      if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-        let altNode;
-        if (node.type === "RECTANGLE") {
-          altNode = new AltRectangleNode();
-          convertRectangleCorner(altNode, node);
-        } else {
-          altNode = new AltEllipseNode();
-        }
-
-        altNode.id = node.id;
-        altNode.name = node.name;
-
-        if (altParent) {
-          altNode.parent = altParent;
-        }
-
-        convertDefaultShape(altNode, node);
-        convertCorner(altNode, node);
-
-        return altNode;
-      } else if (node.type === "LINE") {
-        const altNode = new AltRectangleNode();
-
-        altNode.id = node.id;
-        altNode.name = node.name;
-
-        if (altParent) {
-          altNode.parent = altParent;
-        }
-
-        convertDefaultShape(altNode, node);
-
+  parent: ParentType = null
+): Array<SceneNode> => {
+  const mapped: Array<SceneNode | null> = sceneNode.map((node: SceneNode) => {
+    switch (node.type) {
+      case "RECTANGLE":
+      case "ELLIPSE":
+        return standardClone(node, parent);
+      case "LINE":
         // Lines have a height of zero, but they must have a height, so add 1.
-        altNode.height = 1;
+        // TODO Bernardo
+        // clonedNode.height = 1;
 
         // Let them be CENTER, since on Lines this property is ignored.
-        altNode.strokeAlign = "CENTER";
+        // TODO Bernardo
+        // clonedNode.strokeAlign = "CENTER";
 
         // Remove 1 since it now has a height of 1. It won't be visually perfect, but will be almost.
-        if (altNode.strokeWeight != figma.mixed) {
-          altNode.strokeWeight = altNode.strokeWeight - 1;
-        }
+        // TODO Bernardo
+        // if (node.strokeWeight != figma.mixed) {
+        //   node.strokeWeight = node.strokeWeight - 1;
+        // }
+        return standardClone(node, parent);
+      case "FRAME":
+      case "INSTANCE":
+      case "COMPONENT":
+        // TODO Fix asset export. Use the new API.
+        // const iconToRect = iconToRectangle(node, parent);
+        // if (iconToRect != null) {
+        //   return iconToRect;
+        // }
 
-        return altNode;
-      } else if (
-        node.type === "FRAME" ||
-        node.type === "INSTANCE" ||
-        node.type === "COMPONENT"
-      ) {
-        const iconToRect = iconToRectangle(node, altParent);
+        return frameNodeTo(node, parent);
+      case "GROUP":
+        // if (node.children.length === 1 && node.visible) {
+        //   // if Group is visible and has only one child, Group should disappear.
+        //   // there will be a single value anyway.
+        //   return convertIntoNodes(node.children, parent)[0];
+        // }
+
+        // TODO see if necessary.
+        const iconToRect = iconToRectangle(node, parent);
         if (iconToRect != null) {
           return iconToRect;
         }
 
-        return frameNodeToAlt(node, altParent);
-      } else if (node.type === "GROUP") {
-        if (node.children.length === 1 && node.visible) {
-          // if Group is visible and has only one child, Group should disappear.
-          // there will be a single value anyway.
-          return convertIntoAltNodes(node.children, altParent)[0];
-        }
-
-        const iconToRect = iconToRectangle(node, altParent);
-        if (iconToRect != null) {
-          return iconToRect;
-        }
-
-        const altNode = new AltGroupNode();
-
-        altNode.id = node.id;
-        altNode.name = node.name;
-
-        if (altParent) {
-          altNode.parent = altParent;
-        }
-
-        convertLayout(altNode, node);
-        convertBlend(altNode, node);
-
-        altNode.children = convertIntoAltNodes(node.children, altNode);
+        const clone = standardClone(node, parent);
+        overrideReadonlyProperty(
+          clone,
+          "children",
+          convertIntoNodes(node.children, clone)
+        );
 
         // try to find big rect and regardless of that result, also try to convert to autolayout.
         // There is a big chance this will be returned as a Frame
         // also, Group will always have at least 2 children.
-        return convertNodesOnRectangle(altNode);
-      } else if (node.type === "TEXT") {
-        const altNode = cloneNode(node);
-        if (altParent) {
-          assignParent(altNode, altParent);
-        }
-        return altNode;
-      } else if (node.type === "STAR" || node.type === "POLYGON") {
-        const altNode = cloneNode(node);
-        if (altParent) {
-          assignParent(altNode, altParent);
-        }
-        return altNode;
-      } else if (node.type === "VECTOR") {
-        const altNode = new AltRectangleNode();
-        altNode.id = node.id;
-        altNode.name = node.name;
+        return convertNodesOnRectangle(clone);
+      case "TEXT":
+        globalTextStyleSegments[node.id] = node.getStyledTextSegments([
+          "fontName",
+          "fills",
+          "fontSize",
+          "fontWeight",
+          "hyperlink",
+          "indentation",
+          "letterSpacing",
+          "lineHeight",
+          "listOptions",
+          "textCase",
+          "textDecoration",
+          "textStyleId",
+          "fillStyleId",
+        ]);
 
-        if (altParent) {
-          altNode.parent = altParent;
-        }
-
-        convertDefaultShape(altNode, node);
-
-        // Vector support is still missing. Meanwhile, add placeholder.
-        altNode.cornerRadius = 8;
-
-        if (altNode.fills === figma.mixed || altNode.fills.length === 0) {
-          // Use rose[400] from Tailwind 3 when Vector has no color.
-          altNode.fills = [
-            {
-              type: "SOLID",
-              color: {
-                r: 0.5,
-                g: 0.23,
-                b: 0.27,
-              },
-              visible: true,
-              opacity: 0.5,
-              blendMode: "NORMAL",
-            },
-          ];
-        }
-
-        return altNode;
-      }
-
-      return null;
+        return standardClone(node, parent);
+      case "STAR":
+      case "POLYGON":
+      case "VECTOR":
+        return standardClone(node, parent);
+      default:
+        return null;
     }
-  );
-
+  });
   return mapped.filter(notEmpty);
 };
 
 const iconToRectangle = (
   node: FrameNode | InstanceNode | ComponentNode | GroupNode,
-  altParent: AltFrameNode | AltGroupNode | null
-): AltRectangleNode | null => {
-  if (node.children.every((d) => d.type === "VECTOR")) {
-    const altNode = new AltRectangleNode();
-    altNode.id = node.id;
-    altNode.name = node.name;
-
-    if (altParent) {
-      altNode.parent = altParent;
-    }
-
-    convertBlend(altNode, node);
-
-    // width, x, y
-    convertLayout(altNode, node);
-
-    // Vector support is still missing. Meanwhile, add placeholder.
-    altNode.cornerRadius = 8;
-
-    altNode.strokes = [];
-    altNode.strokeWeight = 0;
-    altNode.strokeMiterLimit = 0;
-    altNode.strokeAlign = "CENTER";
-    altNode.strokeCap = "NONE";
-    altNode.strokeJoin = "BEVEL";
-    altNode.dashPattern = [];
-    altNode.fillStyleId = "";
-    altNode.strokeStyleId = "";
-
-    altNode.fills = [
-      {
-        type: "IMAGE",
-        imageHash: "",
-        scaleMode: "FIT",
-        visible: true,
-        opacity: 0.5,
-        blendMode: "NORMAL",
-      },
-    ];
-
-    return altNode;
+  parent: ParentType
+): RectangleNode | null => {
+  // TODO Fix this.
+  if (false && node.children.every((d) => d.type === "VECTOR")) {
+    // const node = new RectangleNode();
+    // node.id = node.id;
+    // node.name = node.name;
+    // if (Parent) {
+    //   node.parent = Parent;
+    // }
+    // convertBlend(Node, node);
+    // // width, x, y
+    // convertLayout(Node, node);
+    // // Vector support is still missing. Meanwhile, add placeholder.
+    // node.cornerRadius = 8;
+    // node.strokes = [];
+    // node.strokeWeight = 0;
+    // node.strokeMiterLimit = 0;
+    // node.strokeAlign = "CENTER";
+    // node.strokeCap = "NONE";
+    // node.strokeJoin = "BEVEL";
+    // node.dashPattern = [];
+    // node.fillStyleId = "";
+    // node.strokeStyleId = "";
+    // node.fills = [
+    //   {
+    //     type: "IMAGE",
+    //     imageHash: "",
+    //     scaleMode: "FIT",
+    //     visible: true,
+    //     opacity: 0.5,
+    //     blendMode: "NORMAL",
+    //   },
+    // ];
+    // return node;
   }
   return null;
-};
-
-const convertLayout = (altNode: AltLayoutMixin, node: LayoutMixin) => {
-  // Get the correct X/Y position when rotation is applied.
-  // This won't guarantee a perfect position, since we would still
-  // need to calculate the offset based on node width/height to compensate,
-  // which we are not currently doing. However, this is a lot better than nothing and will help LineNode.
-  if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
-    const boundingRect = getBoundingRect(node);
-    altNode.x = boundingRect.x;
-    altNode.y = boundingRect.y;
-  } else {
-    altNode.x = node.x;
-    altNode.y = node.y;
-  }
-
-  copyProperties(altNode, node, [
-    "width",
-    "height",
-    "rotation",
-    "layoutAlign",
-    "layoutGrow",
-  ]);
-};
-
-const convertFrame = (altNode: AltFrameMixin, node: DefaultFrameMixin) => {
-  copyProperties(altNode, node, [
-    "layoutMode",
-    "primaryAxisSizingMode",
-    "counterAxisSizingMode",
-    "primaryAxisAlignItems",
-    "counterAxisAlignItems",
-    "paddingLeft",
-    "paddingRight",
-    "paddingTop",
-    "paddingBottom",
-    "itemSpacing",
-    "layoutGrids",
-    "gridStyleId",
-    "clipsContent",
-    "guides",
-  ]);
-  if (
-    node.primaryAxisAlignItems === "SPACE_BETWEEN" &&
-    node.children.length === 1
-  ) {
-    altNode.primaryAxisAlignItems = "CENTER";
-  }
-  altNode.counterAxisAlignItems =
-    node.counterAxisAlignItems === "BASELINE"
-      ? "CENTER"
-      : node.counterAxisAlignItems;
-};
-
-// Helper function to copy properties
-type AnyObject = { [key: string]: any };
-
-const copyProperties = <T extends AnyObject, U extends AnyObject>(
-  source: T,
-  target: U,
-  properties: (keyof T & keyof U)[]
-): void => {
-  properties.forEach((property) => {
-    (target as any)[property] = source[property];
-  });
-};
-
-const convertGeometry = (altNode: AltGeometryMixin, node: GeometryMixin) => {
-  copyProperties(node, altNode, [
-    "fills",
-    "strokes",
-    "strokeWeight",
-    "strokeMiterLimit",
-    "strokeAlign",
-    "strokeCap",
-    "strokeJoin",
-    "dashPattern",
-    "fillStyleId",
-    "strokeStyleId",
-  ]);
-
-  // Handle the special case for strokeWeight
-  if (node.strokeWeight === figma.mixed) {
-    altNode.strokeWeight = 0;
-  }
-};
-
-const convertBlend = (
-  altNode: AltBlendMixin,
-  node: BlendMixin & SceneNodeMixin
-) => {
-  copyProperties(node, altNode, [
-    "opacity",
-    "blendMode",
-    "isMask",
-    "effects",
-    "effectStyleId",
-    "visible",
-  ]);
-};
-
-const convertDefaultShape = (
-  altNode: AltDefaultShapeMixin,
-  node: DefaultShapeMixin
-) => {
-  // opacity, visible
-  convertBlend(altNode, node);
-
-  // fills, strokes
-  convertGeometry(altNode, node);
-
-  // width, x, y
-  convertLayout(altNode, node);
-};
-
-const convertCorner = (altNode: AltCornerMixin, node: CornerMixin) => {
-  copyProperties(node, altNode, ["cornerRadius", "cornerSmoothing"]);
-};
-
-const convertRectangleCorner = (
-  altNode: AltRectangleCornerMixin,
-  node: RectangleCornerMixin
-) => {
-  copyProperties(node, altNode, [
-    "topLeftRadius",
-    "topRightRadius",
-    "bottomLeftRadius",
-    "bottomRightRadius",
-  ]);
-};
-
-const convertIntoAltText = (altNode: AltTextNode, node: TextNode) => {
-  copyProperties(altNode, node, [
-    "textAlignHorizontal",
-    "textAlignVertical",
-    "paragraphIndent",
-    "paragraphSpacing",
-    "fontSize",
-    "fontName",
-    "textCase",
-    "textDecoration",
-    "letterSpacing",
-    "textAutoResize",
-    "characters",
-    "lineHeight",
-  ]);
-  altNode.textAutoResize =
-    node.textAutoResize === "TRUNCATE"
-      ? "WIDTH_AND_HEIGHT"
-      : node.textAutoResize;
 };
 
 export function notEmpty<TValue>(

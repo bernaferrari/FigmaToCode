@@ -1,10 +1,8 @@
-import { AltTextNode } from "../../altNodes/altMixins";
-
 /**
  * Large (Default)
  * https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/
  */
-export const swiftuiFontMatcher = (node: AltTextNode): string => {
+export const swiftuiFontMatcher = (node: TextNode): string => {
   if (node.fontSize === figma.mixed) {
     return "";
   }

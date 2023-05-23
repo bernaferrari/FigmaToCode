@@ -1,17 +1,11 @@
-import {
-  AltRectangleNode,
-  AltFrameNode,
-  AltGroupNode,
-  AltSceneNode,
-} from "./altMixins";
-import { convertToAutoLayout } from "./convertToAutoLayout";
+import { FrameNodeMock } from "./altMixins2";
 
 /**
  * Identify all nodes that are inside Rectangles and transform those Rectangles into Frames containing those nodes.
  */
 export const convertNodesOnRectangle = (
-  node: AltFrameNode | AltGroupNode
-): AltFrameNode | AltGroupNode => {
+  node: FrameNode | GroupNode | InstanceNode | ComponentNode
+): FrameNode | GroupNode | InstanceNode | ComponentNode => {
   if (node.children.length < 2) {
     return node;
   }
@@ -25,13 +19,11 @@ export const convertNodesOnRectangle = (
 
   const parentsKeys = Object.keys(colliding);
   // start with all children. This is going to be filtered.
-  let updatedChildren: Array<AltSceneNode> = [...node.children];
+  let updatedChildren: Array<SceneNode> = [...node.children];
 
   parentsKeys.forEach((key) => {
     // dangerous cast, but this is always true
-    const parentNode = node.children.find(
-      (d) => d.id === key
-    ) as AltRectangleNode;
+    const parentNode = node.children.find((d) => d.id === key) as RectangleNode;
 
     // retrieve the position. Key should always be at the left side, so even when other items are removed, the index is kept the same.
     const indexPosition = updatedChildren.findIndex((d) => d.id === key);
@@ -45,37 +37,33 @@ export const convertNodesOnRectangle = (
 
     // todo when the soon-to-be-parent is larger than its parent, things get weird. Happens, for example, when a large image is used in the background. Should this be handled or is this something user should never do?
 
-    frameNode.children = [...colliding[key]];
+    Object.assign(frameNode, { children: [...colliding[key]] });
+    // frameNode.children = [...colliding[key]];
     colliding[key].forEach((d) => {
-      d.parent = frameNode;
+      Object.assign(d, { parent: frameNode });
       d.x = d.x - frameNode.x;
       d.y = d.y - frameNode.y;
     });
-
-    // try to convert the children to AutoLayout, and insert back at updatedChildren.
-    updatedChildren.splice(indexPosition, 0, convertToAutoLayout(frameNode));
   });
 
   if (updatedChildren.length > 0) {
-    node.children = updatedChildren;
+    Object.assign(node, { children: updatedChildren });
   }
-
-  // convert the resulting node to AutoLayout.
-  node = convertToAutoLayout(node);
 
   return node;
 };
 
-const convertRectangleToFrame = (rect: AltRectangleNode) => {
-  // if a Rect with elements inside were identified, extract this Rect
+const convertRectangleToFrame = (rect: RectangleNode) => {
+  // If a Rect with elements inside were identified, extract this Rect
   // outer methods are going to use it.
 
-  const frameNode = new AltFrameNode();
+  const frameNode = new FrameNodeMock();
 
-  frameNode.parent = rect.parent;
-
-  frameNode.width = rect.width;
-  frameNode.height = rect.height;
+  Object.assign(frameNode, {
+    parent: rect.parent,
+    width: rect.width,
+    height: rect.height,
+  });
   frameNode.x = rect.x;
   frameNode.y = rect.y;
   frameNode.rotation = rect.rotation;
@@ -115,7 +103,7 @@ const convertRectangleToFrame = (rect: AltRectangleNode) => {
   frameNode.bottomLeftRadius = rect.bottomLeftRadius;
   frameNode.bottomRightRadius = rect.bottomRightRadius;
 
-  frameNode.id = rect.id;
+  Object.assign(frameNode, { id: rect.id });
   frameNode.name = rect.name;
 
   return frameNode;
@@ -127,10 +115,10 @@ const convertRectangleToFrame = (rect: AltRectangleNode) => {
  * A Node can only have a single parent. The order is defined by layer order.
  */
 const retrieveCollidingItems = (
-  children: ReadonlyArray<AltSceneNode>
-): Record<string, Array<AltSceneNode>> => {
+  children: ReadonlyArray<SceneNode>
+): Record<string, Array<SceneNode>> => {
   const used: Record<string, boolean> = {};
-  const groups: Record<string, Array<AltSceneNode>> = {};
+  const groups: Record<string, Array<SceneNode>> = {};
 
   for (let i = 0; i < children.length - 1; i++) {
     const item1 = children[i];

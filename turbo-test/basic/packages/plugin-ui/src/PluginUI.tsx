@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Description } from "./description";
+import copy from "clipboard-copy";
 
 export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
 
 type PluginUIProps = {
   code: string;
+  htmlPreview: {
+    size: { width: number; height: number };
+    content: string;
+  } | null;
   emptySelection: boolean;
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
@@ -15,13 +19,14 @@ type PluginUIProps = {
 export const PluginUI = (props: PluginUIProps) => {
   return (
     <div className="flex flex-col h-full dark:text-white">
-      <div className="p-2 grid grid-cols-4 gap-1">
+      <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
         {["HTML", "Tailwind", "Flutter", "SwiftUI"].map((tab) => (
           <button
+            key={`tab ${tab}`}
             className={`w-full p-1 text-sm ${
               props.selectedFramework === tab
-                ? "bg-green-400 dark:bg-emerald-600 dark:text-white bg-opacity-50 rounded text-gray-700 font-semibold"
-                : "bg-green-50 dark:bg-green-600 dark:bg-opacity-25 border-[1px] border-green-500 border-opacity-20 dark:text-white dark:border-green-500 dark:border-opacity-25 rounded hover:text-gray-800 dark:hover:hover:text-gray-200 font-semibold"
+                ? "bg-green-500 dark:bg-green-600 text-white rounded-md font-semibold shadow-sm"
+                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-300 dark:hover:bg-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
             }`}
             onClick={() => {
               props.setSelectedFramework(tab as FrameworkTypes);
@@ -39,25 +44,21 @@ export const PluginUI = (props: PluginUIProps) => {
         }}
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
-        <div className="flex flex-col items-center px-2 py-2 bg-gray-50 dark:bg-transparent">
-          <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-800 rounded">
+        <div className="flex flex-col items-center px-2 py-2 bg-neutral-50 dark:bg-transparent">
+          {/* <div className="flex flex-col items-center p-4 bg-neutral-50 dark:bg-neutral-800 rounded">
             <Description selected={props.selectedFramework} />
-          </div>
+          </div> */}
 
-          <div className="h-2"></div>
-
+          {props.htmlPreview && <Preview htmlPreview={props.htmlPreview} />}
           {/* <ResponsiveGrade /> */}
-
           {/* <div className="h-2"></div>
         <div className="flex justify-end w-full mb-1">
-          <button className="px-4 py-2 text-sm font-semibold text-white bg-gray-900 rounded-lg ring-1 ring-gray-700 hover:bg-gray-700 focus:outline-none">
+          <button className="px-4 py-2 text-sm font-semibold text-white bg-neutral-900 rounded-lg ring-1 ring-neutral-700 hover:bg-neutral-700 focus:outline-none">
             Copy
           </button>
         </div> */}
-
           {/* Code View */}
           <CodeWindow code={props.code} />
-
           <div className="text-xs">
             Other things go here, such as color, tokens, etc.
           </div>
@@ -90,6 +91,8 @@ export const CodeWindow = (props: { code: string }) => {
   const handleButtonClick = () => {
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 250);
+
+    copy(props.code);
   };
 
   if (emptySelection)
@@ -101,16 +104,16 @@ export const CodeWindow = (props: { code: string }) => {
     );
   else
     return (
-      <div className="w-full pt-2 {sectionStyle}">
+      <div className="w-full">
         <div className="flex items-center justify-between space-x-2">
           <p className="px-4 py-1.5 text-lg font-medium text-center dark:text-white rounded-lg">
-            HTML Code
+            Code
           </p>
           <button
-            className={`px-4 py-2 font-semibold border border-blue-500 rounded-lg hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white hover:border-transparent transition-all duration-300 ${
+            className={`px-4 py-2 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-800 hover:text-white hover:border-transparent transition-all duration-300 ${
               isPressed
                 ? "bg-green-500 text-white hover:bg-green-500 ring-4 ring-green-300 ring-opacity-50 animate-pulse"
-                : "bg-transparent text-blue-700 dark:text-blue-200"
+                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600"
             }`}
             onClick={handleButtonClick}
           >
@@ -134,4 +137,83 @@ export const CodeWindow = (props: { code: string }) => {
         </div>
       </div>
     );
+};
+
+export const Preview: React.FC<{
+  htmlPreview: {
+    size: { width: number; height: number };
+    content: string;
+  };
+}> = (props) => {
+  const previewWidths = [45, 80, 140];
+  const labels = ["sm", "md", "lg"];
+
+  return (
+    <div className="flex flex-col">
+      <p className="px-4 py-1.5 text-lg font-medium text-center dark:text-white rounded-lg">
+        Responsive Preview
+      </p>
+      <div className="flex gap-2 justify-center items-center">
+        {previewWidths.map((targetWidth, index) => {
+          const targetHeight = 80;
+          const scaleFactor = Math.min(
+            targetWidth / props.htmlPreview.size.width,
+            targetHeight / props.htmlPreview.size.height
+          );
+          return (
+            <div
+              key={"preview " + index}
+              className="relative flex flex-col items-center"
+              style={{ width: targetWidth }}
+            >
+              <div
+                className="flex flex-col justify-center items-center border border-neutral-200 overflow-clip dark:border-neutral-700 rounded-md shadow-sm"
+                style={{
+                  width: targetWidth,
+                  height: targetHeight,
+                }}
+              >
+                <div
+                  style={{
+                    zoom: scaleFactor,
+                    width: "100%",
+                    height: props.htmlPreview.size.height,
+                    display: "flex",
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: props.htmlPreview.content,
+                  }}
+                />
+              </div>
+              <span className="mt-auto text-xs text-gray-500">
+                {labels[index]}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export const viewDocumentationWebsite = () => {
+  return (
+    <div className="p-4 bg-neutral-100 dark:bg-neutral-700 rounded-md shadow-sm">
+      <h2 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-2">
+        Documentation
+      </h2>
+      <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-4">
+        Learn how to use our Figma plugin and explore its features in detail by
+        visiting our documentation website.
+      </p>
+      <a
+        href="https://documentation.example.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm font-semibold text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-500 transition-colors duration-300"
+      >
+        Visit Documentation Website &rarr;
+      </a>
+    </div>
+  );
 };

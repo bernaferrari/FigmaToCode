@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { AltFrameNode, AltGroupNode } from "../altNodes/altMixins";
 // import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
 export const tailwindVector = (
-  node: AltFrameNode | AltGroupNode,
+  node: FrameNode | GroupNode,
   showLayerName: boolean,
   parentId: string,
   isJsx: boolean
@@ -13,16 +11,16 @@ export const tailwindVector = (
 };
 
 // import {
-//   AltFrameMixin,
-//   AltFrameNode,
-//   AltGroupNode,
-// } from "./../common/AltMixins";
+//   FrameMixin,
+//   FrameNode,
+//   GroupNode,
+// } from "./../common/Mixins";
 // import { rgbTo6hex } from "./colors";
 
 // // todo improve this, positioning is wrong
 // // todo support for ungroup vectors. This was reused because 80% of people are going
 // export const tailwindVector = (
-//   group: AltFrameNode | AltGroupNode,
+//   group: FrameNode | GroupNode,
 //   isJsx: Boolean
 // ) => {
 //   // to use Vectors in groups (like icons)

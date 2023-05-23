@@ -1,8 +1,7 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { nodeWidthHeight } from "../../common/nodeWidthHeight";
 import { sliceNum } from "../../common/numToAutoFixed";
 
-export const swiftuiSize = (node: AltSceneNode): [string, string] => {
+export const swiftuiSize = (node: SceneNode): [string, string] => {
   const size = nodeWidthHeight(node, false);
 
   // if width is set as maxWidth, height must also be set as maxHeight (not height)

@@ -1,5 +1,6 @@
 import { FrameworkTypes, PluginUI } from "plugin-ui";
 import * as React from "react";
+import Image from "next/image";
 
 export default function Web() {
   return (
@@ -18,6 +19,7 @@ export default function Web() {
               emptySelection={false}
               selectedFramework={"HTML"}
               setSelectedFramework={() => {}}
+              htmlPreview={null}
             />
           </div>
         </div>
@@ -30,6 +32,7 @@ export default function Web() {
               selectedFramework={"HTML"}
               setSelectedFramework={() => {}}
               emptySelection={false}
+              htmlPreview={null}
             />
           </div>
         </div>
@@ -37,13 +40,22 @@ export default function Web() {
       <div>Templates for debugging</div>
       <div className="flex space-x-4">
         {[1, 2, 3, 4, 5].map((d) => (
-          <img
+          <div
             key={`row ${d}`}
             className={`bg-gray-400 w-28 h-28 rounded ${
               d == 1 ? "ring-2 ring-green-500" : ""
             }`}
-            src="https://images.unsplash.com/photo-1678653300204-75de70535454?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=120&q=0"
-          />
+          >
+            <Image
+              src="https://images.unsplash.com/photo-1678653300204-75de70535454?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=120&q=0"
+              alt="A random image"
+              width={112}
+              height={112}
+              fill={true}
+              style={{ objectFit: "cover" }}
+              className="rounded"
+            />
+          </div>
         ))}
       </div>
 

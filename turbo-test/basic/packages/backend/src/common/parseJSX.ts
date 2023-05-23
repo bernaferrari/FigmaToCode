@@ -13,13 +13,13 @@ export const formatWithJSX = (
 
   if (typeof value === "number") {
     if (isJsx) {
-      return `${jsx_property}: ${sliceNum(value)}, `;
+      return `${jsx_property}: ${sliceNum(value)}`;
     } else {
-      return `${property}: ${sliceNum(value)}px; `;
+      return `${property}: ${sliceNum(value)}px`;
     }
   } else if (isJsx) {
-    return `${jsx_property}: '${value}', `;
+    return `${jsx_property}: '${value}'`;
   } else {
-    return `${property}: ${value}; `;
+    return `${property}: ${value}`;
   }
 };

@@ -1,10 +1,8 @@
-import { AltBlendMixin } from "../../altNodes/altMixins";
-
 /**
  * https://tailwindcss.com/docs/box-shadow/
  * example: shadow
  */
-export const tailwindShadow = (node: AltBlendMixin): string => {
+export const tailwindShadow = (node: BlendMixin): string => {
   // [when testing] node.effects can be undefined
   if (node.effects && node.effects.length > 0) {
     const dropShadow = node.effects.filter(

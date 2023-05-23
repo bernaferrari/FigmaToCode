@@ -19,11 +19,6 @@ export const htmlColorFromFills = (
 };
 
 export const htmlColor = (color: RGB, alpha: number = 1): string => {
-  const r = sliceNum(color.r * 255);
-  const g = sliceNum(color.g * 255);
-  const b = sliceNum(color.b * 255);
-  const a = sliceNum(alpha ?? 1);
-
   if (color.r === 1 && color.g === 1 && color.b === 1 && alpha === 1) {
     return "white";
   }
@@ -31,6 +26,21 @@ export const htmlColor = (color: RGB, alpha: number = 1): string => {
   if (color.r === 0 && color.g === 0 && color.b === 0 && alpha === 1) {
     return "black";
   }
+
+  // Return # when possible.
+  if (alpha === 1) {
+    const r = Math.round(color.r * 255);
+    const g = Math.round(color.g * 255);
+    const b = Math.round(color.b * 255);
+
+    const toHex = (num: number): string => num.toString(16).padStart(2, "0");
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+  }
+
+  const r = sliceNum(color.r * 255);
+  const g = sliceNum(color.g * 255);
+  const b = sliceNum(color.b * 255);
+  const a = sliceNum(alpha ?? 1);
 
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };

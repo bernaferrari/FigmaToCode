@@ -1,4 +1,3 @@
-import { AltTextNode } from "../altNodes/altMixins";
 import { sliceNum } from "../common/numToAutoFixed";
 import {
   commonLetterSpacing,
@@ -13,24 +12,26 @@ import {
 import { swiftuiSize } from "./builderImpl/swiftuiSize";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
+  modifiers: string[] = [];
+
   reset(): void {
-    this.modifiers = "";
+    this.modifiers = [];
   }
 
-  textAutoSize(node: AltTextNode): this {
-    this.modifiers += this.wrapTextAutoResize(node);
+  textAutoSize(node: TextNode): this {
+    this.modifiers.push(this.wrapTextAutoResize(node));
     return this;
   }
 
-  textDecoration(node: AltTextNode): this {
+  textDecoration(node: TextNode): this {
     // https://developer.apple.com/documentation/swiftui/text/underline(_:color:)
     if (node.textDecoration === "UNDERLINE") {
-      this.modifiers += "\n.underline()";
+      this.modifiers.push(".underline()");
     }
 
     // https://developer.apple.com/documentation/swiftui/text/strikethrough(_:color:)
     if (node.textDecoration === "STRIKETHROUGH") {
-      this.modifiers += "\n.strikethrough()";
+      this.modifiers.push(".strikethrough()");
     }
 
     // https://developer.apple.com/documentation/swiftui/text/italic()
@@ -38,45 +39,45 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
       node.fontName !== figma.mixed &&
       node.fontName.style.toLowerCase().match("italic")
     ) {
-      this.modifiers += "\n.italic()";
+      this.modifiers.push(".italic()");
     }
 
     return this;
   }
 
-  textStyle = (node: AltTextNode): this => {
+  textStyle = (node: TextNode): this => {
     // for some reason this must be set before the multilineTextAlignment
     if (node.fontName !== figma.mixed) {
       const fontWeight = convertFontWeight(node.fontName.style);
       if (fontWeight && fontWeight !== "400") {
         const weight = swiftuiWeightMatcher(fontWeight);
-        this.modifiers += `\n.fontWeight(${weight})`;
+        this.modifiers.push(`.fontWeight(${weight})`);
       }
     }
 
     // https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/
     const retrievedFont = swiftuiFontMatcher(node);
     if (retrievedFont) {
-      this.modifiers += `\n.font(${retrievedFont})`;
+      this.modifiers.push(`.font(${retrievedFont})`);
     }
 
     // todo might be a good idea to calculate the width based on the font size and check if view is really multi-line
     if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
       // it can be confusing, but multilineTextAlignment is always set to left by default.
       if (node.textAlignHorizontal === "CENTER") {
-        this.modifiers += `\n.multilineTextAlignment(.center)`;
+        this.modifiers.push(".multilineTextAlignment(.center)");
       } else if (node.textAlignHorizontal === "RIGHT") {
-        this.modifiers += `\n.multilineTextAlignment(.trailing)`;
+        this.modifiers.push(".multilineTextAlignment(.trailing)");
       }
     }
 
     return this;
   };
 
-  letterSpacing = (node: AltTextNode): this => {
+  letterSpacing = (node: TextNode): this => {
     const letterSpacing = commonLetterSpacing(node);
     if (letterSpacing > 0) {
-      this.modifiers += `\n.tracking(${sliceNum(letterSpacing)})`;
+      this.modifiers.push(`.tracking(${sliceNum(letterSpacing)})`);
     }
 
     return this;
@@ -84,17 +85,17 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
 
   // the difference between kerning and tracking is that tracking spaces everything, kerning keeps lignatures,
   // Figma spaces everything, so we are going to use tracking.
-  lineHeight = (node: AltTextNode): this => {
+  lineHeight = (node: TextNode): this => {
     const letterHeight = commonLineHeight(node);
 
     if (letterHeight > 0) {
-      this.modifiers += `\n.lineSpacing(${sliceNum(letterHeight)})`;
+      this.modifiers.push(`.lineSpacing(${sliceNum(letterHeight)})`);
     }
 
     return this;
   };
 
-  wrapTextAutoResize = (node: AltTextNode): string => {
+  wrapTextAutoResize = (node: TextNode): string => {
     const [propWidth, propHeight] = swiftuiSize(node);
 
     let comp = "";
@@ -111,14 +112,14 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     if (comp.length > 0) {
       const align = this.textAlignment(node);
 
-      return `\n.frame(${comp}${align})`;
+      return `.frame(${comp}${align})`;
     }
 
     return "";
   };
 
   // SwiftUI has two alignments for Text, when it is a single line and when it is multiline. This one is for single line.
-  textAlignment = (node: AltTextNode): string => {
+  textAlignment = (node: TextNode): string => {
     let hAlign = "";
     if (node.textAlignHorizontal === "LEFT") {
       hAlign = "leading";
@@ -149,4 +150,8 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     // when they are centered
     return "";
   };
+
+  build(): string {
+    return this.modifiers.join("");
+  }
 }

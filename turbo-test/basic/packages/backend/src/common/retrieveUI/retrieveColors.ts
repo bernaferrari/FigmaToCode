@@ -1,6 +1,4 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { rgbTo6hex } from "../color";
-import { notEmpty } from "../../altNodes/altConversion";
 import {
   swiftuiColor,
   swiftuiGradient,
@@ -18,6 +16,7 @@ import {
 import { htmlColor, htmlGradient } from "../../html/builderImpl/htmlColor";
 import { calculateContrastRatio, deepFlatten } from "./commonUI";
 import { FrameworkTypes } from "../../code";
+import { notEmpty } from "../../altNodes/altConversion";
 
 // For Tailwind, show the name and don't show the contrast.
 type exportSolidColor = {
@@ -29,7 +28,7 @@ type exportSolidColor = {
 };
 
 export const retrieveGenericSolidUIColors = (
-  sceneNode: Array<AltSceneNode>,
+  sceneNode: Array<SceneNode>,
   framework: FrameworkTypes
 ): Array<exportSolidColor> => {
   const selectedChildren = deepFlatten(sceneNode);
@@ -143,7 +142,7 @@ type exportLinearGradient = {
 };
 
 export const retrieveGenericLinearGradients = (
-  sceneNode: Array<AltSceneNode>,
+  sceneNode: Array<SceneNode>,
   framework: FrameworkTypes
 ): Array<exportLinearGradient> => {
   const selectedChildren = deepFlatten(sceneNode);

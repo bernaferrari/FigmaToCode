@@ -1,4 +1,3 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { formatWithJSX } from "../../common/parseJSX";
 
 /**
@@ -6,10 +5,7 @@ import { formatWithJSX } from "../../common/parseJSX";
  * example: rounded-sm
  * example: rounded-tr-lg
  */
-export const htmlBorderRadius = (
-  node: AltSceneNode,
-  isJsx: boolean
-): string => {
+export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string => {
   if (node.type === "ELLIPSE") {
     return formatWithJSX("border-radius", isJsx, 9999);
   } else if (

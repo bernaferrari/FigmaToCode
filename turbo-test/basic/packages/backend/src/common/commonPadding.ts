@@ -1,87 +1,44 @@
-import { AltFrameMixin, AltDefaultShapeMixin } from "../altNodes/altMixins";
-
-type paddingType = {
-  horizontal: number;
-  left: number;
-  right: number;
-  vertical: number;
-  top: number;
-  bottom: number;
-};
-
-/**
- * Add padding if necessary.
- * Padding is currently only valid for auto layout.
- * Padding can have values even when AutoLayout is off
- */
-export const commonPadding = (
-  node: AltFrameMixin | AltDefaultShapeMixin
-): { all: number } | paddingType | null => {
-  if ("layoutMode" in node && node.layoutMode !== "NONE") {
-    // round the numbers to avoid 5 being different than 5.00001
-    // fix it if undefined (in tests)
-    node.paddingLeft = Math.round(node.paddingLeft ?? 0);
-    node.paddingRight = Math.round(node.paddingRight ?? 0);
-    node.paddingTop = Math.round(node.paddingTop ?? 0);
-    node.paddingBottom = Math.round(node.paddingBottom ?? 0);
-
-    const arr: paddingType = {
-      horizontal: 0,
-      vertical: 0,
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
+type PaddingType =
+  | { all: number }
+  | {
+      horizontal: number;
+      vertical: number;
+    }
+  | {
+      left: number;
+      right: number;
+      top: number;
+      bottom: number;
     };
 
+export const commonPadding = (
+  node: BaseFrameMixin | DefaultShapeMixin
+): PaddingType | null => {
+  if ("layoutMode" in node && node.layoutMode !== "NONE") {
+    const paddingLeft = parseFloat((node.paddingLeft ?? 0).toFixed(2));
+    const paddingRight = parseFloat((node.paddingRight ?? 0).toFixed(2));
+    const paddingTop = parseFloat((node.paddingTop ?? 0).toFixed(2));
+    const paddingBottom = parseFloat((node.paddingBottom ?? 0).toFixed(2));
+
     if (
-      node.paddingLeft > 0 &&
-      node.paddingLeft === node.paddingRight &&
-      node.paddingLeft === node.paddingBottom &&
-      node.paddingTop === node.paddingBottom
+      paddingLeft === paddingRight &&
+      paddingLeft === paddingBottom &&
+      paddingTop === paddingBottom
     ) {
-      return { all: node.paddingLeft };
-    } else if (node.paddingLeft > 0 && node.paddingLeft === node.paddingRight) {
-      // horizontal padding + vertical + individual paddings
-      arr.horizontal = node.paddingLeft;
-
-      if (node.paddingTop > 0 && node.paddingTop === node.paddingBottom) {
-        arr.vertical = node.paddingTop;
-      } else {
-        if (node.paddingTop > 0) {
-          arr.top = node.paddingTop;
-        }
-        if (node.paddingBottom > 0) {
-          arr.bottom = node.paddingBottom;
-        }
-      }
-    } else if (node.paddingTop > 0 && node.paddingTop === node.paddingBottom) {
-      // vertical padding + individual paddings
-      arr.vertical = node.paddingBottom;
-
-      if (node.paddingLeft > 0) {
-        arr.left = node.paddingLeft;
-      }
-      if (node.paddingRight > 0) {
-        arr.right = node.paddingRight;
-      }
+      return { all: paddingLeft };
+    } else if (paddingLeft === paddingRight && paddingTop === paddingBottom) {
+      return {
+        horizontal: paddingLeft,
+        vertical: paddingTop,
+      };
     } else {
-      // individual paddings
-      if (node.paddingLeft > 0) {
-        arr.left = node.paddingLeft;
-      }
-      if (node.paddingRight > 0) {
-        arr.right = node.paddingRight;
-      }
-      if (node.paddingTop > 0) {
-        arr.top = node.paddingTop;
-      }
-      if (node.paddingBottom > 0) {
-        arr.bottom = node.paddingBottom;
-      }
+      return {
+        left: paddingLeft,
+        right: paddingRight,
+        top: paddingTop,
+        bottom: paddingBottom,
+      };
     }
-
-    return arr;
   }
 
   return null;

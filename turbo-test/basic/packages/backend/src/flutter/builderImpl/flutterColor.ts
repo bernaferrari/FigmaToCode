@@ -162,5 +162,5 @@ export const flutterColor = (color: RGB, opacity: number): string => {
       : `Colors.white.withOpacity(${opacity})`;
   }
 
-  return `Color(0x${rgbTo8hex(color, opacity)})`;
+  return `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
 };

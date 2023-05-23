@@ -1,10 +1,9 @@
-import { AltSceneNode } from "../../altNodes/altMixins";
 import { sliceNum } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
 
 // Add padding if necessary!
 // This must happen before Stack or after the Positioned, but not before.
-export const swiftuiPadding = (node: AltSceneNode): string => {
+export const swiftuiPadding = (node: SceneNode): string => {
   if (!("layoutMode" in node)) {
     return "";
   }

@@ -3,7 +3,7 @@ import {
   flutterMain,
   tailwindMain,
   swiftuiMain,
-  convertIntoAltNodes,
+  convertIntoNodes,
   FrameworkTypes,
   htmlMain,
 } from "backend";
@@ -21,9 +21,30 @@ const initSettings = () => {
     } else {
       settings.framework = "HTML";
     }
-    console.log("settings.mode", settings);
-    run(settings.framework);
+
+    figma.ui.postMessage({
+      type: "tabChange",
+      data: settings.framework,
+    });
+
+    safeRun(settings.framework);
   });
+};
+
+
+const safeRun = (framework: FrameworkTypes) => {
+  try {
+    run(framework);
+  } catch (e) {
+    console.log(e);
+
+    if (e && typeof e === "object" && "message" in e) {
+      figma.ui.postMessage({
+        type: "error",
+        data: e.message,
+      });
+    }
+  }
 };
 
 switch (figma.mode) {
@@ -36,11 +57,10 @@ switch (figma.mode) {
 
     figma.showUI(__html__, { width: 450, height: 550, themeColors: true });
     figma.on("selectionchange", () => {
-      run(settings.framework);
+      safeRun(settings.framework);
     });
     figma.ui.onmessage = (msg) => {
       if (msg.type === "tabChange") {
-        console.log("tabChange with", msg);
         // get from storage
         figma.clientStorage.setAsync("settings", {
           whenOpen: "lastSelected",
@@ -64,14 +84,14 @@ switch (figma.mode) {
         //   layerName = msg.data;
         //   run(mode);
         // }
-        run(settings.framework);
+        safeRun(settings.framework);
       }
     };
     break;
   case "codegen":
     initSettings();
     figma.codegen.on("generate", ({ language, node }) => {
-      const convertedSelection = convertIntoAltNodes([node], null);
+      const convertedSelection = convertIntoNodes([node], null);
 
       switch (language) {
         case "html":

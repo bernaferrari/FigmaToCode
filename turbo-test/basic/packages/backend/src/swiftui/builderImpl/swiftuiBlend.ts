@@ -1,14 +1,9 @@
-import {
-  AltBlendMixin,
-  AltLayoutMixin,
-  AltSceneNode,
-} from "../../altNodes/altMixins";
 import { sliceNum } from "../../common/numToAutoFixed";
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/opacity(_:)
  */
-export const swiftuiOpacity = (node: AltBlendMixin): string => {
+export const swiftuiOpacity = (node: MinimalBlendMixin): string => {
   if (node.opacity !== undefined && node.opacity !== 1) {
     return `\n.opacity(${sliceNum(node.opacity)})`;
   }
@@ -18,7 +13,7 @@ export const swiftuiOpacity = (node: AltBlendMixin): string => {
 /**
  * https://developer.apple.com/documentation/swiftui/view/hidden()
  */
-export const swiftuiVisibility = (node: AltSceneNode): string => {
+export const swiftuiVisibility = (node: SceneNodeMixin): string => {
   // [when testing] node.visible can be undefined
   if (node.visible !== undefined && !node.visible) {
     return `\n.hidden()`;
@@ -29,7 +24,7 @@ export const swiftuiVisibility = (node: AltSceneNode): string => {
 /**
  * https://developer.apple.com/documentation/swiftui/modifiedcontent/rotationeffect(_:anchor:)
  */
-export const swiftuiRotation = (node: AltLayoutMixin): string => {
+export const swiftuiRotation = (node: LayoutMixin): string => {
   if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
     return `.rotationEffect(.degrees(${sliceNum(node.rotation)}))`;
   }
@@ -39,7 +34,7 @@ export const swiftuiRotation = (node: AltLayoutMixin): string => {
 /**
  * https://developer.apple.com/documentation/swiftui/blendmode
  */
-export const swiftuiBlendMode = (node: AltSceneNode): string => {
+export const swiftuiBlendMode = (node: MinimalBlendMixin): string => {
   const fromBlendEnum = blendModeEnum(node);
   if (fromBlendEnum) {
     return `\n.blendMode(${fromBlendEnum})`;
@@ -48,7 +43,7 @@ export const swiftuiBlendMode = (node: AltSceneNode): string => {
   return "";
 };
 
-const blendModeEnum = (node: AltSceneNode): string => {
+const blendModeEnum = (node: MinimalBlendMixin): string => {
   switch (node.blendMode) {
     case "COLOR":
       return ".color";

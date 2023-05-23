@@ -1,9 +1,3 @@
-import {
-  AltFrameNode,
-  AltGroupNode,
-  AltTextNode,
-  AltSceneNode,
-} from "../altNodes/altMixins";
 import { indentString } from "../common/indentString";
 import { sliceNum } from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
@@ -13,7 +7,7 @@ import { swiftuiRoundedRectangle } from "./builderImpl/swiftuiBorder";
 let parentId = "";
 
 export const swiftuiMain = (
-  sceneNode: Array<AltSceneNode>,
+  sceneNode: Array<SceneNode>,
   parentIdSrc: string = ""
 ): string => {
   parentId = parentIdSrc;
@@ -29,7 +23,7 @@ export const swiftuiMain = (
 };
 
 const swiftuiWidgetGenerator = (
-  sceneNode: ReadonlyArray<AltSceneNode>,
+  sceneNode: ReadonlyArray<SceneNode>,
   indentLevel: number
 ): string => {
   let comp = "";
@@ -61,7 +55,7 @@ const swiftuiWidgetGenerator = (
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const swiftuiContainer = (
-  node: AltSceneNode,
+  node: SceneNode,
   indentLevel: number,
   children: string = ""
 ): string => {
@@ -104,7 +98,7 @@ export const swiftuiContainer = (
   return indentString(result, indentLevel);
 };
 
-const swiftuiGroup = (node: AltGroupNode, indentLevel: number): string => {
+const swiftuiGroup = (node: GroupNode, indentLevel: number): string => {
   return swiftuiContainer(
     node,
     indentLevel,
@@ -112,7 +106,7 @@ const swiftuiGroup = (node: AltGroupNode, indentLevel: number): string => {
   );
 };
 
-const swiftuiText = (node: AltTextNode, indentLevel: number): string => {
+const swiftuiText = (node: TextNode, indentLevel: number): string => {
   const builder = new SwiftuiTextBuilder();
 
   let text = node.characters;
@@ -141,7 +135,7 @@ const swiftuiText = (node: AltTextNode, indentLevel: number): string => {
   return indentString(result, indentLevel);
 };
 
-const swiftuiFrame = (node: AltFrameNode, indentLevel: number): string => {
+const swiftuiFrame = (node: FrameNode, indentLevel: number): string => {
   // when there is a single children, indent should be zero; [swiftuiContainer] will already assign it.
   const updatedIndentLevel = node.children.length === 1 ? 0 : indentLevel + 1;
 
@@ -161,10 +155,7 @@ const swiftuiFrame = (node: AltFrameNode, indentLevel: number): string => {
   }
 };
 
-const wrapInDirectionalStack = (
-  node: AltFrameNode,
-  children: string
-): string => {
+const wrapInDirectionalStack = (node: FrameNode, children: string): string => {
   const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "HStack" : "VStack";
 
   // retrieve the align based on the most frequent position of children
@@ -206,7 +197,7 @@ export const mostFrequent = (arr: Array<string>): string | undefined => {
 
 // todo should the plugin manually Group items? Ideally, it would detect the similarities and allow a ForEach.
 const widgetGeneratorWithLimits = (
-  node: AltFrameNode | AltGroupNode,
+  node: FrameNode | GroupNode,
   indentLevel: number
 ) => {
   if (node.children.length < 10) {

@@ -1,6 +1,4 @@
-import { AltTextNode } from "../altNodes/altMixins";
-
-export const commonLineHeight = (node: AltTextNode): number => {
+export const commonLineHeight = (node: TextNode): number => {
   if (
     node.lineHeight !== figma.mixed &&
     node.lineHeight.unit !== "AUTO" &&
@@ -18,7 +16,7 @@ export const commonLineHeight = (node: AltTextNode): number => {
   return 0;
 };
 
-export const commonLetterSpacing = (node: AltTextNode): number => {
+export const commonLetterSpacing = (node: TextNode): number => {
   if (
     node.letterSpacing !== figma.mixed &&
     Math.round(node.letterSpacing.value) !== 0

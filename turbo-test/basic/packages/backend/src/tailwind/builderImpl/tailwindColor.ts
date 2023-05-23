@@ -40,7 +40,7 @@ export const tailwindSolidColor = (fill: SolidPaint, kind: string): string => {
     opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)} ` : "";
 
   // example: text-red-500
-  const colorProp = `${kind}-${getTailwindFromFigmaRGB(fill.color)} `;
+  const colorProp = `${kind}-${getTailwindFromFigmaRGB(fill.color)}`;
 
   // if fill isn't visible, it shouldn't be painted.
   return `${colorProp}${opacityProp}`;
@@ -70,12 +70,12 @@ export const tailwindGradient = (fill: GradientPaint): string => {
   if (fill.gradientStops.length === 1) {
     const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
 
-    return `${direction} from-${fromColor} `;
+    return `${direction} from-${fromColor}`;
   } else if (fill.gradientStops.length === 2) {
     const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
     const toColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
 
-    return `${direction} from-${fromColor} to-${toColor} `;
+    return `${direction} from-${fromColor} to-${toColor}`;
   } else {
     const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
 
@@ -87,7 +87,7 @@ export const tailwindGradient = (fill: GradientPaint): string => {
       fill.gradientStops[fill.gradientStops.length - 1].color
     );
 
-    return `${direction} from-${fromColor} via-${viaColor} to-${toColor} `;
+    return `${direction} from-${fromColor} via-${viaColor} to-${toColor}`;
   }
 };
 

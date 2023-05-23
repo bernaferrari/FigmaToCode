@@ -1,4 +1,3 @@
-import { AltTextNode } from "../altNodes/altMixins";
 import { generateWidgetCode, sliceNum } from "../common/numToAutoFixed";
 import { convertFontWeight } from "../common/convertFontWeight";
 import { indentString } from "../common/indentString";
@@ -6,6 +5,7 @@ import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { flutterColorFromFills } from "./builderImpl/flutterColor";
 import { flutterSize } from "./builderImpl/flutterSize";
+import { globalTextStyleSegments } from "../altNodes/altConversion";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {
   constructor(optChild: string = "") {
@@ -16,18 +16,88 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     this.child = "";
   }
 
-  createText(node: AltTextNode): this {
+  createText(node: TextNode): this {
     this.child = makeTextComponent(node);
     return this;
   }
 
-  textAutoSize(node: AltTextNode): this {
+  getTextSegments(id: string): { style: string; text: string }[] {
+    const segments = globalTextStyleSegments[id];
+    if (!segments) {
+      return [];
+    }
+
+    return segments.map((segment) => {
+      const color = flutterColorFromFills(segment.fills);
+      const textDecoration = this.getFlutterTextDecoration(
+        segment.textDecoration
+      );
+      const textTransform = this.getFlutterTextTransform(segment.textCase);
+      const lineHeightStyle = this.getFlutterLineHeightStyle(
+        segment.lineHeight
+      );
+      const letterSpacingStyle = this.getFlutterLetterSpacingStyle(
+        segment.letterSpacing
+      );
+
+      const style = generateWidgetCode("TextStyle", {
+        color: color,
+        fontSize: segment.fontSize,
+        fontFamily: segment.fontName.family,
+        fontStyle: segment.fontName.style,
+        fontWeight: `FontWeight.w${segment.fontWeight}`,
+        decoration: textDecoration,
+        textTransform: textTransform,
+        lineHeight: lineHeightStyle,
+        letterSpacing: letterSpacingStyle,
+        textIndent: segment.indentation,
+      });
+
+      return { style: style, text: segment.characters };
+    });
+  }
+
+  getFlutterTextDecoration(decoration: TextDecoration): string {
+    switch (decoration) {
+      case "UNDERLINE":
+        return "TextDecoration.underline";
+      case "STRIKETHROUGH":
+        return "TextDecoration.lineThrough";
+      default:
+        return "TextDecoration.none";
+    }
+  }
+
+  getFlutterTextTransform(textCase: TextCase): string {
+    // Flutter doesn't have a direct attribute for text-transform
+    // You'll need to transform the text itself before passing it to the Text widget
+    return "";
+  }
+
+  getFlutterLineHeightStyle(lineHeight: LineHeight): string {
+    if (lineHeight.unit === "AUTO") {
+      return "";
+    } else {
+      return `height: ${lineHeight.value}`;
+    }
+  }
+
+  getFlutterLetterSpacingStyle(letterSpacing: LetterSpacing): string {
+    // if (letterSpacing.unit === "AUTO") {
+    //   return "";
+    // } else {
+    //   return `letterSpacing: ${letterSpacing.value}`;
+    // }
+    return "";
+  }
+
+  textAutoSize(node: TextNode): this {
     this.child = wrapTextAutoResize(node, this.child);
     return this;
   }
 }
 
-export const makeTextComponent = (node: AltTextNode): string => {
+export const makeTextComponent = (node: TextNode): string => {
   // only undefined in testing
   let alignHorizontal =
     node.textAlignHorizontal?.toString()?.toLowerCase() ?? "left";
@@ -66,7 +136,7 @@ export const makeTextComponent = (node: AltTextNode): string => {
   return `Text(${indentString(properties, 2)}\n),`;
 };
 
-export const getTextStyle = (node: AltTextNode): string => {
+export const getTextStyle = (node: TextNode): string => {
   // example: text-md
   let styleBuilder = "";
 
@@ -109,10 +179,7 @@ export const getTextStyle = (node: AltTextNode): string => {
   return styleBuilder;
 };
 
-export const wrapTextAutoResize = (
-  node: AltTextNode,
-  child: string
-): string => {
+export const wrapTextAutoResize = (node: TextNode, child: string): string => {
   const fSize = flutterSize(node);
   const width = fSize.width;
   const height = fSize.height;
