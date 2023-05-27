@@ -4,37 +4,61 @@ import {
   tailwindMain,
   swiftuiMain,
   convertIntoNodes,
-  FrameworkTypes,
   htmlMain,
+  PluginSettings,
 } from "backend";
 
-const settings: {
-  framework: FrameworkTypes;
-} = {
+let userPluginSettings: PluginSettings;
+
+const defaultPluginSettings = {
   framework: "HTML",
+  jsx: true,
+  optimize: true,
+  layerName: true,
 };
 
-const initSettings = () => {
-  figma.clientStorage.getAsync("settings").then((clientSettings) => {
-    if (clientSettings && clientSettings.lastSelected) {
-      settings.framework = clientSettings.lastSelected;
-    } else {
-      settings.framework = "HTML";
-    }
+// A helper type guard to ensure the key belongs to the PluginSettings type
+function isKeyOfPluginSettings(key: string): key is keyof PluginSettings {
+  return key in defaultPluginSettings;
+}
 
-    figma.ui.postMessage({
-      type: "tabChange",
-      data: settings.framework,
-    });
+const getUserSettings = async () => {
+  const possiblePluginSrcSettings =
+    (await figma.clientStorage.getAsync("userPluginSettings")) ?? {};
 
-    safeRun(settings.framework);
+  const updatedPluginSrcSettings = {
+    ...defaultPluginSettings,
+    ...Object.keys(defaultPluginSettings).reduce((validSettings, key) => {
+      if (
+        isKeyOfPluginSettings(key) &&
+        key in possiblePluginSrcSettings &&
+        typeof possiblePluginSrcSettings[key] ===
+          typeof defaultPluginSettings[key]
+      ) {
+        validSettings[key] = possiblePluginSrcSettings[key] as any;
+      }
+      return validSettings;
+    }, {} as Partial<PluginSettings>),
+  };
+
+  console.log("returning ", updatedPluginSrcSettings);
+
+  userPluginSettings = updatedPluginSrcSettings as PluginSettings;
+};
+
+const initSettings = async () => {
+  await getUserSettings();
+  figma.ui.postMessage({
+    type: "pluginSettingChanged",
+    data: userPluginSettings,
   });
+
+  safeRun(userPluginSettings);
 };
 
-
-const safeRun = (framework: FrameworkTypes) => {
+const safeRun = (settings: PluginSettings) => {
   try {
-    run(framework);
+    run(settings);
   } catch (e) {
     console.log(e);
 
@@ -47,49 +71,45 @@ const safeRun = (framework: FrameworkTypes) => {
   }
 };
 
+const standardMode = async () => {
+  figma.showUI(__html__, { width: 450, height: 550, themeColors: true });
+  await initSettings();
+  figma.on("selectionchange", () => {
+    safeRun(userPluginSettings);
+  });
+  figma.ui.onmessage = (msg) => {
+    console.log("[node] figma.ui.onmessage", msg);
+
+    if (msg.type === "pluginSettingChanged") {
+      (userPluginSettings as any)[msg.key] = msg.value;
+      figma.clientStorage.setAsync("userPluginSettings", userPluginSettings);
+      figma.ui.postMessage({
+        type: "pluginSettingChanged",
+        data: userPluginSettings,
+      });
+    }
+    // if (msg.type === "tabChange") {
+    //   // get from storage
+    //   figma.clientStorage.setAsync("lastFrameworkSelected", {
+    //     value: msg.data,
+    //   });
+    //   userPluginSettings.framework = msg.data;
+    //   safeRun(userPluginSettings);
+    // }
+  };
+};
+
 switch (figma.mode) {
   case "default":
   case "panel":
-    let isJsx = false;
-    let layerName = false;
-
-    initSettings();
-
-    figma.showUI(__html__, { width: 450, height: 550, themeColors: true });
-    figma.on("selectionchange", () => {
-      safeRun(settings.framework);
-    });
-    figma.ui.onmessage = (msg) => {
-      if (msg.type === "tabChange") {
-        // get from storage
-        figma.clientStorage.setAsync("settings", {
-          whenOpen: "lastSelected",
-          lastSelected: msg.data,
-        });
-
-        settings.framework = msg.data;
-
-        // if (
-        //   msg.type === "Tailwind" ||
-        //   msg.type === "Flutter" ||
-        //   msg.type === "SwiftUI" ||
-        //   msg.type === "HTML"
-        // ) {
-        //   mode = msg.type;
-        //   run(mode);
-        // } else if (msg.type === "jsx" && msg.data !== isJsx) {
-        //   isJsx = msg.data;
-        //   run(mode);
-        // } else if (msg.type === "layerName" && msg.data !== layerName) {
-        //   layerName = msg.data;
-        //   run(mode);
-        // }
-        safeRun(settings.framework);
-      }
-    };
+    standardMode();
     break;
   case "codegen":
     initSettings();
+    // figma.codegen.on("preferenceschange", (preferences) => {
+
+    // });
+
     figma.codegen.on("generate", ({ language, node }) => {
       const convertedSelection = convertIntoNodes([node], null);
 

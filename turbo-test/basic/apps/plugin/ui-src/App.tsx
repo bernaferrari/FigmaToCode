@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FrameworkTypes, PluginUI } from "plugin-ui";
+import { FrameworkTypes, PluginSettings, PluginUI } from "plugin-ui";
 
 interface AppState {
   code: string;
@@ -9,6 +9,7 @@ interface AppState {
     size: { width: number; height: number };
     content: string;
   } | null;
+  preferences: PluginSettings | null;
 }
 
 export default function App() {
@@ -17,34 +18,44 @@ export default function App() {
     selectedFramework: null,
     isLoading: false,
     htmlPreview: null,
+    preferences: null,
   });
 
   useEffect(() => {
     window.onmessage = (event: MessageEvent) => {
       const message = event.data.pluginMessage;
-
-      if (message.type === "code") {
-        setState((prevState) => ({
-          ...prevState,
-          code: message.data,
-          selectedFramework: message.framework,
-          htmlPreview: message.htmlPreview,
-        }));
-      } else if (message.type === "tabChange") {
-        setState((prevState) => ({
-          ...prevState,
-          selectedFramework: message.data,
-        }));
-      } else if (message.type === "empty") {
-        setState((prevState) => ({
-          ...prevState,
-          code: "empty",
-        }));
-      } else if (message.type === "error") {
-        setState((prevState) => ({
-          ...prevState,
-          code: `Error :(\n// ${message.data}`,
-        }));
+      console.log("[ui] message received:", message);
+      switch (message.type) {
+        case "code":
+          setState((prevState) => ({
+            ...prevState,
+            code: message.data,
+            htmlPreview: message.htmlPreview,
+            preferences: message.preferences,
+          }));
+          break;
+        case "pluginSettingChanged":
+          setState((prevState) => ({
+            ...prevState,
+            preferences: message.data,
+            selectedFramework: message.data.framework,
+          }));
+          break;
+        case "empty":
+          setState((prevState) => ({
+            ...prevState,
+            code: "// No layer is selected.",
+            htmlPreview: null,
+          }));
+          break;
+        case "error":
+          setState((prevState) => ({
+            ...prevState,
+            code: `Error :(\n// ${message.data}`,
+          }));
+          break;
+        default:
+          break;
       }
     };
 
@@ -73,13 +84,19 @@ export default function App() {
     ) : null;
   }
 
-  const handleFrameworkChange = (newFramework: FrameworkTypes) => {
+  const handleFrameworkChange = (updatedFramework: FrameworkTypes) => {
     setState((prevState) => ({
       ...prevState,
-      selectedFramework: newFramework,
+      selectedFramework: updatedFramework,
     }));
     parent.postMessage(
-      { pluginMessage: { type: "tabChange", data: newFramework } },
+      {
+        pluginMessage: {
+          type: "pluginSettingChanged",
+          key: "framework",
+          value: updatedFramework,
+        },
+      },
       "*"
     );
   };
@@ -91,6 +108,19 @@ export default function App() {
       selectedFramework={state.selectedFramework}
       setSelectedFramework={handleFrameworkChange}
       htmlPreview={state.htmlPreview}
+      preferences={state.preferences}
+      onPreferenceChange={(key: string, value: boolean) => {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: "pluginSettingChanged",
+              key: key,
+              value: value,
+            },
+          },
+          "*"
+        );
+      }}
     />
   );
 }

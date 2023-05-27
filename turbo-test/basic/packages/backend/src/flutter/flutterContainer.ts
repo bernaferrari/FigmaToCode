@@ -87,7 +87,6 @@ const getDecoration = (node: SceneNode): string => {
   if (shapeDecorationBorder) {
     return generateWidgetCode("ShapeDecoration", {
       ...decorationBackground,
-      borderRadius: propBorderRadius,
       shape: skipDefaultProperty(
         shapeDecorationBorder,
         "RoundedRectangleBorder()"

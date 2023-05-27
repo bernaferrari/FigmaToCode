@@ -5,6 +5,13 @@ import copy from "clipboard-copy";
 
 export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
 
+export type PluginSettings = {
+  framework: FrameworkTypes;
+  jsx: boolean;
+  optimize: boolean;
+  layerName: boolean;
+};
+
 type PluginUIProps = {
   code: string;
   htmlPreview: {
@@ -14,6 +21,8 @@ type PluginUIProps = {
   emptySelection: boolean;
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
+  preferences: PluginSettings | null;
+  onPreferenceChange: (key: string, value: boolean) => void;
 };
 
 export const PluginUI = (props: PluginUIProps) => {
@@ -26,7 +35,7 @@ export const PluginUI = (props: PluginUIProps) => {
             className={`w-full p-1 text-sm ${
               props.selectedFramework === tab
                 ? "bg-green-500 dark:bg-green-600 text-white rounded-md font-semibold shadow-sm"
-                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-300 dark:hover:bg-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
+                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-600 dark:hover:bg-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
             }`}
             onClick={() => {
               props.setSelectedFramework(tab as FrameworkTypes);
@@ -58,7 +67,12 @@ export const PluginUI = (props: PluginUIProps) => {
           </button>
         </div> */}
           {/* Code View */}
-          <CodeWindow code={props.code} />
+          <CodeWindow
+            code={props.code}
+            selectedFramework={props.selectedFramework}
+            preferences={props.preferences}
+            onPreferenceChange={props.onPreferenceChange}
+          />
           <div className="text-xs">
             Other things go here, such as color, tokens, etc.
           </div>
@@ -82,61 +96,198 @@ export const ResponsiveGrade = () => {
   );
 };
 
-export const CodeWindow = (props: { code: string }) => {
+type LocalCodegenPreference =
+  // | {
+  //     itemType: "alternative-unit";
+  //     defaultScaleFactor: number;
+  //     scaledUnit: string;
+  //     default?: boolean;
+  //     includedLanguages?: FrameworkTypes[];
+  //   }
+  // | {
+  //     itemType: "select";
+  //     propertyName: string;
+  //     label: string;
+  //     options: { label: string; value: string; isDefault?: boolean }[];
+  //     includedLanguages?: FrameworkTypes[];
+  //   }
+  // | {
+  //     itemType: "action";
+  //     propertyName: string;
+  //     label: string;
+  //     includedLanguages?: FrameworkTypes[];
+  //   }
+  // |
+  {
+    itemType: "individual_select";
+    propertyName: Exclude<keyof PluginSettings, "framework">;
+    label: string;
+    // value?: boolean;
+    isDefault?: boolean;
+    includedLanguages?: FrameworkTypes[];
+  };
+
+export const preferenceOptions: LocalCodegenPreference[] = [
+  {
+    itemType: "individual_select",
+    propertyName: "jsx",
+    label: "React (JSX)",
+    isDefault: false,
+    includedLanguages: ["HTML", "Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "optimize",
+    label: "Optimize Layout",
+    isDefault: true,
+    includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "layerName",
+    label: "Layer Names",
+    isDefault: false,
+    includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
+  },
+  // Add your preferences data here
+];
+
+export const CodeWindow = (props: {
+  code: string;
+  selectedFramework: FrameworkTypes;
+  preferences: PluginSettings | null;
+  onPreferenceChange: (key: string, value: boolean) => void;
+}) => {
   const emptySelection = false;
-  const codeObservable = "";
   const [isPressed, setIsPressed] = useState(false);
+  const [syntaxHovered, setSyntaxHovered] = useState(false);
 
   // Add your clipboard function here or any other actions
   const handleButtonClick = () => {
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 250);
-
     copy(props.code);
   };
 
-  if (emptySelection)
+  const handleButtonHover = () => setSyntaxHovered(true);
+  const handleButtonLeave = () => setSyntaxHovered(false);
+
+  if (emptySelection) {
     return (
       <div className="flex flex-col space-y-2 m-auto items-center justify-center p-4 {sectionStyle}">
         <p className="text-lg font-bold">Nothing is selected</p>
         <p className="text-xs">Try selecting a layer, any layer</p>
       </div>
     );
-  else
+  } else {
     return (
       <div className="w-full">
         <div className="flex items-center justify-between space-x-2">
-          <p className="px-4 py-1.5 text-lg font-medium text-center dark:text-white rounded-lg">
+          <p className="py-1.5 text-lg font-medium text-center dark:text-white rounded-lg">
             Code
           </p>
           <button
-            className={`px-4 py-2 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-800 hover:text-white hover:border-transparent transition-all duration-300 ${
+            className={`px-4 py-1 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${
               isPressed
-                ? "bg-green-500 text-white hover:bg-green-500 ring-4 ring-green-300 ring-opacity-50 animate-pulse"
+                ? "bg-green-500 dark:text-white hover:bg-green-500 ring-4 ring-green-300 ring-opacity-50 animate-pulse"
                 : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600"
             }`}
             onClick={handleButtonClick}
+            onMouseEnter={handleButtonHover}
+            onMouseLeave={handleButtonLeave}
           >
             Copy
           </button>
         </div>
 
-        <SyntaxHighlighter
-          language="dart"
-          style={theme}
-          customStyle={{
-            fontSize: 12,
-            borderRadius: 8,
-          }}
+        <div className="flex gap-2 flex-wrap">
+          {preferenceOptions
+            .filter((preference) =>
+              preference.includedLanguages?.includes("HTML")
+            )
+            .map((preference) => (
+              <SelectableToggle
+                title={preference.label}
+                isSelected={
+                  (props.preferences &&
+                    props.preferences[preference.propertyName]) ??
+                  preference.isDefault
+                }
+                onSelect={(value) => {
+                  props.onPreferenceChange(preference.propertyName, value);
+                }}
+              />
+            ))}
+        </div>
+
+        <div
+          className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
+            syntaxHovered ? "ring-2" : "ring-0"
+          }`}
         >
-          {props.code}
-        </SyntaxHighlighter>
+          <SyntaxHighlighter
+            language="dart"
+            style={theme}
+            customStyle={{
+              fontSize: 12,
+              borderRadius: 8,
+              backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
+              transitionProperty: "all",
+              transitionTimingFunction: "ease",
+              transitionDuration: "0.2s",
+            }}
+          >
+            {props.code}
+          </SyntaxHighlighter>
+        </div>
 
         <div className="flex items-center content-center justify-end mx-2 mb-2 space-x-8">
           {/* <Switch id="material" text="Material" /> */}
         </div>
       </div>
     );
+  }
+};
+
+type SelectableToggleProps = {
+  onSelect: (isSelected: boolean) => void;
+  isSelected?: boolean;
+  title: string;
+};
+
+const SelectableToggle = ({
+  onSelect,
+  isSelected = false,
+  title,
+}: SelectableToggleProps) => {
+  const handleClick = () => {
+    onSelect(!isSelected);
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`h-8 px-2 truncate flex items-center justify-center rounded-md cursor-pointer transition-all duration-300
+      hover:bg-neutral-200 dark:hover:bg-neutral-700 gap-2 text-sm ring-1 
+      ${
+        isSelected
+          ? "bg-black dark:ring-green-800"
+          : "bg-neutral-100 dark:bg-neutral-800 dark:ring-neutral-700 ring-neutral-300"
+      }`}
+    >
+      <span
+        className={`h-3 w-3 flex-shrink-0 border-neutral-500 border-2 ${
+          isSelected
+            ? "bg-black dark:bg-green-500 dark:border-green-500 ring-green-300"
+            : "bg-transparent dark:border-neutral-500"
+        }`}
+        style={{
+          borderRadius: 4,
+        }}
+      ></span>
+      {title}
+    </button>
+  );
 };
 
 export const Preview: React.FC<{
@@ -177,7 +328,7 @@ export const Preview: React.FC<{
                   style={{
                     zoom: scaleFactor,
                     width: "100%",
-                    height: props.htmlPreview.size.height,
+                    height: "100%",
                     display: "flex",
                   }}
                   dangerouslySetInnerHTML={{

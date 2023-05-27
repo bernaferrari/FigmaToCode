@@ -3,6 +3,9 @@ import * as React from "react";
 import Image from "next/image";
 
 export default function Web() {
+  const [selectedFramework, setSelectedFramework] =
+    React.useState<FrameworkTypes>("HTML");
+
   return (
     <div className="flex flex-col p-8 space-y-2">
       <p className="text-3xl font-bold">Debug Mode</p>
@@ -17,9 +20,10 @@ export default function Web() {
                 "backend:dev: CJS dist/index.js 105.74 KB backend:dev: CJS ⚡️ Build        success in 419ms plugin:dev: warn - Port 3000 is in use, trying 3001        instead. plugin:dev: warn - Port 3001 is in use, trying 3002 instead."
               }
               emptySelection={false}
-              selectedFramework={"HTML"}
-              setSelectedFramework={() => {}}
+              selectedFramework={selectedFramework}
+              setSelectedFramework={setSelectedFramework}
               htmlPreview={null}
+              preferences={undefined}
             />
           </div>
         </div>
@@ -29,15 +33,16 @@ export default function Web() {
             <PluginFigmaToolbar variant="(Dark)" />
             <PluginUI
               code={"code goes hereeeee"}
-              selectedFramework={"HTML"}
-              setSelectedFramework={() => {}}
+              selectedFramework={selectedFramework}
+              setSelectedFramework={setSelectedFramework}
               emptySelection={false}
               htmlPreview={null}
+              preferences={undefined}
             />
           </div>
         </div>
       </div>
-      <div>Templates for debugging</div>
+      {/* <div>Templates for debugging</div>
       <div className="flex space-x-4">
         {[1, 2, 3, 4, 5].map((d) => (
           <div
@@ -51,13 +56,12 @@ export default function Web() {
               alt="A random image"
               width={112}
               height={112}
-              fill={true}
               style={{ objectFit: "cover" }}
               className="rounded"
             />
           </div>
         ))}
-      </div>
+      </div> */}
 
       <div>Plugin dropdown selection (each frame a different breakpoint)</div>
       <div className="flex space-x-4">
