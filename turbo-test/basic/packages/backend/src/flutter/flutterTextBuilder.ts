@@ -32,25 +32,24 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
       const textDecoration = this.getFlutterTextDecoration(
         segment.textDecoration
       );
-      const textTransform = this.getFlutterTextTransform(segment.textCase);
-      const lineHeightStyle = this.getFlutterLineHeightStyle(
-        segment.lineHeight
-      );
-      const letterSpacingStyle = this.getFlutterLetterSpacingStyle(
-        segment.letterSpacing
-      );
+      const fontSize = `${segment.fontSize}`;
+      const fontStyle = "";
+      const fontFamily = segment.fontName.family;
+      const fontWeight = `FontWeight.w${segment.fontWeight}`;
+      const textTransform = "";
+      const lineHeight = this.getFlutterLineHeightStyle(segment.lineHeight);
+      const letterSpacing = "";
 
       const style = generateWidgetCode("TextStyle", {
-        color: color,
-        fontSize: segment.fontSize,
-        fontFamily: segment.fontName.family,
-        fontStyle: segment.fontName.style,
-        fontWeight: `FontWeight.w${segment.fontWeight}`,
-        decoration: textDecoration,
+        color,
+        fontSize: fontSize,
+        fontStyle: fontStyle,
+        fontFamily: fontFamily,
+        fontWeight: fontWeight,
+        textDecoration: textDecoration,
         textTransform: textTransform,
-        lineHeight: lineHeightStyle,
-        letterSpacing: letterSpacingStyle,
-        textIndent: segment.indentation,
+        lineHeight: lineHeight,
+        letterSpacing: letterSpacing,
       });
 
       return { style: style, text: segment.characters };
@@ -68,27 +67,12 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     }
   }
 
-  getFlutterTextTransform(textCase: TextCase): string {
-    // Flutter doesn't have a direct attribute for text-transform
-    // You'll need to transform the text itself before passing it to the Text widget
-    return "";
-  }
-
   getFlutterLineHeightStyle(lineHeight: LineHeight): string {
     if (lineHeight.unit === "AUTO") {
       return "";
     } else {
       return `height: ${lineHeight.value}`;
     }
-  }
-
-  getFlutterLetterSpacingStyle(letterSpacing: LetterSpacing): string {
-    // if (letterSpacing.unit === "AUTO") {
-    //   return "";
-    // } else {
-    //   return `letterSpacing: ${letterSpacing.value}`;
-    // }
-    return "";
   }
 
   textAutoSize(node: TextNode): this {
@@ -104,8 +88,6 @@ export const makeTextComponent = (node: TextNode): string => {
   alignHorizontal =
     alignHorizontal === "justified" ? "justify" : alignHorizontal;
 
-  // todo if layoutAlign !== MIN, Text will be wrapped by Align
-  // if alignHorizontal is LEFT, don't do anything because that is native
   const textAlign =
     alignHorizontal !== "left"
       ? `\ntextAlign: TextAlign.${alignHorizontal},`
@@ -117,15 +99,10 @@ export const makeTextComponent = (node: TextNode): string => {
   } else if (node.textCase === "UPPER") {
     text = text.toUpperCase();
   }
-  // else if (node.textCase === "TITLE") {
-  // TODO this
-  // }
 
   const textStyle = getTextStyle(node);
 
-  const style = textStyle
-    ? `\nstyle: TextStyle(${indentString(textStyle, 2)}\n),`
-    : "";
+  const style = textStyle ? `\nstyle: ${textStyle}` : "";
 
   const splittedChars = text.split("\n");
   const charsWithLineBreak =
@@ -133,28 +110,28 @@ export const makeTextComponent = (node: TextNode): string => {
 
   const properties = `\n"${charsWithLineBreak}",${textAlign}${style}`;
 
-  return `Text(${indentString(properties, 2)}\n),`;
+  return `Text(${properties.trim()});`;
 };
 
 export const getTextStyle = (node: TextNode): string => {
-  // example: text-md
-  let styleBuilder = "";
+  let styleBuilder = new Map();
 
-  styleBuilder = generateWidgetCode("TextStyle", {
-    color: flutterColorFromFills(node.fills),
-    fontSize: node.fontSize !== figma.mixed ? sliceNum(node.fontSize) : "",
-    decoration:
-      node.textDecoration === "UNDERLINE" ? "TextDecoration.underline" : "",
-  });
+  const color = flutterColorFromFills(node.fills);
+  color ? styleBuilder.set("color", color) : "";
+
+  const fontSize = node.fontSize !== figma.mixed ? sliceNum(node.fontSize) : "";
+  fontSize ? styleBuilder.set("fontSize", fontSize) : "";
+
+  if (node.textDecoration === "UNDERLINE") {
+    styleBuilder.set("decoration", "TextDecoration.underline");
+  }
 
   if (node.fontName !== figma.mixed) {
     const lowercaseStyle = node.fontName.style.toLowerCase();
-
     if (lowercaseStyle.match("italic")) {
-      styleBuilder += "\nfontStyle: FontStyle.italic,";
+      styleBuilder.set("fontStyle", "FontStyle.italic");
     }
 
-    // ignore the font-style when regular (default)
     if (!lowercaseStyle.match("regular")) {
       const value = node.fontName.style
         .replace("italic", "")
@@ -164,21 +141,21 @@ export const getTextStyle = (node: TextNode): string => {
       const weight = convertFontWeight(value);
 
       if (weight) {
-        styleBuilder += `\nfontFamily: "${node.fontName.family}",`;
-        styleBuilder += `\nfontWeight: FontWeight.w${weight},`;
+        styleBuilder.set("fontFamily", `"${node.fontName.family}"`);
+        styleBuilder.set("fontWeight", `FontWeight.w${weight}`);
       }
     }
   }
 
-  // todo lineSpacing
   const letterSpacing = commonLetterSpacing(node);
   if (letterSpacing > 0) {
-    styleBuilder += `\nletterSpacing: ${sliceNum(letterSpacing)},`;
+    styleBuilder.set("letterSpacing", `${sliceNum(letterSpacing)}`);
   }
 
-  return styleBuilder;
+  return `TextStyle(${[...styleBuilder]
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(", ")});`;
 };
-
 export const wrapTextAutoResize = (node: TextNode, child: string): string => {
   const fSize = flutterSize(node);
   const width = fSize.width;

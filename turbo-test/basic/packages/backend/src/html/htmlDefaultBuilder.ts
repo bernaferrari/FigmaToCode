@@ -1,4 +1,4 @@
-import { formatWithJSX } from "../common/parseJSX";
+import { formatMultipleJSX, formatWithJSX } from "../common/parseJSX";
 import { htmlShadow } from "./builderImpl/htmlShadow";
 import {
   htmlVisibility,
@@ -19,7 +19,6 @@ export class HtmlDefaultBuilder {
   isJSX: boolean;
   visible: boolean;
   name: string = "";
-  hasFixedSize = false;
 
   constructor(node: SceneNode, showLayerName: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
@@ -31,7 +30,7 @@ export class HtmlDefaultBuilder {
   commonPositionStyles(
     node: SceneNode & LayoutMixin & MinimalBlendMixin
   ): this {
-    this.widthHeight(node);
+    this.size(node);
     this.autoLayoutPadding(node);
     this.position(node);
     this.blend(node);
@@ -42,9 +41,9 @@ export class HtmlDefaultBuilder {
     this.customColor(node.fills, "background-color");
     this.shadow(node);
     this.border(node);
-    if ("clipsContent" in node && node.clipsContent === true) {
-      this.addStyles(formatWithJSX("overflow", this.isJSX, "hidden"));
-    }
+    // if ("clipsContent" in node && node.clipsContent === true) {
+    //   this.addStyles(formatWithJSX("overflow", this.isJSX, "hidden"));
+    // }
     return this;
   }
 
@@ -62,7 +61,7 @@ export class HtmlDefaultBuilder {
   }
 
   border(node: GeometryMixin & SceneNode): this {
-    this.addStyles(htmlBorderRadius(node, this.isJSX));
+    this.addStyles(...htmlBorderRadius(node, this.isJSX));
     if (
       node.strokes &&
       node.strokes.length > 0 &&
@@ -151,10 +150,24 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  widthHeight(node: SceneNode): this {
-    const partial = htmlSizePartial(node, this.isJSX);
-    this.hasFixedSize = partial.width !== "" && partial.height !== "";
-    this.addStyles(partial.width, partial.height);
+  size(node: SceneNode): this {
+    const { width, height } = htmlSizePartial(node, this.isJSX);
+
+    if (node.type === "TEXT") {
+      switch (node.textAutoResize) {
+        case "WIDTH_AND_HEIGHT":
+          this.addStyles(width, height);
+          break;
+        case "HEIGHT":
+          this.addStyles(height);
+          break;
+        case "NONE":
+          break;
+      }
+    } else {
+      this.addStyles(width, height);
+    }
+
     return this;
   }
 

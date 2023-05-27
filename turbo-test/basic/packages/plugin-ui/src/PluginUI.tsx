@@ -326,10 +326,11 @@ export const Preview: React.FC<{
               style={{ width: targetWidth }}
             >
               <div
-                className="flex flex-col justify-center items-center border border-neutral-200 overflow-clip dark:border-neutral-700 rounded-md shadow-sm"
+                className="flex flex-col justify-center items-center border border-neutral-200 dark:border-neutral-700 rounded-md shadow-sm"
                 style={{
                   width: targetWidth,
                   height: targetHeight,
+                  clipPath: "inset(0px round 6px)",
                 }}
               >
                 <div

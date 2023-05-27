@@ -5,38 +5,51 @@ type SizeResult = {
   readonly height: responsive | number | null;
 };
 
-// Update for latest Figma APIs. The old one is still being used for Tailwind.
-export const nodeWidthHeight = (
+function getUpdatedNodeDimension(
   node: SceneNode,
-  allowRelative: boolean
-): SizeResult => {
-  let nodeWidth: number | null = node.width;
-  let nodeHeight: number | null = node.height;
-
-  if (node.type === "FRAME") {
-    switch (node.layoutMode) {
-      case "HORIZONTAL":
-        nodeWidth = node.primaryAxisSizingMode === "AUTO" ? null : node.width;
-        break;
-      case "VERTICAL":
-        nodeHeight = node.primaryAxisSizingMode === "AUTO" ? null : node.height;
-        break;
-      case "NONE":
-        break;
+  sizingMode: "AUTO" | "FIXED",
+  dimensionValue: number
+): number | "fill" | null {
+  if ("layoutAlign" in node && node.parent !== null) {
+    if (node.layoutGrow === 1 || node.layoutAlign === "STRETCH") {
+      return "fill";
     }
   }
+  if (sizingMode === "FIXED") {
+    return dimensionValue;
+  }
+  return null;
+}
 
-  if (node.parent && node.parent.type === "FRAME" && "layoutGrow" in node) {
-    switch (node.parent.layoutMode) {
+// Update for latest Figma APIs. The old one is still being used for Tailwind.
+export const nodeWidthHeight = (node: SceneNode): SizeResult => {
+  if ("layoutMode" in node) {
+    switch (node.layoutMode) {
       case "HORIZONTAL":
         return {
-          width: node.layoutGrow === 1 ? "full" : nodeWidth,
-          height: node.layoutAlign === "STRETCH" ? "full" : nodeHeight,
+          width: getUpdatedNodeDimension(
+            node,
+            node.primaryAxisSizingMode,
+            node.width
+          ),
+          height: getUpdatedNodeDimension(
+            node,
+            node.counterAxisSizingMode,
+            node.height
+          ),
         };
       case "VERTICAL":
         return {
-          width: node.layoutAlign === "STRETCH" ? "full" : nodeWidth,
-          height: node.layoutGrow === 1 ? "full" : nodeHeight,
+          width: getUpdatedNodeDimension(
+            node,
+            node.primaryAxisSizingMode,
+            node.width
+          ),
+          height: getUpdatedNodeDimension(
+            node,
+            node.counterAxisSizingMode,
+            node.height
+          ),
         };
       case "NONE":
         break;
@@ -44,8 +57,8 @@ export const nodeWidthHeight = (
   }
 
   return {
-    width: nodeWidth,
-    height: nodeHeight,
+    width: getUpdatedNodeDimension(node, "FIXED", node.width),
+    height: getUpdatedNodeDimension(node, "FIXED", node.height),
   };
 };
 
@@ -62,8 +75,8 @@ export const nodeWidthHeightTailwind = (
 
   if (node.layoutAlign === "STRETCH" && node.layoutGrow === 1) {
     return {
-      width: "full",
-      height: "full",
+      width: "fill",
+      height: "fill",
     };
   }
 
@@ -77,10 +90,10 @@ export const nodeWidthHeightTailwind = (
     if (node.layoutAlign === "STRETCH") {
       switch (node.parent.layoutMode) {
         case "HORIZONTAL":
-          propHeight = "full";
+          propHeight = "fill";
           break;
         case "VERTICAL":
-          propWidth = "full";
+          propWidth = "fill";
           break;
         case "NONE":
           break;
@@ -90,9 +103,9 @@ export const nodeWidthHeightTailwind = (
     // Grow means the same direction
     if (node.layoutGrow === 1) {
       if (node.parent.layoutMode === "HORIZONTAL") {
-        propWidth = "full";
+        propWidth = "fill";
       } else {
-        propHeight = "full";
+        propHeight = "fill";
       }
     }
   }
@@ -102,7 +115,7 @@ export const nodeWidthHeightTailwind = (
   // todo should this be kept this way? The issue is w-full which doesn't work well with absolute position.
   if (allowRelative && node.parent?.isRelative !== true) {
     // don't calculate again if it was already calculated
-    if (propWidth !== "full") {
+    if (propWidth !== "fill") {
       const rW = calculateResponsiveWH(node, nodeWidth, "x");
       if (rW) {
         propWidth = rW;
@@ -266,7 +279,7 @@ const childLargerThanMaxSize = (node: SceneNode, axis: "x" | "y") => {
 
 type responsive =
   | ""
-  | "full"
+  | "fill"
   | "1/2"
   | "1/3"
   | "2/3"
@@ -284,7 +297,7 @@ const calculateResponsiveWH = (
   let returnValue: responsive = "";
 
   if (nodeWidthHeightNumber > 384 || childLargerThanMaxSize(node, axis)) {
-    returnValue = "full";
+    returnValue = "fill";
   }
 
   if (!node.parent) {

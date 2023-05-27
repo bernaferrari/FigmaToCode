@@ -1,64 +1,78 @@
 import { formatWithJSX } from "../../common/parseJSX";
 
-/**
- * https://tailwindcss.com/docs/border-radius/
- * example: rounded-sm
- * example: rounded-tr-lg
- */
-export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string => {
+export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
   if (node.type === "ELLIPSE") {
-    return formatWithJSX("border-radius", isJsx, 9999);
-  } else if (
-    (!("cornerRadius" in node) && !("topLeftRadius" in node)) ||
-    ("cornerRadius" in node &&
-      node.cornerRadius === figma.mixed &&
-      node.topLeftRadius === undefined) ||
-    ("cornerRadius" in node && node.cornerRadius === 0)
+    return [formatWithJSX("border-radius", isJsx, 9999)];
+  }
+
+  let comp: string[] = [];
+  let cornerValues: number[] = [0, 0, 0, 0];
+  let singleCorner: number = 0;
+
+  if (
+    "cornerRadius" in node &&
+    node.cornerRadius !== figma.mixed &&
+    node.cornerRadius
   ) {
-    // the second condition is used on tests. On Figma, topLeftRadius is never undefined.
-    // ignore when 0, undefined or non existent
-    return "";
+    singleCorner = node.cornerRadius;
+    comp.push(formatWithJSX("border-radius", isJsx, node.cornerRadius));
+  } else if ("topLeftRadius" in node) {
+    cornerValues = handleIndividualRadius(node);
+    comp.push(
+      ...cornerValues
+        .filter((d) => d !== 0)
+        .map((value, index) => {
+          const property = [
+            "border-top-left-radius",
+            "border-top-right-radius",
+            "border-bottom-right-radius",
+            "border-bottom-left-radius",
+          ][index];
+          return formatWithJSX(property, isJsx, value);
+        })
+    );
   }
 
-  if (!("cornerRadius" in node)) {
-    return "";
-  }
-
-  let comp = "";
-
-  if (node.cornerRadius !== figma.mixed) {
-    comp += formatWithJSX("border-radius", isJsx, node.cornerRadius);
-  } else {
-    // todo optimize for tr/tl/br/bl instead of t/r/l/b
-    if (node.topLeftRadius !== 0) {
-      comp += formatWithJSX(
-        "border-top-left-radius",
-        isJsx,
-        node.topLeftRadius
-      );
-    }
-    if (node.topRightRadius !== 0) {
-      comp += formatWithJSX(
-        "border-top-right-radius",
-        isJsx,
-        node.topRightRadius
-      );
-    }
-    if (node.bottomLeftRadius !== 0) {
-      comp += formatWithJSX(
-        "border-bottom-left-radius",
-        isJsx,
-        node.bottomLeftRadius
-      );
-    }
-    if (node.bottomRightRadius !== 0) {
-      comp += formatWithJSX(
-        "border-bottom-right-radius",
-        isJsx,
-        node.bottomRightRadius
-      );
+  if (
+    "children" in node &&
+    "clipsContent" in node &&
+    node.children.length > 0 &&
+    node.clipsContent === true
+  ) {
+    if (
+      node.children.some(
+        (child) =>
+          "layoutPositioning" in child && node.layoutPositioning === "AUTO"
+      )
+    ) {
+      if (singleCorner) {
+        comp.push(
+          formatWithJSX(
+            "clip-path",
+            isJsx,
+            `inset(0px round ${singleCorner}px)`
+          )
+        );
+      } else {
+        const insetValues = cornerValues.map((value) => `${value}px`).join(" ");
+        comp.push(
+          formatWithJSX("clip-path", isJsx, `inset(0px round ${insetValues})`)
+        );
+      }
+    } else {
+      comp.push(formatWithJSX("overflow", isJsx, "hidden"));
     }
   }
 
   return comp;
+};
+
+const handleIndividualRadius = (node: RectangleCornerMixin): number[] => {
+  const cornerValues = [
+    node.topLeftRadius,
+    node.topRightRadius,
+    node.bottomRightRadius,
+    node.bottomLeftRadius,
+  ];
+  return cornerValues;
 };

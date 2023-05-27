@@ -1,4 +1,8 @@
-import { generateWidgetCode, sliceNum } from "../common/numToAutoFixed";
+import {
+  generateWidgetCode,
+  skipDefaultProperty,
+  sliceNum,
+} from "../common/numToAutoFixed";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { FlutterTextBuilder } from "./flutterTextBuilder";
@@ -142,7 +146,10 @@ const makeRowColumn = (node: FrameNode, children: string): string => {
   return generateWidgetCode(rowOrColumn, {
     mainAxisSize:
       node.layoutGrow === 1 ? "MainAxisSize.max" : "MainAxisSize.min",
-    mainAxisAlignment: getMainAxisAlignment(node),
+    mainAxisAlignment: skipDefaultProperty(
+      getMainAxisAlignment(node),
+      "MainAxisAlignment.start"
+    ),
     crossAxisAlignment: getCrossAxisAlignment(node),
     children: `[\n${indentString(children, 2)}\n]`,
   });

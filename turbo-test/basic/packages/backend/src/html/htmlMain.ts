@@ -58,9 +58,7 @@ const htmlWidgetGenerator = (
       comp += htmlLine(node, isJsx);
     }
 
-    comp += addSpacingIfNeeded(node, index, sceneLen, isJsx);
-
-    // todo support Line
+    // comp += addSpacingIfNeeded(node, index, sceneLen, isJsx);
   });
 
   return comp;
@@ -115,7 +113,7 @@ export const htmlText = (node: TextNode, isJsx: boolean): string => {
       .join("");
   }
 
-  return `\n<p${layoutBuilder.build()}>${content}</p>`;
+  return `\n<div${layoutBuilder.build()}>${content}</div>`;
 };
 
 const htmlFrame = (node: FrameNode, isJsx: boolean = false): string => {
@@ -215,39 +213,14 @@ export const htmlLine = (node: LineNode, isJsx: boolean): string => {
 export const rowColumnProps = (node: FrameNode, isJsx: boolean): string[] => {
   // ROW or COLUMN
 
-  // ignore current node when it has only one child and it has the same size
-  if (
-    node.children.length === 1 &&
-    node.children[0].width === node.width &&
-    node.children[0].height === node.height
-  ) {
-    return [];
-  }
-
   // [optimization]
   // flex, by default, has flex-row. Therefore, it can be omitted.
-  const rowOrColumn =
-    node.layoutMode === "HORIZONTAL"
-      ? formatWithJSX("flex-direction", isJsx, "row")
-      : formatWithJSX("flex-direction", isJsx, "column");
+  let rowOrColumn = "";
+  if (node.layoutMode === "VERTICAL") {
+    rowOrColumn = formatWithJSX("flex-direction", isJsx, "column");
+  }
 
-  // special case when there is only one children; need to position correctly in Flex.
-  // let justify = "justify-center";
-  // if (node.children.length === 1) {
-  //   const nodeCenteredPosX = node.children[0].x + node.children[0].width / 2;
-  //   const parentCenteredPosX = node.width / 2;
-
-  //   const marginX = nodeCenteredPosX - parentCenteredPosX;
-
-  //   // allow a small threshold
-  //   if (marginX < -4) {
-  //     justify = "justify-start";
-  //   } else if (marginX > 4) {
-  //     justify = "justify-end";
-  //   }
-  // }
   let primaryAlign: string;
-
   switch (node.primaryAxisAlignItems) {
     case "MIN":
       primaryAlign = "flex-start";
@@ -262,11 +235,8 @@ export const rowColumnProps = (node: FrameNode, isJsx: boolean): string[] => {
       primaryAlign = "space-between";
       break;
   }
-
   primaryAlign = formatWithJSX("justify-content", isJsx, primaryAlign);
 
-  // [optimization]
-  // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, center it.
   let counterAlign: string = "";
   switch (node.counterAxisAlignItems) {
     case "MIN":
@@ -284,41 +254,19 @@ export const rowColumnProps = (node: FrameNode, isJsx: boolean): string[] => {
   counterAlign = formatWithJSX("align-items", isJsx, counterAlign);
 
   // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
-  let flex =
+  let display =
     node.parent &&
     "layoutMode" in node.parent &&
     node.parent.layoutMode === node.layoutMode
       ? "flex"
       : "inline-flex";
+  display = formatWithJSX("display", isJsx, display);
 
-  flex = formatWithJSX("display", isJsx, flex);
-
-  return [flex, rowOrColumn, counterAlign, primaryAlign];
-};
-
-const addSpacingIfNeeded = (
-  node: SceneNode,
-  index: number,
-  len: number,
-  isJsx: boolean
-): string => {
-  // Ignore this when SPACE_BETWEEN is set.
-  if (
-    node.parent?.type === "FRAME" &&
-    node.parent.layoutMode !== "NONE" &&
-    node.parent.primaryAxisAlignItems !== "SPACE_BETWEEN"
-  ) {
-    // check if itemSpacing is set and if it isn't the last value.
-    // Don't add at the last value. In Figma, itemSpacing CAN be negative; here it can't.
-    if (node.parent.itemSpacing > 0 && index < len - 1) {
-      const wh = node.parent.layoutMode === "HORIZONTAL" ? "width" : "height";
-
-      // don't show the layer name in these separators.
-      const style = new HtmlDefaultBuilder(node, false, isJsx).build([
-        formatWithJSX(wh, isJsx, node.parent.itemSpacing),
-      ]);
-      return isJsx ? `\n<div${style}/>` : `\n<div${style}></div>`;
-    }
-  }
-  return "";
+  return [
+    display,
+    rowOrColumn,
+    counterAlign,
+    primaryAlign,
+    formatWithJSX("gap", isJsx, node.itemSpacing),
+  ];
 };

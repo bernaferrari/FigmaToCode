@@ -25,6 +25,10 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
     node.type === "GROUP" || !("effects" in node) ? "" : getDecoration(node);
   const fSize = flutterSize(node);
   const isExpanded = fSize.isExpanded;
+  const clipBehavior =
+    "clipsContent" in node && node.clipsContent === true
+      ? "Clip.antiAlias"
+      : "";
 
   // todo Image & multiple fills
 
@@ -40,6 +44,7 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
       width: fSize.width,
       height: fSize.height,
       padding: propPadding,
+      clipBehavior: clipBehavior,
       decoration: skipDefaultProperty(propBoxDecoration, "ShapeDecoration()"),
       child: child,
     });
@@ -47,6 +52,7 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
     // if there is just a padding, add Padding
     result = generateWidgetCode("Padding", {
       padding: propPadding,
+      clipBehavior: clipBehavior,
       child: child,
     });
   } else {
@@ -81,16 +87,16 @@ const getDecoration = (node: SceneNode): string => {
   } else if (node.type === "ELLIPSE") {
     shapeDecorationBorder = generateOvalBorder(node);
   } else if ("strokeWeight" in node && node.strokeWeight !== figma.mixed) {
-    shapeDecorationBorder = generateRoundedRectangleBorder(node);
+    shapeDecorationBorder = skipDefaultProperty(
+      generateRoundedRectangleBorder(node),
+      "RoundedRectangleBorder()"
+    );
   }
 
   if (shapeDecorationBorder) {
     return generateWidgetCode("ShapeDecoration", {
       ...decorationBackground,
-      shape: skipDefaultProperty(
-        shapeDecorationBorder,
-        "RoundedRectangleBorder()"
-      ),
+      shape: shapeDecorationBorder,
       shadows: propBoxShadow,
     });
   }

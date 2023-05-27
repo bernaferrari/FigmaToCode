@@ -13,35 +13,35 @@ export const htmlSizePartial = (
     };
   }
 
-  const size = nodeWidthHeight(node, false);
+  const size = nodeWidthHeight(node);
 
   let w = "";
   if (typeof size.width === "number") {
-    w += formatWithJSX("width", isJsx, size.width);
-  } else if (size.width === "full") {
+    w = formatWithJSX("width", isJsx, size.width);
+  } else if (size.width === "fill") {
     if (
       node.parent &&
       "layoutMode" in node.parent &&
       node.parent.layoutMode === "HORIZONTAL"
     ) {
-      w += formatWithJSX("flex", isJsx, "1 1 0");
+      w = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
-      w += formatWithJSX("width", isJsx, "100%");
+      w = formatWithJSX("align-self", isJsx, "stretch");
     }
   }
 
   let h = "";
   if (typeof size.height === "number") {
-    h += formatWithJSX("height", isJsx, size.height);
+    h = formatWithJSX("height", isJsx, size.height);
   } else if (typeof size.height === "string") {
     if (
       node.parent &&
       "layoutMode" in node.parent &&
       node.parent.layoutMode === "VERTICAL"
     ) {
-      h += formatWithJSX("flex", isJsx, "1 1 0");
+      h = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
-      h += formatWithJSX("height", isJsx, "100%");
+      h = formatWithJSX("align-self", isJsx, "stretch");
     }
   }
 
