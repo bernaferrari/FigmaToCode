@@ -35,7 +35,9 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
       prop !== "parent" &&
       prop !== "children" &&
       prop !== "horizontalPadding" &&
-      prop !== "verticalPadding"
+      prop !== "verticalPadding" &&
+      prop !== "mainComponent" &&
+      prop !== "masterComponent"
     ) {
       cloned[prop as keyof T] = node[prop as keyof T];
     }

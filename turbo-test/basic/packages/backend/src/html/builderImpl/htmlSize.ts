@@ -24,7 +24,7 @@ export const htmlSizePartial = (
       "layoutMode" in node.parent &&
       node.parent.layoutMode === "HORIZONTAL"
     ) {
-      w += formatWithJSX("flex", isJsx, "1 1 0%");
+      w += formatWithJSX("flex", isJsx, "1 1 0");
     } else {
       w += formatWithJSX("width", isJsx, "100%");
     }
@@ -39,7 +39,7 @@ export const htmlSizePartial = (
       "layoutMode" in node.parent &&
       node.parent.layoutMode === "VERTICAL"
     ) {
-      h += formatWithJSX("flex", isJsx, "1 1 0%");
+      h += formatWithJSX("flex", isJsx, "1 1 0");
     } else {
       h += formatWithJSX("height", isJsx, "100%");
     }

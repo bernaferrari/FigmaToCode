@@ -1,5 +1,8 @@
 import { createFigma } from "figma-api-stub";
-import { frameNodeToAlt , convertSingleNodeToAlt } from "../../src/altNodes/altConversion";
+import {
+  frameNodeToAlt,
+  convertSingleNodeToAlt,
+} from "../../src/altNodes/altConversion";
 import { tailwindSize } from "../../src/tailwind/builderImpl/tailwindSize";
 import { tailwindMain } from "./../../src/tailwind/tailwindMain";
 import { AltFrameNode, AltRectangleNode } from "./../../src/altNodes/altMixins";

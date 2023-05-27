@@ -23,8 +23,6 @@ export const htmlMain = (
   showLayerName = layerName;
   isPreviewGlobal = isPreview;
 
-  console.log("HTML MAIN");
-
   let result = htmlWidgetGenerator(sceneNode, isJsx);
 
   // remove the initial \n that is made in Container.

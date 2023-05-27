@@ -1,4 +1,7 @@
-import { tailwindColorFromFills , tailwindGradientFromFills } from "../../../src/tailwind/builderImpl/tailwindColor";
+import {
+  tailwindColorFromFills,
+  tailwindGradientFromFills,
+} from "../../../src/tailwind/builderImpl/tailwindColor";
 import { AltRectangleNode, AltTextNode } from "../../../src/altNodes/altMixins";
 import { tailwindMain } from "./../../../src/tailwind/tailwindMain";
 describe("Tailwind Color", () => {

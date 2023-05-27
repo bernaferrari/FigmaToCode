@@ -8,6 +8,7 @@ export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
 export type PluginSettings = {
   framework: FrameworkTypes;
   jsx: boolean;
+  inlineStyle: boolean;
   optimize: boolean;
   layerName: boolean;
 };
@@ -137,6 +138,13 @@ export const preferenceOptions: LocalCodegenPreference[] = [
   },
   {
     itemType: "individual_select",
+    propertyName: "inlineStyle",
+    label: "Inline Style",
+    isDefault: true,
+    includedLanguages: ["HTML", "Tailwind"],
+  },
+  {
+    itemType: "individual_select",
     propertyName: "optimize",
     label: "Optimize Layout",
     isDefault: true,
@@ -203,14 +211,14 @@ export const CodeWindow = (props: {
         <div className="flex gap-2 flex-wrap">
           {preferenceOptions
             .filter((preference) =>
-              preference.includedLanguages?.includes("HTML")
+              preference.includedLanguages?.includes(props.selectedFramework)
             )
             .map((preference) => (
               <SelectableToggle
+                key={preference.propertyName}
                 title={preference.label}
                 isSelected={
-                  (props.preferences &&
-                    props.preferences[preference.propertyName]) ??
+                  props.preferences?.[preference.propertyName] ??
                   preference.isDefault
                 }
                 onSelect={(value) => {

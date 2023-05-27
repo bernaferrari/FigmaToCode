@@ -2,7 +2,10 @@ import {
   swiftuiBorder,
   swiftuiShapeStroke,
 } from "../../../src/swiftui/builderImpl/swiftuiBorder";
-import { AltRectangleNode , AltEllipseNode } from "../../../src/altNodes/altMixins";
+import {
+  AltRectangleNode,
+  AltEllipseNode,
+} from "../../../src/altNodes/altMixins";
 describe("SwiftUI Border", () => {
   // @ts-expect-error for some reason, need to override this for figma.mixed to work
   global.figma = {

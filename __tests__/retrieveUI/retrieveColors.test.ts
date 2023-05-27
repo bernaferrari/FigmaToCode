@@ -2,7 +2,11 @@ import {
   retrieveGenericLinearGradients,
   retrieveGenericSolidUIColors,
 } from "../../src/common/retrieveUI/retrieveColors";
-import { AltFrameNode, AltRectangleNode , AltTextNode } from "../../src/altNodes/altMixins";
+import {
+  AltFrameNode,
+  AltRectangleNode,
+  AltTextNode,
+} from "../../src/altNodes/altMixins";
 
 describe("Retrieve Colors for UI", () => {
   // @ts-expect-error for some reason, need to override this for figma.mixed to work

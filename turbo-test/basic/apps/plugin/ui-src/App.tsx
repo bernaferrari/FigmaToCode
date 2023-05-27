@@ -31,7 +31,6 @@ export default function App() {
             ...prevState,
             code: message.data,
             htmlPreview: message.htmlPreview,
-            preferences: message.preferences,
           }));
           break;
         case "pluginSettingChanged":

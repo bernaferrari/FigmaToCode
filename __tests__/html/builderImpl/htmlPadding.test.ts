@@ -1,4 +1,7 @@
-import { AltRectangleNode , AltFrameNode } from "../../../src/altNodes/altMixins";
+import {
+  AltRectangleNode,
+  AltFrameNode,
+} from "../../../src/altNodes/altMixins";
 import { htmlPadding } from "./../../../src/html/builderImpl/htmlPadding";
 
 describe("HTML padding", () => {

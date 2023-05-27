@@ -1,4 +1,6 @@
-import { AltEllipseNode, AltTextNode ,
+import {
+  AltEllipseNode,
+  AltTextNode,
   AltRectangleNode,
   AltFrameNode,
   AltGroupNode,

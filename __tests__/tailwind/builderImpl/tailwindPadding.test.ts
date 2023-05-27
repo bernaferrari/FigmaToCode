@@ -1,5 +1,8 @@
 import { tailwindPadding } from "../../../src/tailwind/builderImpl/tailwindPadding";
-import { AltRectangleNode , AltFrameNode } from "../../../src/altNodes/altMixins";
+import {
+  AltRectangleNode,
+  AltFrameNode,
+} from "../../../src/altNodes/altMixins";
 
 describe("Tailwind padding", () => {
   it("test tailwind padding", () => {

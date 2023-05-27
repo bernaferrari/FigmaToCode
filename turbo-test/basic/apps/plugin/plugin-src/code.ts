@@ -15,6 +15,7 @@ const defaultPluginSettings = {
   jsx: true,
   optimize: true,
   layerName: true,
+  inlineStyle: true,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
@@ -40,8 +41,6 @@ const getUserSettings = async () => {
       return validSettings;
     }, {} as Partial<PluginSettings>),
   };
-
-  console.log("returning ", updatedPluginSrcSettings);
 
   userPluginSettings = updatedPluginSrcSettings as PluginSettings;
 };
@@ -87,15 +86,8 @@ const standardMode = async () => {
         type: "pluginSettingChanged",
         data: userPluginSettings,
       });
+      safeRun(userPluginSettings);
     }
-    // if (msg.type === "tabChange") {
-    //   // get from storage
-    //   figma.clientStorage.setAsync("lastFrameworkSelected", {
-    //     value: msg.data,
-    //   });
-    //   userPluginSettings.framework = msg.data;
-    //   safeRun(userPluginSettings);
-    // }
   };
 };
 

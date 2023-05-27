@@ -2,7 +2,9 @@ import {
   AltRectangleNode,
   AltFrameNode,
   AltGroupNode,
- AltEllipseNode, AltTextNode } from "../../src/altNodes/altMixins";
+  AltEllipseNode,
+  AltTextNode,
+} from "../../src/altNodes/altMixins";
 import { TailwindDefaultBuilder } from "../../src/tailwind/tailwindDefaultBuilder";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { convertToAutoLayout } from "./../../src/altNodes/convertToAutoLayout";

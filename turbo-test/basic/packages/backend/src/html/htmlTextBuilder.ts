@@ -10,11 +10,36 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     super(node, showLayerName, optIsJSX);
   }
 
+  getCommonStyles(segment: StyledTextSegment) {
+    const color = htmlColorFromFills(segment.fills);
+    const textDecoration = this.getTextDecoration(segment.textDecoration);
+    const textTransform = this.getTextTransform(segment.textCase);
+    const lineHeightStyle = this.getLineHeightStyle(segment.lineHeight);
+    const letterSpacingStyle = this.getLetterSpacingStyle(
+      segment.letterSpacing
+    );
+
+    return [
+      `color: ${color}`,
+      `font-size: ${segment.fontSize}px`,
+      `font-family: ${segment.fontName.family}`,
+      `font-style: ${segment.fontName.style}`,
+      `font-weight: ${segment.fontWeight}`,
+      `text-decoration: ${textDecoration}`,
+      `text-transform: ${textTransform}`,
+      `word-wrap: break-word`,
+      lineHeightStyle,
+      letterSpacingStyle,
+    ].join("; ");
+  }
+
   getTextSegments(id: string): { style: string; text: string }[] {
     const segments = globalTextStyleSegments[id];
     if (!segments) {
       return [];
     }
+
+    const firstSegment = segments[0];
 
     return segments.map((segment) => {
       const color = htmlColorFromFills(segment.fills);

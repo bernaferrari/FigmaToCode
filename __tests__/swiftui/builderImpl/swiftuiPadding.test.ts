@@ -1,5 +1,8 @@
 import { swiftuiPadding } from "../../../src/swiftui/builderImpl/swiftuiPadding";
-import { AltRectangleNode , AltFrameNode } from "../../../src/altNodes/altMixins";
+import {
+  AltRectangleNode,
+  AltFrameNode,
+} from "../../../src/altNodes/altMixins";
 
 describe("SwiftUI padding", () => {
   it("test all possible variations", () => {

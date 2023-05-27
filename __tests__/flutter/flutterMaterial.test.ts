@@ -1,4 +1,8 @@
-import { AltFrameNode, AltEllipseNode , AltRectangleNode } from "../../src/altNodes/altMixins";
+import {
+  AltFrameNode,
+  AltEllipseNode,
+  AltRectangleNode,
+} from "../../src/altNodes/altMixins";
 import { flutterMaterial } from "../../src/flutter/flutterMaterial";
 
 describe("Flutter Material", () => {

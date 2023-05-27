@@ -3,7 +3,9 @@ import {
   AltRectangleNode,
   AltFrameNode,
   AltGroupNode,
- AltEllipseNode, AltTextNode } from "../../src/altNodes/altMixins";
+  AltEllipseNode,
+  AltTextNode,
+} from "../../src/altNodes/altMixins";
 import { swiftuiMain } from "./../../src/swiftui/swiftuiMain";
 
 describe("SwiftUI Main", () => {

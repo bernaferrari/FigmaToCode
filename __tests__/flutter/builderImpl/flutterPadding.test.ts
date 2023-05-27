@@ -1,4 +1,7 @@
-import { AltRectangleNode , AltFrameNode } from "../../../src/altNodes/altMixins";
+import {
+  AltRectangleNode,
+  AltFrameNode,
+} from "../../../src/altNodes/altMixins";
 import { flutterPadding } from "../../../src/flutter/builderImpl/flutterPadding";
 
 describe("Flutter Padding", () => {

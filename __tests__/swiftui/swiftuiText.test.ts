@@ -1,7 +1,10 @@
 import { swiftuiMain } from "../../src/swiftui/swiftuiMain";
 import { AltTextNode } from "../../src/altNodes/altMixins";
 import { SwiftuiTextBuilder } from "../../src/swiftui/swiftuiTextBuilder";
-import { swiftuiFontMatcher , swiftuiWeightMatcher } from "../../src/swiftui/builderImpl/swiftuiTextWeight";
+import {
+  swiftuiFontMatcher,
+  swiftuiWeightMatcher,
+} from "../../src/swiftui/builderImpl/swiftuiTextWeight";
 
 describe("SwiftUI Text", () => {
   // @ts-expect-error for some reason, need to override this for figma.mixed to work

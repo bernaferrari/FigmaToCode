@@ -1,5 +1,11 @@
 import { tailwindSize } from "../../src/tailwind/builderImpl/tailwindSize";
-import { AltFrameNode , AltGroupNode, AltRectangleNode , AltSceneNode, AltTextNode } from "../../src/altNodes/altMixins";
+import {
+  AltFrameNode,
+  AltGroupNode,
+  AltRectangleNode,
+  AltSceneNode,
+  AltTextNode,
+} from "../../src/altNodes/altMixins";
 import { tailwindMain } from "../../src/tailwind/tailwindMain";
 import { convertNodesOnRectangle } from "../../src/altNodes/convertNodesOnRectangle";
 
@@ -242,7 +248,7 @@ describe("convert node if child is big rect", () => {
     const pre_conv = convertNodesOnRectangle(group);
 
     // force Group removal. This is done automatically in AltConversion when executed in Figma.
-    const conv = pre_conv.children[0] ;
+    const conv = pre_conv.children[0];
     conv.parent = null;
 
     // counterAxisSizingMode is AUTO, therefore bg-black doesn't contain the size

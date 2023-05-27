@@ -1,9 +1,9 @@
-import { tailwindVisibility ,
+import {
+  tailwindVisibility,
   tailwindOpacity,
   tailwindRotation,
 } from "../../../src/tailwind/builderImpl/tailwindBlend";
 import { AltRectangleNode } from "../../../src/altNodes/altMixins";
-
 
 describe("Tailwind Blend", () => {
   const node = new AltRectangleNode();
