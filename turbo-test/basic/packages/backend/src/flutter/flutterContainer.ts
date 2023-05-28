@@ -12,7 +12,11 @@ import {
 } from "../common/numToAutoFixed";
 import { sliceNum } from "../common/numToAutoFixed";
 
-export const flutterContainer = (node: SceneNode, child: string): string => {
+export const flutterContainer = (
+  node: SceneNode,
+  child: string,
+  optimizeLayout: boolean
+): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -35,24 +39,25 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
   // [propPadding] will be "padding: const EdgeInsets.symmetric(...)" or ""
   let propPadding = "";
   if (node.type === "FRAME") {
-    propPadding = flutterPadding(node);
+    propPadding = flutterPadding(
+      (optimizeLayout ? node.inferredAutoLayout : null) ?? node
+    );
   }
 
   let result: string;
-  if (fSize.width || fSize.height || propBoxDecoration) {
+  if (fSize.width || fSize.height || propBoxDecoration || clipBehavior) {
     result = generateWidgetCode("Container", {
       width: fSize.width,
       height: fSize.height,
       padding: propPadding,
       clipBehavior: clipBehavior,
-      decoration: skipDefaultProperty(propBoxDecoration, "ShapeDecoration()"),
+      decoration: skipDefaultProperty(propBoxDecoration, "BoxDecoration()"),
       child: child,
     });
   } else if (propPadding) {
     // if there is just a padding, add Padding
     result = generateWidgetCode("Padding", {
       padding: propPadding,
-      clipBehavior: clipBehavior,
       child: child,
     });
   } else {
@@ -62,7 +67,6 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
   // Add Expanded() when parent is a Row/Column and width is full.
   if (isExpanded) {
     result = generateWidgetCode("Expanded", {
-      padding: propPadding,
       child: result,
     });
   }
@@ -101,14 +105,12 @@ const getDecoration = (node: SceneNode): string => {
     });
   }
 
-  // if ("strokes" in node && node.strokeWeight === figma.mixed) {
   return generateWidgetCode("BoxDecoration", {
     ...decorationBackground,
     borderRadius: propBorderRadius,
     border: flutterBorder(node),
     boxShadow: propBoxShadow,
   });
-  // }
 };
 
 const generateRoundedRectangleBorder = (

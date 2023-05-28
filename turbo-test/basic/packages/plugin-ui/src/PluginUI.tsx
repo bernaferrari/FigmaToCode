@@ -13,6 +13,7 @@ export type PluginSettings = {
   optimizeLayout: boolean;
   layerName: boolean;
   responsiveRoot: boolean;
+  flutterWithTemplate: boolean;
 };
 
 type PluginUIProps = {
@@ -137,6 +138,13 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     label: "React (JSX)",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "flutterWithTemplate",
+    label: "With Template",
+    isDefault: false,
+    includedLanguages: ["Flutter"],
   },
   // {
   //   itemType: "individual_select",

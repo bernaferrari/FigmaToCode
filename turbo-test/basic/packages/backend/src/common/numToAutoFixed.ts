@@ -61,3 +61,17 @@ export const generateWidgetCode = (
 
   return `${className}(\n${indentStringFlutter(propertiesArray.join("\n"))}\n)`;
 };
+
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
+
+export const replaceAllUtil = (str: string, find: string, replace: string) =>
+  str.replace(new RegExp(escapeRegExp(find), "g"), replace);
+
+export function className(name: string): string {
+  const cleanedName = name
+    .replace(/[^a-zA-Z0-9]+/g, "")
+    .replace(/^[0-9]+/g, "");
+  return cleanedName.charAt(0).toUpperCase() + cleanedName.slice(1);
+}

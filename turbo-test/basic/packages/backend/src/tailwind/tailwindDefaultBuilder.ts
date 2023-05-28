@@ -1,4 +1,4 @@
-import { sliceNum } from "./../common/numToAutoFixed";
+import { className, sliceNum } from "./../common/numToAutoFixed";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   tailwindVisibility,
@@ -32,7 +32,7 @@ export class TailwindDefaultBuilder {
     this.visible = node.visible;
 
     if (showLayerName) {
-      this.attributes.push(node.name.replace(" ", ""));
+      this.attributes.push(className(node.name));
     }
   }
 

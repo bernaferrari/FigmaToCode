@@ -17,6 +17,7 @@ const defaultPluginSettings: PluginSettings = {
   layerName: true,
   inlineStyle: true,
   responsiveRoot: false,
+  flutterWithTemplate: true,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
@@ -137,7 +138,7 @@ switch (figma.mode) {
           return [
             {
               title: `Flutter`,
-              code: flutterMain(convertedSelection, node.parent?.id, true),
+              code: flutterMain(convertedSelection, defaultPluginSettings),
               language: "SWIFT",
             },
           ];
@@ -161,7 +162,7 @@ switch (figma.mode) {
         },
         {
           title: `Flutter`,
-          code: flutterMain(convertedSelection, node.parent?.id, true),
+          code: flutterMain(convertedSelection, defaultPluginSettings),
           language: "SWIFT",
         },
         {

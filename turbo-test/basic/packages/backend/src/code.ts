@@ -18,6 +18,7 @@ export type PluginSettings = {
   optimizeLayout: boolean;
   layerName: boolean;
   responsiveRoot: boolean;
+  flutterWithTemplate: boolean;
 };
 
 export const run = (settings: PluginSettings) => {
@@ -41,7 +42,7 @@ export const run = (settings: PluginSettings) => {
       result = tailwindMain(convertedSelection, settings);
       break;
     case "Flutter":
-      result = flutterMain(convertedSelection, parentId, false);
+      result = flutterMain(convertedSelection, settings);
       break;
     case "SwiftUI":
       result = swiftuiMain(convertedSelection, parentId);

@@ -1,4 +1,4 @@
-import { formatMultipleJSX, formatWithJSX } from "../common/parseJSX";
+import { formatWithJSX } from "../common/parseJSX";
 import { htmlShadow } from "./builderImpl/htmlShadow";
 import {
   htmlVisibility,
@@ -13,6 +13,7 @@ import { htmlPadding } from "./builderImpl/htmlPadding";
 import { htmlSizePartial } from "./builderImpl/htmlSize";
 import { htmlBorderRadius } from "./builderImpl/htmlBorderRadius";
 import { commonIsAbsolutePosition } from "../common/commonPosition";
+import { className } from "../common/numToAutoFixed";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
@@ -24,7 +25,9 @@ export class HtmlDefaultBuilder {
     this.isJSX = optIsJSX;
     this.styles = [];
     this.visible = node.visible;
-    if (showLayerName) this.name = node.name.replace(" ", "");
+    if (showLayerName) {
+      this.name = className(node.name);
+    }
   }
 
   commonPositionStyles(

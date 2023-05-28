@@ -16,8 +16,8 @@ export class FlutterDefaultBuilder {
     this.child = optChild;
   }
 
-  createContainer(node: SceneNode): this {
-    this.child = flutterContainer(node, this.child);
+  createContainer(node: SceneNode, optimizeLayout: boolean): this {
+    this.child = flutterContainer(node, this.child, optimizeLayout);
     return this;
   }
 
@@ -28,8 +28,8 @@ export class FlutterDefaultBuilder {
     return this;
   }
 
-  position(node: SceneNode, rootParentId: string): this {
-    if (commonIsAbsolutePosition(node, rootParentId)) {
+  position(node: SceneNode, optimizeLayout: boolean): this {
+    if (commonIsAbsolutePosition(node, optimizeLayout)) {
       this.child = generateWidgetCode("Positioned", {
         left: node.x,
         top: node.y,

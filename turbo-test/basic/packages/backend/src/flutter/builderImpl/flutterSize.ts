@@ -11,15 +11,14 @@ export const flutterSizeWH = (node: SceneNode): string => {
 export const flutterSize = (
   node: SceneNode
 ): { width: string; height: string; isExpanded: boolean } => {
-  const size = nodeSize(node, false);
-
+  const size = nodeSize(node);
   let isExpanded: boolean = false;
 
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
   if (typeof size.width === "number") {
     propWidth = sliceNum(size.width);
-  } else if (size.width === "full") {
+  } else if (size.width === "fill") {
     // When parent is a Row, child must be Expanded.
     if (
       node.parent &&
@@ -35,7 +34,7 @@ export const flutterSize = (
   let propHeight = "";
   if (typeof size.height === "number") {
     propHeight = sliceNum(size.height);
-  } else if (size.height === "full") {
+  } else if (size.height === "fill") {
     // When parent is a Column, child must be Expanded.
     if (
       node.parent &&

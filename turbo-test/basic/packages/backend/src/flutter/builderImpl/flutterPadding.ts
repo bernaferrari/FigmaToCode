@@ -6,7 +6,7 @@ import {
 import { commonPadding } from "../../common/commonPadding";
 
 // This must happen before Stack or after the Positioned, but not before.
-export const flutterPadding = (node: SceneNode): string => {
+export const flutterPadding = (node: inferredAutoLayoutResult): string => {
   if (!("layoutMode" in node)) {
     return "";
   }
@@ -17,10 +17,10 @@ export const flutterPadding = (node: SceneNode): string => {
   }
 
   if ("all" in padding) {
-    if (padding.all === 0) {
-      return "";
-    }
-    return `const EdgeInsets.all(${sliceNum(padding.all)})`;
+    return skipDefaultProperty(
+      `const EdgeInsets.all(${sliceNum(padding.all)})`,
+      "const EdgeInsets.all(0)"
+    );
   }
 
   if ("horizontal" in padding) {
