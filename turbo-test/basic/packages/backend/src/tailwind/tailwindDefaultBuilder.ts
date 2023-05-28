@@ -158,8 +158,7 @@ export class TailwindDefaultBuilder {
 
   build(additionalAttr = ""): string {
     // this.attributes.unshift(this.name + additionalAttr);
-    this.attributes.push(additionalAttr);
-    this.attributes = this.attributes.filter((attr) => attr !== "");
+    this.addAttributes(additionalAttr);
 
     if (this.style.length > 0) {
       this.style = ` style="${this.style}"`;

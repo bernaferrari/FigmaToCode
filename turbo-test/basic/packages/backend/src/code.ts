@@ -48,7 +48,7 @@ export const run = (settings: PluginSettings) => {
       result = swiftuiMain(convertedSelection, parentId);
       break;
   }
-  console.log(result);
+  // console.log(result);
 
   figma.ui.postMessage({
     type: "code",

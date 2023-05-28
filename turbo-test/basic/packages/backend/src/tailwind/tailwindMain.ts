@@ -121,18 +121,14 @@ const tailwindFrame = (node: FrameNode, isJsx: boolean): string => {
   const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
 
   if (node.layoutMode !== "NONE") {
-    const rowColumn = Object.values(tailwindAutoLayoutProps(node, node)).join(
-      " "
-    );
+    const rowColumn = tailwindAutoLayoutProps(node, node);
     return tailwindContainer(node, childrenStr, rowColumn, isJsx);
   } else {
     if (
       globalLocalSettings.optimizeLayout &&
       node.inferredAutoLayout !== null
     ) {
-      const rowColumn = Object.values(
-        tailwindAutoLayoutProps(node, node.inferredAutoLayout)
-      ).join(" ");
+      const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
       return tailwindContainer(node, childrenStr, rowColumn, isJsx);
     }
 

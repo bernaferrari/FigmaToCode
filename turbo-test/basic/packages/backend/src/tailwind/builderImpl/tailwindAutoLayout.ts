@@ -45,10 +45,13 @@ const getFlex = (
 export const tailwindAutoLayoutProps = (
   node: SceneNode,
   autoLayout: inferredAutoLayoutResult
-): Record<string, string> => ({
-  flexDirection: getFlexDirection(autoLayout),
-  justifyContent: getJustifyContent(autoLayout),
-  alignItems: getAlignItems(autoLayout),
-  gap: getGap(autoLayout),
-  flex: getFlex(node, autoLayout),
-});
+): string =>
+  Object.values({
+    flexDirection: getFlexDirection(autoLayout),
+    justifyContent: getJustifyContent(autoLayout),
+    alignItems: getAlignItems(autoLayout),
+    gap: getGap(autoLayout),
+    flex: getFlex(node, autoLayout),
+  })
+    .filter((value) => value !== "")
+    .join(" ");

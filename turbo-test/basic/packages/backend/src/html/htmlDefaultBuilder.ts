@@ -49,7 +49,7 @@ export class HtmlDefaultBuilder {
   }
 
   addStyles = (...newStyles: string[]) => {
-    this.styles.push(...newStyles.filter((style) => style !== ""));
+    this.styles.push(...newStyles.filter((style) => style));
   };
 
   blend(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
@@ -179,13 +179,8 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  removeTrailingSpace(): this {
-    return this;
-  }
-
   build(additionalStyle: Array<string> = []): string {
     this.addStyles(...additionalStyle);
-    this.removeTrailingSpace();
 
     const formattedStyles = this.styles.map((s) => s.trim());
     let formattedStyle = "";
