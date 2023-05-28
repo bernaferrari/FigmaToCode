@@ -1,5 +1,4 @@
-import { formatWithJSX } from "../common/parseJSX";
-import { parentCoordinates } from "../common/parentCoordinates";
+import { sliceNum } from "./../common/numToAutoFixed";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   tailwindVisibility,
@@ -33,7 +32,7 @@ export class TailwindDefaultBuilder {
     this.visible = node.visible;
 
     if (showLayerName) {
-      this.name = `${node.name.replace(" ", "")}`;
+      this.attributes.push(node.name.replace(" ", ""));
     }
   }
 
@@ -51,6 +50,35 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
+  commonPositionStyles(
+    node: SceneNode &
+      SceneNodeMixin &
+      BlendMixin &
+      LayoutMixin &
+      MinimalBlendMixin,
+    optimizeLayout: boolean
+  ): this {
+    this.size(node);
+    this.autoLayoutPadding(node, optimizeLayout);
+    this.position(node, optimizeLayout);
+    this.blend(node);
+    return this;
+  }
+
+  commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): this {
+    this.customColor(node.fills, "bg");
+
+    if (node.type === "ELLIPSE") {
+      this.radiusEllipse(node);
+    } else {
+      this.radiusRectangle(node);
+    }
+
+    this.shadow(node);
+    this.border(node);
+    return this;
+  }
+
   radiusEllipse(node: SceneNode): this {
     if (node.type === "ELLIPSE") {
       this.addAttributes("rounded-full");
@@ -58,7 +86,7 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  radiusRectangle(node: SceneNode & CornerMixin & RectangleCornerMixin): this {
+  radiusRectangle(node: SceneNode): this {
     this.addAttributes(tailwindBorderRadius(node));
     return this;
   }
@@ -69,35 +97,14 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  position(node: SceneNode, parentId: string, isRelative = false): this {
-    if (commonIsAbsolutePosition(node, parentId)) {
-      this.style += formatWithJSX("left", this.isJSX, node.x);
-      this.style += formatWithJSX("top", this.isJSX, node.y);
-    } else {
-      // this.addAttributes(position);
+  position(node: SceneNode, optimizeLayout: boolean): this {
+    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+      this.addAttributes(
+        `left-[${sliceNum(node.x)}px]`,
+        `top-[${sliceNum(node.y)}px]`,
+        `absolute`
+      );
     }
-
-    // if (position === "absoluteManualLayout" && node.parent) {
-    //   // tailwind can't deal with absolute layouts.
-
-    //   if (!("x" in node.parent)) {
-    //     return this;
-    //   }
-
-    //   const [parentX, parentY] = parentCoordinates(node.parent);
-
-    //   const left = node.x - parentX;
-    //   const top = node.y - parentY;
-
-    //   this.style += formatWithJSX("left", this.isJSX, left);
-    //   this.style += formatWithJSX("top", this.isJSX, top);
-
-    //   if (!isRelative) {
-    //   }
-    // } else {
-    // this.addAttributes(position);
-    // }
-
     return this;
   }
 
@@ -136,65 +143,23 @@ export class TailwindDefaultBuilder {
   }
 
   // must be called before Position, because of the hasFixedSize attribute.
-  widthHeight(node: SceneNode): this {
-    // if current element is relative (therefore, children are absolute)
-    // or current element is one of the absoltue children and has a width or height > w/h-64
-
-    // if ("isRelative" in node && node.isRelative === true) {
-    //   this.style += htmlSizeForTailwind(node, this.isJSX);
-    // } else if (
-    //   // node.parent?.isRelative === true ||
-    //   node.width > 384 ||
-    //   node.height > 384
-    // ) {
-    // to avoid mixing html and tailwind sizing too much, only use html sizing when absolutely necessary.
-    // therefore, if only one attribute is larger than 256, only use the html size in there.
-    //   const [tailwindWidth, tailwindHeight] = tailwindSizePartial(node);
-    //   const [htmlWidth, htmlHeight] = htmlSizePartialForTailwind(
-    //     node,
-    //     this.isJSX
-    //   );
-
-    //   // when textAutoResize is NONE or WIDTH_AND_HEIGHT, it has a defined width.
-    //   if (node.type !== "TEXT" || node.textAutoResize !== "WIDTH_AND_HEIGHT") {
-    //     if (node.width > 384) {
-    //       this.style += htmlWidth;
-    //     } else {
-    //       this.attributes += tailwindWidth;
-    //     }
-
-    //     this.hasFixedSize = htmlWidth !== "";
-    //   }
-
-    //   // when textAutoResize is NONE has a defined height.
-    //   if (node.type !== "TEXT" || node.textAutoResize === "NONE") {
-    //     if (node.width > 384) {
-    //       this.style += htmlHeight;
-    //     } else {
-    //       this.attributes += tailwindHeight;
-    //     }
-
-    //     this.hasFixedSize = htmlHeight !== "";
-    //   }
-    // } else {
+  size(node: SceneNode): this {
     const { width, height } = tailwindSizePartial(node);
-
-    // Width
-    this.addAttributes(width);
-    this.addAttributes(height);
-
-    // this.hasFixedSize = tailwindWidth !== "" && tailwindHeight !== "";
-    // }
+    this.addAttributes(width, height);
     return this;
   }
 
-  autoLayoutPadding(node: BaseFrameMixin): this {
-    this.addAttributes(...tailwindPadding(node));
+  autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
+    if ("paddingLeft" in node) {
+      this.addAttributes(...tailwindPadding(node, optimizeLayout));
+    }
     return this;
   }
 
   build(additionalAttr = ""): string {
     // this.attributes.unshift(this.name + additionalAttr);
+    this.attributes.push(additionalAttr);
+    this.attributes = this.attributes.filter((attr) => attr !== "");
 
     if (this.style.length > 0) {
       this.style = ` style="${this.style}"`;

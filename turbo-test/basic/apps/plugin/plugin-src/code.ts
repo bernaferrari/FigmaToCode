@@ -10,12 +10,13 @@ import {
 
 let userPluginSettings: PluginSettings;
 
-const defaultPluginSettings = {
+const defaultPluginSettings: PluginSettings = {
   framework: "HTML",
   jsx: true,
-  optimize: true,
+  optimizeLayout: true,
   layerName: true,
   inlineStyle: true,
+  responsiveRoot: false,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
@@ -110,7 +111,7 @@ switch (figma.mode) {
           return [
             {
               title: `HTML`,
-              code: htmlMain(convertedSelection, node.parent?.id, true),
+              code: htmlMain(convertedSelection, defaultPluginSettings, true),
               language: "HTML",
             },
           ];
@@ -118,42 +119,17 @@ switch (figma.mode) {
           return [
             {
               title: `Whole Code`,
-              code: tailwindMain(
-                convertedSelection,
-                node.parent?.id,
-                true,
-                false
-              ),
-              language: "HTML",
-            },
-            {
-              title: `Layout`,
-              code: tailwindMain(
-                convertedSelection,
-                node.parent?.id,
-                true,
-                false
-              ),
+              code: tailwindMain(convertedSelection, defaultPluginSettings),
               language: "HTML",
             },
             {
               title: `Style`,
-              code: tailwindMain(
-                convertedSelection,
-                node.parent?.id,
-                true,
-                false
-              ),
+              code: tailwindMain(convertedSelection, defaultPluginSettings),
               language: "HTML",
             },
             {
               title: `Colors`,
-              code: tailwindMain(
-                convertedSelection,
-                node.parent?.id,
-                true,
-                false
-              ),
+              code: tailwindMain(convertedSelection, defaultPluginSettings),
               language: "HTML",
             },
           ];
@@ -180,7 +156,7 @@ switch (figma.mode) {
       const blocks: CodegenResult[] = [
         {
           title: `Tailwind Code`,
-          code: tailwindMain(convertedSelection, node.parent?.id, true, false),
+          code: tailwindMain(convertedSelection, defaultPluginSettings),
           language: "HTML",
         },
         {

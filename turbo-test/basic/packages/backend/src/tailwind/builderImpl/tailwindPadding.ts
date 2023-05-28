@@ -6,9 +6,12 @@ import { commonPadding } from "../../common/commonPadding";
  * example: px-2 py-8
  */
 export const tailwindPadding = (
-  node: BaseFrameMixin | DefaultShapeMixin
+  node: BaseFrameMixin,
+  optimizeLayout: boolean
 ): string[] => {
-  const padding = commonPadding(node);
+  const padding = commonPadding(
+    (optimizeLayout ? node.inferredAutoLayout : null) ?? node
+  );
   if (!padding) {
     return [];
   }

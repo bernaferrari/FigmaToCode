@@ -7,6 +7,7 @@ import {
 import { sliceNum } from "../../common/numToAutoFixed";
 import { flutterColorFromFills2 } from "./flutterColor";
 import { getStrokeAlign } from "../flutterContainer";
+import { getCommonRadius } from "../../common/commonRadius";
 
 // generate the border, when it exists
 export const flutterBorder = (node: SceneNode): string => {
@@ -71,38 +72,33 @@ export const flutterBorder = (node: SceneNode): string => {
 
 // retrieve the borderRadius, when existent (returns "" for EllipseNode)
 export const flutterBorderRadius = (node: SceneNode): string => {
-  if (
-    "cornerRadius" in node &&
-    node.cornerRadius &&
-    node.cornerRadius !== 0 &&
-    node.cornerRadius !== figma.mixed
-  ) {
+  const radius = getCommonRadius(node);
+  if ("all" in radius) {
     return skipDefaultProperty(
-      `BorderRadius.circular(${sliceNum(node.cornerRadius)})`,
+      `BorderRadius.circular(${sliceNum(radius.all)})`,
       "BorderRadius.circular(0)"
     );
-  } else if ("topLeftRadius" in node) {
-    return skipDefaultProperty(
-      generateWidgetCode("BorderRadius.only", {
-        topLeft: skipDefaultProperty(
-          `Radius.circular(${sliceNum(node.topLeftRadius)})`,
-          "Radius.circular(0)"
-        ),
-        topRight: skipDefaultProperty(
-          `Radius.circular(${sliceNum(node.topRightRadius)})`,
-          "Radius.circular(0)"
-        ),
-        bottomLeft: skipDefaultProperty(
-          `Radius.circular(${sliceNum(node.bottomLeftRadius)})`,
-          "Radius.circular(0)"
-        ),
-        bottomRight: skipDefaultProperty(
-          `Radius.circular(${sliceNum(node.bottomRightRadius)})`,
-          "Radius.circular(0)"
-        ),
-      }),
-      "BorderRadius.only()"
-    );
   }
-  return "";
+
+  return skipDefaultProperty(
+    generateWidgetCode("BorderRadius.only", {
+      topLeft: skipDefaultProperty(
+        `Radius.circular(${sliceNum(radius.topLeft)})`,
+        "Radius.circular(0)"
+      ),
+      topRight: skipDefaultProperty(
+        `Radius.circular(${sliceNum(radius.topRight)})`,
+        "Radius.circular(0)"
+      ),
+      bottomLeft: skipDefaultProperty(
+        `Radius.circular(${sliceNum(radius.bottomLeft)})`,
+        "Radius.circular(0)"
+      ),
+      bottomRight: skipDefaultProperty(
+        `Radius.circular(${sliceNum(radius.bottomRight)})`,
+        "Radius.circular(0)"
+      ),
+    }),
+    "BorderRadius.only()"
+  );
 };

@@ -104,7 +104,20 @@ export const commonPosition = (
   return "Absolute";
 };
 
-export const commonIsAbsolutePosition = (node: SceneNode) => {
+export const commonIsAbsolutePosition = (
+  node: SceneNode,
+  optimizeLayout: boolean
+) => {
+  // No position when parent is inferred auto layout.
+  if (
+    optimizeLayout &&
+    node.parent &&
+    "layoutMode" in node.parent &&
+    node.parent.inferredAutoLayout !== null
+  ) {
+    return this;
+  }
+
   if ("layoutAlign" in node) {
     if (!node.parent || node.parent === undefined) {
       return this;

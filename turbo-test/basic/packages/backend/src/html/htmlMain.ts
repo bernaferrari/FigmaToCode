@@ -3,8 +3,8 @@ import { indentString } from "../common/indentString";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { HtmlTextBuilder } from "./htmlTextBuilder";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
-
-let parentId = "";
+import { PluginSettings } from "../code";
+import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 
 let showLayerName = false;
 
@@ -12,18 +12,18 @@ const selfClosingTags = ["img"];
 
 export let isPreviewGlobal = false;
 
+let localSettings: PluginSettings;
+
 export const htmlMain = (
   sceneNode: Array<SceneNode>,
-  parentIdSrc: string = "",
-  isJsx: boolean = false,
-  layerName: boolean = false,
+  settings: PluginSettings,
   isPreview: boolean = false
 ): string => {
-  parentId = parentIdSrc;
-  showLayerName = layerName;
+  showLayerName = settings.layerName;
   isPreviewGlobal = isPreview;
+  localSettings = settings;
 
-  let result = htmlWidgetGenerator(sceneNode, isJsx);
+  let result = htmlWidgetGenerator(sceneNode, settings.jsx);
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -39,12 +39,8 @@ const htmlWidgetGenerator = (
   isJsx: boolean
 ): string => {
   let comp = "";
-
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
-
-  const sceneLen = visibleSceneNode.length;
-
   visibleSceneNode.forEach((node, index) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += htmlContainer(node, "", [], isJsx);
@@ -57,8 +53,6 @@ const htmlWidgetGenerator = (
     } else if (node.type === "LINE") {
       comp += htmlLine(node, isJsx);
     }
-
-    // comp += addSpacingIfNeeded(node, index, sceneLen, isJsx);
   });
 
   return comp;
@@ -81,7 +75,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
     node,
     showLayerName,
     isJsx
-  ).commonPositionStyles(node);
+  ).commonPositionStyles(node, localSettings.optimizeLayout);
 
   if (builder.styles) {
     const attr = builder.build([formatWithJSX("position", isJsx, "relative")]);
@@ -97,7 +91,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
 export const htmlText = (node: TextNode, isJsx: boolean): string => {
   let layoutBuilder = new HtmlTextBuilder(node, showLayerName, isJsx)
-    .commonPositionStyles(node)
+    .commonPositionStyles(node, localSettings.optimizeLayout)
     .textAlign(node)
     .textTransform(node);
 
@@ -139,9 +133,18 @@ const htmlFrame = (node: FrameNode, isJsx: boolean = false): string => {
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
 
   if (node.layoutMode !== "NONE") {
-    const rowColumn = rowColumnProps(node, isJsx);
+    const rowColumn = htmlAutoLayoutProps(node, node, isJsx);
     return htmlContainer(node, childrenStr, rowColumn, isJsx);
   } else {
+    if (localSettings.optimizeLayout && node.inferredAutoLayout !== null) {
+      const rowColumn = htmlAutoLayoutProps(
+        node,
+        node.inferredAutoLayout,
+        isJsx
+      );
+      return htmlContainer(node, childrenStr, rowColumn, isJsx);
+    }
+
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
     return htmlContainer(
@@ -173,7 +176,7 @@ export const htmlContainer = (
   }
 
   const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
-    .commonPositionStyles(node)
+    .commonPositionStyles(node, localSettings.optimizeLayout)
     .commonShapeStyles(node);
 
   // if (isInput) {
@@ -204,69 +207,8 @@ export const htmlContainer = (
 
 export const htmlLine = (node: LineNode, isJsx: boolean): string => {
   const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
-    .commonPositionStyles(node)
+    .commonPositionStyles(node, localSettings.optimizeLayout)
     .commonShapeStyles(node);
 
   return `\n<div${builder.build()}></div>`;
-};
-
-export const rowColumnProps = (node: FrameNode, isJsx: boolean): string[] => {
-  // ROW or COLUMN
-
-  // [optimization]
-  // flex, by default, has flex-row. Therefore, it can be omitted.
-  let rowOrColumn = "";
-  if (node.layoutMode === "VERTICAL") {
-    rowOrColumn = formatWithJSX("flex-direction", isJsx, "column");
-  }
-
-  let primaryAlign: string;
-  switch (node.primaryAxisAlignItems) {
-    case "MIN":
-      primaryAlign = "flex-start";
-      break;
-    case "CENTER":
-      primaryAlign = "center";
-      break;
-    case "MAX":
-      primaryAlign = "flex-end";
-      break;
-    case "SPACE_BETWEEN":
-      primaryAlign = "space-between";
-      break;
-  }
-  primaryAlign = formatWithJSX("justify-content", isJsx, primaryAlign);
-
-  let counterAlign: string = "";
-  switch (node.counterAxisAlignItems) {
-    case "MIN":
-      counterAlign = "flex-start";
-      break;
-    case "CENTER":
-      counterAlign = "center";
-      break;
-    case "MAX":
-      counterAlign = "flex-end";
-      break;
-    case "BASELINE":
-      break;
-  }
-  counterAlign = formatWithJSX("align-items", isJsx, counterAlign);
-
-  // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
-  let display =
-    node.parent &&
-    "layoutMode" in node.parent &&
-    node.parent.layoutMode === node.layoutMode
-      ? "flex"
-      : "inline-flex";
-  display = formatWithJSX("display", isJsx, display);
-
-  return [
-    display,
-    rowOrColumn,
-    counterAlign,
-    primaryAlign,
-    formatWithJSX("gap", isJsx, node.itemSpacing),
-  ];
 };

@@ -4,22 +4,19 @@ import { pxToLayoutSize } from "./conversionTables";
 import { tailwindVector } from "./vector";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+import { PluginSettings } from "../code";
+import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 
-let parentId = "";
-let showLayerName = false;
+let globalLocalSettings: PluginSettings;
 
 const selfClosingTags = ["img"];
 
 export const tailwindMain = (
   sceneNode: Array<SceneNode>,
-  parentIdSrc: string = "",
-  isJsx: boolean = false,
-  layerName: boolean = false
+  localSettings: PluginSettings
 ): string => {
-  parentId = parentIdSrc;
-  showLayerName = layerName;
-
-  let result = tailwindWidgetGenerator(sceneNode, isJsx);
+  globalLocalSettings = localSettings;
+  let result = tailwindWidgetGenerator(sceneNode, localSettings.jsx);
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -41,13 +38,7 @@ const tailwindWidgetGenerator = (
 
   visibleSceneNode.forEach((node) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += tailwindContainer(
-        node,
-        "",
-        "",
-        { isRelative: false, isInput: false },
-        isJsx
-      );
+      comp += tailwindContainer(node, "", "", isJsx);
     } else if (node.type === "GROUP") {
       comp += tailwindGroup(node, isJsx);
     } else if (node.type === "FRAME") {
@@ -71,14 +62,23 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
     return "";
   }
 
-  const vectorIfExists = tailwindVector(node, showLayerName, parentId, isJsx);
+  const vectorIfExists = tailwindVector(
+    node,
+    globalLocalSettings.layerName,
+    "",
+    isJsx
+  );
   if (vectorIfExists) return vectorIfExists;
 
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new TailwindDefaultBuilder(node, showLayerName, isJsx)
+  const builder = new TailwindDefaultBuilder(
+    node,
+    globalLocalSettings.layerName,
+    isJsx
+  )
     .blend(node)
-    .widthHeight(node)
-    .position(node, parentId);
+    .size(node)
+    .position(node, globalLocalSettings.optimizeLayout);
 
   if (builder.attributes || builder.style) {
     const attr = builder.build("relative");
@@ -92,9 +92,12 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
 };
 
 export const tailwindText = (node: TextNode, isJsx: boolean): string => {
-  let layoutBuilder = new TailwindTextBuilder(node, showLayerName, isJsx)
-    .blend(node)
-    .position(node, parentId)
+  let layoutBuilder = new TailwindTextBuilder(
+    node,
+    globalLocalSettings.layerName,
+    isJsx
+  )
+    .commonPositionStyles(node, globalLocalSettings.optimizeLayout)
     .textShapeSize(node)
     .textAlign(node)
     .textTransform(node);
@@ -111,49 +114,31 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
       .join("");
   }
 
-  return `\n<div${layoutBuilder.build()}>${content}</p>`;
+  return `\n<div${layoutBuilder.build()}>${content}</div>`;
 };
 
 const tailwindFrame = (node: FrameNode, isJsx: boolean): string => {
-  // const vectorIfExists = tailwindVector(node, isJsx);
-  // if (vectorIfExists) return vectorIfExists;
-
-  // if (
-  //   node.children.length === 1 &&
-  //   node.children[0].type === "TEXT" &&
-  //   node?.name?.toLowerCase().match("input")
-  // ) {
-  //   const [attr, char] = tailwindText(node.children[0], true, isJsx);
-  //   return tailwindContainer(
-  //     node,
-  //     ` placeholder="${char}"`,
-  //     attr,
-  //     { isRelative: false, isInput: true },
-  //     isJsx
-  //   );
-  // }
-
   const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
 
   if (node.layoutMode !== "NONE") {
-    const rowColumn = rowColumnProps(node);
-    return tailwindContainer(
-      node,
-      childrenStr,
-      rowColumn,
-      { isRelative: false, isInput: false },
-      isJsx
+    const rowColumn = Object.values(tailwindAutoLayoutProps(node, node)).join(
+      " "
     );
+    return tailwindContainer(node, childrenStr, rowColumn, isJsx);
   } else {
+    if (
+      globalLocalSettings.optimizeLayout &&
+      node.inferredAutoLayout !== null
+    ) {
+      const rowColumn = Object.values(
+        tailwindAutoLayoutProps(node, node.inferredAutoLayout)
+      ).join(" ");
+      return tailwindContainer(node, childrenStr, rowColumn, isJsx);
+    }
+
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return tailwindContainer(
-      node,
-      childrenStr,
-      "relative",
-      { isRelative: true, isInput: false },
-      isJsx
-    );
+    return tailwindContainer(node, childrenStr, "relative", isJsx);
   }
 };
 
@@ -163,10 +148,6 @@ export const tailwindContainer = (
   node: FrameNode | RectangleNode | EllipseNode,
   children: string,
   additionalAttr: string,
-  attr: {
-    isRelative: boolean;
-    isInput: boolean;
-  },
   isJsx: boolean
 ): string => {
   // ignore the view when size is zero or less
@@ -176,31 +157,13 @@ export const tailwindContainer = (
     return children;
   }
 
-  let builder = new TailwindDefaultBuilder(node, showLayerName, isJsx)
-    .blend(node)
-    .widthHeight(node);
-
-  if ("paddingLeft" in node) {
-    builder = builder.autoLayoutPadding(node);
-  }
-
-  builder = builder
-    .position(node, parentId, attr.isRelative)
-    .customColor(node.fills, "bg")
-    // TODO image and gradient support (tailwind does not support gradients)
-    .shadow(node)
-    .border(node);
-
-  if (node.type === "ELLIPSE") {
-    builder = builder.radiusEllipse(node);
-  } else {
-    builder = builder.radiusRectangle(node);
-  }
-
-  if (attr.isInput) {
-    // children before the > is not a typo.
-    return `\n<input${builder.build(additionalAttr)}${children}></input>`;
-  }
+  let builder = new TailwindDefaultBuilder(
+    node,
+    globalLocalSettings.layerName,
+    isJsx
+  )
+    .commonPositionStyles(node, globalLocalSettings.optimizeLayout)
+    .commonShapeStyles(node);
 
   if (builder.attributes || additionalAttr) {
     const build = builder.build(additionalAttr);
@@ -223,95 +186,4 @@ export const tailwindContainer = (
   }
 
   return children;
-};
-
-export const rowColumnProps = (node: FrameNode): string => {
-  // ROW or COLUMN
-
-  // ignore current node when it has only one child and it has the same size
-  if (
-    node.children.length === 1 &&
-    node.children[0].width === node.width &&
-    node.children[0].height === node.height
-  ) {
-    return "";
-  }
-
-  // [optimization]
-  // flex, by default, has flex-row. Therefore, it can be omitted.
-  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "" : "flex-col";
-
-  // https://tailwindcss.com/docs/space/
-  // space between items
-  const spacing = node.itemSpacing > 0 ? pxToLayoutSize(node.itemSpacing) : 0;
-  const spaceDirection = node.layoutMode === "HORIZONTAL" ? "x" : "y";
-
-  // space is visually ignored when there is only one child or spacing is zero
-  const space =
-    node.children.length > 1 // TODO figure if this is important: && spacing != "0"
-      ? `space-${spaceDirection}-${spacing} `
-      : "";
-
-  // special case when there is only one children; need to position correctly in Flex.
-  // let justify = "justify-center";
-  // if (node.children.length === 1) {
-  //   const nodeCenteredPosX = node.children[0].x + node.children[0].width / 2;
-  //   const parentCenteredPosX = node.width / 2;
-
-  //   const marginX = nodeCenteredPosX - parentCenteredPosX;
-
-  //   // allow a small threshold
-  //   if (marginX < -4) {
-  //     justify = "justify-start";
-  //   } else if (marginX > 4) {
-  //     justify = "justify-end";
-  //   }
-  // }
-  let primaryAlign: string;
-
-  switch (node.primaryAxisAlignItems) {
-    case "MIN":
-      primaryAlign = "justify-start";
-      break;
-    case "CENTER":
-      primaryAlign = "justify-center";
-      break;
-    case "MAX":
-      primaryAlign = "justify-end";
-      break;
-    case "SPACE_BETWEEN":
-      primaryAlign = "justify-between";
-      break;
-  }
-
-  // [optimization]
-  // when all children are STRETCH and layout is Vertical, align won't matter. Otherwise, center it.
-  let counterAlign: string = "";
-  switch (node.counterAxisAlignItems) {
-    case "MIN":
-      counterAlign = "items-start ";
-      break;
-    case "CENTER":
-      counterAlign = "items-center ";
-      break;
-    case "MAX":
-      counterAlign = "items-end ";
-      break;
-  }
-
-  // const layoutAlign =
-  //   node.layoutMode === "VERTICAL" &&
-  //   node.children.every((d) => d.layoutAlign === "STRETCH")
-  //     ? ""
-  //     : `items-center ${justify}`;
-
-  // if parent is a Frame with AutoLayout set to Vertical, the current node should expand
-  const flex =
-    node.parent &&
-    "layoutMode" in node.parent &&
-    node.parent.layoutMode === node.layoutMode
-      ? "flex"
-      : "inline-flex";
-
-  return `${flex}${rowOrColumn}${space}${counterAlign}${primaryAlign}`;
 };

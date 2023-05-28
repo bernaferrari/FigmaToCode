@@ -11,12 +11,14 @@ import { tailwindMain } from "./tailwind/tailwindMain";
 
 export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 
-export interface PluginSettings {
+export type PluginSettings = {
   framework: FrameworkTypes;
   jsx: boolean;
-  optimize: boolean;
+  inlineStyle: boolean;
+  optimizeLayout: boolean;
   layerName: boolean;
-}
+  responsiveRoot: boolean;
+};
 
 export const run = (settings: PluginSettings) => {
   // ignore when nothing was selected
@@ -27,19 +29,16 @@ export const run = (settings: PluginSettings) => {
     return;
   }
 
-  let isJsx = settings.jsx;
-  let layerName = settings.layerName;
-
   const firstSelection = figma.currentPage.selection[0];
   const parentId = firstSelection.parent?.id ?? "";
   const convertedSelection = convertIntoNodes([firstSelection], null);
   let result = "";
   switch (settings.framework) {
     case "HTML":
-      result = htmlMain(convertedSelection, parentId, isJsx, layerName);
+      result = htmlMain(convertedSelection, settings);
       break;
     case "Tailwind":
-      result = tailwindMain(convertedSelection, parentId, isJsx, layerName);
+      result = tailwindMain(convertedSelection, settings);
       break;
     case "Flutter":
       result = flutterMain(convertedSelection, parentId, false);
@@ -59,7 +58,14 @@ export const run = (settings: PluginSettings) => {
         width: node.width,
         height: node.height,
       }))[0],
-      content: htmlMain(convertedSelection, parentId, false, layerName, true),
+      content: htmlMain(
+        convertedSelection,
+        {
+          ...settings,
+          jsx: false,
+        },
+        true
+      ),
     },
   });
 

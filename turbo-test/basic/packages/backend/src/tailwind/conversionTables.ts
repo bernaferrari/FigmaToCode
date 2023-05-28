@@ -1,3 +1,5 @@
+import { sliceNum } from "../common/numToAutoFixed";
+
 export const nearestValue = (goal: number, array: Array<number>): number => {
   return array.reduce((prev, curr) => {
     return Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev;
@@ -74,21 +76,11 @@ const mapBorderRadius: Record<number, string> = {
 
 const mapWidthHeightSize: Record<number, string> = {
   // 0: "0",
-  0.125: "0.5",
-  0.25: "1",
-  0.375: "1.5",
   0.5: "2",
-  0.625: "2.5",
-  0.75: "3",
-  0.875: "3.5",
   1: "4",
-  1.25: "5",
   1.5: "6",
-  1.75: "7",
   2: "8",
-  2.25: "9",
   2.5: "10",
-  2.75: "11",
   3: "12",
   3.5: "14",
   4: "16",
@@ -100,13 +92,23 @@ const mapWidthHeightSize: Record<number, string> = {
   10: "40",
   11: "44",
   12: "48",
-  13: "52",
   14: "56",
-  15: "60",
   16: "64",
-  18: "72",
   20: "80",
   24: "96",
+  28: "112",
+  32: "128",
+  36: "144",
+  40: "160",
+  44: "176",
+  48: "192",
+  52: "208",
+  56: "224",
+  60: "240",
+  64: "256",
+  72: "288",
+  80: "320",
+  96: "384",
 };
 
 export const opacityValues = [
@@ -128,5 +130,9 @@ export const pxToFontSize = (value: number): string =>
 export const pxToBorderRadius = (value: number): string =>
   pixelToTailwindValue(value, mapBorderRadius);
 
-export const pxToLayoutSize = (value: number): string =>
-  pixelToTailwindValue(value, mapWidthHeightSize);
+export const pxToLayoutSize = (value: number): string => {
+  if (value > 384) {
+    return `[${sliceNum(value)}px]`;
+  }
+  return pixelToTailwindValue(value, mapWidthHeightSize);
+};

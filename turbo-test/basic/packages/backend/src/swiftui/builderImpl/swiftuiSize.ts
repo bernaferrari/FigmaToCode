@@ -1,8 +1,8 @@
-import { nodeWidthHeight } from "../../common/nodeWidthHeight";
+import { nodeSize } from "../../common/nodeWidthHeight";
 import { sliceNum } from "../../common/numToAutoFixed";
 
 export const swiftuiSize = (node: SceneNode): [string, string] => {
-  const size = nodeWidthHeight(node, false);
+  const size = nodeSize(node, false);
 
   // if width is set as maxWidth, height must also be set as maxHeight (not height)
   const shouldExtend = size.height === "full" || size.width === "full";

@@ -1,57 +1,46 @@
 import { pxToLayoutSize } from "../conversionTables";
-import { nodeWidthHeightTailwind } from "../../common/nodeWidthHeight";
+import { nodeSize } from "../../common/nodeWidthHeight";
 import { formatWithJSX } from "../../common/parseJSX";
 
 export const tailwindSizePartial = (
   node: SceneNode
 ): { width: string; height: string } => {
-  const size = nodeWidthHeightTailwind(node, true);
+  const size = nodeSize(node);
 
   let w = "";
   if (typeof size.width === "number") {
-    w += `w-${pxToLayoutSize(size.width)}`;
-  } else if (typeof size.width === "string") {
+    w = `w-${pxToLayoutSize(size.width)}`;
+  } else if (size.width === "fill") {
     if (
-      size.width === "full" &&
       node.parent &&
       "layoutMode" in node.parent &&
       node.parent.layoutMode === "HORIZONTAL"
     ) {
-      w += `flex-1`;
+      w = `grow shrink basis-0`;
     } else {
-      w += `w-${size.width}`;
+      w = `self-stretch`;
     }
   }
 
   let h = "";
-
   if (typeof size.height === "number") {
     h = `h-${pxToLayoutSize(size.height)}`;
-  } else if (typeof size.height === "string") {
+  } else if (size.height === "fill") {
     if (
-      size.height === "full" &&
+      size.height === "fill" &&
       node.parent &&
       "layoutMode" in node.parent &&
       node.parent.layoutMode === "VERTICAL"
     ) {
-      h += `flex-1`;
+      h = `grow shrink basis-0`;
     } else {
-      h += `h-${size.height}`;
+      h = `self-stretch`;
     }
   }
 
   return { width: w, height: h };
 };
 
-/**
- * https://www.w3schools.com/css/css_dimension.asp
- */
-export const htmlSizeForTailwind = (
-  node: SceneNode,
-  isJSX: boolean
-): string => {
-  return htmlSizePartialForTailwind(node, isJSX).join("");
-};
 
 export const htmlSizePartialForTailwind = (
   node: SceneNode,

@@ -37,13 +37,13 @@ export const tailwindSolidColor = (fill: SolidPaint, kind: string): string => {
   // example: text-opacity-50
   // ignore the 100. If opacity was changed, let it be visible.
   const opacityProp =
-    opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)} ` : "";
+    opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)}` : null;
 
   // example: text-red-500
   const colorProp = `${kind}-${getTailwindFromFigmaRGB(fill.color)}`;
 
   // if fill isn't visible, it shouldn't be painted.
-  return `${colorProp}${opacityProp}`;
+  return [colorProp, opacityProp].filter((d) => d).join(" ");
 };
 
 /**

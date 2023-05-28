@@ -5,12 +5,14 @@ import copy from "clipboard-copy";
 
 export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
 
+// This must be kept in sync with the backend.
 export type PluginSettings = {
   framework: FrameworkTypes;
   jsx: boolean;
   inlineStyle: boolean;
-  optimize: boolean;
+  optimizeLayout: boolean;
   layerName: boolean;
+  responsiveRoot: boolean;
 };
 
 type PluginUIProps = {
@@ -136,16 +138,23 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
+  // {
+  //   itemType: "individual_select",
+  //   propertyName: "inlineStyle",
+  //   label: "Inline Style",
+  //   isDefault: true,
+  //   includedLanguages: ["HTML"],
+  // },
+  // {
+  //   itemType: "individual_select",
+  //   propertyName: "responsiveRoot",
+  //   label: "Responsive Root",
+  //   isDefault: false,
+  //   includedLanguages: ["Tailwind"],
+  // },
   {
     itemType: "individual_select",
-    propertyName: "inlineStyle",
-    label: "Inline Style",
-    isDefault: true,
-    includedLanguages: ["HTML", "Tailwind"],
-  },
-  {
-    itemType: "individual_select",
-    propertyName: "optimize",
+    propertyName: "optimizeLayout",
     label: "Optimize Layout",
     isDefault: true,
     includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],

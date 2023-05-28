@@ -1,13 +1,14 @@
-import { sliceNum } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
 import { formatWithJSX } from "../../common/parseJSX";
 
-/**
- * https://tailwindcss.com/docs/margin/
- * example: px-2 py-8
- */
-export const htmlPadding = (node: BaseFrameMixin, isJsx: boolean): string[] => {
-  const padding = commonPadding(node);
+export const htmlPadding = (
+  node: BaseFrameMixin,
+  isJsx: boolean,
+  optimizeLayout: boolean
+): string[] => {
+  const padding = commonPadding(
+    (optimizeLayout ? node.inferredAutoLayout : null) ?? node
+  );
   if (padding === null) {
     return [];
   }

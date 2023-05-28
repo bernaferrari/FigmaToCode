@@ -1,4 +1,4 @@
-import { nodeWidthHeight } from "../../common/nodeWidthHeight";
+import { nodeSize } from "../../common/nodeWidthHeight";
 import { formatWithJSX } from "../../common/parseJSX";
 import { isPreviewGlobal } from "../htmlMain";
 
@@ -13,7 +13,8 @@ export const htmlSizePartial = (
     };
   }
 
-  const size = nodeWidthHeight(node);
+  const size = nodeSize(node);
+  console.log("size is", size);
 
   let w = "";
   if (typeof size.width === "number") {

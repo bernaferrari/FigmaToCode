@@ -1,4 +1,4 @@
-import { nodeWidthHeight } from "../../common/nodeWidthHeight";
+import { nodeSize } from "../../common/nodeWidthHeight";
 import { sliceNum } from "../../common/numToAutoFixed";
 
 // Used in tests.
@@ -11,7 +11,7 @@ export const flutterSizeWH = (node: SceneNode): string => {
 export const flutterSize = (
   node: SceneNode
 ): { width: string; height: string; isExpanded: boolean } => {
-  const size = nodeWidthHeight(node, false);
+  const size = nodeSize(node, false);
 
   let isExpanded: boolean = false;
 

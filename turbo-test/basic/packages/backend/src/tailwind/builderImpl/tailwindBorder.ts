@@ -1,3 +1,4 @@
+import { getCommonRadius } from "../../common/commonRadius";
 import { nearestValue, pxToBorderRadius } from "../conversionTables";
 
 /**
@@ -30,49 +31,36 @@ export const tailwindBorderWidth = (node: MinimalStrokesMixin): string => {
  * example: rounded-sm
  * example: rounded-tr-lg
  */
-export const tailwindBorderRadius = (
-  node: CornerMixin & RectangleCornerMixin & SceneNode
-): string => {
-  if (
-    (!("cornerRadius" in node) && !("topLeftRadius" in node)) ||
-    ("cornerRadius" in node &&
-      node.cornerRadius === figma.mixed &&
-      node.topLeftRadius === undefined) ||
-    ("cornerRadius" in node && node.cornerRadius === 0)
-  ) {
-    // the second condition is used on tests. On Figma, topLeftRadius is never undefined.
-    // ignore when 0, undefined or non existent
-    return "";
-  }
+export const tailwindBorderRadius = (node: SceneNode): string => {
+  const radius = getCommonRadius(node);
 
-  let comp = "";
+  if ("all" in radius) {
+    if (radius.all === 0) {
+      return "";
+    }
 
-  if (!("cornerRadius" in node)) {
-    return "";
-  }
-
-  if (node.cornerRadius !== figma.mixed) {
-    if (node.cornerRadius >= node.height / 2) {
+    if (radius.all >= node.height / 2) {
       // special case. If height is 90 and cornerRadius is 45, it is full.
-      comp += "rounded-full";
+      return "rounded-full";
     } else {
-      comp += `rounded${pxToBorderRadius(node.cornerRadius)}`;
-    }
-  } else {
-    // todo optimize for tr/tl/br/bl instead of t/r/l/b
-    if (node.topLeftRadius !== 0) {
-      comp += `rounded-tl${pxToBorderRadius(node.topLeftRadius)}`;
-    }
-    if (node.topRightRadius !== 0) {
-      comp += `rounded-tr${pxToBorderRadius(node.topRightRadius)}`;
-    }
-    if (node.bottomLeftRadius !== 0) {
-      comp += `rounded-bl${pxToBorderRadius(node.bottomLeftRadius)}`;
-    }
-    if (node.bottomRightRadius !== 0) {
-      comp += `rounded-br${pxToBorderRadius(node.bottomRightRadius)}`;
+      return `rounded${pxToBorderRadius(radius.all)}`;
     }
   }
 
-  return comp;
+  // todo optimize for tr/tl/br/bl instead of t/r/l/b
+  let comp: string[] = [];
+  if (radius.topLeft !== 0) {
+    comp.push(`rounded-tl${pxToBorderRadius(radius.topLeft)}`);
+  }
+  if (radius.topRight !== 0) {
+    comp.push(`rounded-tr${pxToBorderRadius(radius.topRight)}`);
+  }
+  if (radius.bottomLeft !== 0) {
+    comp.push(`rounded-bl${pxToBorderRadius(radius.bottomLeft)}`);
+  }
+  if (radius.bottomRight !== 0) {
+    comp.push(`rounded-br${pxToBorderRadius(radius.bottomRight)}`);
+  }
+
+  return comp.join(" ");
 };

@@ -24,6 +24,14 @@ export const formatWithJSX = (
   }
 };
 
+export const formatMultipleJSXArray = (
+  styles: Record<string, string | number>,
+  isJsx: boolean
+): string[] =>
+  Object.entries(styles)
+    .filter(([key, value]) => value !== "")
+    .map(([key, value]) => formatWithJSX(key, isJsx, value));
+
 export const formatMultipleJSX = (
   styles: Record<string, string | number>,
   isJsx: boolean

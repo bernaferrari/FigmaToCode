@@ -28,11 +28,12 @@ export class HtmlDefaultBuilder {
   }
 
   commonPositionStyles(
-    node: SceneNode & LayoutMixin & MinimalBlendMixin
+    node: SceneNode & LayoutMixin & MinimalBlendMixin,
+    optimizeLayout: boolean
   ): this {
     this.size(node);
-    this.autoLayoutPadding(node);
-    this.position(node);
+    this.autoLayoutPadding(node, optimizeLayout);
+    this.position(node, optimizeLayout);
     this.blend(node);
     return this;
   }
@@ -41,9 +42,6 @@ export class HtmlDefaultBuilder {
     this.customColor(node.fills, "background-color");
     this.shadow(node);
     this.border(node);
-    // if ("clipsContent" in node && node.clipsContent === true) {
-    //   this.addStyles(formatWithJSX("overflow", this.isJSX, "hidden"));
-    // }
     return this;
   }
 
@@ -93,8 +91,8 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  position(node: SceneNode): this {
-    if (commonIsAbsolutePosition(node)) {
+  position(node: SceneNode, optimizeLayout: boolean): this {
+    if (commonIsAbsolutePosition(node, optimizeLayout)) {
       this.addStyles(
         formatWithJSX("left", this.isJSX, node.x),
         formatWithJSX("top", this.isJSX, node.y),
@@ -171,9 +169,9 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  autoLayoutPadding(node: SceneNode): this {
+  autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
     if ("paddingLeft" in node) {
-      this.addStyles(...htmlPadding(node, this.isJSX));
+      this.addStyles(...htmlPadding(node, this.isJSX, optimizeLayout));
     }
     return this;
   }

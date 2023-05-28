@@ -12,7 +12,7 @@ type PaddingType =
     };
 
 export const commonPadding = (
-  node: BaseFrameMixin | DefaultShapeMixin
+  node: inferredAutoLayoutResult
 ): PaddingType | null => {
   if ("layoutMode" in node && node.layoutMode !== "NONE") {
     const paddingLeft = parseFloat((node.paddingLeft ?? 0).toFixed(2));
