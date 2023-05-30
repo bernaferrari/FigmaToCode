@@ -51,8 +51,6 @@ export const flutterMain = (
   localSettings = settings;
 
   let result = flutterWidgetGenerator(sceneNode);
-  // remove the last ','
-  result = result.slice(0, -1);
 
   if (localSettings.flutterWithTemplate) {
     return getTemplate(className(sceneNode[0].name), result);
@@ -99,17 +97,14 @@ const flutterWidgetGenerator = (
     }
   });
 
-  return comp.join(",\n") + ",";
+  return comp.join(",\n");
 };
 
 const flutterGroup = (node: GroupNode): string => {
   return flutterContainer(
     node,
     generateWidgetCode("Stack", {
-      children: `[\n${indentString(
-        flutterWidgetGenerator(node.children),
-        2
-      )}\n]`,
+      children: [flutterWidgetGenerator(node.children)],
     })
   );
 };
@@ -134,7 +129,7 @@ const flutterContainer = (
     });
 
     propChild = generateWidgetCode("Stack", {
-      children: `[\n${indentString(prop1 + prop2, 2)}\n]`,
+      children: [prop1, prop2],
     });
   } else if (child.length > 0) {
     propChild = child;
@@ -177,7 +172,7 @@ const flutterFrame = (node: FrameNode): string => {
     return flutterContainer(
       node,
       generateWidgetCode("Stack", {
-        children: `[\n${indentString(children, 2)}\n]`,
+        children: [children],
       })
     );
   }
@@ -195,7 +190,7 @@ const makeRowColumn = (
     // mainAxisSize: getFlex(node, autoLayout),
     mainAxisAlignment: getMainAxisAlignment(autoLayout),
     crossAxisAlignment: getCrossAxisAlignment(autoLayout),
-    children: `[\n${indentString(children, 2)}\n]`,
+    children: [children],
   };
 
   return generateWidgetCode(rowOrColumn, widgetProps);

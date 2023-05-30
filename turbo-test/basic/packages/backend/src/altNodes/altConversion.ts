@@ -138,11 +138,11 @@ export const convertIntoNodes = (
 
         return frameNodeTo(node, parent);
       case "GROUP":
-        // if (node.children.length === 1 && node.visible) {
-        //   // if Group is visible and has only one child, Group should disappear.
-        //   // there will be a single value anyway.
-        //   return convertIntoNodes(node.children, parent)[0];
-        // }
+        if (node.children.length === 1 && node.visible) {
+          // if Group is visible and has only one child, Group should disappear.
+          // there will be a single value anyway.
+          return convertIntoNodes(node.children, parent)[0];
+        }
 
         // TODO see if necessary.
         const iconToRect = iconToRectangle(node, parent);
@@ -151,6 +151,7 @@ export const convertIntoNodes = (
         }
 
         const clone = standardClone(node, parent);
+
         overrideReadonlyProperty(
           clone,
           "children",

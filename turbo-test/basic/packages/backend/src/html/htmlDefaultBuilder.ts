@@ -12,8 +12,12 @@ import {
 import { htmlPadding } from "./builderImpl/htmlPadding";
 import { htmlSizePartial } from "./builderImpl/htmlSize";
 import { htmlBorderRadius } from "./builderImpl/htmlBorderRadius";
-import { commonIsAbsolutePosition } from "../common/commonPosition";
+import {
+  commonIsAbsolutePosition,
+  getCommonPositionValue,
+} from "../common/commonPosition";
 import { className } from "../common/numToAutoFixed";
+import { PluginSettings } from "../code";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
@@ -41,7 +45,10 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): this {
+  commonShapeStyles(
+    node: GeometryMixin & SceneNode,
+    localSettings: PluginSettings
+  ): this {
     this.customColor(node.fills, "background-color");
     this.shadow(node);
     this.border(node);
@@ -96,9 +103,11 @@ export class HtmlDefaultBuilder {
 
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
+      const { x, y } = getCommonPositionValue(node);
+
       this.addStyles(
-        formatWithJSX("left", this.isJSX, node.x),
-        formatWithJSX("top", this.isJSX, node.y),
+        formatWithJSX("left", this.isJSX, x),
+        formatWithJSX("top", this.isJSX, y),
         formatWithJSX("position", this.isJSX, "absolute")
       );
     }
@@ -111,42 +120,58 @@ export class HtmlDefaultBuilder {
     property: "text" | "background-color"
   ): this {
     const fill = this.retrieveFill(paintArray);
+
     if (fill.kind === "solid") {
       const prop = property === "text" ? "color" : property;
       this.addStyles(formatWithJSX(prop, this.isJSX, fill.prop));
     } else if (fill.kind === "gradient") {
-      if (property === "background-color") {
-        this.addStyles(
-          formatWithJSX("background-image", this.isJSX, fill.prop)
-        );
-      } else if (property === "text") {
-        this.addStyles(
-          formatWithJSX("background", this.isJSX, fill.prop),
-          formatWithJSX("-webkit-background-clip", this.isJSX, "text"),
-          formatWithJSX("-webkit-text-fill-color", this.isJSX, "transparent")
-        );
-      }
+      this.applyGradientStyle(fill, property);
     }
+
     return this;
   }
 
-  retrieveFill = (
-    paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"]
-  ): { prop: string; kind: "solid" | "gradient" | "none" } => {
+  applyGradientStyle(
+    fill: { prop: string; kind: "solid" | "gradient" | "none" },
+    property: "text" | "background-color"
+  ) {
+    if (property === "background-color") {
+      this.addStyles(formatWithJSX("background-image", this.isJSX, fill.prop));
+    } else if (property === "text") {
+      this.addStyles(
+        formatWithJSX("background", this.isJSX, fill.prop),
+        formatWithJSX("-webkit-background-clip", this.isJSX, "text"),
+        formatWithJSX("-webkit-text-fill-color", this.isJSX, "transparent")
+      );
+    }
+  }
+
+  retrieveFill(paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"]): {
+    prop: string;
+    kind: "solid" | "gradient" | "none";
+  } {
     if (this.visible) {
       const gradient = htmlGradientFromFills(paintArray);
-      if (gradient) return { prop: gradient, kind: "gradient" };
+      if (gradient) {
+        return { prop: gradient, kind: "gradient" };
+      }
 
       const color = htmlColorFromFills(paintArray);
-      if (color) return { prop: color, kind: "solid" };
+      if (color) {
+        return { prop: color, kind: "solid" };
+      }
     }
     return { prop: "", kind: "none" };
-  };
+  }
 
-  shadow(node: BlendMixin): this {
-    const shadow = htmlShadow(node);
-    if (shadow) {
-      this.addStyles(formatWithJSX("box-shadow", this.isJSX, htmlShadow(node)));
+  shadow(node: SceneNode): this {
+    if ("effects" in node) {
+      const shadow = htmlShadow(node);
+      if (shadow) {
+        this.addStyles(
+          formatWithJSX("box-shadow", this.isJSX, htmlShadow(node))
+        );
+      }
     }
     return this;
   }

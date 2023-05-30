@@ -32,7 +32,10 @@ export const run = (settings: PluginSettings) => {
 
   const firstSelection = figma.currentPage.selection[0];
   const parentId = firstSelection.parent?.id ?? "";
-  const convertedSelection = convertIntoNodes([firstSelection], null);
+  const convertedSelection = convertIntoNodes(
+    figma.currentPage.selection,
+    null
+  );
   let result = "";
   switch (settings.framework) {
     case "HTML":

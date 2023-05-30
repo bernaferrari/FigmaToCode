@@ -1,4 +1,3 @@
-import { flutterPosition } from "./builderImpl/flutterPosition";
 import {
   flutterVisibility,
   flutterOpacity,
@@ -6,8 +5,11 @@ import {
 } from "./builderImpl/flutterBlend";
 
 import { flutterContainer } from "./flutterContainer";
-import { commonIsAbsolutePosition } from "../common/commonPosition";
-import { generateWidgetCode, sliceNum } from "../common/numToAutoFixed";
+import {
+  commonIsAbsolutePosition,
+  getCommonPositionValue,
+} from "../common/commonPosition";
+import { generateWidgetCode } from "../common/numToAutoFixed";
 
 export class FlutterDefaultBuilder {
   child: string;
@@ -30,15 +32,13 @@ export class FlutterDefaultBuilder {
 
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
+      const { x, y } = getCommonPositionValue(node);
       this.child = generateWidgetCode("Positioned", {
-        left: node.x,
-        top: node.y,
+        left: x,
+        top: y,
         child: this.child,
       });
     }
     return this;
-
-    // TODO see if necessary.
-    // return this.child = flutterPosition(node, this.child, parentId);
   }
 }

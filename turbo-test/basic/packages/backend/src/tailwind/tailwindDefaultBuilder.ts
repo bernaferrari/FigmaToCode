@@ -15,7 +15,10 @@ import {
 } from "./builderImpl/tailwindColor";
 import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
-import { commonIsAbsolutePosition } from "../common/commonPosition";
+import {
+  commonIsAbsolutePosition,
+  getCommonPositionValue,
+} from "../common/commonPosition";
 
 export class TailwindDefaultBuilder {
   attributes: string[] = [];
@@ -99,9 +102,10 @@ export class TailwindDefaultBuilder {
 
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
+      const { x, y } = getCommonPositionValue(node);
       this.addAttributes(
-        `left-[${sliceNum(node.x)}px]`,
-        `top-[${sliceNum(node.y)}px]`,
+        `left-[${sliceNum(x)}px]`,
+        `top-[${sliceNum(y)}px]`,
         `absolute`
       );
     }

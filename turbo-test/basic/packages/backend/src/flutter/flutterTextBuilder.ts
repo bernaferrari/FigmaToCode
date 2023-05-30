@@ -1,4 +1,8 @@
-import { generateWidgetCode, sliceNum } from "../common/numToAutoFixed";
+import {
+  generateWidgetCode,
+  skipDefaultProperty,
+} from "./../common/numToAutoFixed";
+import { sliceNum } from "../common/numToAutoFixed";
 import { convertFontWeight } from "../common/convertFontWeight";
 import { indentString } from "../common/indentString";
 import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
@@ -17,7 +21,44 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
   }
 
   createText(node: TextNode): this {
-    this.child = makeTextComponent(node);
+    let alignHorizontal =
+      node.textAlignHorizontal?.toString()?.toLowerCase() ?? "left";
+    alignHorizontal =
+      alignHorizontal === "justified" ? "justify" : alignHorizontal;
+
+    const textAlign =
+      alignHorizontal !== "left"
+        ? `\ntextAlign: TextAlign.${alignHorizontal},`
+        : "";
+
+    const segments = this.getTextSegments(node.id);
+
+    const basicTextStyle = {
+      textAlign: textAlign,
+    };
+
+    if (segments.length === 1) {
+      this.child = generateWidgetCode(
+        "Text",
+        {
+          ...basicTextStyle,
+          style: segments[0].style,
+        },
+        [`'${segments[0].text}'`]
+      );
+    } else {
+      this.child = generateWidgetCode("Text.rich", basicTextStyle, [
+        generateWidgetCode("TextSpan", {
+          children: segments.map((segment) =>
+            generateWidgetCode("TextSpan", {
+              text: `'${segment.text}'`,
+              style: segment.style,
+            })
+          ),
+        }),
+      ]);
+    }
+
     return this;
   }
 
@@ -29,30 +70,38 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
 
     return segments.map((segment) => {
       const color = flutterColorFromFills(segment.fills);
-      const textDecoration = this.getFlutterTextDecoration(
-        segment.textDecoration
-      );
+
       const fontSize = `${segment.fontSize}`;
       const fontStyle = "";
-      const fontFamily = segment.fontName.family;
+      const fontFamily = `'${segment.fontName.family}'`;
       const fontWeight = `FontWeight.w${segment.fontWeight}`;
       const textTransform = "";
       const lineHeight = this.getFlutterLineHeightStyle(segment.lineHeight);
       const letterSpacing = "";
 
       const style = generateWidgetCode("TextStyle", {
-        color,
+        color: color,
         fontSize: fontSize,
         fontStyle: fontStyle,
         fontFamily: fontFamily,
         fontWeight: fontWeight,
-        textDecoration: textDecoration,
+        textDecoration: skipDefaultProperty(
+          this.getFlutterTextDecoration(segment.textDecoration),
+          "TextDecoration.none"
+        ),
         textTransform: textTransform,
         lineHeight: lineHeight,
         letterSpacing: letterSpacing,
       });
 
-      return { style: style, text: segment.characters };
+      let text = segment.characters;
+      if (segment.textCase === "LOWER") {
+        text = text.toLowerCase();
+      } else if (segment.textCase === "UPPER") {
+        text = text.toUpperCase();
+      }
+
+      return { style: style, text: text };
     });
   }
 

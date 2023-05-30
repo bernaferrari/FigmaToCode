@@ -5,9 +5,9 @@ import {
   skipDefaultProperty,
 } from "./../../common/numToAutoFixed";
 import { sliceNum } from "../../common/numToAutoFixed";
-import { flutterColorFromFills2 } from "./flutterColor";
 import { getStrokeAlign } from "../flutterContainer";
 import { getCommonRadius } from "../../common/commonRadius";
+import { flutterColorFromFills } from "./flutterColor";
 
 // generate the border, when it exists
 export const flutterBorder = (node: SceneNode): string => {
@@ -21,7 +21,7 @@ export const flutterBorder = (node: SceneNode): string => {
   }
 
   const color = skipDefaultProperty(
-    flutterColorFromFills2(node.strokes),
+    flutterColorFromFills(node.strokes),
     "Colors.black"
   );
 

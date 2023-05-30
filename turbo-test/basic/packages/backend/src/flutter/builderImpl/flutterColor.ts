@@ -12,20 +12,6 @@ export const flutterColorFromFills = (
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
-    // todo maybe ignore text color when it is black?
-    const opacity = fill.opacity ?? 1.0;
-    return `color: ${flutterColor(fill.color, opacity)},`;
-  }
-
-  return "";
-};
-
-export const flutterColorFromFills2 = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): string => {
-  const fill = retrieveTopFill(fills);
-
-  if (fill && fill.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
     return flutterColor(fill.color, opacity);
   }

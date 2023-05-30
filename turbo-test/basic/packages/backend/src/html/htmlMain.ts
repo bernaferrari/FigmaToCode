@@ -42,6 +42,9 @@ const htmlWidgetGenerator = (
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
   visibleSceneNode.forEach((node, index) => {
+    // if (node.isAsset || ("isMask" in node && node.isMask === true)) {
+    //   comp += htmlAsset(node, isJsx);
+    // } else
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += htmlContainer(node, "", [], isJsx);
     } else if (node.type === "GROUP") {
@@ -52,6 +55,8 @@ const htmlWidgetGenerator = (
       comp += htmlText(node, isJsx);
     } else if (node.type === "LINE") {
       comp += htmlLine(node, isJsx);
+    } else if (node.type === "VECTOR") {
+      comp += htmlAsset(node, isJsx);
     }
   });
 
@@ -111,25 +116,6 @@ export const htmlText = (node: TextNode, isJsx: boolean): string => {
 };
 
 const htmlFrame = (node: FrameNode, isJsx: boolean = false): string => {
-  // const vectorIfExists = tailwindVector(node, isJsx);
-  // if (vectorIfExists) return vectorIfExists;
-
-  // if (
-  //   node.children.length === 1 &&
-  //   node.children[0].type === "TEXT" &&
-  //   node?.name?.toLowerCase().match("input")
-  // ) {
-  //   const isInput = true;
-  //   const [attr, char] = htmlText(node.children[0], isInput, isJsx);
-  //   return htmlContainer(
-  //     node,
-  //     ` placeholder="${char}"`,
-  //     [attr],
-  //     isJsx,
-  //     isInput
-  //   );
-  // }
-
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
 
   if (node.layoutMode !== "NONE") {
@@ -151,11 +137,28 @@ const htmlFrame = (node: FrameNode, isJsx: boolean = false): string => {
       node,
       childrenStr,
       [formatWithJSX("position", isJsx, "relative")],
-      isJsx,
-      false,
-      false
+      isJsx
     );
   }
+};
+
+export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
+  if (!("opacity" in node) || !("layoutAlign" in node) || !("fills" in node)) {
+    return "";
+  }
+
+  const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
+    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .commonShapeStyles(node, localSettings);
+
+  let tag = "div";
+  let src = "";
+  if (retrieveTopFill(node.fills)?.type === "IMAGE") {
+    tag = "img";
+    src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+  }
+
+  return `\n<${tag}${builder.build()}${src} />`;
 };
 
 // properties named propSomething always take care of ","
@@ -164,9 +167,7 @@ export const htmlContainer = (
   node: FrameNode | RectangleNode | EllipseNode,
   children: string,
   additionalStyles: string[] = [],
-  isJsx: boolean,
-  isInput: boolean = false,
-  isRelative: boolean = false
+  isJsx: boolean
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -178,10 +179,6 @@ export const htmlContainer = (
   const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .commonShapeStyles(node);
-
-  // if (isInput) {
-  //   return `\n<input${builder.build(additionalStyle)}${children}></input>`;
-  // }
 
   if (builder.styles || additionalStyles) {
     const build = builder.build(additionalStyles);

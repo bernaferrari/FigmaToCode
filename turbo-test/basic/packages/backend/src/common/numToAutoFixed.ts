@@ -36,30 +36,41 @@ export const propertyIfNotDefault = (
   return propertyValue;
 };
 
+type PropertyValueType = number | string | string[];
+
 export const generateWidgetCode = (
   className: string,
-  properties: Record<string, number | string>
+  properties: Record<string, PropertyValueType>,
+  positionedValues?: string[]
 ): string => {
   const propertiesArray = Object.entries(properties)
     .filter(([, value]) => value !== "")
     .map(([key, value]) => {
-      if (typeof value === "number") {
-        return `${key}: ${sliceNum(value)},`;
+      if (Array.isArray(value)) {
+        return `${key}: [\n${indentStringFlutter(value.join(",\n"))},\n],`;
+      } else {
+        return `${key}: ${
+          typeof value === "number" ? sliceNum(value) : value
+        },`;
       }
-      return `${key}: ${value},`;
     });
 
-  if (propertiesArray.length === 0) {
-    return `${className}()`;
+  const positionedValuesString = (positionedValues || [])
+    .map((value) => {
+      return typeof value === "number" ? sliceNum(value) : value;
+    })
+    .join(", ");
+
+  const compactPropertiesArray = propertiesArray.join(", ");
+  if (compactPropertiesArray.length < 40 && !positionedValues) {
+    return `${className}(${compactPropertiesArray.slice(0, -1)})`;
   }
 
-  const joined = propertiesArray.join(" ");
+  const joined = `${positionedValuesString}${
+    positionedValuesString ? ",\n" : ""
+  }${propertiesArray.join("\n")}`;
 
-  if (joined.length < 40) {
-    return `${className}(${joined.slice(0, -1)})`;
-  }
-
-  return `${className}(\n${indentStringFlutter(propertiesArray.join("\n"))}\n)`;
+  return `${className}(\n${indentStringFlutter(joined.trim())}\n)`;
 };
 
 function escapeRegExp(string: string) {
