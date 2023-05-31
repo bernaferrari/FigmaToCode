@@ -16,7 +16,7 @@ export const retrieveTailwindText = (
     if (node.type === "TEXT") {
       const attr = new TailwindTextBuilder(node, false, false)
         .blend(node)
-        .position(node, node.parent?.id ?? "")
+        .position(node, true)
         .textShapeSize(node)
         .fontSize(node)
         .fontStyle(node)

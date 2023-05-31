@@ -71,12 +71,14 @@ export const PluginUI = (props: PluginUIProps) => {
           </button>
         </div> */}
           {/* Code View */}
-          <CodeWindow
+          <CodePanel
             code={props.code}
             selectedFramework={props.selectedFramework}
             preferences={props.preferences}
             onPreferenceChange={props.onPreferenceChange}
           />
+
+          <ColorsPanel />
           <div className="text-xs">
             Other things go here, such as color, tokens, etc.
           </div>
@@ -172,12 +174,12 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     propertyName: "layerName",
     label: "Layer Names",
     isDefault: false,
-    includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
+    includedLanguages: ["HTML", "Tailwind", "SwiftUI"],
   },
   // Add your preferences data here
 ];
 
-export const CodeWindow = (props: {
+export const CodePanel = (props: {
   code: string;
   selectedFramework: FrameworkTypes;
   preferences: PluginSettings | null;
@@ -272,6 +274,47 @@ export const CodeWindow = (props: {
       </div>
     );
   }
+};
+
+export const ColorsPanel = (props: {
+  // colors: string;
+  // onColorClick: (color: string) => void;
+}) => {
+  return (
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="container mx-auto p-4">
+        <div className="flex flex-wrap items-start justify-between max-w-[200px]">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-gray-800 dark:text-gray-200 mb-2">Text</h2>
+            {["Button1", "Button2", "Button3"].map((button, idx) => (
+              <button
+                key={idx}
+                className="bg-white dark:bg-gray-800 p-2 mb-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 w-full transition"
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    Tt
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {button}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+          <div className="flex-none w-24">
+            <h2 className="text-gray-800 dark:text-gray-200 mb-2">Colors</h2>
+            {["Color1", "Color2", "Color3"].map((color, idx) => (
+              <div
+                key={idx}
+                className={`bg-${color.toLowerCase()} w-6 h-6 mb-2 rounded-full`}
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 type SelectableToggleProps = {

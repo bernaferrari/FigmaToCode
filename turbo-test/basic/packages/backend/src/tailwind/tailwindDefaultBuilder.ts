@@ -142,7 +142,7 @@ export class TailwindDefaultBuilder {
    * example: shadow
    */
   shadow(node: BlendMixin): this {
-    this.addAttributes(tailwindShadow(node));
+    this.addAttributes(...tailwindShadow(node));
     return this;
   }
 

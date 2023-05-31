@@ -12,7 +12,8 @@ export const flutterShadow = (node: SceneNode): string => {
       let boxShadow = "";
 
       visibleEffects.forEach((effect: Effect) => {
-        if (effect.type === "DROP_SHADOW" || effect.type === "INNER_SHADOW") {
+        if (effect.type === "DROP_SHADOW") {
+          //|| effect.type === "INNER_SHADOW"
           boxShadow += generateWidgetCode("BoxShadow", {
             color: `Color(0x${rgbTo8hex(
               effect.color,
@@ -27,7 +28,9 @@ export const flutterShadow = (node: SceneNode): string => {
         }
       });
 
-      propBoxShadow = `[\n${indentStringFlutter(boxShadow)}\n]`;
+      if (boxShadow) {
+        propBoxShadow = `[\n${indentStringFlutter(boxShadow)}\n]`;
+      }
     }
   }
   return propBoxShadow;

@@ -40,7 +40,7 @@ export const htmlColor = (color: RGB, alpha: number = 1): string => {
   const r = sliceNum(color.r * 255);
   const g = sliceNum(color.g * 255);
   const b = sliceNum(color.b * 255);
-  const a = sliceNum(alpha ?? 1);
+  const a = sliceNum(alpha);
 
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
@@ -57,18 +57,25 @@ export const htmlGradientFromFills = (
 
 // This was separated from htmlGradient because it is going to be used in the plugin UI and it wants all gradients, not only the top one.
 export const htmlGradient = (fill: GradientPaint): string => {
-  // add 90 to be correct in HTML.
+  // Adjust angle for HTML.
   const angle = (gradientAngle(fill) + 90).toFixed(0);
 
   const mappedFill = fill.gradientStops
-    .map((d) => {
-      // only add position to fractional
-      const position =
-        d.position > 0 && d.position < 1
-          ? ` ${(100 * d.position).toFixed(0)}%`
-          : "";
+    .map((stop, index, stops) => {
+      const alpha = (stop.color.a * (fill.opacity ?? 1)).toFixed(2);
+      const color = `rgba(${Math.round(stop.color.r * 255)}, ${Math.round(
+        stop.color.g * 255
+      )}, ${Math.round(stop.color.b * 255)}, ${alpha})`;
 
-      return `${htmlColor(d.color, d.color.a)}${position}`;
+      // Calculate position for all stops except the first and last ones.
+      const position =
+        index > 0 && index < stops.length - 1
+          ? ` ${(stop.position * 100).toFixed(0)}%`
+          : index === 0
+          ? " 0%"
+          : " 100%";
+
+      return `${color}${position}`;
     })
     .join(", ");
 
