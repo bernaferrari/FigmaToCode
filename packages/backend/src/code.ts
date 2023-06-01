@@ -18,7 +18,8 @@ export type PluginSettings = {
   optimizeLayout: boolean;
   layerName: boolean;
   responsiveRoot: boolean;
-  flutterWithTemplate: boolean;
+  flutterGenerationMode: string;
+  swiftUIGenerationMode: string;
 };
 
 export const run = (settings: PluginSettings) => {

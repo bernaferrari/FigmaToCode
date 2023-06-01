@@ -61,7 +61,7 @@ export const generateWidgetCode = (
     })
     .join(", ");
 
-  const compactPropertiesArray = propertiesArray.join(", ");
+  const compactPropertiesArray = propertiesArray.join(" ");
   if (compactPropertiesArray.length < 40 && !positionedValues) {
     return `${className}(${compactPropertiesArray.slice(0, -1)})`;
   }
@@ -83,11 +83,13 @@ export const replaceAllUtil = (str: string, find: string, replace: string) =>
 export function className(name: string): string {
   const words = name.split(/[^a-zA-Z0-9]+/);
   const camelCaseWords = words.map((word, index) => {
-    if (index === 0) return word.toLowerCase();
-    const cleanedWord = word.replace(/^[0-9]+/g, "");
-    return (
-      cleanedWord.charAt(0).toUpperCase() + cleanedWord.slice(1).toLowerCase()
-    );
+    if (index === 0) {
+      const cleanedWord = word.replace(/^[^a-zA-Z]+/g, "");
+      return (
+        cleanedWord.charAt(0).toUpperCase() + cleanedWord.slice(1).toLowerCase()
+      );
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
   });
   return camelCaseWords.join("");
 }

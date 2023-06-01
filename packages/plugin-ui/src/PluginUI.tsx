@@ -13,7 +13,8 @@ export type PluginSettings = {
   optimizeLayout: boolean;
   layerName: boolean;
   responsiveRoot: boolean;
-  flutterWithTemplate: boolean;
+  flutterGenerationMode: string;
+  swiftUIGenerationMode: string;
 };
 
 type PluginUIProps = {
@@ -26,7 +27,7 @@ type PluginUIProps = {
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
   preferences: PluginSettings | null;
-  onPreferenceChange: (key: string, value: boolean) => void;
+  onPreferenceChange: (key: string, value: boolean | string) => void;
 };
 
 export const PluginUI = (props: PluginUIProps) => {
@@ -112,7 +113,7 @@ type LocalCodegenPreference =
   //   }
   // | {
   //     itemType: "select";
-  //     propertyName: string;
+  //     propertyName: Exclude<keyof PluginSettings, "framework">;
   //     label: string;
   //     options: { label: string; value: string; isDefault?: boolean }[];
   //     includedLanguages?: FrameworkTypes[];
@@ -126,9 +127,12 @@ type LocalCodegenPreference =
   // |
   {
     itemType: "individual_select";
-    propertyName: Exclude<keyof PluginSettings, "framework">;
+    propertyName: Exclude<
+      keyof PluginSettings,
+      "framework" | "flutterGenerationMode"
+    >;
     label: string;
-    // value?: boolean;
+    value?: boolean;
     isDefault?: boolean;
     includedLanguages?: FrameworkTypes[];
   };
@@ -140,13 +144,6 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     label: "React (JSX)",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
-  },
-  {
-    itemType: "individual_select",
-    propertyName: "flutterWithTemplate",
-    label: "With Template",
-    isDefault: false,
-    includedLanguages: ["Flutter"],
   },
   // {
   //   itemType: "individual_select",
@@ -179,11 +176,41 @@ export const preferenceOptions: LocalCodegenPreference[] = [
   // Add your preferences data here
 ];
 
+const selectPreferenceOptions: {
+  itemType: "select";
+  propertyName: Exclude<keyof PluginSettings, "framework">;
+  label: string;
+  options: { label: string; value: string; isDefault?: boolean }[];
+  includedLanguages?: FrameworkTypes[];
+}[] = [
+  {
+    itemType: "select",
+    propertyName: "flutterGenerationMode",
+    label: "Mode",
+    options: [
+      { label: "Full App", value: "fullApp" },
+      { label: "Stateless", value: "stateless" },
+      { label: "Snippet", value: "snippet" },
+    ],
+    includedLanguages: ["Flutter"],
+  },
+  {
+    itemType: "select",
+    propertyName: "swiftUIGenerationMode",
+    label: "Mode",
+    options: [
+      { label: "Struct", value: "struct" },
+      { label: "Snippet", value: "snippet" },
+    ],
+    includedLanguages: ["SwiftUI"],
+  },
+];
+
 export const CodePanel = (props: {
   code: string;
   selectedFramework: FrameworkTypes;
   preferences: PluginSettings | null;
-  onPreferenceChange: (key: string, value: boolean) => void;
+  onPreferenceChange: (key: string, value: boolean | string) => void;
 }) => {
   const emptySelection = false;
   const [isPressed, setIsPressed] = useState(false);
@@ -207,6 +234,11 @@ export const CodePanel = (props: {
       </div>
     );
   } else {
+    const selectablePreferencesFiltered = selectPreferenceOptions.filter(
+      (preference) =>
+        preference.includedLanguages?.includes(props.selectedFramework)
+    );
+
     return (
       <div className="w-full">
         <div className="flex items-center justify-between space-x-2">
@@ -227,25 +259,69 @@ export const CodePanel = (props: {
           </button>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
-          {preferenceOptions
-            .filter((preference) =>
-              preference.includedLanguages?.includes(props.selectedFramework)
-            )
-            .map((preference) => (
-              <SelectableToggle
-                key={preference.propertyName}
-                title={preference.label}
-                isSelected={
-                  props.preferences?.[preference.propertyName] ??
-                  preference.isDefault
-                }
-                onSelect={(value) => {
-                  props.onPreferenceChange(preference.propertyName, value);
-                }}
-              />
-            ))}
+        <div className="flex gap-2 justify-center flex-col p-2 bg-black bg-opacity-25 rounded-lg text-sm">
+          <div className="flex gap-2 items-center flex-wrap">
+            {/* <span className="min-w-[60px] font-medium">Settings</span> */}
+
+            {preferenceOptions
+              .filter((preference) =>
+                preference.includedLanguages?.includes(props.selectedFramework)
+              )
+              .map((preference) => (
+                <SelectableToggle
+                  key={preference.propertyName}
+                  title={preference.label}
+                  isSelected={
+                    props.preferences?.[preference.propertyName] ??
+                    preference.isDefault
+                  }
+                  onSelect={(value) => {
+                    props.onPreferenceChange(preference.propertyName, value);
+                  }}
+                  buttonClass="bg-black dark:ring-green-800"
+                  checkClass="bg-black dark:bg-green-500 dark:border-green-500 ring-green-300"
+                />
+              ))}
+          </div>
+          {selectablePreferencesFiltered.length > 0 && (
+            <>
+              <div className="w-full h-px bg-white bg-opacity-25" />
+
+              <div className="flex gap-2 items-center flex-wrap">
+                {selectablePreferencesFiltered.map((preference) => (
+                  <>
+                    {/* <span className="min-w-[60px] font-medium">
+                      {preference.label}
+                    </span> */}
+                    {preference.options.map((option) => (
+                      <SelectableToggle
+                        key={option.label}
+                        title={option.label}
+                        isSelected={
+                          option.value ===
+                            props.preferences?.[preference.propertyName] ??
+                          option.isDefault
+                        }
+                        onSelect={() => {
+                          props.onPreferenceChange(
+                            preference.propertyName,
+                            option.value
+                          );
+                        }}
+                        buttonClass="bg-black dark:ring-blue-800"
+                        checkClass="bg-black dark:bg-blue-500 dark:border-blue-500 ring-blue-300"
+                      />
+                    ))}
+                  </>
+                ))}
+              </div>
+            </>
+          )}
         </div>
+
+        {/* <div className="h-2" />
+
+        <div className="flex gap-2 items-center p-2 flex-wrap bg-black bg-opacity-25 rounded-lg text-sm"></div> */}
 
         <div
           className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
@@ -329,12 +405,16 @@ type SelectableToggleProps = {
   onSelect: (isSelected: boolean) => void;
   isSelected?: boolean;
   title: string;
+  buttonClass: string;
+  checkClass: string;
 };
 
 const SelectableToggle = ({
   onSelect,
   isSelected = false,
   title,
+  buttonClass,
+  checkClass,
 }: SelectableToggleProps) => {
   const handleClick = () => {
     onSelect(!isSelected);
@@ -347,15 +427,13 @@ const SelectableToggle = ({
       hover:bg-neutral-200 dark:hover:bg-neutral-700 gap-2 text-sm ring-1 
       ${
         isSelected
-          ? "bg-black dark:ring-green-800"
+          ? buttonClass
           : "bg-neutral-100 dark:bg-neutral-800 dark:ring-neutral-700 ring-neutral-300"
       }`}
     >
       <span
         className={`h-3 w-3 flex-shrink-0 border-neutral-500 border-2 ${
-          isSelected
-            ? "bg-black dark:bg-green-500 dark:border-green-500 ring-green-300"
-            : "bg-transparent dark:border-neutral-500"
+          isSelected ? checkClass : "bg-transparent dark:border-neutral-500"
         }`}
         style={{
           borderRadius: 4,

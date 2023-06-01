@@ -11,7 +11,7 @@ import {
 
 let localSettings: PluginSettings;
 
-const getTemplate = (name: string, injectCode: string): string =>
+const getFullAppTemplate = (name: string, injectCode: string): string =>
   `import 'package:flutter/material.dart';
 
 void main() {
@@ -44,6 +44,14 @@ class ${name} extends StatelessWidget {
   }
 }`;
 
+const getStatelessTemplate = (name: string, injectCode: string): string =>
+  `class ${name} extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ${indentString(injectCode, 4).trimStart()};
+  }
+}`;
+
 export const flutterMain = (
   sceneNode: ReadonlyArray<SceneNode>,
   settings: PluginSettings
@@ -51,9 +59,15 @@ export const flutterMain = (
   localSettings = settings;
 
   let result = flutterWidgetGenerator(sceneNode);
-
-  if (localSettings.flutterWithTemplate) {
-    return getTemplate(className(sceneNode[0].name), result);
+  switch (localSettings.flutterGenerationMode) {
+    case "widget":
+      return result;
+    case "fullApp":
+      result = generateWidgetCode("Column", { children: [result] });
+      return getFullAppTemplate(className(sceneNode[0].name), result);
+    case "stateless":
+      result = generateWidgetCode("Column", { children: [result] });
+      return getStatelessTemplate(className(sceneNode[0].name), result);
   }
 
   return result;

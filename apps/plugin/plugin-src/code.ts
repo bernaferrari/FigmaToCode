@@ -17,7 +17,8 @@ const defaultPluginSettings: PluginSettings = {
   layerName: true,
   inlineStyle: true,
   responsiveRoot: false,
-  flutterWithTemplate: true,
+  flutterGenerationMode: "snippet",
+  swiftUIGenerationMode: "snippet",
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
@@ -178,7 +179,7 @@ switch (figma.mode) {
               title: `Code`,
               code: flutterMain(convertedSelection, {
                 ...defaultPluginSettings,
-                flutterWithTemplate: false,
+                flutterGenerationMode: "snippet",
               }),
               language: "SWIFT",
             },
