@@ -17,7 +17,6 @@ import {
   getCommonPositionValue,
 } from "../common/commonPosition";
 import { className } from "../common/numToAutoFixed";
-import { PluginSettings } from "../code";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
@@ -45,10 +44,7 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  commonShapeStyles(
-    node: GeometryMixin & SceneNode,
-    localSettings: PluginSettings
-  ): this {
+  commonShapeStyles(node: GeometryMixin & SceneNode): this {
     this.customColor(node.fills, "background-color");
     this.shadow(node);
     this.border(node);

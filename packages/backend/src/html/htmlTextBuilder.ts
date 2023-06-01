@@ -2,6 +2,7 @@ import { formatMultipleJSX, formatWithJSX } from "../common/parseJSX";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { htmlColorFromFills } from "./builderImpl/htmlColor";
+import { sliceNum } from "../common/numToAutoFixed";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
   constructor(node: TextNode, showLayerName: boolean, optIsJSX: boolean) {
@@ -18,7 +19,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       const styleAttributes = formatMultipleJSX(
         {
           color: htmlColorFromFills(segment.fills),
-          "font-size": segment.fontSize,
+          "font-size": sliceNum(segment.fontSize),
           "font-family": segment.fontName.family,
           "font-style": this.getFontStyle(segment.fontName.style),
           "font-weight": `${segment.fontWeight}`,
@@ -35,7 +36,8 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
         this.isJSX
       );
 
-      return { style: styleAttributes, text: segment.characters };
+      const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
+      return { style: styleAttributes, text: charsWithLineBreak };
     });
   }
 
@@ -68,18 +70,18 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       case "AUTO":
         return "normal";
       case "PIXELS":
-        return lineHeight.value;
+        return sliceNum(lineHeight.value);
       case "PERCENT":
-        return `${lineHeight.value}%`;
+        return `${sliceNum(lineHeight.value)}%`;
     }
   };
 
   getLetterSpacingStyle = (letterSpacing: LetterSpacing, fontSize: number) => {
     switch (letterSpacing.unit) {
       case "PIXELS":
-        return letterSpacing.value;
+        return sliceNum(letterSpacing.value);
       case "PERCENT":
-        return (fontSize * letterSpacing.value) / 100;
+        return sliceNum((fontSize * letterSpacing.value) / 100);
     }
   };
 

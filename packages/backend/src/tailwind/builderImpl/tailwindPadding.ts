@@ -40,9 +40,9 @@ export const tailwindPadding = (
     const pl = left ? `pl-${pxToLayoutSize(left)}` : "";
     const pr = right ? `pr-${pxToLayoutSize(right)}` : "";
     comp.push(
-      left && right && pxToLayoutSize(left) === pxToLayoutSize(right)
-        ? `px-${pxToLayoutSize(left)}`
-        : `${pl} ${pr}`
+      ...(left && right && pxToLayoutSize(left) === pxToLayoutSize(right)
+        ? [`px-${pxToLayoutSize(left)}`]
+        : [pl, pr])
     );
   }
 
@@ -50,9 +50,9 @@ export const tailwindPadding = (
     const pt = top ? `pt-${pxToLayoutSize(top)}` : "";
     const pb = bottom ? `pb-${pxToLayoutSize(bottom)}` : "";
     comp.push(
-      top && bottom && pxToLayoutSize(top) === pxToLayoutSize(bottom)
-        ? `py-${pxToLayoutSize(top)}`
-        : `${pt} ${pb}`
+      ...(top && bottom && pxToLayoutSize(top) === pxToLayoutSize(bottom)
+        ? [`py-${pxToLayoutSize(top)}`]
+        : [pt, pb])
     );
   }
 

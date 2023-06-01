@@ -81,8 +81,13 @@ export const replaceAllUtil = (str: string, find: string, replace: string) =>
   str.replace(new RegExp(escapeRegExp(find), "g"), replace);
 
 export function className(name: string): string {
-  const cleanedName = name
-    .replace(/[^a-zA-Z0-9]+/g, "")
-    .replace(/^[0-9]+/g, "");
-  return cleanedName.charAt(0).toUpperCase() + cleanedName.slice(1);
+  const words = name.split(/[^a-zA-Z0-9]+/);
+  const camelCaseWords = words.map((word, index) => {
+    if (index === 0) return word.toLowerCase();
+    const cleanedWord = word.replace(/^[0-9]+/g, "");
+    return (
+      cleanedWord.charAt(0).toUpperCase() + cleanedWord.slice(1).toLowerCase()
+    );
+  });
+  return camelCaseWords.join("");
 }

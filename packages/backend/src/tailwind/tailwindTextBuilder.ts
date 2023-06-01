@@ -5,17 +5,10 @@ import {
 } from "../common/commonTextHeightSpacing";
 import { tailwindColorFromFills } from "./builderImpl/tailwindColor";
 import { tailwindSizePartial } from "./builderImpl/tailwindSize";
-import {
-  pxToLetterSpacing,
-  pxToLineHeight,
-  pxToFontSize,
-} from "./conversionTables";
+import { pxToLetterSpacing, pxToLineHeight } from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
-  // constructor(node: TextNode, showLayerName: boolean, optIsJSX: boolean) {
-  //   super(node, showLayerName, optIsJSX);
-  // }
   getTextSegments(id: string): { style: string; text: string }[] {
     const segments = globalTextStyleSegments[id];
     if (!segments) {
@@ -24,15 +17,15 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
 
     return segments.map((segment) => {
       const color = this.getTailwindColorFromFills(segment.fills);
-      const textDecoration = this.getTailwindTextDecoration(
-        segment.textDecoration
-      );
+      const textDecoration = this.textDecoration(segment.textDecoration);
       const textTransform = this.getTailwindTextTransform(segment.textCase);
-      const lineHeightStyle = this.getTailwindLineHeightStyle(
-        segment.lineHeight
+      const lineHeightStyle = this.lineHeight(
+        segment.lineHeight,
+        segment.fontSize
       );
-      const letterSpacingStyle = this.getTailwindLetterSpacingStyle(
-        segment.letterSpacing
+      const letterSpacingStyle = this.letterSpacing(
+        segment.letterSpacing,
+        segment.fontSize
       );
       const fontSizeStyle = this.getTailwindFontSizeStyle(segment.fontSize);
       const fontWeightStyle = this.getTailwindFontWeightStyle(
@@ -55,7 +48,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         .filter((d) => d !== "")
         .join(" ");
 
-      return { style: styleClasses, text: segment.characters };
+      const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
+      return { style: styleClasses, text: charsWithLineBreak };
     });
   }
 
@@ -68,33 +62,12 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     return tailwindColorFromFills(fills, "text");
   };
 
-  getTailwindTextDecoration = (textDecoration: string) => {
-    return textDecoration === "STRIKETHROUGH"
-      ? "line-through"
-      : textDecoration === "UNDERLINE"
-      ? "underline"
-      : "no-underline";
-  };
-
   getTailwindTextTransform = (textCase: string) => {
     return textCase === "UPPER"
       ? "uppercase"
       : textCase === "LOWER"
       ? "lowercase"
       : "capitalize";
-  };
-
-  getTailwindLineHeightStyle = (lineHeight: any) => {
-    // Convert lineHeight to the appropriate Tailwind CSS class.
-    // This can be based on your project's configuration and lineHeight scale.
-    // For example, suppose your project uses the default Tailwind CSS lineHeight scale:
-    if (lineHeight.unit === "AUTO") {
-      return "leading-normal";
-    } else if (lineHeight.unit === "PIXELS") {
-      return `leading-${lineHeight.value}px`;
-    } else if (lineHeight.unit === "PERCENT") {
-      return `leading-${lineHeight.value}%`;
-    }
   };
 
   getTailwindLetterSpacingStyle = (letterSpacing: any) => {
@@ -153,15 +126,12 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/font-size/
    * example: text-md
    */
-  fontSize(node: TextNode): this {
-    // example: text-md
-    if (node.fontSize !== figma.mixed) {
-      const value = pxToFontSize(node.fontSize);
-      this.addAttributes(`text-${value}`);
-    }
-
-    return this;
-  }
+  // fontSize(fontSize: number): this {
+  //   // example: text-md
+  //   const value = pxToFontSize(fontSize);
+  //   this.addAttributes(`text-${value}`);
+  //   return this;
+  // }
 
   /**
    * https://tailwindcss.com/docs/font-style/
@@ -195,10 +165,10 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/letter-spacing/
    * example: tracking-widest
    */
-  letterSpacing(node: TextNode): this {
-    const letterSpacing = commonLetterSpacing(node);
-    if (letterSpacing > 0) {
-      const value = pxToLetterSpacing(letterSpacing);
+  letterSpacing(letterSpacing: LetterSpacing, fontSize: number): this {
+    const letterSpacingProp = commonLetterSpacing(letterSpacing, fontSize);
+    if (letterSpacingProp > 0) {
+      const value = pxToLetterSpacing(letterSpacingProp);
       this.addAttributes(`tracking-${value}`);
     }
 
@@ -209,10 +179,10 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/line-height/
    * example: leading-3
    */
-  lineHeight(node: TextNode): this {
-    const lineHeight = commonLineHeight(node);
-    if (lineHeight > 0) {
-      const value = pxToLineHeight(lineHeight);
+  lineHeight(lineHeight: LineHeight, fontSize: number): this {
+    const lineHeightProp = commonLineHeight(lineHeight, fontSize);
+    if (lineHeightProp > 0) {
+      const value = pxToLineHeight(lineHeightProp);
       this.addAttributes(`leading-${value}`);
     }
 
@@ -269,13 +239,17 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/text-decoration/
    * example: underline
    */
-  textDecoration(node: TextNode): this {
-    if (node.textDecoration === "UNDERLINE") {
-      this.addAttributes("underline");
-    } else if (node.textDecoration === "STRIKETHROUGH") {
-      this.addAttributes("line-through");
+  textDecoration(textDecoration: TextDecoration): this {
+    switch (textDecoration) {
+      case "NONE":
+        break;
+      case "STRIKETHROUGH":
+        this.addAttributes("line-through");
+        break;
+      case "UNDERLINE":
+        this.addAttributes("underline");
+        break;
     }
-
     return this;
   }
 

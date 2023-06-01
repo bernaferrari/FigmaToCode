@@ -12,7 +12,7 @@ let userPluginSettings: PluginSettings;
 
 const defaultPluginSettings: PluginSettings = {
   framework: "HTML",
-  jsx: true,
+  jsx: false,
   optimizeLayout: true,
   layerName: true,
   inlineStyle: true,
@@ -93,7 +93,7 @@ const standardMode = async () => {
 
 switch (figma.mode) {
   case "default":
-  case "panel":
+  case "inspect":
     standardMode();
     break;
   case "codegen":
@@ -109,34 +109,77 @@ switch (figma.mode) {
         case "html":
           return [
             {
-              title: `HTML`,
-              code: htmlMain(convertedSelection, defaultPluginSettings, true),
+              title: `Code`,
+              code: htmlMain(
+                convertedSelection,
+                { ...defaultPluginSettings, jsx: false },
+                true
+              ),
+              language: "HTML",
+            },
+          ];
+        case "html_jsx":
+          return [
+            {
+              title: `Code`,
+              code: htmlMain(
+                convertedSelection,
+                { ...defaultPluginSettings, jsx: true },
+                true
+              ),
               language: "HTML",
             },
           ];
         case "tailwind":
           return [
             {
-              title: `Whole Code`,
-              code: tailwindMain(convertedSelection, defaultPluginSettings),
+              title: `Code`,
+              code: tailwindMain(convertedSelection, {
+                ...defaultPluginSettings,
+                jsx: false,
+              }),
               language: "HTML",
             },
+            // {
+            //   title: `Style`,
+            //   code: tailwindMain(convertedSelection, defaultPluginSettings),
+            //   language: "HTML",
+            // },
+            // {
+            //   title: `Colors`,
+            //   code: tailwindMain(convertedSelection, defaultPluginSettings),
+            //   language: "HTML",
+            // },
+          ];
+        case "tailwind_jsx":
+          return [
             {
-              title: `Style`,
-              code: tailwindMain(convertedSelection, defaultPluginSettings),
+              title: `Code`,
+              code: tailwindMain(convertedSelection, {
+                ...defaultPluginSettings,
+                jsx: true,
+              }),
               language: "HTML",
             },
-            {
-              title: `Colors`,
-              code: tailwindMain(convertedSelection, defaultPluginSettings),
-              language: "HTML",
-            },
+            // {
+            //   title: `Style`,
+            //   code: tailwindMain(convertedSelection, defaultPluginSettings),
+            //   language: "HTML",
+            // },
+            // {
+            //   title: `Colors`,
+            //   code: tailwindMain(convertedSelection, defaultPluginSettings),
+            //   language: "HTML",
+            // },
           ];
         case "flutter":
           return [
             {
-              title: `Flutter`,
-              code: flutterMain(convertedSelection, defaultPluginSettings),
+              title: `Code`,
+              code: flutterMain(convertedSelection, {
+                ...defaultPluginSettings,
+                flutterWithTemplate: false,
+              }),
               language: "SWIFT",
             },
           ];
@@ -154,25 +197,25 @@ switch (figma.mode) {
 
       const blocks: CodegenResult[] = [
         {
-          title: `Tailwind Code`,
+          title: `Code`,
           code: tailwindMain(convertedSelection, defaultPluginSettings),
           language: "HTML",
         },
-        {
-          title: `Flutter`,
-          code: flutterMain(convertedSelection, defaultPluginSettings),
-          language: "SWIFT",
-        },
-        {
-          title: `SwiftUI`,
-          code: swiftuiMain(convertedSelection, node.parent?.id),
-          language: "SWIFT",
-        },
-        {
-          title: `Settings`,
-          code: "To change settings, export to\n CodeSandbox, and see a preview,\n click in the 'Plugins' tab above",
-          language: "JSON",
-        },
+        // {
+        //   title: `Flutter`,
+        //   code: flutterMain(convertedSelection, defaultPluginSettings),
+        //   language: "SWIFT",
+        // },
+        // {
+        //   title: `SwiftUI`,
+        //   code: swiftuiMain(convertedSelection, node.parent?.id),
+        //   language: "SWIFT",
+        // },
+        // {
+        //   title: `Settings`,
+        //   code: "To change settings, export to\n CodeSandbox, and see a preview,\n click in the 'Plugins' tab above",
+        //   language: "JSON",
+        // },
         // {
         //   title: `Tailwind Colors`,
         //   code: JSON.stringify(colors).split(", ").join(",\n"),

@@ -4,12 +4,14 @@
   "api": "1.0.0",
   "main": "apps/plugin/dist/code.js",
   "ui": "apps/plugin/dist/index.html",
-  "editorType": ["figma", "inspect"],
-  "capabilities": ["panel", "codegen"],
+  "editorType": ["figma", "dev"],
+  "capabilities": ["inspect", "codegen"],
   "permissions": [],
   "codegenLanguages": [
-    { "label": "HTML / React", "value": "html" },
+    { "label": "HTML", "value": "html" },
+    { "label": "React (JSX)", "value": "html_jsx" },
     { "label": "Tailwind", "value": "tailwind" },
+    { "label": "Tailwind (JSX)", "value": "tailwind_jsx" },
     { "label": "Flutter", "value": "flutter" },
     { "label": "SwiftUI", "value": "swiftUI" }
   ],

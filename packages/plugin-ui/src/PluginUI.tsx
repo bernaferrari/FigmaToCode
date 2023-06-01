@@ -78,9 +78,9 @@ export const PluginUI = (props: PluginUIProps) => {
             onPreferenceChange={props.onPreferenceChange}
           />
 
-          <ColorsPanel />
+          {/* <ColorsPanel /> */}
           <div className="text-xs">
-            Other things go here, such as color, tokens, etc.
+            Other things go here, such as color, text, etc.
           </div>
         </div>
       </div>
@@ -283,13 +283,13 @@ export const ColorsPanel = (props: {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <div className="container mx-auto p-4">
-        <div className="flex flex-wrap items-start justify-between max-w-[200px]">
+        <div className="flex flex-wrap items-start space-x-2 lg:space-x-0">
           <div className="flex-1 min-w-0">
             <h2 className="text-gray-800 dark:text-gray-200 mb-2">Text</h2>
             {["Button1", "Button2", "Button3"].map((button, idx) => (
               <button
                 key={idx}
-                className="bg-white dark:bg-gray-800 p-2 mb-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 w-full transition"
+                className="bg-white dark:bg-gray-800 p-2 mb-1 rounded-lg focus:outline-none focus:ring-0 hover:bg-gray-200 dark:hover:bg-gray-700 w-full transition"
               >
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
@@ -302,14 +302,22 @@ export const ColorsPanel = (props: {
               </button>
             ))}
           </div>
-          <div className="flex-none w-24">
+          <div className="flex-1 lg:max-w-[200px]">
             <h2 className="text-gray-800 dark:text-gray-200 mb-2">Colors</h2>
-            {["Color1", "Color2", "Color3"].map((color, idx) => (
-              <div
-                key={idx}
-                className={`bg-${color.toLowerCase()} w-6 h-6 mb-2 rounded-full`}
-              ></div>
-            ))}
+            <div className="flex flex-wrap">
+              {["red-500", "yellow-500", "blue-500"].map((color, idx) => (
+                <button
+                  key={idx}
+                  className={`bg-${color} w-full sm:w-1/2 lg:w-full h-16 mb-1 rounded-lg focus:outline-none focus:ring-0 transition`}
+                >
+                  <div className="flex flex-col h-full justify-center items-center">
+                    <span className="text-xs font-semibold text-white">
+                      Color{idx + 1}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
