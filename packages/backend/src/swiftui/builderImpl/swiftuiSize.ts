@@ -13,7 +13,7 @@ export const swiftuiSize = (node: SceneNode): [string, string] => {
     const w = sliceNum(size.width);
 
     if (shouldExtend) {
-      propWidth = `maxWidth: ${w}`;
+      propWidth = `minWidth: ${w}, maxWidth: ${w}`;
     } else {
       propWidth = `width: ${w}`;
     }
@@ -26,7 +26,7 @@ export const swiftuiSize = (node: SceneNode): [string, string] => {
     const h = sliceNum(size.height);
 
     if (shouldExtend) {
-      propHeight = `maxHeight: ${h}`;
+      propHeight = `minHeight: ${h}, maxHeight: ${h}`;
     } else {
       propHeight = `height: ${h}`;
     }

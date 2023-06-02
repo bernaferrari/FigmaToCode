@@ -55,10 +55,40 @@ export class SwiftuiDefaultBuilder {
     return this;
   }
 
+  topLeftToCenterOffset(
+    x: number,
+    y: number,
+    node: SceneNode,
+    parent: (BaseNode & ChildrenMixin) | null
+  ): { centerX: number; centerY: number } {
+    if (!parent || !("width" in parent)) {
+      return { centerX: 0, centerY: 0 };
+    }
+    // Find the child's center coordinates
+    const centerX = x + node.width / 2;
+    const centerY = y + node.height / 2;
+
+    // Calculate the center-based offset
+    const centerBasedX = centerX - parent.width / 2;
+    const centerBasedY = centerY - parent.height / 2;
+
+    return { centerX: centerBasedX, centerY: centerBasedY };
+  }
+
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-      this.pushModifier([`offset`, `x: ${sliceNum(x)}, y: ${sliceNum(y)}`]);
+      const { centerX, centerY } = this.topLeftToCenterOffset(
+        x,
+        y,
+        node,
+        node.parent
+      );
+
+      this.pushModifier([
+        `offset`,
+        `x: ${sliceNum(centerX)}, y: ${sliceNum(centerY)}`,
+      ]);
     }
     return this;
   }

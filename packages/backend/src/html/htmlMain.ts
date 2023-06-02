@@ -42,9 +42,10 @@ const htmlWidgetGenerator = (
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
   visibleSceneNode.forEach((node, index) => {
-    if (node.isAsset || ("isMask" in node && node.isMask === true)) {
-      comp += htmlAsset(node, isJsx);
-    } else if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
+    // if (node.isAsset || ("isMask" in node && node.isMask === true)) {
+    //   comp += htmlAsset(node, isJsx);
+    // }
+    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += htmlContainer(node, "", [], isJsx);
     } else if (node.type === "GROUP") {
       comp += htmlGroup(node, isJsx);
