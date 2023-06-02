@@ -31,8 +31,6 @@ type PluginUIProps = {
 };
 
 export const PluginUI = (props: PluginUIProps) => {
-  // const styleTagDefinitions = document.getElementById("figma-style")?.innerHTML;
-
   return (
     <div className="flex flex-col h-full dark:text-white">
       <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
@@ -262,7 +260,7 @@ export const CodePanel = (props: {
           </button>
         </div>
 
-        <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 rounded-lg text-sm">
+        <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
           <div className="flex gap-2 items-center flex-wrap">
             {/* <span className="min-w-[60px] font-medium">Settings</span> */}
 
@@ -288,7 +286,7 @@ export const CodePanel = (props: {
           </div>
           {selectablePreferencesFiltered.length > 0 && (
             <>
-              <div className="w-full h-px bg-neutral-200 dark:bg-white dark:bg-opacity-25" />
+              <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700" />
 
               <div className="flex gap-2 items-center flex-wrap">
                 {selectablePreferencesFiltered.map((preference) => (
@@ -435,8 +433,10 @@ const SelectableToggle = ({
       }`}
     >
       <span
-        className={`h-3 w-3 flex-shrink-0 border-neutral-500 border-2 ${
-          isSelected ? checkClass : "bg-transparent dark:border-neutral-500"
+        className={`h-3 w-3 flex-shrink-0 border-2 ${
+          isSelected
+            ? checkClass
+            : "bg-transparent border-neutral-500 dark:border-neutral-500"
         }`}
         style={{
           borderRadius: 4,

@@ -21,6 +21,11 @@ export default function App() {
     preferences: null,
   });
 
+  const rootStyles = getComputedStyle(document.documentElement);
+  const figmaColorBgValue = rootStyles
+    .getPropertyValue("--figma-color-bg")
+    .trim();
+
   useEffect(() => {
     window.onmessage = (event: MessageEvent) => {
       const message = event.data.pluginMessage;
@@ -101,25 +106,31 @@ export default function App() {
   };
 
   return (
-    <PluginUI
-      code={state.code}
-      emptySelection={false}
-      selectedFramework={state.selectedFramework}
-      setSelectedFramework={handleFrameworkChange}
-      htmlPreview={state.htmlPreview}
-      preferences={state.preferences}
-      onPreferenceChange={(key: string, value: boolean | string) => {
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: "pluginSettingChanged",
-              key: key,
-              value: value,
+    <div
+      className={`${
+        figmaColorBgValue === "rgba(255, 255, 255, 1)" ? "" : "dark"
+      }`}
+    >
+      <PluginUI
+        code={state.code}
+        emptySelection={false}
+        selectedFramework={state.selectedFramework}
+        setSelectedFramework={handleFrameworkChange}
+        htmlPreview={state.htmlPreview}
+        preferences={state.preferences}
+        onPreferenceChange={(key: string, value: boolean | string) => {
+          parent.postMessage(
+            {
+              pluginMessage: {
+                type: "pluginSettingChanged",
+                key: key,
+                value: value,
+              },
             },
-          },
-          "*"
-        );
-      }}
-    />
+            "*"
+          );
+        }}
+      />
+    </div>
   );
 }
