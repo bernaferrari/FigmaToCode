@@ -129,7 +129,7 @@ type LocalCodegenPreference =
     itemType: "individual_select";
     propertyName: Exclude<
       keyof PluginSettings,
-      "framework" | "flutterGenerationMode"
+      "framework" | "flutterGenerationMode" | "swiftUIGenerationMode"
     >;
     label: string;
     value?: boolean;

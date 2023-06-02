@@ -38,7 +38,7 @@ export const flutterContainer = (
 
   // [propPadding] will be "padding: const EdgeInsets.symmetric(...)" or ""
   let propPadding = "";
-  if (node.type === "FRAME") {
+  if ("paddingLeft" in node) {
     propPadding = flutterPadding(
       (optimizeLayout ? node.inferredAutoLayout : null) ?? node
     );

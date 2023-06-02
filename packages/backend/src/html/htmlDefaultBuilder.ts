@@ -195,7 +195,12 @@ export class HtmlDefaultBuilder {
 
   autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
     if ("paddingLeft" in node) {
-      this.addStyles(...htmlPadding(node, this.isJSX, optimizeLayout));
+      this.addStyles(
+        ...htmlPadding(
+          (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
+          this.isJSX
+        )
+      );
     }
     return this;
   }

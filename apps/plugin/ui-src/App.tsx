@@ -108,7 +108,7 @@ export default function App() {
       setSelectedFramework={handleFrameworkChange}
       htmlPreview={state.htmlPreview}
       preferences={state.preferences}
-      onPreferenceChange={(key: string, value: boolean) => {
+      onPreferenceChange={(key: string, value: boolean | string) => {
         parent.postMessage(
           {
             pluginMessage: {

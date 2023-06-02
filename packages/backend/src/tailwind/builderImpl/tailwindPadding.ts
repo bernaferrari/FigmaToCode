@@ -5,13 +5,8 @@ import { commonPadding } from "../../common/commonPadding";
  * https://tailwindcss.com/docs/margin/
  * example: px-2 py-8
  */
-export const tailwindPadding = (
-  node: BaseFrameMixin,
-  optimizeLayout: boolean
-): string[] => {
-  const padding = commonPadding(
-    (optimizeLayout ? node.inferredAutoLayout : null) ?? node
-  );
+export const tailwindPadding = (node: inferredAutoLayoutResult): string[] => {
+  const padding = commonPadding(node);
   if (!padding) {
     return [];
   }

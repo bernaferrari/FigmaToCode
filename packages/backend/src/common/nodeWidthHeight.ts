@@ -3,7 +3,7 @@ type SizeResult = {
   readonly height: "fill" | number | null;
 };
 
-function getUpdatedNodeDimension(node: SceneNode): SizeResult {
+export const nodeSize = (node: SceneNode): SizeResult => {
   const hasLayout =
     "layoutAlign" in node && node.parent && "layoutMode" in node.parent;
   const parentLayoutMode = hasLayout ? node.parent.layoutMode : null;
@@ -37,7 +37,4 @@ function getUpdatedNodeDimension(node: SceneNode): SizeResult {
       ? null
       : node.height,
   };
-}
-
-export const nodeSize = (node: SceneNode): SizeResult =>
-  getUpdatedNodeDimension(node);
+};

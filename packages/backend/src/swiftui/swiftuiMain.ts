@@ -1,18 +1,32 @@
 import { indentString } from "../common/indentString";
-import { sliceNum } from "../common/numToAutoFixed";
+import { className, sliceNum } from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
-import { swiftuiRoundedRectangle } from "./builderImpl/swiftuiBorder";
+import { PluginSettings } from "../code";
 
-let parentId = "";
+let localSettings: PluginSettings;
+
+const getStructTemplate = (name: string, injectCode: string): string =>
+  `struct ${name}: View {
+  var body: some View {
+    ${indentString(injectCode, 4).trimStart()};
+  }
+}`;
 
 export const swiftuiMain = (
   sceneNode: Array<SceneNode>,
-  parentIdSrc: string = ""
+  settings: PluginSettings
 ): string => {
-  parentId = parentIdSrc;
-
+  localSettings = settings;
   let result = swiftuiWidgetGenerator(sceneNode, 0);
+
+  switch (localSettings.swiftUIGenerationMode) {
+    case "snippet":
+      return result;
+    case "struct":
+      // result = generateWidgetCode("Column", { children: [result] });
+      return getStructTemplate(className(sceneNode[0].name), result);
+  }
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -59,6 +73,10 @@ export const swiftuiContainer = (
   indentLevel: number,
   children: string = ""
 ): string => {
+  if (!("layoutAlign" in node) || !("opacity" in node)) {
+    return "";
+  }
+
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -66,35 +84,24 @@ export const swiftuiContainer = (
     return children;
   }
 
-  const modifiers = new SwiftuiDefaultBuilder()
-    .shapeBackground(node)
-    .shapeBorder(node)
-    .blend(node)
-    .autoLayoutPadding(node)
-    .position(node, parentId)
-    .widthHeight(node)
-    .layerBackground(node)
-    .layerBorder(node)
-    .effects(node)
-    .build();
-
   let kind = "";
-  if (node.type === "RECTANGLE" || (!children && node.type === "FRAME")) {
-    // return a different kind of Rectangle when cornerRadius exists
-    const roundedRect = swiftuiRoundedRectangle(node);
-    if (roundedRect) {
-      kind = roundedRect;
-    } else {
-      kind = "Rectangle()";
-    }
+  if (node.type === "RECTANGLE") {
+    kind = "Rectangle()";
   } else if (node.type === "ELLIPSE") {
     kind = "Ellipse()";
   } else {
     kind = children;
   }
 
-  // only add the newline when result is not empty
-  const result = (children !== kind ? "\n" : "") + kind + modifiers;
+  const result = new SwiftuiDefaultBuilder()
+    .shapeBackground(node)
+    .cornerRadius(node)
+    .shapeBorder(node)
+    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .effects(node)
+    .layerBorder(node)
+    .build(kind);
+
   return indentString(result, indentLevel);
 };
 
@@ -126,9 +133,9 @@ const swiftuiText = (node: TextNode, indentLevel: number): string => {
     .textAutoSize(node)
     .letterSpacing(node)
     .lineHeight(node)
-    .blend(node)
-    .layerBackground(node)
-    .position(node, parentId)
+    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .fillColor(node)
+    .position(node, localSettings.optimizeLayout)
     .build();
 
   const result = `\nText("${charsWithLineBreak}")${modifier}`;
@@ -136,63 +143,87 @@ const swiftuiText = (node: TextNode, indentLevel: number): string => {
 };
 
 const swiftuiFrame = (node: FrameNode, indentLevel: number): string => {
-  // when there is a single children, indent should be zero; [swiftuiContainer] will already assign it.
-  const updatedIndentLevel = node.children.length === 1 ? 0 : indentLevel + 1;
+  const children = widgetGeneratorWithLimits(
+    node,
+    node.children.length > 1 ? indentLevel + 1 : indentLevel
+  );
 
-  const children = widgetGeneratorWithLimits(node, updatedIndentLevel);
+  // if (node.children.length === 1) {
+  //   return swiftuiContainer(node, indentLevel, children);
+  // } else {
+  const anyStack = createDirectionalStack(
+    children,
+    localSettings.optimizeLayout && node.inferredAutoLayout !== null
+      ? node.inferredAutoLayout
+      : node
+  );
+  return swiftuiContainer(node, indentLevel, anyStack);
+  // }
+};
 
-  // if there is only one child, there is no need for a HStack of VStack.
-  if (node.children.length === 1) {
-    return swiftuiContainer(node, indentLevel, children);
-    // return swiftuiContainer(node, rowColumn);
-  } else if (node.layoutMode !== "NONE") {
-    const rowColumn = wrapInDirectionalStack(node, children);
-    return swiftuiContainer(node, indentLevel, rowColumn);
+const createDirectionalStack = (
+  children: string,
+  inferredAutoLayout: inferredAutoLayoutResult
+): string => {
+  if (inferredAutoLayout.layoutMode !== "NONE") {
+    return generateSwiftViewCode(
+      inferredAutoLayout.layoutMode === "HORIZONTAL" ? "HStack" : "VStack",
+      {
+        alignment: getLayoutAlignment(inferredAutoLayout),
+        spacing: getSpacing(inferredAutoLayout),
+      },
+      children
+    );
   } else {
-    // node.layoutMode === "NONE" && node.children.length > 1
-    // children needs to be absolute
-    return swiftuiContainer(node, indentLevel, `\nZStack {${children}\n}`);
+    return generateSwiftViewCode("ZStack", {}, children);
   }
 };
 
-const wrapInDirectionalStack = (node: FrameNode, children: string): string => {
-  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "HStack" : "VStack";
-
-  // retrieve the align based on the most frequent position of children
-  // SwiftUI doesn't allow the children to be set individually. And there are different align properties for HStack and VStack.
-  let layoutAlign = "";
-  const mostFreq = node.counterAxisAlignItems;
-  if (node.layoutMode === "VERTICAL") {
-    if (mostFreq === "MIN") {
-      layoutAlign = "alignment: .leading";
-    } else if (mostFreq === "MAX") {
-      layoutAlign = "alignment: .trailing";
-    }
-  } else if (mostFreq === "MIN") {
-    layoutAlign = "alignment: .top";
-  } else if (mostFreq === "MAX") {
-    layoutAlign = "alignment: .bottom";
+const getLayoutAlignment = (
+  inferredAutoLayout: inferredAutoLayoutResult
+): string => {
+  switch (inferredAutoLayout.counterAxisAlignItems) {
+    case "MIN":
+      return inferredAutoLayout.layoutMode === "VERTICAL" ? ".leading" : ".top";
+    case "MAX":
+      return inferredAutoLayout.layoutMode === "VERTICAL"
+        ? ".trailing"
+        : ".bottom";
+    case "BASELINE":
+      return ".firstTextBaseline";
+    case "CENTER":
+      return "";
   }
-
-  // only add comma and a space if layoutAlign has a value
-  const comma = layoutAlign ? ", " : "";
-  // default spacing for SwiftUI is 16.
-  const spacing =
-    Math.round(node.itemSpacing) !== 16
-      ? `${comma}spacing: ${sliceNum(node.itemSpacing)}`
-      : "";
-
-  return `\n${rowOrColumn}(${layoutAlign}${spacing}) {${children}\n}`;
 };
 
-// https://stackoverflow.com/a/20762713
-export const mostFrequent = (arr: Array<string>): string | undefined => {
-  return arr
-    .sort(
-      (a, b) =>
-        arr.filter((v) => v === a).length - arr.filter((v) => v === b).length
-    )
-    .pop();
+const getSpacing = (inferredAutoLayout: inferredAutoLayoutResult): number => {
+  const defaultSpacing = 16;
+  return Math.round(inferredAutoLayout.itemSpacing) !== defaultSpacing
+    ? inferredAutoLayout.itemSpacing
+    : defaultSpacing;
+};
+
+const generateSwiftViewCode = (
+  className: string,
+  properties: Record<string, string | number>,
+  children: string
+): string => {
+  const propertiesArray = Object.entries(properties)
+    .filter(([, value]) => value !== "")
+    .map(
+      ([key, value]) =>
+        `${key}: ${typeof value === "number" ? sliceNum(value) : value}`
+    );
+
+  const compactPropertiesArray = propertiesArray.join(", ");
+  if (compactPropertiesArray.length > 60) {
+    const formattedProperties = propertiesArray.join(",\n");
+    return `${className}(\n${formattedProperties}\n) {${children}\n}`;
+  }
+
+  return `${className}(${compactPropertiesArray}) {\n${indentString(
+    children
+  )}\n}`;
 };
 
 // todo should the plugin manually Group items? Ideally, it would detect the similarities and allow a ForEach.

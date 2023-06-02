@@ -60,14 +60,14 @@ export const flutterMain = (
 
   let result = flutterWidgetGenerator(sceneNode);
   switch (localSettings.flutterGenerationMode) {
-    case "widget":
+    case "snippet":
       return result;
-    case "fullApp":
-      result = generateWidgetCode("Column", { children: [result] });
-      return getFullAppTemplate(className(sceneNode[0].name), result);
     case "stateless":
       result = generateWidgetCode("Column", { children: [result] });
       return getStatelessTemplate(className(sceneNode[0].name), result);
+    case "fullApp":
+      result = generateWidgetCode("Column", { children: [result] });
+      return getFullAppTemplate(className(sceneNode[0].name), result);
   }
 
   return result;

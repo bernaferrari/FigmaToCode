@@ -73,18 +73,18 @@ export const swiftuiColor = (color: RGB, opacity: number): string => {
   // https://stackoverflow.com/a/56824114/4418073
   // Therefore, only use Color.black/white when opacity is 1.
   if (color.r + color.g + color.b === 0 && opacity === 1) {
-    return "Color.black";
+    return ".black";
   }
 
   if (color.r + color.g + color.b === 3 && opacity === 1) {
-    return "Color.white";
+    return ".white";
   }
 
   const r = `red: ${sliceNum(color.r)}`;
   const g = `green: ${sliceNum(color.g)}`;
   const b = `blue: ${sliceNum(color.b)}`;
 
-  const opacityAttr = opacity !== 1.0 ? `, opacity: ${sliceNum(opacity)}` : "";
+  const opacityAttr = opacity !== 1.0 ? `.opacity(${sliceNum(opacity)})` : "";
 
-  return `Color(${r}, ${g}, ${b}${opacityAttr})`;
+  return `Color(${r}, ${g}, ${b})${opacityAttr})`;
 };

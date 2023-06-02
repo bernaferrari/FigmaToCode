@@ -1,9 +1,11 @@
 import { sliceNum } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
 
-// Add padding if necessary!
 // This must happen before Stack or after the Positioned, but not before.
-export const swiftuiPadding = (node: SceneNode): string => {
+export const swiftuiPadding = (
+  node: inferredAutoLayoutResult,
+  optimizeLayout: boolean
+): string => {
   if (!("layoutMode" in node)) {
     return "";
   }
@@ -14,32 +16,19 @@ export const swiftuiPadding = (node: SceneNode): string => {
   }
 
   if ("all" in padding) {
-    return `\n.padding(${sliceNum(padding.all)})`;
+    return `.padding(${sliceNum(padding.all)})`;
   }
-
-  let comp = "";
 
   // horizontal and vertical, as the default AutoLayout
-  if (padding.horizontal) {
-    comp += `\n.padding(.horizontal, ${sliceNum(padding.horizontal)})`;
-  }
-  if (padding.vertical) {
-    comp += `\n.padding(.vertical, ${sliceNum(padding.vertical)})`;
-  }
-
-  // if left and right exists, verify if they are the same after [pxToLayoutSize] conversion.
-  if (padding.left) {
-    comp += `\n.padding(.leading, ${sliceNum(padding.left)})`;
-  }
-  if (padding.right) {
-    comp += `\n.padding(.trailing, ${sliceNum(padding.right)})`;
-  }
-  if (padding.top) {
-    comp += `\n.padding(.top, ${sliceNum(padding.top)})`;
-  }
-  if (padding.bottom) {
-    comp += `\n.padding(.bottom, ${sliceNum(padding.bottom)})`;
+  if ("horizontal" in padding) {
+    const vertical = sliceNum(padding.vertical);
+    const horizontal = sliceNum(padding.horizontal);
+    return `.padding(EdgeInsets(top: ${vertical}, leading: ${horizontal}, bottom: ${vertical}, trailing: ${horizontal}))`;
   }
 
-  return comp;
+  const top = sliceNum(padding.top);
+  const left = sliceNum(padding.left);
+  const bottom = sliceNum(padding.bottom);
+  const right = sliceNum(padding.right);
+  return `.padding(EdgeInsets(top: ${top}, leading: ${left}, bottom: ${bottom}, trailing: ${right}))`;
 };

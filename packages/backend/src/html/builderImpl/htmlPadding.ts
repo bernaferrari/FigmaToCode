@@ -2,13 +2,10 @@ import { commonPadding } from "../../common/commonPadding";
 import { formatWithJSX } from "../../common/parseJSX";
 
 export const htmlPadding = (
-  node: BaseFrameMixin,
-  isJsx: boolean,
-  optimizeLayout: boolean
+  node: inferredAutoLayoutResult,
+  isJsx: boolean
 ): string[] => {
-  const padding = commonPadding(
-    (optimizeLayout ? node.inferredAutoLayout : null) ?? node
-  );
+  const padding = commonPadding(node);
   if (padding === null) {
     return [];
   }

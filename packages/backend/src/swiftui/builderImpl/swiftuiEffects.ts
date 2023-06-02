@@ -1,7 +1,7 @@
 import { sliceNum } from "../../common/numToAutoFixed";
 
 export const swiftuiShadow = (node: SceneNode): string => {
-  if (!node.effects || node.effects.length === 0) {
+  if (!("effects" in node) || node.effects.length === 0) {
     return "";
   }
 
@@ -43,11 +43,11 @@ export const swiftuiShadow = (node: SceneNode): string => {
     }
   }
 
-  return `\n.shadow(${comp})`;
+  return `.shadow(${comp})`;
 };
 
 export const swiftuiBlur = (node: SceneNode): string => {
-  if (!node.effects || node.effects.length === 0) {
+  if (!("effects" in node) || node.effects.length === 0) {
     return "";
   }
 
@@ -61,5 +61,5 @@ export const swiftuiBlur = (node: SceneNode): string => {
 
   // retrieve first blur.
   const blur = layerBlur[0].radius;
-  return `\n.blur(radius: ${sliceNum(blur)})`;
+  return `.blur(radius: ${sliceNum(blur)})`;
 };

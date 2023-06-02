@@ -1,7 +1,6 @@
-import { indentString } from "../../common/indentString";
-import { generateWidgetCode } from "../../common/numToAutoFixed";
-
-export const getMainAxisAlignment = (node: inferredAutoLayoutResult): string => {
+export const getMainAxisAlignment = (
+  node: inferredAutoLayoutResult
+): string => {
   switch (node.primaryAxisAlignItems) {
     case "MIN":
       return "MainAxisAlignment.start";
@@ -14,7 +13,9 @@ export const getMainAxisAlignment = (node: inferredAutoLayoutResult): string => 
   }
 };
 
-export const getCrossAxisAlignment = (node: inferredAutoLayoutResult): string => {
+export const getCrossAxisAlignment = (
+  node: inferredAutoLayoutResult
+): string => {
   switch (node.counterAxisAlignItems) {
     case "MIN":
       return "CrossAxisAlignment.start";
@@ -36,5 +37,3 @@ const getFlex = (
   node.parent.layoutMode === autoLayout.layoutMode
     ? "MainAxisSize.max"
     : "MainAxisSize.min";
-
-

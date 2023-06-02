@@ -155,7 +155,11 @@ export class TailwindDefaultBuilder {
 
   autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
     if ("paddingLeft" in node) {
-      this.addAttributes(...tailwindPadding(node, optimizeLayout));
+      this.addAttributes(
+        ...tailwindPadding(
+          (optimizeLayout ? node.inferredAutoLayout : null) ?? node
+        )
+      );
     }
     return this;
   }

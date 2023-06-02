@@ -31,8 +31,6 @@ export const run = (settings: PluginSettings) => {
     return;
   }
 
-  const firstSelection = figma.currentPage.selection[0];
-  const parentId = firstSelection.parent?.id ?? "";
   const convertedSelection = convertIntoNodes(
     figma.currentPage.selection,
     null
@@ -49,7 +47,7 @@ export const run = (settings: PluginSettings) => {
       result = flutterMain(convertedSelection, settings);
       break;
     case "SwiftUI":
-      result = swiftuiMain(convertedSelection, parentId);
+      result = swiftuiMain(convertedSelection, settings);
       break;
   }
   // console.log(result);
@@ -78,7 +76,6 @@ export const run = (settings: PluginSettings) => {
     type: "colors",
     data: retrieveGenericSolidUIColors(convertedSelection, settings.framework),
   });
-
   figma.ui.postMessage({
     type: "gradients",
     data: retrieveGenericLinearGradients(
@@ -86,7 +83,6 @@ export const run = (settings: PluginSettings) => {
       settings.framework
     ),
   });
-  // }
   if (settings.framework === "Tailwind") {
     figma.ui.postMessage({
       type: "text",

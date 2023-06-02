@@ -1,3 +1,4 @@
+import { getCommonRadius } from "../../common/commonRadius";
 import { sliceNum } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { swiftuiColorFromFills } from "./swiftuiColor";
@@ -12,7 +13,7 @@ import { swiftuiColorFromFills } from "./swiftuiColor";
  * @returns a string with overlay, when there node has a corner radius, or just border. If no color is found in node.strokes, return "".
  */
 export const swiftuiBorder = (node: SceneNode): string => {
-  if (node.type === "GROUP" || !node.strokes || node.strokes.length === 0) {
+  if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
     return "";
   }
 
@@ -23,7 +24,7 @@ export const swiftuiBorder = (node: SceneNode): string => {
   if (propStrokeColor && node.strokeWeight) {
     const roundRect = swiftuiRoundedRectangle(node);
     if (roundRect) {
-      return `\n.overlay(${roundRect}.stroke(${propStrokeColor}, lineWidth: ${lW}))`;
+      return `.overlay(${roundRect}.stroke(${propStrokeColor}, lineWidth: ${lW}))`;
     } else if (node.type === "RECTANGLE" && !fill) {
       // this scenario was taken care already by [swiftuiShapeStroke]
       return "";
@@ -31,14 +32,14 @@ export const swiftuiBorder = (node: SceneNode): string => {
 
     if (node.type === "ELLIPSE" && fill) {
       // add overlay, to not loose the current fill
-      return `\n.overlay(Ellipse().stroke(${propStrokeColor}, lineWidth: ${lW}))`;
+      return `.overlay(Ellipse().stroke(${propStrokeColor}, lineWidth: ${lW}))`;
     } else if (node.type === "ELLIPSE" && !fill) {
       // this scenario was taken care already by [swiftuiShapeStroke]
       return "";
     }
 
     // border can be put before or after frame()
-    return `\n.border(${propStrokeColor}, width: ${lW})`;
+    return `.border(${propStrokeColor}, width: ${lW})`;
   }
 
   return "";
@@ -47,7 +48,7 @@ export const swiftuiBorder = (node: SceneNode): string => {
 // .stroke() must be called near the shape declaration, but .overlay() must be called after frame().
 // Stroke and Border were split. This method deals with stroke, and the other one with overlay.
 export const swiftuiShapeStroke = (node: SceneNode): string => {
-  if (node.type === "GROUP" || !node.strokes || node.strokes.length === 0) {
+  if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
     return "";
   }
 
@@ -59,12 +60,12 @@ export const swiftuiShapeStroke = (node: SceneNode): string => {
 
     // only add stroke when there isn't a fill set.
     if (node.type === "ELLIPSE" && !fill) {
-      return `\n.stroke(${propStrokeColor}, lineWidth: ${lW})`;
+      return `.stroke(${propStrokeColor}, lineWidth: ${lW})`;
     }
 
     const roundRect = swiftuiRoundedRectangle(node);
     if (!roundRect && node.type === "RECTANGLE" && !fill) {
-      return `\n.stroke(${propStrokeColor}, lineWidth: ${lW})`;
+      return `.stroke(${propStrokeColor}, lineWidth: ${lW})`;
     }
   }
 
@@ -80,28 +81,25 @@ export const swiftuiShapeStroke = (node: SceneNode): string => {
  * @returns a string with RoundedRectangle, if node has a corner larger than zero; else "".
  */
 export const swiftuiCornerRadius = (node: SceneNode): string => {
-  if (
-    "cornerRadius" in node &&
-    node.cornerRadius !== figma.mixed &&
-    node.cornerRadius > 0
-  ) {
-    return sliceNum(node.cornerRadius);
-  } else {
-    if (!("topLeftRadius" in node)) {
+  const radius = getCommonRadius(node);
+  if ("all" in radius) {
+    if (radius.all > 0) {
+      return sliceNum(radius.all);
+    } else {
       return "";
     }
+  }
 
-    // SwiftUI doesn't support individual corner radius, so get the largest one
-    const maxBorder = Math.max(
-      node.topLeftRadius,
-      node.topRightRadius,
-      node.bottomLeftRadius,
-      node.bottomRightRadius
-    );
+  // SwiftUI doesn't support individual corner radius, so get the largest one
+  const maxBorder = Math.max(
+    radius.topLeft,
+    radius.topRight,
+    radius.bottomLeft,
+    radius.bottomRight
+  );
 
-    if (maxBorder > 0) {
-      return sliceNum(maxBorder);
-    }
+  if (maxBorder > 0) {
+    return sliceNum(maxBorder);
   }
 
   return "";

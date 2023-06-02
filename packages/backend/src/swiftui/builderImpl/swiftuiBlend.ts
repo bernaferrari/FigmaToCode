@@ -5,7 +5,7 @@ import { sliceNum } from "../../common/numToAutoFixed";
  */
 export const swiftuiOpacity = (node: MinimalBlendMixin): string => {
   if (node.opacity !== undefined && node.opacity !== 1) {
-    return `\n.opacity(${sliceNum(node.opacity)})`;
+    return `.opacity(${sliceNum(node.opacity)})`;
   }
   return "";
 };
@@ -16,7 +16,7 @@ export const swiftuiOpacity = (node: MinimalBlendMixin): string => {
 export const swiftuiVisibility = (node: SceneNodeMixin): string => {
   // [when testing] node.visible can be undefined
   if (node.visible !== undefined && !node.visible) {
-    return `\n.hidden()`;
+    return `.hidden()`;
   }
   return "";
 };
@@ -37,7 +37,7 @@ export const swiftuiRotation = (node: LayoutMixin): string => {
 export const swiftuiBlendMode = (node: MinimalBlendMixin): string => {
   const fromBlendEnum = blendModeEnum(node);
   if (fromBlendEnum) {
-    return `\n.blendMode(${fromBlendEnum})`;
+    return `.blendMode(${fromBlendEnum})`;
   }
 
   return "";
