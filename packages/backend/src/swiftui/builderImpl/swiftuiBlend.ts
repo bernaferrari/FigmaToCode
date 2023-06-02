@@ -1,46 +1,47 @@
 import { sliceNum } from "../../common/numToAutoFixed";
+import { Modifier } from "./swiftuiParser";
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/opacity(_:)
  */
-export const swiftuiOpacity = (node: MinimalBlendMixin): string => {
+export const swiftuiOpacity = (node: MinimalBlendMixin): Modifier | null => {
   if (node.opacity !== undefined && node.opacity !== 1) {
-    return `.opacity(${sliceNum(node.opacity)})`;
+    return ["opacity", sliceNum(node.opacity)];
   }
-  return "";
+  return null;
 };
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/hidden()
  */
-export const swiftuiVisibility = (node: SceneNodeMixin): string => {
+export const swiftuiVisibility = (node: SceneNodeMixin): Modifier | null => {
   // [when testing] node.visible can be undefined
   if (node.visible !== undefined && !node.visible) {
-    return `.hidden()`;
+    return ["hidden", ""];
   }
-  return "";
+  return null;
 };
 
 /**
  * https://developer.apple.com/documentation/swiftui/modifiedcontent/rotationeffect(_:anchor:)
  */
-export const swiftuiRotation = (node: LayoutMixin): string => {
+export const swiftuiRotation = (node: LayoutMixin): Modifier | null => {
   if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
-    return `.rotationEffect(.degrees(${sliceNum(node.rotation)}))`;
+    return ["rotationEffect", `.degrees(${sliceNum(node.rotation)})`];
   }
-  return "";
+  return null;
 };
 
 /**
  * https://developer.apple.com/documentation/swiftui/blendmode
  */
-export const swiftuiBlendMode = (node: MinimalBlendMixin): string => {
+export const swiftuiBlendMode = (node: MinimalBlendMixin): Modifier | null => {
   const fromBlendEnum = blendModeEnum(node);
   if (fromBlendEnum) {
-    return `.blendMode(${fromBlendEnum})`;
+    return ["blendMode", fromBlendEnum];
   }
 
-  return "";
+  return null;
 };
 
 const blendModeEnum = (node: MinimalBlendMixin): string => {

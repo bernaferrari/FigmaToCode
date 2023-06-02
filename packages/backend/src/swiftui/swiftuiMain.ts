@@ -13,6 +13,21 @@ const getStructTemplate = (name: string, injectCode: string): string =>
   }
 }`;
 
+const getPreviewTemplate = (name: string, injectCode: string): string =>
+  `import SwiftUI
+
+struct ContentView: View {
+  var body: some View {
+    ${indentString(injectCode, 4).trimStart()};
+  }
+}
+
+struct ContentView_Previews: PreviewProvider {
+  static var previews: some View {
+    ContentView()
+  }
+}`;
+
 export const swiftuiMain = (
   sceneNode: Array<SceneNode>,
   settings: PluginSettings
@@ -26,6 +41,9 @@ export const swiftuiMain = (
     case "struct":
       // result = generateWidgetCode("Column", { children: [result] });
       return getStructTemplate(className(sceneNode[0].name), result);
+    case "preview":
+      // result = generateWidgetCode("Column", { children: [result] });
+      return getPreviewTemplate(className(sceneNode[0].name), result);
   }
 
   // remove the initial \n that is made in Container.
@@ -71,7 +89,7 @@ const swiftuiWidgetGenerator = (
 export const swiftuiContainer = (
   node: SceneNode,
   indentLevel: number,
-  children: string = ""
+  stack: string = ""
 ): string => {
   if (!("layoutAlign" in node) || !("opacity" in node)) {
     return "";
@@ -81,7 +99,7 @@ export const swiftuiContainer = (
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
   if (node.width <= 0 || node.height <= 0) {
-    return children;
+    return stack;
   }
 
   let kind = "";
@@ -90,17 +108,19 @@ export const swiftuiContainer = (
   } else if (node.type === "ELLIPSE") {
     kind = "Ellipse()";
   } else {
-    kind = children;
+    kind = stack;
   }
 
-  const result = new SwiftuiDefaultBuilder()
+  const result = new SwiftuiDefaultBuilder(kind)
+    .shapeForeground(node)
+    .autoLayoutPadding(node, localSettings.optimizeLayout)
+    .size(node)
     .shapeBackground(node)
     .cornerRadius(node)
     .shapeBorder(node)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .effects(node)
-    .layerBorder(node)
-    .build(kind);
+    .build(kind === stack ? -2 : 0);
 
   return indentString(result, indentLevel);
 };
@@ -203,7 +223,7 @@ const getSpacing = (inferredAutoLayout: inferredAutoLayoutResult): number => {
     : defaultSpacing;
 };
 
-const generateSwiftViewCode = (
+export const generateSwiftViewCode = (
   className: string,
   properties: Record<string, string | number>,
   children: string

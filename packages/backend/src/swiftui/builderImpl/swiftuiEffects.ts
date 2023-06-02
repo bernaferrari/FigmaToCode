@@ -1,8 +1,9 @@
 import { sliceNum } from "../../common/numToAutoFixed";
+import { Modifier } from "./swiftuiParser";
 
-export const swiftuiShadow = (node: SceneNode): string => {
+export const swiftuiShadow = (node: SceneNode): Modifier | null => {
   if (!("effects" in node) || node.effects.length === 0) {
-    return "";
+    return null;
   }
 
   const dropShadow: Array<DropShadowEffect> = node.effects.filter(
@@ -10,7 +11,7 @@ export const swiftuiShadow = (node: SceneNode): string => {
   );
 
   if (dropShadow.length === 0) {
-    return "";
+    return null;
   }
 
   // retrieve first shadow.
@@ -43,12 +44,12 @@ export const swiftuiShadow = (node: SceneNode): string => {
     }
   }
 
-  return `.shadow(${comp})`;
+  return ["shadow", comp];
 };
 
-export const swiftuiBlur = (node: SceneNode): string => {
+export const swiftuiBlur = (node: SceneNode): Modifier | null => {
   if (!("effects" in node) || node.effects.length === 0) {
-    return "";
+    return null;
   }
 
   const layerBlur: Array<BlurEffect> = node.effects.filter(
@@ -56,10 +57,10 @@ export const swiftuiBlur = (node: SceneNode): string => {
   );
 
   if (layerBlur.length === 0) {
-    return "";
+    return null;
   }
 
   // retrieve first blur.
   const blur = layerBlur[0].radius;
-  return `.blur(radius: ${sliceNum(blur)})`;
+  return ["blur", `radius: ${sliceNum(blur)})`];
 };

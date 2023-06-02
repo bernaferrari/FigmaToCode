@@ -1,7 +1,26 @@
+import { commonStroke } from "./../../common/commonStroke";
 import { getCommonRadius } from "../../common/commonRadius";
 import { sliceNum } from "../../common/numToAutoFixed";
-import { retrieveTopFill } from "../../common/retrieveFill";
-import { swiftuiColorFromFills } from "./swiftuiColor";
+import { swiftUISolidColor } from "./swiftuiColor";
+import { Modifier, SwiftUIElement } from "./swiftuiParser";
+
+const swiftUIStroke = (node: SceneNode): number => {
+  if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
+    return 0;
+  }
+
+  const stroke = commonStroke(node);
+
+  if (!stroke) {
+    return 0;
+  }
+
+  if ("all" in stroke) {
+    return stroke.all;
+  }
+
+  return Math.max(stroke.left, stroke.top, stroke.right, stroke.bottom);
+};
 
 /**
  * Generate border or an overlay with stroke.
@@ -12,64 +31,64 @@ import { swiftuiColorFromFills } from "./swiftuiColor";
  * @param node with hopefully a fill object in [node.strokes].
  * @returns a string with overlay, when there node has a corner radius, or just border. If no color is found in node.strokes, return "".
  */
-export const swiftuiBorder = (node: SceneNode): string => {
+export const swiftuiBorder = (node: SceneNode): string[] | null => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
-    return "";
+    return null;
   }
 
-  const propStrokeColor = swiftuiColorFromFills(node.strokes);
-  const lW = sliceNum(node.strokeWeight);
-  const fill = retrieveTopFill(node.fills);
+  const width = swiftUIStroke(node);
+  const inset = strokeInset(node, width);
 
-  if (propStrokeColor && node.strokeWeight) {
-    const roundRect = swiftuiRoundedRectangle(node);
-    if (roundRect) {
-      return `.overlay(${roundRect}.stroke(${propStrokeColor}, lineWidth: ${lW}))`;
-    } else if (node.type === "RECTANGLE" && !fill) {
-      // this scenario was taken care already by [swiftuiShapeStroke]
-      return "";
-    }
-
-    if (node.type === "ELLIPSE" && fill) {
-      // add overlay, to not loose the current fill
-      return `.overlay(Ellipse().stroke(${propStrokeColor}, lineWidth: ${lW}))`;
-    } else if (node.type === "ELLIPSE" && !fill) {
-      // this scenario was taken care already by [swiftuiShapeStroke]
-      return "";
-    }
-
-    // border can be put before or after frame()
-    return `.border(${propStrokeColor}, width: ${lW})`;
+  if (!width) {
+    return null;
   }
 
-  return "";
+  return node.strokes
+    .map((stroke) => {
+      const strokeColor = swiftUISolidColor(stroke);
+
+      const strokeModifier: Modifier = [
+        "stroke",
+        `${strokeColor}, lineWidth: ${sliceNum(width)}`,
+      ];
+
+      if (strokeColor) {
+        return new SwiftUIElement(getViewType(node))
+          .addModifier(inset)
+          .addModifier(strokeModifier)
+          .toString();
+      }
+
+      return null;
+    })
+    .filter((d) => d !== null) as string[];
 };
 
-// .stroke() must be called near the shape declaration, but .overlay() must be called after frame().
-// Stroke and Border were split. This method deals with stroke, and the other one with overlay.
-export const swiftuiShapeStroke = (node: SceneNode): string => {
-  if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
-    return "";
+const getViewType = (node: SceneNode): string => {
+  if (node.type === "ELLIPSE") {
+    return "Ellipse()";
   }
 
-  const propStrokeColor = swiftuiColorFromFills(node.strokes);
-  const lW = sliceNum(node.strokeWeight);
-
-  if (propStrokeColor && node.strokeWeight) {
-    const fill = retrieveTopFill(node.fills);
-
-    // only add stroke when there isn't a fill set.
-    if (node.type === "ELLIPSE" && !fill) {
-      return `.stroke(${propStrokeColor}, lineWidth: ${lW})`;
-    }
-
-    const roundRect = swiftuiRoundedRectangle(node);
-    if (!roundRect && node.type === "RECTANGLE" && !fill) {
-      return `.stroke(${propStrokeColor}, lineWidth: ${lW})`;
-    }
+  const corner = swiftuiCornerRadius(node);
+  if (corner) {
+    return `RoundedRectangle(cornerRadius: ${corner})`;
+  } else {
+    return "Rectangle()";
   }
+};
 
-  return "";
+const strokeInset = (
+  node: MinimalStrokesMixin,
+  width: number
+): Modifier | null => {
+  switch (node.strokeAlign) {
+    case "INSIDE":
+      return ["inset", `by: ${sliceNum(width / 2)}`];
+    case "OUTSIDE":
+      return ["inset", `by: -${sliceNum(width / 2)}`];
+    case "CENTER":
+      return null;
+  }
 };
 
 /**

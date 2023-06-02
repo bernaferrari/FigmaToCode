@@ -3,6 +3,14 @@ import { gradientAngle } from "../../common/color";
 import { nearestValue } from "../../tailwind/conversionTables";
 import { sliceNum } from "../../common/numToAutoFixed";
 
+export const swiftUISolidColor = (fill: Paint): string => {
+  if (fill && fill.type === "SOLID") {
+    return swiftuiColor(fill.color, fill.opacity ?? 1.0);
+  }
+
+  return "";
+};
+
 /**
  * Retrieve the SOLID color for SwiftUI when existent, otherwise ""
  */
@@ -12,8 +20,6 @@ export const swiftuiColorFromFills = (
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
-    // todo maybe ignore text color when it is black?
-
     // opacity should only be null on set, not on get. But better be prevented.
     const opacity = fill.opacity ?? 1.0;
     return swiftuiColor(fill.color, opacity);
@@ -86,5 +92,5 @@ export const swiftuiColor = (color: RGB, opacity: number): string => {
 
   const opacityAttr = opacity !== 1.0 ? `.opacity(${sliceNum(opacity)})` : "";
 
-  return `Color(${r}, ${g}, ${b})${opacityAttr})`;
+  return `Color(${r}, ${g}, ${b})${opacityAttr}`;
 };

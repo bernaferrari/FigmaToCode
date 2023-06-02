@@ -3,7 +3,6 @@ import { swiftuiBlur, swiftuiShadow } from "./builderImpl/swiftuiEffects";
 import {
   swiftuiBorder,
   swiftuiCornerRadius,
-  swiftuiShapeStroke,
 } from "./builderImpl/swiftuiBorder";
 import { swiftuiColorFromFills } from "./builderImpl/swiftuiColor";
 import { swiftuiPadding } from "./builderImpl/swiftuiPadding";
@@ -19,21 +18,27 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { indentString } from "../common/indentString";
+import { Modifier, SwiftUIElement } from "./builderImpl/swiftuiParser";
 
 export class SwiftuiDefaultBuilder {
-  modifiers: string[] = [];
+  private readonly element: SwiftUIElement;
 
-  private pushModifier(...args: string[]): void {
-    this.modifiers.push(...args.filter(Boolean));
+  constructor(kind: string = "") {
+    this.element = new SwiftUIElement(kind);
+  }
+
+  private pushModifier(...args: (Modifier | null)[]): void {
+    args.forEach((modifier) => {
+      if (modifier) {
+        this.element.addModifier(modifier);
+      }
+    });
   }
 
   commonPositionStyles(
     node: SceneNode & LayoutMixin & MinimalBlendMixin,
     optimizeLayout: boolean
   ): this {
-    this.autoLayoutPadding(node, optimizeLayout);
-    this.size(node);
     this.position(node, optimizeLayout);
     this.blend(node);
     return this;
@@ -53,18 +58,19 @@ export class SwiftuiDefaultBuilder {
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-      this.pushModifier(`.offset(x: ${sliceNum(x)}, y: ${sliceNum(y)})`);
+      this.pushModifier([`offset`, `x: ${sliceNum(x)}, y: ${sliceNum(y)}`]);
     }
     return this;
   }
 
   shapeBorder(node: SceneNode): this {
-    this.pushModifier(swiftuiShapeStroke(node));
-    return this;
-  }
-
-  layerBorder(node: SceneNode): this {
-    this.pushModifier(swiftuiBorder(node));
+    const borders = swiftuiBorder(node);
+    if (borders) {
+      borders.forEach((border) => {
+        console.log("border is ", border);
+        this.element.addModifierMixed("overlay", border);
+      });
+    }
     return this;
   }
 
@@ -72,17 +78,23 @@ export class SwiftuiDefaultBuilder {
     if ("fills" in node) {
       const fillColor = swiftuiColorFromFills(node.fills);
       if (fillColor) {
-        this.pushModifier(`.background(${fillColor})`);
+        this.pushModifier([`background`, fillColor]);
       }
     }
+    return this;
+  }
 
+  shapeForeground(node: SceneNode): this {
+    if (!("children" in node) || node.children.length === 0) {
+      this.pushModifier([`foregroundColor`, ".clear"]);
+    }
     return this;
   }
 
   cornerRadius(node: SceneNode): this {
     const corner = swiftuiCornerRadius(node);
     if (corner) {
-      this.pushModifier(`.cornerRadius(${corner})`);
+      this.pushModifier([`cornerRadius`, corner]);
     }
     return this;
   }
@@ -90,7 +102,7 @@ export class SwiftuiDefaultBuilder {
   fillColor(node: MinimalFillsMixin): this {
     const fillColor = swiftuiColorFromFills(node.fills);
     if (fillColor) {
-      this.pushModifier(`.fill(${fillColor})`);
+      this.pushModifier([`fill`, fillColor]);
     }
 
     return this;
@@ -110,7 +122,7 @@ export class SwiftuiDefaultBuilder {
     const widthHeight = swiftuiSize(node);
     const sizes = widthHeight.filter((d) => d);
     if (sizes.length > 0) {
-      this.pushModifier(`.frame(${sizes.join(", ")})`);
+      this.pushModifier([`frame`, sizes.join(", ")]);
     }
 
     return this;
@@ -118,15 +130,18 @@ export class SwiftuiDefaultBuilder {
 
   autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
     if ("paddingLeft" in node) {
-      this.pushModifier(swiftuiPadding(node, optimizeLayout));
+      this.pushModifier(
+        swiftuiPadding(
+          (optimizeLayout ? node.inferredAutoLayout : null) ?? node
+        )
+      );
     }
     return this;
   }
 
-  build(kind: string): string {
-    if (this.modifiers.join("").length > 20) {
-      return kind + "\n" + indentString(this.modifiers.join("\n"));
-    }
-    return kind + this.modifiers.join("");
+  build(indentLevel: number = 0): string {
+    console.log("this.element", this.element.toString(-2));
+    // this.element.element = kind;
+    return this.element.toString(indentLevel);
   }
 }

@@ -199,6 +199,7 @@ const selectPreferenceOptions: {
     propertyName: "swiftUIGenerationMode",
     label: "Mode",
     options: [
+      { label: "Preview", value: "preview" },
       { label: "Struct", value: "struct" },
       { label: "Snippet", value: "snippet" },
     ],
