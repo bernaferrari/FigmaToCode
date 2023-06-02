@@ -94,6 +94,8 @@ const standardMode = async () => {
 
 switch (figma.mode) {
   case "default":
+  case "panel":
+  case "dev":
   case "inspect":
     standardMode();
     break;
@@ -188,7 +190,7 @@ switch (figma.mode) {
           return [
             {
               title: `SwiftUI`,
-              code: swiftuiMain(convertedSelection, node.parent?.id),
+              code: swiftuiMain(convertedSelection, defaultPluginSettings),
               language: "SWIFT",
             },
           ];

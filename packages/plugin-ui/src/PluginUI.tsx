@@ -31,6 +31,8 @@ type PluginUIProps = {
 };
 
 export const PluginUI = (props: PluginUIProps) => {
+  // const styleTagDefinitions = document.getElementById("figma-style")?.innerHTML;
+
   return (
     <div className="flex flex-col h-full dark:text-white">
       <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
@@ -58,7 +60,7 @@ export const PluginUI = (props: PluginUIProps) => {
         }}
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
-        <div className="flex flex-col items-center px-2 py-2 bg-neutral-50 dark:bg-transparent">
+        <div className="flex flex-col items-center px-2 py-2 dark:bg-transparent">
           {/* <div className="flex flex-col items-center p-4 bg-neutral-50 dark:bg-neutral-800 rounded">
             <Description selected={props.selectedFramework} />
           </div> */}
@@ -171,7 +173,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     propertyName: "layerName",
     label: "Layer Names",
     isDefault: false,
-    includedLanguages: ["HTML", "Tailwind", "SwiftUI"],
+    includedLanguages: ["HTML", "Tailwind"],
   },
   // Add your preferences data here
 ];
@@ -260,7 +262,7 @@ export const CodePanel = (props: {
           </button>
         </div>
 
-        <div className="flex gap-2 justify-center flex-col p-2 bg-black bg-opacity-25 rounded-lg text-sm">
+        <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 rounded-lg text-sm">
           <div className="flex gap-2 items-center flex-wrap">
             {/* <span className="min-w-[60px] font-medium">Settings</span> */}
 
@@ -279,14 +281,14 @@ export const CodePanel = (props: {
                   onSelect={(value) => {
                     props.onPreferenceChange(preference.propertyName, value);
                   }}
-                  buttonClass="bg-black dark:ring-green-800"
-                  checkClass="bg-black dark:bg-green-500 dark:border-green-500 ring-green-300"
+                  buttonClass="bg-green-100 dark:bg-black dark:ring-green-800 ring-green-500"
+                  checkClass="bg-green-400 dark:bg-black dark:bg-green-500 dark:border-green-500 ring-green-300 border-green-400"
                 />
               ))}
           </div>
           {selectablePreferencesFiltered.length > 0 && (
             <>
-              <div className="w-full h-px bg-white bg-opacity-25" />
+              <div className="w-full h-px bg-neutral-200 dark:bg-white dark:bg-opacity-25" />
 
               <div className="flex gap-2 items-center flex-wrap">
                 {selectablePreferencesFiltered.map((preference) => (
@@ -309,8 +311,8 @@ export const CodePanel = (props: {
                             option.value
                           );
                         }}
-                        buttonClass="bg-black dark:ring-blue-800"
-                        checkClass="bg-black dark:bg-blue-500 dark:border-blue-500 ring-blue-300"
+                        buttonClass="bg-blue-100 dark:bg-black dark:ring-blue-800"
+                        checkClass="bg-blue-400 dark:bg-black dark:bg-blue-500 dark:border-blue-500 ring-blue-300 border-blue-400"
                       />
                     ))}
                   </>

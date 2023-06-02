@@ -1,6 +1,5 @@
 import { FrameworkTypes, PluginUI } from "plugin-ui";
 import * as React from "react";
-import Image from "next/image";
 
 export default function Web() {
   const [selectedFramework, setSelectedFramework] =
