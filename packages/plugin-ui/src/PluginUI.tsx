@@ -40,7 +40,7 @@ export const PluginUI = (props: PluginUIProps) => {
             className={`w-full p-1 text-sm ${
               props.selectedFramework === tab
                 ? "bg-green-500 dark:bg-green-600 text-white rounded-md font-semibold shadow-sm"
-                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-600 dark:hover:bg-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
+                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-600 dark:hover:bg-green-800 dark:hover:border-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
             }`}
             onClick={() => {
               props.setSelectedFramework(tab as FrameworkTypes);
@@ -241,9 +241,9 @@ export const CodePanel = (props: {
     );
 
     return (
-      <div className="w-full">
-        <div className="flex items-center justify-between space-x-2">
-          <p className="py-1.5 text-lg font-medium text-center dark:text-white rounded-lg">
+      <div className="w-full flex flex-col gap-2 mt-2">
+        <div className="flex items-center justify-between w-full">
+          <p className="text-lg font-medium text-center dark:text-white rounded-lg">
             Code
           </p>
           <button
@@ -320,10 +320,6 @@ export const CodePanel = (props: {
           )}
         </div>
 
-        {/* <div className="h-2" />
-
-        <div className="flex gap-2 items-center p-2 flex-wrap bg-black bg-opacity-25 rounded-lg text-sm"></div> */}
-
         <div
           className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
             syntaxHovered ? "ring-2" : "ring-0"
@@ -335,6 +331,8 @@ export const CodePanel = (props: {
             customStyle={{
               fontSize: 12,
               borderRadius: 8,
+              marginTop: 0,
+              marginBottom: 0,
               backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
               transitionProperty: "all",
               transitionTimingFunction: "ease",
