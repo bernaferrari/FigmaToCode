@@ -189,7 +189,7 @@ const selectPreferenceOptions: {
     label: "Mode",
     options: [
       { label: "Full App", value: "fullApp" },
-      { label: "Stateless", value: "stateless" },
+      { label: "Widget", value: "stateless" },
       { label: "Snippet", value: "snippet" },
     ],
     includedLanguages: ["Flutter"],

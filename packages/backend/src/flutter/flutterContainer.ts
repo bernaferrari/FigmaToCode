@@ -8,6 +8,7 @@ import {
   skipDefaultProperty,
 } from "../common/numToAutoFixed";
 import { sliceNum } from "../common/numToAutoFixed";
+import { getCommonRadius } from "../common/commonRadius";
 
 export const flutterContainer = (
   node: SceneNode,
@@ -77,7 +78,6 @@ const getDecoration = (node: SceneNode): string => {
   }
 
   const propBoxShadow = flutterShadow(node);
-  const propBorderRadius = flutterBorderRadius(node);
   const decorationBackground = flutterBoxDecorationColor(node.fills);
 
   let shapeDecorationBorder = "";
@@ -104,7 +104,7 @@ const getDecoration = (node: SceneNode): string => {
 
   return generateWidgetCode("BoxDecoration", {
     ...decorationBackground,
-    borderRadius: propBorderRadius,
+    borderRadius: generateBorderRadius(node),
     border: flutterBorder(node),
     boxShadow: propBoxShadow,
   });
@@ -113,18 +113,8 @@ const getDecoration = (node: SceneNode): string => {
 const generateRoundedRectangleBorder = (
   node: SceneNode & MinimalStrokesMixin
 ): string => {
-  const borderRadius =
-    "cornerRadius" in node &&
-    node.cornerRadius !== figma.mixed &&
-    node.cornerRadius !== undefined
-      ? node.cornerRadius
-      : 0;
-
   return generateWidgetCode("RoundedRectangleBorder", {
-    borderRadius: skipDefaultProperty(
-      `BorderRadius.circular(${sliceNum(borderRadius)})`,
-      "BorderRadius.circular(0)"
-    ),
+    borderRadius: generateBorderRadius(node),
     strokeAlign: skipDefaultProperty(
       getStrokeAlign(node),
       "BorderSide.strokeAlignInside"
@@ -176,9 +166,35 @@ const generatePolygonBorder = (node: PolygonNode): string => {
 
   return generateWidgetCode("StarBorder.polygon", {
     sides: sliceNum(points),
-    borderRadius: skipDefaultProperty(
-      `BorderRadius.circular(${sliceNum(borderRadius)})`,
-      "BorderRadius.circular(0)"
+    borderRadius: generateBorderRadius(node),
+  });
+};
+
+const generateBorderRadius = (node: SceneNode): string => {
+  const radius = getCommonRadius(node);
+  if ("all" in radius) {
+    if (radius.all === 0) {
+      return "";
+    }
+    return `BorderRadius.circular(${sliceNum(radius.all)})`;
+  }
+
+  return generateWidgetCode("BorderRadius.only", {
+    topLeft: skipDefaultProperty(
+      `Radius.circular(${sliceNum(radius.topLeft)})`,
+      "Radius.circular(0)"
+    ),
+    topRight: skipDefaultProperty(
+      `Radius.circular(${sliceNum(radius.topRight)})`,
+      "Radius.circular(0)"
+    ),
+    bottomLeft: skipDefaultProperty(
+      `Radius.circular(${sliceNum(radius.bottomLeft)})`,
+      "Radius.circular(0)"
+    ),
+    bottomRight: skipDefaultProperty(
+      `Radius.circular(${sliceNum(radius.bottomRight)})`,
+      "Radius.circular(0)"
     ),
   });
 };
