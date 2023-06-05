@@ -149,8 +149,8 @@ export class SwiftuiDefaultBuilder {
   }
 
   size(node: SceneNode): this {
-    const widthHeight = swiftuiSize(node);
-    const sizes = widthHeight.filter((d) => d);
+    const { width, height } = swiftuiSize(node);
+    const sizes = [width, height].filter((d) => d);
     if (sizes.length > 0) {
       this.pushModifier([`frame`, sizes.join(", ")]);
     }

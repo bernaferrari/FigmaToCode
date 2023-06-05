@@ -72,17 +72,17 @@ export const run = (settings: PluginSettings) => {
     },
   });
 
-  figma.ui.postMessage({
-    type: "colors",
-    data: retrieveGenericSolidUIColors(convertedSelection, settings.framework),
-  });
-  figma.ui.postMessage({
-    type: "gradients",
-    data: retrieveGenericLinearGradients(
-      convertedSelection,
-      settings.framework
-    ),
-  });
+  // figma.ui.postMessage({
+  //   type: "colors",
+  //   data: retrieveGenericSolidUIColors(convertedSelection, settings.framework),
+  // });
+  // figma.ui.postMessage({
+  //   type: "gradients",
+  //   data: retrieveGenericLinearGradients(
+  //     convertedSelection,
+  //     settings.framework
+  //   ),
+  // });
   // if (settings.framework === "Tailwind") {
   //   figma.ui.postMessage({
   //     type: "text",

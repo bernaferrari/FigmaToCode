@@ -14,18 +14,27 @@ export const retrieveTailwindText = (
 
   selectedText.forEach((node) => {
     if (node.type === "TEXT") {
+      let layoutBuilder = new TailwindTextBuilder(node, false, false)
+        .commonPositionStyles(node, false)
+        .textAlign(node);
+
+      const styledHtml = layoutBuilder.getTextSegments(node.id);
+
+      let content = "";
+      if (styledHtml.length === 1) {
+        layoutBuilder.addAttributes(styledHtml[0].style);
+        content = styledHtml[0].text;
+      } else {
+        content = styledHtml
+          .map((style) => `<span style="${style.style}">${style.text}</span>`)
+          .join("");
+      }
+
+      // return `\n<div${layoutBuilder.build()}>${content}</div>`;
+
       const attr = new TailwindTextBuilder(node, false, false)
         .blend(node)
-        .position(node, true)
-        .textShapeSize(node)
-        .fontSize(node)
-        .fontStyle(node)
-        .letterSpacing(node)
-        .lineHeight(node)
-        .textDecoration(node)
-        .textAlign(node)
-        .customColor(node.fills, "text")
-        .textTransform(node);
+        .position(node, true);
 
       const splittedChars = node.characters.split("\n");
       const charsWithLineBreak =
@@ -50,7 +59,7 @@ export const retrieveTailwindText = (
       textStr.push({
         name: node.name,
         attr: attr.attributes.join(" "),
-        full: `<p class="${attr.attributes}">${charsWithLineBreak}</p>`,
+        full: `<span class="${attr.attributes}">${charsWithLineBreak}</span>`,
         style: style(node),
         contrastBlack,
       });

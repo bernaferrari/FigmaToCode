@@ -153,9 +153,6 @@ const swiftuiFrame = (node: FrameNode, indentLevel: number): string => {
     node.children.length > 1 ? indentLevel + 1 : indentLevel
   );
 
-  // if (node.children.length === 1) {
-  //   return swiftuiContainer(node, indentLevel, children);
-  // } else {
   const anyStack = createDirectionalStack(
     children,
     localSettings.optimizeLayout && node.inferredAutoLayout !== null
@@ -163,7 +160,6 @@ const swiftuiFrame = (node: FrameNode, indentLevel: number): string => {
       : node
   );
   return swiftuiContainer(node, indentLevel, anyStack);
-  // }
 };
 
 const createDirectionalStack = (

@@ -26,10 +26,8 @@ export const flutterContainer = (
   }
 
   // ignore for Groups
-  const propBoxDecoration =
-    node.type === "GROUP" || !("effects" in node) ? "" : getDecoration(node);
-  const fSize = flutterSize(node);
-  const isExpanded = fSize.isExpanded;
+  const propBoxDecoration = getDecoration(node);
+  const { width, height, isExpanded } = flutterSize(node);
   const clipBehavior =
     "clipsContent" in node && node.clipsContent === true
       ? "Clip.antiAlias"
@@ -46,13 +44,13 @@ export const flutterContainer = (
   }
 
   let result: string;
-  if (fSize.width || fSize.height || propBoxDecoration || clipBehavior) {
+  if (width || height || propBoxDecoration || clipBehavior) {
     result = generateWidgetCode("Container", {
-      width: fSize.width,
-      height: fSize.height,
+      width: width,
+      height: height,
       padding: propPadding,
       clipBehavior: clipBehavior,
-      decoration: skipDefaultProperty(propBoxDecoration, "BoxDecoration()"),
+      decoration: skipDefaultProperty(getDecoration(node), "BoxDecoration()"),
       child: child,
     });
   } else if (propPadding) {

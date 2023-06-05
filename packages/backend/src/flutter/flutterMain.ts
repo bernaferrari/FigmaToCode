@@ -160,9 +160,7 @@ const flutterContainer = (
 };
 
 const flutterText = (node: TextNode): string => {
-  const builder = new FlutterTextBuilder();
-
-  builder
+  const builder = new FlutterTextBuilder()
     .createText(node)
     .blendAttr(node)
     .textAutoSize(node)

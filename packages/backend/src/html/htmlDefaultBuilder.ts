@@ -178,12 +178,15 @@ export class HtmlDefaultBuilder {
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {
         case "WIDTH_AND_HEIGHT":
-          this.addStyles(width, height);
           break;
         case "HEIGHT":
-          this.addStyles(height);
+          this.addStyles(width);
           break;
         case "NONE":
+          this.addStyles(width, height);
+          break;
+        case "TRUNCATE":
+          // TODO make this work?
           break;
       }
     } else {
