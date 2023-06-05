@@ -99,7 +99,10 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         text = text.toUpperCase();
       }
 
-      return { style: style, text: parseTextAsCode(text) };
+      return {
+        style: style,
+        text: parseTextAsCode(text).replace(/\$/g, "\\$"),
+      };
     });
   }
 
@@ -150,7 +153,6 @@ export const wrapTextAutoResize = (node: TextNode, child: string): string => {
 
   if (node.textAutoResize === "NONE") {
     // = instead of += because we want to replace it
-
     result = generateWidgetCode("SizedBox", {
       width: width,
       height: height,
