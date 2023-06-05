@@ -23,16 +23,16 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     return this;
   }
 
-  textDecoration(textDecoration: TextDecoration): string {
+  textDecoration(textDecoration: TextDecoration): string | null {
     switch (textDecoration) {
       case "UNDERLINE":
         // https://developer.apple.com/documentation/swiftui/text/underline(_:color:)
-        return ".underline()";
+        return "underline";
       case "STRIKETHROUGH":
         // https://developer.apple.com/documentation/swiftui/text/strikethrough(_:color:)
-        return ".strikethrough()";
+        return "strikethrough";
       case "NONE":
-        return "";
+        return null;
     }
   }
 
@@ -44,16 +44,12 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     return "";
   }
 
-  textStyle(node: TextNode): string {
+  textStyle(style: string): string | null {
     // https://developer.apple.com/documentation/swiftui/text/italic()
-    if (
-      node.fontName !== figma.mixed &&
-      node.fontName.style.toLowerCase().match("italic")
-    ) {
-      return ".italic()";
+    if (style.toLowerCase().match("italic")) {
+      return "italic";
     }
-
-    return "";
+    return null;
   }
 
   fontWeight(fontWeight: number): string {
@@ -111,8 +107,6 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
 
     return segments.map((segment) => {
       const fontSize = sliceNum(segment.fontSize);
-      // TODO add this back:
-      // const fontStyle = this.fontStyle(segment.fontName);
       const fontFamily = segment.fontName.family;
       const fontWeight = this.fontWeight(segment.fontWeight);
       const lineHeight = this.lineHeight(segment.lineHeight, segment.fontSize);
@@ -139,28 +133,33 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
         ])
         .addModifier(["tracking", letterSpacing])
         .addModifier(["lineSpacing", lineHeight])
+        .addModifier([this.textDecoration(segment.textDecoration), ""])
+        .addModifier([this.textStyle(segment.fontName.style), ""])
         .addModifier(["foregroundColor", this.textColor(segment.fills)]);
 
       return { style: element.toString(), text: text };
     });
   }
 
-  letterSpacing = (letterSpacing: LetterSpacing, fontSize: number): string => {
+  letterSpacing = (
+    letterSpacing: LetterSpacing,
+    fontSize: number
+  ): string | null => {
     const value = commonLetterSpacing(letterSpacing, fontSize);
     if (value > 0) {
       return sliceNum(value);
     }
-    return "";
+    return null;
   };
 
   // the difference between kerning and tracking is that tracking spaces everything, kerning keeps lignatures,
   // Figma spaces everything, so we are going to use tracking.
-  lineHeight = (lineHeight: LineHeight, fontSize: number): string => {
+  lineHeight = (lineHeight: LineHeight, fontSize: number): string | null => {
     const value = commonLineHeight(lineHeight, fontSize);
     if (value > 0) {
       return sliceNum(value);
     }
-    return "";
+    return null;
   };
 
   wrapTextAutoResize = (node: TextNode): string => {

@@ -19,8 +19,8 @@ export class SwiftUIElement {
     return this;
   }
 
-  addModifier(modifier: Modifier | null): this {
-    if (modifier && modifier[1] !== "") {
+  addModifier(modifier: Modifier | [string | null, string | null]): this {
+    if (modifier && modifier[0] !== null && modifier[1] !== null) {
       this.modifiers.push([modifier[0], modifier[1]]);
     }
     return this;
