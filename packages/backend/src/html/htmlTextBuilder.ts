@@ -3,6 +3,10 @@ import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { htmlColorFromFills } from "./builderImpl/htmlColor";
 import { sliceNum } from "../common/numToAutoFixed";
+import {
+  commonLetterSpacing,
+  commonLineHeight,
+} from "../common/commonTextHeightSpacing";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
   constructor(node: TextNode, showLayerName: boolean, optIsJSX: boolean) {
@@ -23,14 +27,14 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
           "font-family": segment.fontName.family,
           "font-style": this.getFontStyle(segment.fontName.style),
           "font-weight": `${segment.fontWeight}`,
-          "text-decoration": this.getTextDecoration(segment.textDecoration),
-          "text-transform": this.getTextTransform(segment.textCase),
-          "line-height": this.getLineHeightStyle(segment.lineHeight),
-          "letter-spacing": this.getLetterSpacingStyle(
+          "text-decoration": this.textDecoration(segment.textDecoration),
+          "text-transform": this.textTransform(segment.textCase),
+          "line-height": this.lineHeight(segment.lineHeight, segment.fontSize),
+          "letter-spacing": this.letterSpacing(
             segment.letterSpacing,
             segment.fontSize
           ),
-          "text-indent": segment.indentation,
+          // "text-indent": segment.indentation,
           "word-wrap": "break-word",
         },
         this.isJSX
@@ -49,41 +53,48 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     return this;
   }
 
-  getTextDecoration = (textDecoration: string) => {
-    return textDecoration === "STRIKETHROUGH"
-      ? "line-through"
-      : textDecoration === "UNDERLINE"
-      ? "underline"
-      : "none";
-  };
-
-  getTextTransform = (textCase: string) => {
-    return textCase === "UPPER"
-      ? "uppercase"
-      : textCase === "LOWER"
-      ? "lowercase"
-      : "none";
-  };
-
-  getLineHeightStyle = (lineHeight: LineHeight) => {
-    switch (lineHeight.unit) {
-      case "AUTO":
-        return "normal";
-      case "PIXELS":
-        return sliceNum(lineHeight.value);
-      case "PERCENT":
-        return `${sliceNum(lineHeight.value)}%`;
+  textDecoration(textDecoration: TextDecoration): string {
+    switch (textDecoration) {
+      case "STRIKETHROUGH":
+        return "line-through";
+      case "UNDERLINE":
+        return "underline";
+      case "NONE":
+        return "";
     }
-  };
+  }
 
-  getLetterSpacingStyle = (letterSpacing: LetterSpacing, fontSize: number) => {
-    switch (letterSpacing.unit) {
-      case "PIXELS":
-        return sliceNum(letterSpacing.value);
-      case "PERCENT":
-        return sliceNum((fontSize * letterSpacing.value) / 100);
+  textTransform(textCase: TextCase): string {
+    switch (textCase) {
+      case "UPPER":
+        return "uppercase";
+      case "LOWER":
+        return "lowercase";
+      case "TITLE":
+        return "capitalize";
+      case "ORIGINAL":
+      case "SMALL_CAPS":
+      case "SMALL_CAPS_FORCED":
+      default:
+        return "";
     }
-  };
+  }
+
+  letterSpacing(letterSpacing: LetterSpacing, fontSize: number): string {
+    const letterSpacingProp = commonLetterSpacing(letterSpacing, fontSize);
+    if (letterSpacingProp > 0) {
+      return sliceNum(letterSpacingProp);
+    }
+    return "";
+  }
+
+  lineHeight(lineHeight: LineHeight, fontSize: number): string {
+    const lineHeightProp = commonLineHeight(lineHeight, fontSize);
+    if (lineHeightProp > 0) {
+      return sliceNum(lineHeightProp);
+    }
+    return "";
+  }
 
   /**
    * https://tailwindcss.com/docs/font-style/
@@ -117,21 +128,6 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       }
       this.addStyles(formatWithJSX("text-align", this.isJSX, textAlign));
     }
-
-    return this;
-  }
-
-  textTransform(node: TextNode): this {
-    if (node.textCase === "LOWER") {
-      this.addStyles(formatWithJSX("text-transform", this.isJSX, "lowercase"));
-    } else if (node.textCase === "TITLE") {
-      this.addStyles(formatWithJSX("text-transform", this.isJSX, "capitalize"));
-    } else if (node.textCase === "UPPER") {
-      this.addStyles(formatWithJSX("text-transform", this.isJSX, "uppercase"));
-    } else if (node.textCase === "ORIGINAL") {
-      // default, ignore
-    }
-
     return this;
   }
 }

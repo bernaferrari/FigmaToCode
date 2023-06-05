@@ -136,29 +136,14 @@ const swiftuiGroup = (node: GroupNode, indentLevel: number): string => {
 const swiftuiText = (node: TextNode, indentLevel: number): string => {
   const builder = new SwiftuiTextBuilder();
 
-  let text = node.characters;
-  if (node.textCase === "LOWER") {
-    text = text.toLowerCase();
-  } else if (node.textCase === "UPPER") {
-    text = text.toUpperCase();
-  }
-
-  const splittedChars = text.split("\n");
-  const charsWithLineBreak =
-    splittedChars.length > 1 ? splittedChars.join("\\n") : text;
-
   const modifier = builder
-    .textDecoration(node)
-    .textStyle(node)
-    .textAutoSize(node)
-    .letterSpacing(node)
-    .lineHeight(node)
+    .createText(node)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .fillColor(node)
     .position(node, localSettings.optimizeLayout)
     .build();
 
-  const result = `\nText("${charsWithLineBreak}")${modifier}`;
+  const result = modifier;
   return indentString(result, indentLevel);
 };
 

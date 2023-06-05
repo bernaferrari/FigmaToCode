@@ -1,6 +1,5 @@
 import { retrieveTopFill } from "../common/retrieveFill";
 import { indentString } from "../common/indentString";
-import { pxToLayoutSize } from "./conversionTables";
 import { tailwindVector } from "./vector";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
@@ -35,7 +34,6 @@ const tailwindWidgetGenerator = (
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
-
   visibleSceneNode.forEach((node) => {
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += tailwindContainer(node, "", "", isJsx);
@@ -98,9 +96,7 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
     isJsx
   )
     .commonPositionStyles(node, globalLocalSettings.optimizeLayout)
-    .textShapeSize(node)
-    .textAlign(node)
-    .textTransform(node);
+    .textAlign(node);
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
 

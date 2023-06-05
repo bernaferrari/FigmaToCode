@@ -4,7 +4,6 @@ import {
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
 import { tailwindColorFromFills } from "./builderImpl/tailwindColor";
-import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { pxToLetterSpacing, pxToLineHeight } from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
@@ -18,7 +17,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     return segments.map((segment) => {
       const color = this.getTailwindColorFromFills(segment.fills);
       const textDecoration = this.textDecoration(segment.textDecoration);
-      const textTransform = this.getTailwindTextTransform(segment.textCase);
+      const textTransform = this.textTransform(segment.textCase);
       const lineHeightStyle = this.lineHeight(
         segment.lineHeight,
         segment.fontSize
@@ -27,23 +26,17 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         segment.letterSpacing,
         segment.fontSize
       );
-      const fontSizeStyle = this.getTailwindFontSizeStyle(segment.fontSize);
-      const fontWeightStyle = this.getTailwindFontWeightStyle(
-        segment.fontWeight
-      );
-      const textIndentStyle = this.getTailwindTextIndentStyle(
-        segment.indentation
-      );
+      // const textIndentStyle = this.indentStyle(segment.indentation);
 
       const styleClasses = [
         color,
-        fontSizeStyle,
-        fontWeightStyle,
+        this.fontSize(segment.fontSize),
+        this.fontWeight(segment.fontWeight),
         textDecoration,
         textTransform,
         lineHeightStyle,
         letterSpacingStyle,
-        textIndentStyle,
+        // textIndentStyle,
       ]
         .filter((d) => d !== "")
         .join(" ");
@@ -62,14 +55,6 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     return tailwindColorFromFills(fills, "text");
   };
 
-  getTailwindTextTransform = (textCase: string) => {
-    return textCase === "UPPER"
-      ? "uppercase"
-      : textCase === "LOWER"
-      ? "lowercase"
-      : "capitalize";
-  };
-
   getTailwindLetterSpacingStyle = (letterSpacing: any) => {
     // Convert letterSpacing to the appropriate Tailwind CSS class.
     // This can be based on your project's configuration and letterSpacing scale.
@@ -81,40 +66,43 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     }
   };
 
-  getTailwindFontSizeStyle = (fontSize: number) => {
+  fontSize = (fontSize: number) => {
     // Convert fontSize to the appropriate Tailwind CSS class.
     // This can be based on your project's configuration and fontSize scale.
     // For example, suppose your project uses the default Tailwind CSS fontSize scale:
     return `text-[${fontSize}px]`;
   };
 
-  getTailwindFontWeightStyle = (fontWeight: number) => {
-    // Convert fontWeight to the appropriate Tailwind CSS class.
-    // This can be based on your project's configuration and fontWeight scale.
-    // For example, suppose your project uses the default Tailwind CSS fontWeight scale:
-    return `font-${fontWeight}`;
+  fontWeight = (fontWeight: number): string => {
+    switch (fontWeight) {
+      case 100:
+        return "font-thin";
+      case 200:
+        return "font-extralight";
+      case 300:
+        return "font-light";
+      case 400:
+        return "font-normal";
+      case 500:
+        return "font-medium";
+      case 600:
+        return "font-semibold";
+      case 700:
+        return "font-bold";
+      case 800:
+        return "font-extrabold";
+      case 900:
+        return "font-black";
+      default:
+        return "";
+    }
   };
 
-  getTailwindTextIndentStyle = (indentation: number) => {
+  indentStyle = (indentation: number) => {
     // Convert indentation to the appropriate Tailwind CSS class.
     // This can be based on your project's configuration and spacing scale.
     // For example, suppose your project uses the default Tailwind CSS spacing scale:
     return `pl-${Math.round(indentation)}`;
-  };
-
-  // must be called before Position method
-  textShapeSize = (node: TextNode): this => {
-    const { width, height } = tailwindSizePartial(node);
-
-    if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
-      this.addAttributes(width);
-    }
-
-    if (node.textAutoResize === "NONE") {
-      this.addAttributes(height);
-    }
-
-    return this;
   };
 
   // todo fontFamily
@@ -165,28 +153,28 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/letter-spacing/
    * example: tracking-widest
    */
-  letterSpacing(letterSpacing: LetterSpacing, fontSize: number): this {
+  letterSpacing(letterSpacing: LetterSpacing, fontSize: number): string {
     const letterSpacingProp = commonLetterSpacing(letterSpacing, fontSize);
     if (letterSpacingProp > 0) {
       const value = pxToLetterSpacing(letterSpacingProp);
-      this.addAttributes(`tracking-${value}`);
+      return `tracking-${value}`;
     }
 
-    return this;
+    return "";
   }
 
   /**
    * https://tailwindcss.com/docs/line-height/
    * example: leading-3
    */
-  lineHeight(lineHeight: LineHeight, fontSize: number): this {
+  lineHeight(lineHeight: LineHeight, fontSize: number): string {
     const lineHeightProp = commonLineHeight(lineHeight, fontSize);
     if (lineHeightProp > 0) {
       const value = pxToLineHeight(lineHeightProp);
-      this.addAttributes(`leading-${value}`);
+      return `leading-${value}`;
     }
 
-    return this;
+    return "";
   }
 
   /**
@@ -221,36 +209,35 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/text-transform/
    * example: uppercase
    */
-  textTransform(node: TextNode): this {
-    if (node.textCase === "LOWER") {
-      this.addAttributes("lowercase");
-    } else if (node.textCase === "TITLE") {
-      this.addAttributes("capitalize");
-    } else if (node.textCase === "UPPER") {
-      this.addAttributes("uppercase");
-    } else if (node.textCase === "ORIGINAL") {
-      // default, ignore
+  textTransform(textCase: TextCase): string {
+    switch (textCase) {
+      case "UPPER":
+        return "uppercase";
+      case "LOWER":
+        return "lowercase";
+      case "TITLE":
+        return "capitalize";
+      case "ORIGINAL":
+      case "SMALL_CAPS":
+      case "SMALL_CAPS_FORCED":
+      default:
+        return "";
     }
-
-    return this;
   }
 
   /**
    * https://tailwindcss.com/docs/text-decoration/
    * example: underline
    */
-  textDecoration(textDecoration: TextDecoration): this {
+  textDecoration(textDecoration: TextDecoration): string {
     switch (textDecoration) {
-      case "NONE":
-        break;
       case "STRIKETHROUGH":
-        this.addAttributes("line-through");
-        break;
+        return "line-through";
       case "UNDERLINE":
-        this.addAttributes("underline");
-        break;
+        return "underline";
+      case "NONE":
+        return "";
     }
-    return this;
   }
 
   reset(): void {

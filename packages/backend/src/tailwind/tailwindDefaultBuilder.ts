@@ -61,7 +61,11 @@ export class TailwindDefaultBuilder {
       MinimalBlendMixin,
     optimizeLayout: boolean
   ): this {
-    this.size(node);
+    if (node.type === "TEXT") {
+      this.textSize(node);
+    } else {
+      this.size(node);
+    }
     this.autoLayoutPadding(node, optimizeLayout);
     this.position(node, optimizeLayout);
     this.blend(node);
@@ -152,6 +156,20 @@ export class TailwindDefaultBuilder {
     this.addAttributes(width, height);
     return this;
   }
+  // must be called before Position method
+  textSize = (node: TextNode): this => {
+    const { width, height } = tailwindSizePartial(node);
+
+    if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
+      this.addAttributes(width);
+    }
+
+    if (node.textAutoResize === "NONE") {
+      this.addAttributes(height);
+    }
+
+    return this;
+  };
 
   autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
     if ("paddingLeft" in node) {

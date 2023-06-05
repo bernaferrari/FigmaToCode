@@ -1,7 +1,9 @@
 import { nodeSize } from "../../common/nodeWidthHeight";
 import { sliceNum } from "../../common/numToAutoFixed";
 
-export const swiftuiSize = (node: SceneNode): [string, string] => {
+export const swiftuiSize = (
+  node: SceneNode
+): { width: string; height: string } => {
   const size = nodeSize(node);
 
   // if width is set as maxWidth, height must also be set as maxHeight (not height)
@@ -34,5 +36,5 @@ export const swiftuiSize = (node: SceneNode): [string, string] => {
     propHeight = `maxHeight: .infinity`;
   }
 
-  return [propWidth, propHeight];
+  return { width: propWidth, height: propHeight };
 };

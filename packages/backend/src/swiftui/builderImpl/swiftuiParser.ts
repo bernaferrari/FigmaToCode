@@ -20,7 +20,7 @@ export class SwiftUIElement {
   }
 
   addModifier(modifier: Modifier | null): this {
-    if (modifier) {
+    if (modifier && modifier[1] !== "") {
       this.modifiers.push([modifier[0], modifier[1]]);
     }
     return this;

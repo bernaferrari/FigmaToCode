@@ -83,10 +83,10 @@ export const run = (settings: PluginSettings) => {
       settings.framework
     ),
   });
-  if (settings.framework === "Tailwind") {
-    figma.ui.postMessage({
-      type: "text",
-      data: retrieveTailwindText(convertedSelection),
-    });
-  }
+  // if (settings.framework === "Tailwind") {
+  //   figma.ui.postMessage({
+  //     type: "text",
+  //     data: retrieveTailwindText(convertedSelection),
+  //   });
+  // }
 };

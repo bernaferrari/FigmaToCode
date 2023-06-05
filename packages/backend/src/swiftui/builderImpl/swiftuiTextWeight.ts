@@ -34,28 +34,28 @@ export const swiftuiFontMatcher = (node: TextNode): string => {
  * nine weights — from Ultralight to Black
  * https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/
  */
-export const swiftuiWeightMatcher = (
-  weight: "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
-): string => {
+export const swiftuiWeightMatcher = (weight: number): string => {
   // yes, "ultraLight" and "semibold" are correct.
   switch (weight) {
-    case "100":
+    case 100:
       return ".ultraLight";
-    case "200":
+    case 200:
       return ".thin";
-    case "300":
+    case 300:
       return ".light";
-    case "400":
+    case 400:
       return ".regular";
-    case "500":
+    case 500:
       return ".medium";
-    case "600":
+    case 600:
       return ".semibold";
-    case "700":
+    case 700:
       return ".bold";
-    case "800":
+    case 800:
       return ".heavy";
-    case "900":
+    case 900:
       return ".black";
+    default:
+      return "";
   }
 };

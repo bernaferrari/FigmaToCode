@@ -3,13 +3,13 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
-import { convertFontWeight } from "../common/convertFontWeight";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
-import {
-  swiftuiFontMatcher,
-  swiftuiWeightMatcher,
-} from "./builderImpl/swiftuiTextWeight";
+import { swiftuiWeightMatcher } from "./builderImpl/swiftuiTextWeight";
 import { swiftuiSize } from "./builderImpl/swiftuiSize";
+import { globalTextStyleSegments } from "../altNodes/altConversion";
+import { SwiftUIElement } from "./builderImpl/swiftuiParser";
+import { parseTextAsCode } from "../flutter/flutterTextBuilder";
+import { swiftuiColorFromFills } from "./builderImpl/swiftuiColor";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   modifiers: string[] = [];
@@ -23,44 +23,49 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     return this;
   }
 
-  textDecoration(node: TextNode): this {
-    // https://developer.apple.com/documentation/swiftui/text/underline(_:color:)
-    if (node.textDecoration === "UNDERLINE") {
-      this.modifiers.push(".underline()");
+  textDecoration(textDecoration: TextDecoration): string {
+    switch (textDecoration) {
+      case "UNDERLINE":
+        // https://developer.apple.com/documentation/swiftui/text/underline(_:color:)
+        return ".underline()";
+      case "STRIKETHROUGH":
+        // https://developer.apple.com/documentation/swiftui/text/strikethrough(_:color:)
+        return ".strikethrough()";
+      case "NONE":
+        return "";
     }
+  }
 
-    // https://developer.apple.com/documentation/swiftui/text/strikethrough(_:color:)
-    if (node.textDecoration === "STRIKETHROUGH") {
-      this.modifiers.push(".strikethrough()");
+  textColor(fills: Paint[]): string {
+    const fillColor = swiftuiColorFromFills(fills);
+    if (fillColor) {
+      return fillColor;
     }
+    return "";
+  }
 
+  textStyle(node: TextNode): string {
     // https://developer.apple.com/documentation/swiftui/text/italic()
     if (
       node.fontName !== figma.mixed &&
       node.fontName.style.toLowerCase().match("italic")
     ) {
-      this.modifiers.push(".italic()");
+      return ".italic()";
     }
 
-    return this;
+    return "";
   }
 
-  textStyle = (node: TextNode): this => {
+  fontWeight(fontWeight: number): string {
     // for some reason this must be set before the multilineTextAlignment
-    if (node.fontName !== figma.mixed) {
-      const fontWeight = convertFontWeight(node.fontName.style);
-      if (fontWeight && fontWeight !== "400") {
-        const weight = swiftuiWeightMatcher(fontWeight);
-        this.modifiers.push(`.fontWeight(${weight})`);
-      }
+    if (fontWeight !== 400) {
+      const weight = swiftuiWeightMatcher(fontWeight);
+      return `.weight(${weight})`;
     }
+    return "";
+  }
 
-    // https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/
-    const retrievedFont = swiftuiFontMatcher(node);
-    if (retrievedFont) {
-      this.modifiers.push(`.font(${retrievedFont})`);
-    }
-
+  textStyle2 = (node: TextNode): this => {
     // todo might be a good idea to calculate the width based on the font size and check if view is really multi-line
     if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
       // it can be confusing, but multilineTextAlignment is always set to left by default.
@@ -74,45 +79,106 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     return this;
   };
 
-  letterSpacing = (node: TextNode): this => {
-    const letterSpacing = commonLetterSpacing(node);
-    if (letterSpacing > 0) {
-      this.modifiers.push(`.tracking(${sliceNum(letterSpacing)})`);
+  createText(node: TextNode): this {
+    let alignHorizontal =
+      node.textAlignHorizontal?.toString()?.toLowerCase() ?? "left";
+    alignHorizontal =
+      alignHorizontal === "justified" ? "justify" : alignHorizontal;
+
+    // const basicTextStyle = {
+    //   textAlign:
+    //     alignHorizontal !== "left" ? `TextAlign.${alignHorizontal}` : "",
+    // };
+
+    const segments = this.getTextSegments(node.id);
+    if (segments.length === 1) {
+      this.modifiers.push(segments[0].style);
+      // return segments[0].text;
+    } else {
+      this.modifiers.push(
+        segments.map((segment) => segment.style).join(" +\n")
+      );
     }
 
     return this;
+  }
+
+  getTextSegments(id: string): { style: string; text: string }[] {
+    const segments = globalTextStyleSegments[id];
+    if (!segments) {
+      return [];
+    }
+
+    return segments.map((segment) => {
+      const fontSize = sliceNum(segment.fontSize);
+      // TODO add this back:
+      // const fontStyle = this.fontStyle(segment.fontName);
+      const fontFamily = segment.fontName.family;
+      const fontWeight = this.fontWeight(segment.fontWeight);
+      const lineHeight = this.lineHeight(segment.lineHeight, segment.fontSize);
+      const letterSpacing = this.letterSpacing(
+        segment.letterSpacing,
+        segment.fontSize
+      );
+
+      let text = parseTextAsCode(segment.characters);
+      if (segment.textCase === "LOWER") {
+        text = text.toLowerCase();
+      } else if (segment.textCase === "UPPER") {
+        text = text.toUpperCase();
+      }
+
+      const element = new SwiftUIElement(
+        `Text(${parseTextAsCode(`"${text}"`)})`
+      )
+        .addModifier([
+          "font",
+          `Font.custom("${fontFamily}", size: ${fontSize})${
+            fontWeight ? `${fontWeight}` : ""
+          }`,
+        ])
+        .addModifier(["tracking", letterSpacing])
+        .addModifier(["lineSpacing", lineHeight])
+        .addModifier(["foregroundColor", this.textColor(segment.fills)]);
+
+      return { style: element.toString(), text: text };
+    });
+  }
+
+  letterSpacing = (letterSpacing: LetterSpacing, fontSize: number): string => {
+    const value = commonLetterSpacing(letterSpacing, fontSize);
+    if (value > 0) {
+      return sliceNum(value);
+    }
+    return "";
   };
 
   // the difference between kerning and tracking is that tracking spaces everything, kerning keeps lignatures,
   // Figma spaces everything, so we are going to use tracking.
-  lineHeight = (node: TextNode): this => {
-    const letterHeight = commonLineHeight(node);
-
-    if (letterHeight > 0) {
-      this.modifiers.push(`.lineSpacing(${sliceNum(letterHeight)})`);
+  lineHeight = (lineHeight: LineHeight, fontSize: number): string => {
+    const value = commonLineHeight(lineHeight, fontSize);
+    if (value > 0) {
+      return sliceNum(value);
     }
-
-    return this;
+    return "";
   };
 
   wrapTextAutoResize = (node: TextNode): string => {
-    const [propWidth, propHeight] = swiftuiSize(node);
+    const { width, height } = swiftuiSize(node);
 
-    let comp = "";
+    let comp: string[] = [];
     if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
-      comp += propWidth;
+      comp.push(width);
     }
 
     if (node.textAutoResize === "NONE") {
       // if it is NONE, it isn't WIDTH_AND_HEIGHT, which means the comma must be added.
-      comp += ", ";
-      comp += propHeight;
+      comp.push(height);
     }
 
     if (comp.length > 0) {
       const align = this.textAlignment(node);
-
-      return `.frame(${comp}${align})`;
+      return `.frame(${comp.join(", ")}${align})`;
     }
 
     return "";

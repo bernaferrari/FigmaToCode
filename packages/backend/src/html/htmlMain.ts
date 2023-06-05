@@ -97,8 +97,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
 export const htmlText = (node: TextNode, isJsx: boolean): string => {
   let layoutBuilder = new HtmlTextBuilder(node, showLayerName, isJsx)
     .commonPositionStyles(node, localSettings.optimizeLayout)
-    .textAlign(node)
-    .textTransform(node);
+    .textAlign(node);
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
 

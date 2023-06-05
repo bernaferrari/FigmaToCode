@@ -1,7 +1,4 @@
-import {
-  flutterBorder,
-  generateBorderSideCode,
-} from "./builderImpl/flutterBorder";
+import { flutterBorder } from "./builderImpl/flutterBorder";
 import { flutterSize } from "./builderImpl/flutterSize";
 import { flutterPadding } from "./builderImpl/flutterPadding";
 import { flutterShadow } from "./builderImpl/flutterShadow";

@@ -27,17 +27,12 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     alignHorizontal =
       alignHorizontal === "justified" ? "justify" : alignHorizontal;
 
-    const textAlign =
-      alignHorizontal !== "left"
-        ? `\ntextAlign: TextAlign.${alignHorizontal},`
-        : "";
-
-    const segments = this.getTextSegments(node.id);
-
     const basicTextStyle = {
-      textAlign: textAlign,
+      textAlign:
+        alignHorizontal !== "left" ? `TextAlign.${alignHorizontal}` : "",
     };
 
+    const segments = this.getTextSegments(node.id);
     if (segments.length === 1) {
       this.child = generateWidgetCode(
         "Text",
@@ -45,14 +40,14 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
           ...basicTextStyle,
           style: segments[0].style,
         },
-        [`'${parseTextAsCode(segments[0].text)}'`]
+        [`'${segments[0].text}'`]
       );
     } else {
       this.child = generateWidgetCode("Text.rich", basicTextStyle, [
         generateWidgetCode("TextSpan", {
           children: segments.map((segment) =>
             generateWidgetCode("TextSpan", {
-              text: `'${parseTextAsCode(segment.text)}'`,
+              text: `'${segment.text}'`,
               style: segment.style,
             })
           ),
@@ -76,11 +71,8 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
       const fontStyle = this.fontStyle(segment.fontName);
       const fontFamily = `'${segment.fontName.family}'`;
       const fontWeight = `FontWeight.w${segment.fontWeight}`;
-      const lineHeight = this.getFlutterLineHeightStyle(
-        segment.lineHeight,
-        segment.fontSize
-      );
-      const letterSpacing = this.getFlutterLetterSpacingStyle(
+      const lineHeight = this.lineHeight(segment.lineHeight, segment.fontSize);
+      const letterSpacing = this.letterSpacing(
         segment.letterSpacing,
         segment.fontSize
       );
@@ -107,7 +99,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         text = text.toUpperCase();
       }
 
-      return { style: style, text: text };
+      return { style: style, text: parseTextAsCode(text) };
     });
   }
 
@@ -122,21 +114,18 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     }
   }
 
-  getFlutterLineHeightStyle(lineHeight: LineHeight, fontSize: number): string {
-    const commonSize = commonLineHeight(lineHeight, fontSize);
-    if (commonSize) {
-      return sliceNum(commonSize);
+  lineHeight(lineHeight: LineHeight, fontSize: number): string {
+    const value = commonLineHeight(lineHeight, fontSize);
+    if (value) {
+      return sliceNum(value);
     }
     return "";
   }
 
-  getFlutterLetterSpacingStyle(
-    letterSpacing: LetterSpacing,
-    fontSize: number
-  ): string {
-    const commonSize = commonLetterSpacing(letterSpacing, fontSize);
-    if (commonSize) {
-      return sliceNum(commonSize);
+  letterSpacing(letterSpacing: LetterSpacing, fontSize: number): string {
+    const value = commonLetterSpacing(letterSpacing, fontSize);
+    if (value) {
+      return sliceNum(value);
     }
     return "";
   }
@@ -156,10 +145,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
 }
 
 export const wrapTextAutoResize = (node: TextNode, child: string): string => {
-  const fSize = flutterSize(node);
-  const width = fSize.width;
-  const height = fSize.height;
-  const isExpanded = fSize.isExpanded;
+  const { width, height, isExpanded } = flutterSize(node);
   let result = "";
 
   if (node.textAutoResize === "NONE") {
@@ -191,5 +177,5 @@ export const wrapTextAutoResize = (node: TextNode, child: string): string => {
   return child;
 };
 
-export const parseTextAsCode = (phrase: string) =>
-  phrase.replace(/\\\\/g, "\\\\\\\\");
+export const parseTextAsCode = (originalText: string) =>
+  originalText.replace(/\n/g, "\\n");
