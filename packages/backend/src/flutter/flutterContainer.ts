@@ -1,8 +1,14 @@
-import { flutterBorder } from "./builderImpl/flutterBorder";
+import {
+  flutterBorder,
+  generateBorderSideCode,
+} from "./builderImpl/flutterBorder";
 import { flutterSize } from "./builderImpl/flutterSize";
 import { flutterPadding } from "./builderImpl/flutterPadding";
 import { flutterShadow } from "./builderImpl/flutterShadow";
-import { flutterBoxDecorationColor } from "./builderImpl/flutterColor";
+import {
+  flutterBoxDecorationColor,
+  flutterColorFromFills,
+} from "./builderImpl/flutterColor";
 import {
   generateWidgetCode,
   skipDefaultProperty,
@@ -114,10 +120,30 @@ const generateRoundedRectangleBorder = (
   node: SceneNode & MinimalStrokesMixin
 ): string => {
   return generateWidgetCode("RoundedRectangleBorder", {
+    side: generateBorderSideCode(node),
     borderRadius: generateBorderRadius(node),
+  });
+};
+
+const generateBorderSideCode = (
+  node: SceneNode & MinimalStrokesMixin
+): string => {
+  const width =
+    node.strokeWeight !== figma.mixed
+      ? node.strokeWeight
+      : "strokeTopWeight" in node
+      ? node.strokeTopWeight
+      : 0;
+
+  return generateWidgetCode("BorderSide", {
+    width: skipDefaultProperty(width, 0),
     strokeAlign: skipDefaultProperty(
       getStrokeAlign(node),
       "BorderSide.strokeAlignInside"
+    ),
+    color: skipDefaultProperty(
+      flutterColorFromFills(node.strokes),
+      "Colors.black"
     ),
   });
 };
@@ -133,6 +159,7 @@ const generateStarBorder = (node: StarNode): string => {
   const squash = 0; // Assuming no squash, modify if needed
 
   return generateWidgetCode("StarBorder", {
+    side: generateBorderSideCode(node),
     points: sliceNum(points),
     innerRadiusRatio: sliceNum(innerRadiusRatio),
     pointRounding: sliceNum(pointRounding),
@@ -156,15 +183,16 @@ export const getStrokeAlign = (node: MinimalStrokesMixin): string => {
 };
 
 const generateOvalBorder = (node: EllipseNode): string => {
-  return generateWidgetCode("OvalBorder", {});
+  return generateWidgetCode("OvalBorder", {
+    side: generateBorderSideCode(node),
+  });
 };
 
 const generatePolygonBorder = (node: PolygonNode): string => {
   const points = node.pointCount;
-  const cornerRadius = node.cornerRadius;
-  const borderRadius = cornerRadius === figma.mixed ? 0 : cornerRadius;
 
   return generateWidgetCode("StarBorder.polygon", {
+    side: generateBorderSideCode(node),
     sides: sliceNum(points),
     borderRadius: generateBorderRadius(node),
   });
