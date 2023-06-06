@@ -1,12 +1,11 @@
 import { convertIntoNodes } from "./altNodes/altConversion";
 import {
   retrieveGenericSolidUIColors,
-  retrieveGenericLinearGradients,
+  retrieveGenericLinearGradients as retrieveGenericGradients,
 } from "./common/retrieveUI/retrieveColors";
 import { flutterMain } from "./flutter/flutterMain";
 import { htmlMain } from "./html/htmlMain";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
-import { retrieveTailwindText } from "./tailwind/retrieveUI/retrieveTexts";
 import { tailwindMain } from "./tailwind/tailwindMain";
 
 export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
@@ -70,23 +69,8 @@ export const run = (settings: PluginSettings) => {
         true
       ),
     },
+    colors: retrieveGenericSolidUIColors(settings.framework),
+    gradients: retrieveGenericGradients(settings.framework),
+    // text: retrieveTailwindText(convertedSelection),
   });
-
-  // figma.ui.postMessage({
-  //   type: "colors",
-  //   data: retrieveGenericSolidUIColors(convertedSelection, settings.framework),
-  // });
-  // figma.ui.postMessage({
-  //   type: "gradients",
-  //   data: retrieveGenericLinearGradients(
-  //     convertedSelection,
-  //     settings.framework
-  //   ),
-  // });
-  // if (settings.framework === "Tailwind") {
-  //   figma.ui.postMessage({
-  //     type: "text",
-  //     data: retrieveTailwindText(convertedSelection),
-  //   });
-  // }
 };

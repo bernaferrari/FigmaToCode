@@ -7,6 +7,7 @@ import {
   htmlMain,
   PluginSettings,
 } from "backend";
+import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retrieveColors";
 
 let userPluginSettings: PluginSettings;
 
@@ -148,11 +149,13 @@ switch (figma.mode) {
             //   code: tailwindMain(convertedSelection, defaultPluginSettings),
             //   language: "HTML",
             // },
-            // {
-            //   title: `Colors`,
-            //   code: tailwindMain(convertedSelection, defaultPluginSettings),
-            //   language: "HTML",
-            // },
+            {
+              title: `Colors`,
+              code: retrieveGenericSolidUIColors("Tailwind")
+                .map((d) => `#${d.hex} <- ${d.colorName}`)
+                .join("\n"),
+              language: "HTML",
+            },
           ];
         case "tailwind_jsx":
           return [
@@ -169,11 +172,13 @@ switch (figma.mode) {
             //   code: tailwindMain(convertedSelection, defaultPluginSettings),
             //   language: "HTML",
             // },
-            // {
-            //   title: `Colors`,
-            //   code: tailwindMain(convertedSelection, defaultPluginSettings),
-            //   language: "HTML",
-            // },
+            {
+              title: `Colors`,
+              code: retrieveGenericSolidUIColors("Tailwind")
+                .map((d) => `#${d.hex} <- ${d.colorName}`)
+                .join("\n"),
+              language: "HTML",
+            },
           ];
         case "flutter":
           return [

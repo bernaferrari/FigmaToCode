@@ -10,6 +10,14 @@ interface AppState {
     content: string;
   } | null;
   preferences: PluginSettings | null;
+  colors: {
+    hex: string;
+    colorName: string;
+    exportValue: string;
+    contrastWhite: number;
+    contrastBlack: number;
+  }[];
+  gradients: { cssPreview: string; exportedValue: string }[];
 }
 
 export default function App() {
@@ -19,6 +27,8 @@ export default function App() {
     isLoading: false,
     htmlPreview: null,
     preferences: null,
+    colors: [],
+    gradients: [],
   });
 
   const rootStyles = getComputedStyle(document.documentElement);
@@ -36,6 +46,8 @@ export default function App() {
             ...prevState,
             code: message.data,
             htmlPreview: message.htmlPreview,
+            colors: message.colors,
+            gradients: message.gradients,
           }));
           break;
         case "pluginSettingChanged":
@@ -130,6 +142,8 @@ export default function App() {
             "*"
           );
         }}
+        colors={state.colors}
+        gradients={state.gradients}
       />
     </div>
   );

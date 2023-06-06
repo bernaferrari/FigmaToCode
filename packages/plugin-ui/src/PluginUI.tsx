@@ -28,6 +28,14 @@ type PluginUIProps = {
   setSelectedFramework: (framework: FrameworkTypes) => void;
   preferences: PluginSettings | null;
   onPreferenceChange: (key: string, value: boolean | string) => void;
+  colors: {
+    hex: string;
+    colorName: string;
+    exportValue: string;
+    contrastWhite: number;
+    contrastBlack: number;
+  }[];
+  gradients: { cssPreview: string; exportedValue: string }[];
 };
 
 export const PluginUI = (props: PluginUIProps) => {
@@ -58,7 +66,7 @@ export const PluginUI = (props: PluginUIProps) => {
         }}
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
-        <div className="flex flex-col items-center px-2 py-2 dark:bg-transparent">
+        <div className="flex flex-col items-center px-2 py-2 gap-2 dark:bg-transparent">
           {/* <div className="flex flex-col items-center p-4 bg-neutral-50 dark:bg-neutral-800 rounded">
             <Description selected={props.selectedFramework} />
           </div> */}
@@ -79,10 +87,23 @@ export const PluginUI = (props: PluginUIProps) => {
             onPreferenceChange={props.onPreferenceChange}
           />
 
-          {/* <ColorsPanel /> */}
-          <div className="text-xs">
-            Other things go here, such as color, text, etc.
-          </div>
+          {props.colors.length > 0 && (
+            <ColorsPanel
+              colors={props.colors}
+              onColorClick={(value) => {
+                copy(value);
+              }}
+            />
+          )}
+
+          {props.gradients.length > 0 && (
+            <GradientsPanel
+              gradients={props.gradients}
+              onColorClick={(value) => {
+                copy(value);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -342,63 +363,162 @@ export const CodePanel = (props: {
             {props.code}
           </SyntaxHighlighter>
         </div>
-
-        <div className="flex items-center content-center justify-end mx-2 mb-2 space-x-8">
-          {/* <Switch id="material" text="Material" /> */}
-        </div>
       </div>
     );
   }
 };
 
 export const ColorsPanel = (props: {
-  // colors: string;
-  // onColorClick: (color: string) => void;
+  colors: {
+    hex: string;
+    colorName: string;
+    exportValue: string;
+    contrastWhite: number;
+    contrastBlack: number;
+  }[];
+  onColorClick: (color: string) => void;
 }) => {
+  const [isPressed, setIsPressed] = useState(-1);
+
+  const handleButtonClick = (value: string, idx: number) => {
+    setIsPressed(idx);
+    setTimeout(() => setIsPressed(-1), 250);
+    props.onColorClick(value);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="container mx-auto p-4">
-        <div className="flex flex-wrap items-start space-x-2 lg:space-x-0">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-gray-800 dark:text-gray-200 mb-2">Text</h2>
-            {["Button1", "Button2", "Button3"].map((button, idx) => (
-              <button
-                key={idx}
-                className="bg-white dark:bg-gray-800 p-2 mb-1 rounded-lg focus:outline-none focus:ring-0 hover:bg-gray-200 dark:hover:bg-gray-700 w-full transition"
+    <div className="bg-gray-100 dark:bg-neutral-900 w-full rounded-lg p-2 flex flex-col gap-2">
+      <h2 className="text-gray-800 dark:text-gray-200 text-lg font-medium">
+        Colors
+      </h2>
+      <div className="grid grid-cols-3 gap-2">
+        {props.colors.map((color, idx) => (
+          <button
+            key={"button" + idx}
+            className={`w-full h-16 rounded-lg text-sm font-semibold shadow-sm transition-all duration-300 ${
+              isPressed === idx
+                ? "ring-4 ring-green-300 ring-opacity-50 animate-pulse"
+                : "ring-0"
+            }`}
+            style={{ backgroundColor: color.hex }}
+            onClick={() => {
+              handleButtonClick(color.exportValue, idx);
+            }}
+          >
+            <div className="flex flex-col h-full justify-center items-center">
+              <span
+                className={`text-xs font-semibold ${
+                  color.contrastWhite > color.contrastBlack
+                    ? "text-white"
+                    : "text-black"
+                }`}
               >
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                    Tt
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {button}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-          <div className="flex-1 lg:max-w-[200px]">
-            <h2 className="text-gray-800 dark:text-gray-200 mb-2">Colors</h2>
-            <div className="flex flex-wrap">
-              {["red-500", "yellow-500", "blue-500"].map((color, idx) => (
-                <button
-                  key={idx}
-                  className={`bg-${color} w-full sm:w-1/2 lg:w-full h-16 mb-1 rounded-lg focus:outline-none focus:ring-0 transition`}
-                >
-                  <div className="flex flex-col h-full justify-center items-center">
-                    <span className="text-xs font-semibold text-white">
-                      Color{idx + 1}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                {color.colorName ? color.colorName : `#${color.hex}`}
+              </span>
             </div>
-          </div>
-        </div>
+          </button>
+        ))}
       </div>
     </div>
   );
 };
+
+export const GradientsPanel = (props: {
+  gradients: {
+    cssPreview: string;
+    exportedValue: string;
+  }[];
+  onColorClick: (color: string) => void;
+}) => {
+  const [isPressed, setIsPressed] = useState(-1);
+
+  const handleButtonClick = (value: string, idx: number) => {
+    setIsPressed(idx);
+    setTimeout(() => setIsPressed(-1), 250);
+    props.onColorClick(value);
+  };
+
+  console.log(props.gradients);
+
+  return (
+    <div className="bg-gray-100 dark:bg-neutral-900 w-full rounded-lg p-2 flex flex-col gap-2">
+      <h2 className="text-gray-800 dark:text-gray-200 text-lg font-medium">
+        Gradients
+      </h2>
+      <div className="grid grid-cols-3 gap-2">
+        {props.gradients.map((gradient, idx) => (
+          <button
+            key={"button" + idx}
+            className={`w-full h-16 rounded-lg text-sm shadow-sm transition-all duration-300 ${
+              isPressed === idx
+                ? "ring-4 ring-green-300 ring-opacity-50 animate-pulse"
+                : "ring-0"
+            }`}
+            style={{ background: gradient.cssPreview }}
+            onClick={() => {
+              handleButtonClick(gradient.exportedValue, idx);
+            }}
+          ></button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// export const PrevColorsPanel = (props: {
+//   colors: {
+//     hex: string;
+//     colorName: string;
+//     exportValue: string;
+//     contrastWhite: number;
+//     contrastBlack: number;
+//   }[];
+//   // onColorClick: (color: string) => void;
+// }) => {
+//   return (
+//     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+//       <div className="container mx-auto p-4">
+//         <div className="flex flex-wrap items-start space-x-2 lg:space-x-0">
+//           <div className="flex-1 min-w-0">
+//             <h2 className="text-gray-800 dark:text-gray-200 mb-2">Text</h2>
+//             {["Button1", "Button2", "Button3"].map((button, idx) => (
+//               <button
+//                 key={idx}
+//                 className="bg-white dark:bg-gray-800 p-2 mb-1 rounded-lg focus:outline-none focus:ring-0 hover:bg-gray-200 dark:hover:bg-gray-700 w-full transition"
+//               >
+//                 <div className="flex flex-col">
+//                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+//                     Tt
+//                   </span>
+//                   <span className="text-xs text-gray-500 dark:text-gray-400">
+//                     {button}
+//                   </span>
+//                 </div>
+//               </button>
+//             ))}
+//           </div>
+//           <div className="flex-1 lg:max-w-[200px]">
+//             <h2 className="text-gray-800 dark:text-gray-200 mb-2">Colors</h2>
+//             <div className="flex flex-wrap">
+//               {["red-500", "yellow-500", "blue-500"].map((color, idx) => (
+//                 <button
+//                   key={idx}
+//                   className={`bg-${color} w-full sm:w-1/2 lg:w-full h-16 mb-1 rounded-lg focus:outline-none focus:ring-0 transition`}
+//                 >
+//                   <div className="flex flex-col h-full justify-center items-center">
+//                     <span className="text-xs font-semibold text-white">
+//                       Color{idx + 1}
+//                     </span>
+//                   </div>
+//                 </button>
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 type SelectableToggleProps = {
   onSelect: (isSelected: boolean) => void;

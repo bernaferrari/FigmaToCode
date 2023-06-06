@@ -15,6 +15,9 @@ export const swiftuiPadding = (
   }
 
   if ("all" in padding) {
+    if (padding.all === 0) {
+      return null;
+    }
     return ["padding", sliceNum(padding.all)];
   }
 
