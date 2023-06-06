@@ -72,7 +72,7 @@ const convertSolidColor = (
   }
 
   return {
-    hex: rgbTo6hex(fill.color),
+    hex: rgbTo6hex(fill.color).toUpperCase(),
     colorName,
     exportValue: exported,
     contrastBlack,

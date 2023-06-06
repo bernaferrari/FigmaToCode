@@ -62,11 +62,15 @@ export default function App() {
             ...prevState,
             code: "// No layer is selected.",
             htmlPreview: null,
+            colors: [],
+            gradients: [],
           }));
           break;
         case "error":
           setState((prevState) => ({
             ...prevState,
+            colors: [],
+            gradients: [],
             code: `Error :(\n// ${message.data}`,
           }));
           break;

@@ -226,6 +226,16 @@ const selectPreferenceOptions: {
     ],
     includedLanguages: ["SwiftUI"],
   },
+  // {
+  //   itemType: "select",
+  //   propertyName: "htmlGenerationMode",
+  //   label: "Mode",
+  //   options: [
+  //     { label: "Component", value: "component" },
+  //     { label: "Snippet", value: "snippet" },
+  //   ],
+  //   includedLanguages: ["HTML"],
+  // },
 ];
 
 export const CodePanel = (props: {
