@@ -42,8 +42,10 @@ export const flutterRotation = (node: LayoutMixin, child: string): string => {
     child !== "" &&
     Math.round(node.rotation) !== 0
   ) {
-    return generateWidgetCode("Transform.rotate", {
-      angle: sliceNum(node.rotation * (-3.14159 / 180)),
+    return generateWidgetCode("Transform", {
+      transform: `Matrix4.identity()..translate(0.0, 0.0)..rotateZ(${sliceNum(
+        node.rotation * (-3.14159 / 180)
+      )})`,
       child: child,
     });
   }

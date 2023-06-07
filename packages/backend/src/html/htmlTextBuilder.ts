@@ -2,7 +2,6 @@ import { formatMultipleJSX, formatWithJSX } from "../common/parseJSX";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { htmlColorFromFills } from "./builderImpl/htmlColor";
-import { sliceNum } from "../common/numToAutoFixed";
 import {
   commonLetterSpacing,
   commonLineHeight,
@@ -23,7 +22,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       const styleAttributes = formatMultipleJSX(
         {
           color: htmlColorFromFills(segment.fills),
-          "font-size": sliceNum(segment.fontSize),
+          "font-size": segment.fontSize,
           "font-family": segment.fontName.family,
           "font-style": this.getFontStyle(segment.fontName.style),
           "font-weight": `${segment.fontWeight}`,
@@ -80,20 +79,20 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     }
   }
 
-  letterSpacing(letterSpacing: LetterSpacing, fontSize: number): string {
+  letterSpacing(letterSpacing: LetterSpacing, fontSize: number): number | null {
     const letterSpacingProp = commonLetterSpacing(letterSpacing, fontSize);
     if (letterSpacingProp > 0) {
-      return sliceNum(letterSpacingProp);
+      return letterSpacingProp;
     }
-    return "";
+    return null;
   }
 
-  lineHeight(lineHeight: LineHeight, fontSize: number): string {
+  lineHeight(lineHeight: LineHeight, fontSize: number): number | null {
     const lineHeightProp = commonLineHeight(lineHeight, fontSize);
     if (lineHeightProp > 0) {
-      return sliceNum(lineHeightProp);
+      return lineHeightProp;
     }
-    return "";
+    return null;
   }
 
   /**

@@ -1,6 +1,6 @@
 {
   "name": "Figma to Code [Dev]",
-  "id": "1248037579235937673",
+  "id": "842128343887142055",
   "api": "1.0.0",
   "main": "apps/plugin/dist/code.js",
   "ui": "apps/plugin/dist/index.html",

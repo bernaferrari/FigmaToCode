@@ -14,6 +14,7 @@ export const convertNodesOnRectangle = (
       "Node is missing an id! This error should only happen in tests."
     );
   }
+  console.log("returning node2", node);
 
   const colliding = retrieveCollidingItems(node.children);
 
@@ -26,7 +27,7 @@ export const convertNodesOnRectangle = (
     const parentNode = node.children.find((d) => d.id === key) as RectangleNode;
 
     // retrieve the position. Key should always be at the left side, so even when other items are removed, the index is kept the same.
-    const indexPosition = updatedChildren.findIndex((d) => d.id === key);
+    // const indexPosition = updatedChildren.findIndex((d) => d.id === key);
 
     // filter the children to remove those that are being modified
     updatedChildren = updatedChildren.filter(
@@ -38,7 +39,6 @@ export const convertNodesOnRectangle = (
     // todo when the soon-to-be-parent is larger than its parent, things get weird. Happens, for example, when a large image is used in the background. Should this be handled or is this something user should never do?
 
     Object.assign(frameNode, { children: [...colliding[key]] });
-    // frameNode.children = [...colliding[key]];
     colliding[key].forEach((d) => {
       Object.assign(d, { parent: frameNode });
       d.x = d.x - frameNode.x;
@@ -49,6 +49,8 @@ export const convertNodesOnRectangle = (
   if (updatedChildren.length > 0) {
     Object.assign(node, { children: updatedChildren });
   }
+
+  console.log("returning node", node);
 
   return node;
 };

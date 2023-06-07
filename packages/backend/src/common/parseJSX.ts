@@ -33,10 +33,10 @@ export const formatMultipleJSXArray = (
     .map(([key, value]) => formatWithJSX(key, isJsx, value));
 
 export const formatMultipleJSX = (
-  styles: Record<string, string | number>,
+  styles: Record<string, string | number | null>,
   isJsx: boolean
 ): string =>
   Object.entries(styles)
-    .filter(([key, value]) => value !== "")
-    .map(([key, value]) => formatWithJSX(key, isJsx, value))
+    .filter(([key, value]) => value)
+    .map(([key, value]) => formatWithJSX(key, isJsx, value!))
     .join(isJsx ? ", " : "; ");

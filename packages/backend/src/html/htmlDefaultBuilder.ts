@@ -17,6 +17,7 @@ import {
   getCommonPositionValue,
 } from "../common/commonPosition";
 import { className } from "../common/numToAutoFixed";
+import { commonStroke } from "../common/commonStroke";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
@@ -66,30 +67,61 @@ export class HtmlDefaultBuilder {
 
   border(node: GeometryMixin & SceneNode): this {
     this.addStyles(...htmlBorderRadius(node, this.isJSX));
-    if (
-      node.strokes &&
-      node.strokes.length > 0 &&
-      node.strokeWeight !== figma.mixed &&
-      node.strokeWeight > 0
-    ) {
-      const fill = this.retrieveFill(node.strokes);
-      const weight = node.strokeWeight;
-      const borderStyle = node.dashPattern.length > 0 ? "dotted" : "solid";
 
-      if (fill.kind === "gradient") {
-        this.addStyles(
-          formatWithJSX("border", this.isJSX, `${weight}px ${borderStyle}`)
-        );
-        this.addStyles(
-          formatWithJSX("border-image-slice", this.isJSX, 1),
-          formatWithJSX("border-image-source", this.isJSX, fill.prop)
-        );
-      } else {
+    const commonBorder = commonStroke(node);
+    if (!commonBorder) {
+      return this;
+    }
+
+    const color = htmlColorFromFills(node.strokes);
+    const borderStyle = node.dashPattern.length > 0 ? "dotted" : "solid";
+
+    if ("all" in commonBorder) {
+      if (commonBorder.all === 0) {
+        return this;
+      }
+      const weight = commonBorder.all;
+      this.addStyles(
+        formatWithJSX(
+          "border",
+          this.isJSX,
+          `${weight}px ${color} ${borderStyle}`
+        )
+      );
+    } else {
+      if (commonBorder.left !== 0) {
         this.addStyles(
           formatWithJSX(
-            "border",
+            "border-left",
             this.isJSX,
-            `${weight}px ${borderStyle} ${fill.prop}`
+            `${commonBorder.left}px ${color} ${borderStyle}`
+          )
+        );
+      }
+      if (commonBorder.top !== 0) {
+        this.addStyles(
+          formatWithJSX(
+            "border-top",
+            this.isJSX,
+            `${commonBorder.top}px ${color} ${borderStyle}`
+          )
+        );
+      }
+      if (commonBorder.right !== 0) {
+        this.addStyles(
+          formatWithJSX(
+            "border-right",
+            this.isJSX,
+            `${commonBorder.right}px ${color} ${borderStyle}`
+          )
+        );
+      }
+      if (commonBorder.bottom !== 0) {
+        this.addStyles(
+          formatWithJSX(
+            "border-bottom",
+            this.isJSX,
+            `${commonBorder.bottom}px ${color} ${borderStyle}`
           )
         );
       }

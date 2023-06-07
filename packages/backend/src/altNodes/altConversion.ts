@@ -4,27 +4,6 @@ type ParentType = (BaseNode & ChildrenMixin) | null;
 
 export let globalTextStyleSegments: Record<string, StyledTextSegment[]> = {};
 
-// export const convertSingleNodeTo = (
-//   node: SceneNode,
-//   parent: ParentType = null
-// ): SceneNode => {
-//   globalTextStyleSegments = {};
-//   return convertIntoNodes([node], parent)[0];
-// };
-
-const assignProperty = (
-  target: any,
-  source: any,
-  prop: string,
-  descriptor: PropertyDescriptor
-) => {
-  const value =
-    typeof source[prop] === "object"
-      ? JSON.parse(JSON.stringify(source[prop]))
-      : source[prop];
-  Object.defineProperty(target, prop, { ...descriptor, value });
-};
-
 export const cloneNode = <T extends BaseNode>(node: T): T => {
   // Create the cloned object with the correct prototype
   const cloned = {} as T;
@@ -135,7 +114,6 @@ export const convertIntoNodes = (
         // if (iconToRect != null) {
         //   return iconToRect;
         // }
-
         return frameNodeTo(node, parent);
       case "GROUP":
         if (node.children.length === 1 && node.visible) {

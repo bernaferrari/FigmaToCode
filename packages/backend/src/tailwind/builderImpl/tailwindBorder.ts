@@ -1,29 +1,49 @@
 import { getCommonRadius } from "../../common/commonRadius";
+import { commonStroke } from "../../common/commonStroke";
 import { nearestValue, pxToBorderRadius } from "../conversionTables";
 
 /**
  * https://tailwindcss.com/docs/border-width/
  * example: border-2
  */
-export const tailwindBorderWidth = (node: MinimalStrokesMixin): string => {
-  // [node.strokeWeight] can have a value even when there are no strokes
-  // [when testing] node.effects can be undefined
-  if (
-    node.strokes &&
-    node.strokes.length > 0 &&
-    node.strokeWeight !== figma.mixed &&
-    node.strokeWeight > 0
-  ) {
+export const tailwindBorderWidth = (node: SceneNode): string => {
+  const commonBorder = commonStroke(node);
+  if (!commonBorder) {
+    return "";
+  }
+
+  const getBorder = (weight: number, kind: string) => {
     const allowedValues = [1, 2, 4, 8];
-    const nearest = nearestValue(node.strokeWeight, allowedValues);
+    const nearest = nearestValue(weight, allowedValues);
     if (nearest === 1) {
       // special case
-      return "border ";
+      return "border";
     } else {
-      return `border-${nearest}`;
+      return `border${kind}-${nearest}`;
     }
+  };
+
+  if ("all" in commonBorder) {
+    if (commonBorder.all === 0) {
+      return "";
+    }
+    return getBorder(commonBorder.all, "");
   }
-  return "";
+
+  const comp = [];
+  if (commonBorder.left !== 0) {
+    comp.push(getBorder(commonBorder.left, "-l"));
+  }
+  if (commonBorder.right !== 0) {
+    comp.push(getBorder(commonBorder.right, "-r"));
+  }
+  if (commonBorder.top !== 0) {
+    comp.push(getBorder(commonBorder.top, "-t"));
+  }
+  if (commonBorder.bottom !== 0) {
+    comp.push(getBorder(commonBorder.bottom, "-b"));
+  }
+  return comp.join(" ");
 };
 
 /**

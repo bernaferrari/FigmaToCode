@@ -6,6 +6,21 @@ export const nearestValue = (goal: number, array: Array<number>): number => {
   });
 };
 
+export const exactValue = (
+  goal: number,
+  array: Array<number>
+): number | null => {
+  for (let i = 0; i < array.length; i++) {
+    const diff = Math.abs(goal - array[i]);
+
+    if (diff <= 0.05) {
+      return array[i];
+    }
+  }
+
+  return null;
+};
+
 /**
  * convert pixel values to Tailwind attributes.
  * by default, Tailwind uses rem, while Figma uses px.

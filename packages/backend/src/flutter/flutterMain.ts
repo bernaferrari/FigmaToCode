@@ -88,12 +88,15 @@ const flutterWidgetGenerator = (
       case "ELLIPSE":
       case "STAR":
       case "POLYGON":
+      case "LINE":
         comp.push(flutterContainer(node, ""));
         break;
       case "GROUP":
         comp.push(flutterGroup(node));
         break;
       case "FRAME":
+      case "INSTANCE":
+      case "COMPONENT":
         comp.push(flutterFrame(node));
         break;
       case "TEXT":
@@ -169,7 +172,9 @@ const flutterText = (node: TextNode): string => {
   return builder.child;
 };
 
-const flutterFrame = (node: FrameNode): string => {
+const flutterFrame = (
+  node: FrameNode | InstanceNode | ComponentNode
+): string => {
   const children = flutterWidgetGenerator(node.children);
 
   if (node.layoutMode !== "NONE") {
@@ -191,7 +196,7 @@ const flutterFrame = (node: FrameNode): string => {
 };
 
 const makeRowColumn = (
-  node: FrameNode,
+  node: FrameNode | InstanceNode | ComponentNode,
   autoLayout: inferredAutoLayoutResult,
   children: string
 ): string => {

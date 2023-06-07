@@ -35,17 +35,28 @@ const tailwindWidgetGenerator = (
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
   visibleSceneNode.forEach((node) => {
-    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += tailwindContainer(node, "", "", isJsx);
-    } else if (node.type === "GROUP") {
-      comp += tailwindGroup(node, isJsx);
-    } else if (node.type === "FRAME") {
-      comp += tailwindFrame(node, isJsx);
-    } else if (node.type === "TEXT") {
-      comp += tailwindText(node, isJsx);
+    switch (node.type) {
+      case "RECTANGLE":
+      case "ELLIPSE":
+        comp += tailwindContainer(node, "", "", isJsx);
+        break;
+      case "GROUP":
+        comp += tailwindGroup(node, isJsx);
+        break;
+      case "FRAME":
+      case "COMPONENT":
+      case "INSTANCE":
+        comp += tailwindFrame(node, isJsx);
+        break;
+      case "TEXT":
+        comp += tailwindText(node, isJsx);
+        break;
+      case "LINE":
+        comp += tailwindLine(node, isJsx);
+        break;
+      // case "VECTOR":
+      //   comp += htmlAsset(node, isJsx);
     }
-
-    // todo support Line
   });
 
   return comp;
@@ -113,7 +124,10 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
   return `\n<div${layoutBuilder.build()}>${content}</div>`;
 };
 
-const tailwindFrame = (node: FrameNode, isJsx: boolean): string => {
+const tailwindFrame = (
+  node: FrameNode | InstanceNode | ComponentNode,
+  isJsx: boolean
+): string => {
   const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
 
   if (node.layoutMode !== "NONE") {
@@ -137,7 +151,7 @@ const tailwindFrame = (node: FrameNode, isJsx: boolean): string => {
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const tailwindContainer = (
-  node: FrameNode | RectangleNode | EllipseNode,
+  node: FrameNode | ComponentNode | InstanceNode | RectangleNode | EllipseNode,
   children: string,
   additionalAttr: string,
   isJsx: boolean
@@ -178,4 +192,16 @@ export const tailwindContainer = (
   }
 
   return children;
+};
+
+export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
+  const builder = new TailwindDefaultBuilder(
+    node,
+    globalLocalSettings.layerName,
+    isJsx
+  )
+    .commonPositionStyles(node, globalLocalSettings.optimizeLayout)
+    .commonShapeStyles(node);
+
+  return `\n<div${builder.build()}></div>`;
 };

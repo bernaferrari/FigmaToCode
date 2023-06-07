@@ -12,6 +12,9 @@ export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
   let singleCorner: number = 0;
 
   if ("all" in radius) {
+    if (radius.all === 0) {
+      return [];
+    }
     singleCorner = radius.all;
     comp.push(formatWithJSX("border-radius", isJsx, radius.all));
   } else if ("topLeftRadius" in node) {

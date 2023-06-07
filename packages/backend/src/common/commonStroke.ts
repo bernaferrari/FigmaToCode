@@ -14,13 +14,13 @@ export const commonStroke = (node: SceneNode): BorderSideType | null => {
 
   if ("strokeTopWeight" in node) {
     return {
-      left: node.strokeLeftWeight,
-      top: node.strokeTopWeight,
-      right: node.strokeRightWeight,
-      bottom: node.strokeBottomWeight,
+      left: node.strokeLeftWeight / 2,
+      top: node.strokeTopWeight / 2,
+      right: node.strokeRightWeight / 2,
+      bottom: node.strokeBottomWeight / 2,
     };
   } else if (node.strokeWeight !== figma.mixed && node.strokeWeight !== 0) {
-    return { all: node.strokeWeight };
+    return { all: node.strokeWeight / 2 };
   }
 
   return null;

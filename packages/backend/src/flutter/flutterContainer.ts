@@ -21,7 +21,7 @@ export const flutterContainer = (
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
-  if (node.width <= 0 || node.height <= 0) {
+  if (node.width < 0 || node.height < 0) {
     return child;
   }
 
@@ -46,8 +46,8 @@ export const flutterContainer = (
   let result: string;
   if (width || height || propBoxDecoration || clipBehavior) {
     result = generateWidgetCode("Container", {
-      width: width,
-      height: height,
+      width: skipDefaultProperty(width, "0"),
+      height: skipDefaultProperty(height, "0"),
       padding: propPadding,
       clipBehavior: clipBehavior,
       decoration: skipDefaultProperty(getDecoration(node), "BoxDecoration()"),

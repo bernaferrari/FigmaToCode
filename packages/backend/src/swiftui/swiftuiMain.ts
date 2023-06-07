@@ -65,6 +65,26 @@ const swiftuiWidgetGenerator = (
   const sceneLen = visibleSceneNode.length;
 
   visibleSceneNode.forEach((node, index) => {
+    switch (node.type) {
+      case "RECTANGLE":
+      case "ELLIPSE":
+        comp += swiftuiContainer(node, indentLevel);
+        break;
+      case "GROUP":
+        comp += swiftuiGroup(node, indentLevel);
+        break;
+      case "FRAME":
+      case "INSTANCE":
+      case "COMPONENT":
+        comp += swiftuiFrame(node, indentLevel);
+        break;
+      case "TEXT":
+        comp += swiftuiText(node, indentLevel);
+        break;
+      default:
+        break;
+    }
+
     if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
       comp += swiftuiContainer(node, indentLevel);
     } else if (node.type === "GROUP") {
@@ -147,7 +167,10 @@ const swiftuiText = (node: TextNode, indentLevel: number): string => {
   return indentString(result, indentLevel);
 };
 
-const swiftuiFrame = (node: FrameNode, indentLevel: number): string => {
+const swiftuiFrame = (
+  node: FrameNode | InstanceNode | ComponentNode,
+  indentLevel: number
+): string => {
   const children = widgetGeneratorWithLimits(
     node,
     node.children.length > 1 ? indentLevel + 1 : indentLevel
@@ -229,7 +252,7 @@ export const generateSwiftViewCode = (
 
 // todo should the plugin manually Group items? Ideally, it would detect the similarities and allow a ForEach.
 const widgetGeneratorWithLimits = (
-  node: FrameNode | GroupNode,
+  node: FrameNode | InstanceNode | ComponentNode | GroupNode,
   indentLevel: number
 ) => {
   if (node.children.length < 10) {

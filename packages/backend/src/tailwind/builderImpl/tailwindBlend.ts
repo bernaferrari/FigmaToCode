@@ -1,4 +1,5 @@
-import { nearestOpacity, nearestValue } from "../conversionTables";
+import { sliceNum } from "../../common/numToAutoFixed";
+import { exactValue, nearestOpacity, nearestValue } from "../conversionTables";
 
 /**
  * https://tailwindcss.com/docs/opacity/
@@ -42,14 +43,18 @@ export const tailwindRotation = (node: LayoutMixin): string => {
     const allowedValues = [
       -180, -90, -45, -12, -6, -3, -2, -1, 1, 2, 3, 6, 12, 45, 90, 180,
     ];
-    let nearest = nearestValue(node.rotation, allowedValues);
-    let minusIfNegative = "";
-    if (nearest < 0) {
-      minusIfNegative = "-";
-      nearest = -nearest;
-    }
+    let nearest = exactValue(-node.rotation, allowedValues);
+    if (nearest) {
+      let minusIfNegative = "";
+      if (nearest < 0) {
+        minusIfNegative = "-";
+        nearest = -nearest;
+      }
 
-    return `transform ${minusIfNegative}rotate-${nearest}`;
+      return `origin-top-left ${minusIfNegative}rotate-${nearest}`;
+    } else {
+      return `origin-[0%_0%] rotate-[${sliceNum(-node.rotation)}deg]`;
+    }
   }
   return "";
 };

@@ -45,18 +45,28 @@ const htmlWidgetGenerator = (
     // if (node.isAsset || ("isMask" in node && node.isMask === true)) {
     //   comp += htmlAsset(node, isJsx);
     // }
-    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += htmlContainer(node, "", [], isJsx);
-    } else if (node.type === "GROUP") {
-      comp += htmlGroup(node, isJsx);
-    } else if (node.type === "FRAME") {
-      comp += htmlFrame(node, isJsx);
-    } else if (node.type === "TEXT") {
-      comp += htmlText(node, isJsx);
-    } else if (node.type === "LINE") {
-      comp += htmlLine(node, isJsx);
-    } else if (node.type === "VECTOR") {
-      comp += htmlAsset(node, isJsx);
+
+    switch (node.type) {
+      case "RECTANGLE":
+      case "ELLIPSE":
+        comp += htmlContainer(node, "", [], isJsx);
+        break;
+      case "GROUP":
+        comp += htmlGroup(node, isJsx);
+        break;
+      case "FRAME":
+      case "COMPONENT":
+      case "INSTANCE":
+        comp += htmlFrame(node, isJsx);
+        break;
+      case "TEXT":
+        comp += htmlText(node, isJsx);
+        break;
+      case "LINE":
+        comp += htmlLine(node, isJsx);
+        break;
+      case "VECTOR":
+        comp += htmlAsset(node, isJsx);
     }
   });
 
@@ -114,7 +124,10 @@ export const htmlText = (node: TextNode, isJsx: boolean): string => {
   return `\n<div${layoutBuilder.build()}>${content}</div>`;
 };
 
-const htmlFrame = (node: FrameNode, isJsx: boolean = false): string => {
+const htmlFrame = (
+  node: FrameNode | InstanceNode | ComponentNode,
+  isJsx: boolean = false
+): string => {
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
 
   if (node.layoutMode !== "NONE") {
@@ -157,13 +170,17 @@ export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
     src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
   }
 
+  if (tag === "div") {
+    return `\n<div${builder.build()}${src}></div>`;
+  }
+
   return `\n<${tag}${builder.build()}${src} />`;
 };
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const htmlContainer = (
-  node: FrameNode | RectangleNode | EllipseNode,
+  node: FrameNode | InstanceNode | ComponentNode | RectangleNode | EllipseNode,
   children: string,
   additionalStyles: string[] = [],
   isJsx: boolean
