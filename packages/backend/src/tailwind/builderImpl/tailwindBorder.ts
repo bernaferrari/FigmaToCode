@@ -1,5 +1,6 @@
 import { getCommonRadius } from "../../common/commonRadius";
 import { commonStroke } from "../../common/commonStroke";
+import { sliceNum } from "../../common/numToAutoFixed";
 import { nearestValue, pxToBorderRadius } from "../conversionTables";
 
 /**
@@ -56,6 +57,15 @@ export const tailwindBorderRadius = (node: SceneNode): string => {
     return "rounded-full";
   }
 
+  const getRadius = (radius: number) => {
+    if (radius > 24) {
+      // special case. If height is 90 and cornerRadius is 45, it is full.
+      return `-[${sliceNum(radius)}px]`;
+    } else {
+      return pxToBorderRadius(radius);
+    }
+  };
+
   const radius = getCommonRadius(node);
 
   if ("all" in radius) {
@@ -63,27 +73,22 @@ export const tailwindBorderRadius = (node: SceneNode): string => {
       return "";
     }
 
-    if (radius.all >= node.height / 2) {
-      // special case. If height is 90 and cornerRadius is 45, it is full.
-      return "rounded-full";
-    } else {
-      return `rounded${pxToBorderRadius(radius.all)}`;
-    }
+    return `rounded${getRadius(radius.all)}`;
   }
 
   // todo optimize for tr/tl/br/bl instead of t/r/l/b
   let comp: string[] = [];
   if (radius.topLeft !== 0) {
-    comp.push(`rounded-tl${pxToBorderRadius(radius.topLeft)}`);
+    comp.push(`rounded-tl${getRadius(radius.topLeft)}`);
   }
   if (radius.topRight !== 0) {
-    comp.push(`rounded-tr${pxToBorderRadius(radius.topRight)}`);
+    comp.push(`rounded-tr${getRadius(radius.topRight)}`);
   }
   if (radius.bottomLeft !== 0) {
-    comp.push(`rounded-bl${pxToBorderRadius(radius.bottomLeft)}`);
+    comp.push(`rounded-bl${getRadius(radius.bottomLeft)}`);
   }
   if (radius.bottomRight !== 0) {
-    comp.push(`rounded-br${pxToBorderRadius(radius.bottomRight)}`);
+    comp.push(`rounded-br${getRadius(radius.bottomRight)}`);
   }
 
   return comp.join(" ");

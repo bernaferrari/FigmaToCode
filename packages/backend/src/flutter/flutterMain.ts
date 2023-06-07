@@ -134,7 +134,7 @@ const flutterContainer = (
 
   let image = "";
   if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
-    image = `FlutterLogo(size: ${Math.min(node.width, node.height)}),`;
+    image = `FlutterLogo(size: ${Math.min(node.width, node.height)})`;
   }
 
   if (child.length > 0 && image.length > 0) {
