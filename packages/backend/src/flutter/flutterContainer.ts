@@ -12,6 +12,7 @@ import {
 } from "../common/numToAutoFixed";
 import { sliceNum } from "../common/numToAutoFixed";
 import { getCommonRadius } from "../common/commonRadius";
+import { commonStroke } from "../common/commonStroke";
 
 export const flutterContainer = (
   node: SceneNode,
@@ -115,7 +116,7 @@ const generateRoundedRectangleBorder = (
   node: SceneNode & MinimalStrokesMixin
 ): string => {
   return generateWidgetCode("RoundedRectangleBorder", {
-    side: generateBorderSideCode(node),
+    side: skipDefaultProperty(generateBorderSideCode(node), "BorderSide()"),
     borderRadius: generateBorderRadius(node),
   });
 };
@@ -123,17 +124,12 @@ const generateRoundedRectangleBorder = (
 const generateBorderSideCode = (
   node: SceneNode & MinimalStrokesMixin
 ): string => {
-  const width =
-    node.strokeWeight !== figma.mixed
-      ? node.strokeWeight
-      : "strokeTopWeight" in node
-      ? node.strokeTopWeight
-      : 0;
+  const strokeWidth = getSingleStrokeWidth(node);
 
   return generateWidgetCode("BorderSide", {
-    width: skipDefaultProperty(width, 0),
+    width: skipDefaultProperty(strokeWidth, 0),
     strokeAlign: skipDefaultProperty(
-      getStrokeAlign(node),
+      getStrokeAlign(node, strokeWidth),
       "BorderSide.strokeAlignInside"
     ),
     color: skipDefaultProperty(
@@ -141,6 +137,27 @@ const generateBorderSideCode = (
       "Colors.black"
     ),
   });
+};
+
+const getSingleStrokeWidth = (node: SceneNode) => {
+  if (
+    "strokes" in node &&
+    (node.strokes.length === 0 ||
+      node.strokes.every((d) => d.visible === false))
+  ) {
+    return 0;
+  }
+
+  const stroke = commonStroke(node);
+  if (stroke === null) {
+    return 0;
+  }
+
+  if ("all" in stroke) {
+    return stroke.all;
+  }
+
+  return Math.max(stroke?.bottom, stroke?.top, stroke?.left, stroke?.right);
 };
 
 const generateStarBorder = (node: StarNode): string => {
@@ -164,7 +181,13 @@ const generateStarBorder = (node: StarNode): string => {
   });
 };
 
-export const getStrokeAlign = (node: MinimalStrokesMixin): string => {
+export const getStrokeAlign = (
+  node: MinimalStrokesMixin,
+  strokeWeight: number
+): string => {
+  if (strokeWeight === 0) {
+    return "";
+  }
   switch (node.strokeAlign) {
     case "CENTER":
       return "BorderSide.strokeAlignCenter";
