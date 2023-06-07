@@ -28,12 +28,16 @@ export const nodeSize = (node: SceneNode): SizeResult => {
   return {
     width: isWidthFill
       ? "fill"
-      : "layoutMode" in node && node[primaryAxisMode] === "AUTO"
+      : "layoutMode" in node &&
+        node.layoutMode !== "NONE" &&
+        node[primaryAxisMode] === "AUTO"
       ? null
       : node.width,
     height: isHeightFill
       ? "fill"
-      : "layoutMode" in node && node[counterAxisMode] === "AUTO"
+      : "layoutMode" in node &&
+        node.layoutMode !== "NONE" &&
+        node[counterAxisMode] === "AUTO"
       ? null
       : node.height,
   };

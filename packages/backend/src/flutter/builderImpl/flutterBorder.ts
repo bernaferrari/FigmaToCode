@@ -22,7 +22,7 @@ export const flutterBorder = (node: SceneNode): string => {
   );
 
   const strokeAlign = skipDefaultProperty(
-    getStrokeAlign(node),
+    getStrokeAlign(node, 2),
     "BorderSide.strokeAlignInside"
   );
 

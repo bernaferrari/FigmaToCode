@@ -14,6 +14,7 @@ export const htmlSizePartial = (
   }
 
   const size = nodeSize(node);
+  console.log(node.name, "size", size);
 
   let w = "";
   if (typeof size.width === "number") {
