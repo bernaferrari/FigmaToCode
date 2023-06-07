@@ -116,7 +116,7 @@ const generateRoundedRectangleBorder = (
   node: SceneNode & MinimalStrokesMixin
 ): string => {
   return generateWidgetCode("RoundedRectangleBorder", {
-    side: skipDefaultProperty(generateBorderSideCode(node), "BorderSide()"),
+    side: generateBorderSideCode(node),
     borderRadius: generateBorderRadius(node),
   });
 };
@@ -126,17 +126,20 @@ const generateBorderSideCode = (
 ): string => {
   const strokeWidth = getSingleStrokeWidth(node);
 
-  return generateWidgetCode("BorderSide", {
-    width: skipDefaultProperty(strokeWidth, 0),
-    strokeAlign: skipDefaultProperty(
-      getStrokeAlign(node, strokeWidth),
-      "BorderSide.strokeAlignInside"
-    ),
-    color: skipDefaultProperty(
-      flutterColorFromFills(node.strokes),
-      "Colors.black"
-    ),
-  });
+  return skipDefaultProperty(
+    generateWidgetCode("BorderSide", {
+      width: skipDefaultProperty(strokeWidth, 0),
+      strokeAlign: skipDefaultProperty(
+        getStrokeAlign(node, strokeWidth),
+        "BorderSide.strokeAlignInside"
+      ),
+      color: skipDefaultProperty(
+        flutterColorFromFills(node.strokes),
+        "Colors.black"
+      ),
+    }),
+    "BorderSide()"
+  );
 };
 
 const getSingleStrokeWidth = (node: SceneNode) => {

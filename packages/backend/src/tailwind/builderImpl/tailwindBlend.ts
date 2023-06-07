@@ -53,7 +53,7 @@ export const tailwindRotation = (node: LayoutMixin): string => {
 
       return `origin-top-left ${minusIfNegative}rotate-${nearest}`;
     } else {
-      return `origin-[0%_0%] rotate-[${sliceNum(-node.rotation)}deg]`;
+      return `origin-top-left rotate-[${sliceNum(-node.rotation)}deg]`;
     }
   }
   return "";
