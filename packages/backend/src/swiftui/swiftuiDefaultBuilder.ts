@@ -21,13 +21,13 @@ import {
 import { Modifier, SwiftUIElement } from "./builderImpl/swiftuiParser";
 
 export class SwiftuiDefaultBuilder {
-  private readonly element: SwiftUIElement;
+  element: SwiftUIElement;
 
   constructor(kind: string = "") {
     this.element = new SwiftUIElement(kind);
   }
 
-  private pushModifier(...args: (Modifier | null)[]): void {
+  pushModifier(...args: (Modifier | null)[]): void {
     args.forEach((modifier) => {
       if (modifier) {
         this.element.addModifier(modifier);
@@ -125,15 +125,6 @@ export class SwiftuiDefaultBuilder {
     if (corner) {
       this.pushModifier([`cornerRadius`, corner]);
     }
-    return this;
-  }
-
-  fillColor(node: MinimalFillsMixin): this {
-    const fillColor = swiftuiColorFromFills(node.fills);
-    if (fillColor) {
-      this.pushModifier([`fill`, fillColor]);
-    }
-
     return this;
   }
 

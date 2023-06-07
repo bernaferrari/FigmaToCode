@@ -70,6 +70,7 @@ export const run = (settings: PluginSettings) => {
     },
     colors: retrieveGenericSolidUIColors(settings.framework),
     gradients: retrieveGenericGradients(settings.framework),
+    preferences: settings,
     // text: retrieveTailwindText(convertedSelection),
   });
 };

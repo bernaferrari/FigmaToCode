@@ -49,8 +49,6 @@ export const convertNodesOnRectangle = (
     Object.assign(node, { children: updatedChildren });
   }
 
-  console.log("returning node", node);
-
   return node;
 };
 

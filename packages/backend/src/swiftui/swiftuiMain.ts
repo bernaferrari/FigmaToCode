@@ -58,50 +58,34 @@ const swiftuiWidgetGenerator = (
   sceneNode: ReadonlyArray<SceneNode>,
   indentLevel: number
 ): string => {
-  let comp = "";
-
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
-  const sceneLen = visibleSceneNode.length;
+  let comp: string[] = [];
 
   visibleSceneNode.forEach((node, index) => {
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
-        comp += swiftuiContainer(node, indentLevel);
+        comp.push(swiftuiContainer(node, indentLevel));
         break;
       case "GROUP":
-        comp += swiftuiGroup(node, indentLevel);
+        comp.push(swiftuiGroup(node, indentLevel));
         break;
       case "FRAME":
       case "INSTANCE":
       case "COMPONENT":
-        comp += swiftuiFrame(node, indentLevel);
+        comp.push(swiftuiFrame(node, indentLevel));
         break;
       case "TEXT":
-        comp += swiftuiText(node, indentLevel);
+        comp.push(swiftuiText(node));
+        console.log("text is:\n", swiftuiText(node));
         break;
       default:
         break;
     }
-
-    if (node.type === "RECTANGLE" || node.type === "ELLIPSE") {
-      comp += swiftuiContainer(node, indentLevel);
-    } else if (node.type === "GROUP") {
-      comp += swiftuiGroup(node, indentLevel);
-    } else if (node.type === "FRAME") {
-      comp += swiftuiFrame(node, indentLevel);
-    } else if (node.type === "TEXT") {
-      comp += swiftuiText(node, indentLevel);
-    }
-
-    // don't add a newline at last element.
-    if (index < sceneLen - 1) {
-      comp += "\n";
-    }
   });
 
-  return comp;
+  return comp.join("\n");
 };
 
 // properties named propSomething always take care of ","
@@ -142,29 +126,24 @@ export const swiftuiContainer = (
     .effects(node)
     .build(kind === stack ? -2 : 0);
 
-  return indentString(result, indentLevel);
+  return result;
 };
 
 const swiftuiGroup = (node: GroupNode, indentLevel: number): string => {
+  const children = widgetGeneratorWithLimits(node, indentLevel);
   return swiftuiContainer(
     node,
     indentLevel,
-    `ZStack {${widgetGeneratorWithLimits(node, indentLevel)}\n}`
+    `ZStack() {\n${indentString(children)}\n}`
   );
 };
 
-const swiftuiText = (node: TextNode, indentLevel: number): string => {
-  const builder = new SwiftuiTextBuilder();
-
-  const modifier = builder
+const swiftuiText = (node: TextNode): string => {
+  const result = new SwiftuiTextBuilder()
     .createText(node)
     .commonPositionStyles(node, localSettings.optimizeLayout)
-    .fillColor(node)
-    .position(node, localSettings.optimizeLayout)
     .build();
-
-  const result = modifier;
-  return indentString(result, indentLevel);
+  return result;
 };
 
 const swiftuiFrame = (
@@ -221,7 +200,7 @@ const getLayoutAlignment = (
 };
 
 const getSpacing = (inferredAutoLayout: inferredAutoLayoutResult): number => {
-  const defaultSpacing = 16;
+  const defaultSpacing = 10;
   return Math.round(inferredAutoLayout.itemSpacing) !== defaultSpacing
     ? inferredAutoLayout.itemSpacing
     : defaultSpacing;
@@ -242,7 +221,9 @@ export const generateSwiftViewCode = (
   const compactPropertiesArray = propertiesArray.join(", ");
   if (compactPropertiesArray.length > 60) {
     const formattedProperties = propertiesArray.join(",\n");
-    return `${className}(\n${formattedProperties}\n) {${children}\n}`;
+    return `${className}(\n${formattedProperties}\n) {${indentString(
+      children
+    )}\n}`;
   }
 
   return `${className}(${compactPropertiesArray}) {\n${indentString(

@@ -14,6 +14,10 @@ import { swiftuiColorFromFills } from "./builderImpl/swiftuiColor";
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   modifiers: string[] = [];
 
+  constructor(kind: string = "Text") {
+    super(kind);
+  }
+
   reset(): void {
     this.modifiers = [];
   }
@@ -86,59 +90,58 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     //     alignHorizontal !== "left" ? `TextAlign.${alignHorizontal}` : "",
     // };
 
-    const segments = this.getTextSegments(node.id);
-    if (segments.length === 1) {
-      this.modifiers.push(segments[0].style);
-      // return segments[0].text;
+    const segments = this.getTextSegments(node.id, node.characters);
+    if (segments) {
+      this.element = segments;
     } else {
-      this.modifiers.push(
-        segments.map((segment) => segment.style).join(" +\n")
-      );
+      this.element = new SwiftUIElement("Text()");
     }
 
     return this;
   }
 
-  getTextSegments(id: string): { style: string; text: string }[] {
+  getTextSegments(id: string, characters: string): SwiftUIElement | null {
     const segments = globalTextStyleSegments[id];
     if (!segments) {
-      return [];
+      return null;
     }
 
-    return segments.map((segment) => {
-      const fontSize = sliceNum(segment.fontSize);
-      const fontFamily = segment.fontName.family;
-      const fontWeight = this.fontWeight(segment.fontWeight);
-      const lineHeight = this.lineHeight(segment.lineHeight, segment.fontSize);
-      const letterSpacing = this.letterSpacing(
-        segment.letterSpacing,
-        segment.fontSize
-      );
+    const segment = segments[0];
 
-      let text = parseTextAsCode(segment.characters);
-      if (segment.textCase === "LOWER") {
-        text = text.toLowerCase();
-      } else if (segment.textCase === "UPPER") {
-        text = text.toUpperCase();
-      }
+    // return segments.map((segment) => {
+    const fontSize = sliceNum(segment.fontSize);
+    const fontFamily = segment.fontName.family;
+    const fontWeight = this.fontWeight(segment.fontWeight);
+    const lineHeight = this.lineHeight(segment.lineHeight, segment.fontSize);
+    const letterSpacing = this.letterSpacing(
+      segment.letterSpacing,
+      segment.fontSize
+    );
 
-      const element = new SwiftUIElement(
-        `Text(${parseTextAsCode(`"${text}"`)})`
-      )
-        .addModifier([
-          "font",
-          `Font.custom("${fontFamily}", size: ${fontSize})${
-            fontWeight ? `${fontWeight}` : ""
-          }`,
-        ])
-        .addModifier(["tracking", letterSpacing])
-        .addModifier(["lineSpacing", lineHeight])
-        .addModifier([this.textDecoration(segment.textDecoration), ""])
-        .addModifier([this.textStyle(segment.fontName.style), ""])
-        .addModifier(["foregroundColor", this.textColor(segment.fills)]);
+    let updatedText = parseTextAsCode(characters); //segment.characters); swiftUI only supports a single text.
+    if (segment.textCase === "LOWER") {
+      updatedText = characters.toLowerCase();
+    } else if (segment.textCase === "UPPER") {
+      updatedText = characters.toUpperCase();
+    }
 
-      return { style: element.toString(), text: text };
-    });
+    const element = new SwiftUIElement(
+      `Text(${parseTextAsCode(`"${characters}"`)})`
+    )
+      .addModifier([
+        "font",
+        `Font.custom("${fontFamily}", size: ${fontSize})${
+          fontWeight ? `${fontWeight}` : ""
+        }`,
+      ])
+      .addModifier(["tracking", letterSpacing])
+      .addModifier(["lineSpacing", lineHeight])
+      .addModifier([this.textDecoration(segment.textDecoration), ""])
+      .addModifier([this.textStyle(segment.fontName.style), ""])
+      .addModifier(["foregroundColor", this.textColor(segment.fills)]);
+
+    return element;
+    // });
   }
 
   letterSpacing = (
@@ -215,8 +218,4 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     // when they are centered
     return "";
   };
-
-  build(): string {
-    return this.modifiers.join("");
-  }
 }

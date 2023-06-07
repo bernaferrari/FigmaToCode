@@ -84,10 +84,10 @@ const standardMode = async () => {
     if (msg.type === "pluginSettingChanged") {
       (userPluginSettings as any)[msg.key] = msg.value;
       figma.clientStorage.setAsync("userPluginSettings", userPluginSettings);
-      figma.ui.postMessage({
-        type: "pluginSettingChanged",
-        data: userPluginSettings,
-      });
+      // figma.ui.postMessage({
+      //   type: "pluginSettingChanged",
+      //   data: userPluginSettings,
+      // });
       safeRun(userPluginSettings);
     }
   };

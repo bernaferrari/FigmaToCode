@@ -48,6 +48,8 @@ export default function App() {
             htmlPreview: message.htmlPreview,
             colors: message.colors,
             gradients: message.gradients,
+            preferences: message.preferences,
+            selectedFramework: message.preferences.framework,
           }));
           break;
         case "pluginSettingChanged":
@@ -107,8 +109,10 @@ export default function App() {
   const handleFrameworkChange = (updatedFramework: FrameworkTypes) => {
     setState((prevState) => ({
       ...prevState,
+      // code: "// Loading...",
       selectedFramework: updatedFramework,
     }));
+
     parent.postMessage(
       {
         pluginMessage: {
@@ -120,6 +124,7 @@ export default function App() {
       "*"
     );
   };
+  console.log("state.code", state.code.slice(0, 25));
 
   return (
     <div
