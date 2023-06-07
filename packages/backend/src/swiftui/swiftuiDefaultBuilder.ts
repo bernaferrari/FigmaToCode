@@ -97,7 +97,6 @@ export class SwiftuiDefaultBuilder {
     const borders = swiftuiBorder(node);
     if (borders) {
       borders.forEach((border) => {
-        console.log("border is ", border);
         this.element.addModifierMixed("overlay", border);
       });
     }
@@ -170,7 +169,6 @@ export class SwiftuiDefaultBuilder {
   }
 
   build(indentLevel: number = 0): string {
-    console.log("this.element", this.element.toString(-2));
     // this.element.element = kind;
     return this.element.toString(indentLevel);
   }

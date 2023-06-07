@@ -149,7 +149,7 @@ const swiftuiGroup = (node: GroupNode, indentLevel: number): string => {
   return swiftuiContainer(
     node,
     indentLevel,
-    `\nZStack {${widgetGeneratorWithLimits(node, indentLevel)}\n}`
+    `ZStack {${widgetGeneratorWithLimits(node, indentLevel)}\n}`
   );
 };
 

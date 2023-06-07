@@ -22,7 +22,6 @@ export const htmlShadow = (node: BlendMixin): string => {
       let blur = 0;
       let spread = "";
       let inner = "";
-      let type = "";
       let color = "";
 
       if (shadow.type === "DROP_SHADOW" || shadow.type === "INNER_SHADOW") {
@@ -31,23 +30,15 @@ export const htmlShadow = (node: BlendMixin): string => {
         blur = shadow.radius;
         spread = shadow.spread ? `${shadow.spread}px ` : "";
         inner = shadow.type === "INNER_SHADOW" ? " inset" : "";
-        type =
-          shadow.type === "DROP_SHADOW"
-            ? "DropShadowEffect"
-            : "InnerShadowEffect";
         color = htmlColor(shadow.color, shadow.color.a);
       } else if (shadow.type === "LAYER_BLUR") {
         x = shadow.radius;
         y = shadow.radius;
         blur = shadow.radius;
-        type = "BlurEffect";
       }
 
-      return `${type} { BlurRadius: ${blur}px; ${
-        type === "BlurEffect"
-          ? `Size: ${x}px;`
-          : `OffsetX: ${x}px; OffsetY: ${y}px; Spread: ${spread}; Inner: ${inner}`
-      }}`;
+      // Return box-shadow in the desired format
+      return `${x}px ${y}px ${blur}px ${spread}${color}${inner};`;
     }
   }
   return "";

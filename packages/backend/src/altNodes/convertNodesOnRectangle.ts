@@ -14,8 +14,7 @@ export const convertNodesOnRectangle = (
       "Node is missing an id! This error should only happen in tests."
     );
   }
-  console.log("returning node2", node);
-
+  
   const colliding = retrieveCollidingItems(node.children);
 
   const parentsKeys = Object.keys(colliding);
