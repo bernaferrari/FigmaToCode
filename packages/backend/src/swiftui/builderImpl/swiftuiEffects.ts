@@ -16,35 +16,32 @@ export const swiftuiShadow = (node: SceneNode): Modifier | null => {
 
   // retrieve first shadow.
   const shadow = dropShadow[0];
-  let comp = "";
+  let comp: string[] = [];
 
   const color = shadow.color;
   // set color when not black with 0.25 of opacity, which is the Figma default. Round the alpha now to avoid rounding issues.
   const a = sliceNum(color.a);
-  if (color.r + color.g + color.b === 0 && a !== "0.25") {
-    const r = sliceNum(color.r);
-    const g = sliceNum(color.g);
-    const b = sliceNum(color.b);
-    comp += `color: Color(red: ${r}, green: ${g}, blue: ${b}, opacity: ${a}), `;
-  }
+  const r = sliceNum(color.r);
+  const g = sliceNum(color.g);
+  const b = sliceNum(color.b);
+  comp.push(`color: Color(red: ${r}, green: ${g}, blue: ${b}, opacity: ${a})`);
+  comp.push(`radius: ${sliceNum(shadow.radius)}`);
 
-  comp += `radius: ${sliceNum(shadow.radius)}`;
+  const x = shadow.offset.x > 0 ? `x: ${sliceNum(shadow.offset.x)}` : "";
+  const y = shadow.offset.y > 0 ? `y: ${sliceNum(shadow.offset.y)}` : "";
 
-  if (shadow.offset.x !== shadow.offset.y) {
-    const x = shadow.offset.x > 0 ? `x: ${sliceNum(shadow.offset.x)}` : "";
-    const y = shadow.offset.y > 0 ? `y: ${sliceNum(shadow.offset.y)}` : "";
-
-    // add initial comma since this is an optional paramater and radius must come first.
-    comp += ", ";
-    if (x && y) {
-      comp += `${x}, ${y}`;
-    } else {
-      // no comma in the middle, since only one of them will be valid
-      comp += `${x}${y}`;
+  // add initial comma since this is an optional paramater and radius must come first.
+  if (x && y) {
+    comp.push(x, y);
+  } else {
+    if (x) {
+      comp.push(x);
+    } else if (y) {
+      comp.push(y);
     }
   }
 
-  return ["shadow", comp];
+  return ["shadow", comp.join(", ")];
 };
 
 export const swiftuiBlur = (node: SceneNode): Modifier | null => {
