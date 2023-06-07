@@ -52,6 +52,10 @@ export const tailwindBorderWidth = (node: SceneNode): string => {
  * example: rounded-tr-lg
  */
 export const tailwindBorderRadius = (node: SceneNode): string => {
+  if (node.type === "ELLIPSE") {
+    return "rounded-full";
+  }
+
   const radius = getCommonRadius(node);
 
   if ("all" in radius) {

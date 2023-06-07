@@ -8,10 +8,6 @@ type RadiusType =
     };
 
 export const getCommonRadius = (node: SceneNode): RadiusType => {
-  if (node.type === "ELLIPSE") {
-    return { all: 9999 };
-  }
-
   if (
     "cornerRadius" in node &&
     node.cornerRadius !== figma.mixed &&

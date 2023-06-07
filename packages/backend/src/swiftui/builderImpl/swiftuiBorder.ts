@@ -80,14 +80,14 @@ const getViewType = (node: SceneNode): string => {
 const strokeInset = (
   node: MinimalStrokesMixin,
   width: number
-): Modifier | null => {
+): [string, string | null] => {
   switch (node.strokeAlign) {
     case "INSIDE":
-      return ["inset", `by: ${sliceNum(width / 2)}`];
+      return ["inset", `by: ${sliceNum(width)}`];
     case "OUTSIDE":
-      return ["inset", `by: -${sliceNum(width / 2)}`];
+      return ["inset", `by: -${sliceNum(width)}`];
     case "CENTER":
-      return null;
+      return ["inset", null];
   }
 };
 
