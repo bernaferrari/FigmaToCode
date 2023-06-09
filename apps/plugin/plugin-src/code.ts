@@ -100,8 +100,6 @@ const standardMode = async () => {
 
 switch (figma.mode) {
   case "default":
-  case "panel":
-  case "dev":
   case "inspect":
     standardMode();
     break;
