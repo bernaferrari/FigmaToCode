@@ -5,6 +5,7 @@ import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { PluginSettings } from "../code";
 
 let localSettings: PluginSettings;
+let previousExecutionCache: string[];
 
 const getStructTemplate = (name: string, injectCode: string): string =>
   `struct ${name}: View {
@@ -33,6 +34,7 @@ export const swiftuiMain = (
   settings: PluginSettings
 ): string => {
   localSettings = settings;
+  previousExecutionCache = [];
   let result = swiftuiWidgetGenerator(sceneNode, 0);
 
   switch (localSettings.swiftUIGenerationMode) {
@@ -66,7 +68,7 @@ const swiftuiWidgetGenerator = (
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
-        comp.push(swiftuiContainer(node, indentLevel));
+        comp.push(swiftuiContainer(node));
         break;
       case "GROUP":
       case "SECTION":
@@ -93,7 +95,6 @@ const swiftuiWidgetGenerator = (
 // sometimes a property might not exist, so it doesn't add ","
 export const swiftuiContainer = (
   node: SceneNode,
-  indentLevel: number,
   stack: string = ""
 ): string => {
   // ignore the view when size is zero or less
@@ -133,17 +134,17 @@ const swiftuiGroup = (
   const children = widgetGeneratorWithLimits(node, indentLevel);
   return swiftuiContainer(
     node,
-    indentLevel,
     children ? generateSwiftViewCode("ZStack", {}, children) : `ZStack() { }`
   );
 };
 
 const swiftuiText = (node: TextNode): string => {
-  const result = new SwiftuiTextBuilder()
-    .createText(node)
+  const result = new SwiftuiTextBuilder().createText(node);
+  previousExecutionCache.push(result.build());
+
+  return result
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .build();
-  return result;
 };
 
 const swiftuiFrame = (
@@ -161,7 +162,7 @@ const swiftuiFrame = (
       ? node.inferredAutoLayout
       : node
   );
-  return swiftuiContainer(node, indentLevel, anyStack);
+  return swiftuiContainer(node, anyStack);
 };
 
 const createDirectionalStack = (
@@ -261,3 +262,6 @@ const widgetGeneratorWithLimits = (
 
   return strBuilder;
 };
+
+export const swiftUICodeGenTextStyles = () =>
+  previousExecutionCache.map((style) => `${style}`).join("\n// ---\n");

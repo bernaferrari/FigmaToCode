@@ -10,6 +10,7 @@ import {
 } from "./builderImpl/flutterAutoLayout";
 
 let localSettings: PluginSettings;
+let previousExecutionCache: string[];
 
 const getFullAppTemplate = (name: string, injectCode: string): string =>
   `import 'package:flutter/material.dart';
@@ -57,6 +58,7 @@ export const flutterMain = (
   settings: PluginSettings
 ): string => {
   localSettings = settings;
+  previousExecutionCache = [];
 
   let result = flutterWidgetGenerator(sceneNode);
   switch (localSettings.flutterGenerationMode) {
@@ -166,13 +168,13 @@ const flutterContainer = (node: SceneNode, child: string): string => {
 };
 
 const flutterText = (node: TextNode): string => {
-  const builder = new FlutterTextBuilder()
-    .createText(node)
+  const builder = new FlutterTextBuilder().createText(node);
+  previousExecutionCache.push(builder.child);
+
+  return builder
     .blendAttr(node)
     .textAutoSize(node)
-    .position(node, localSettings.optimizeLayout);
-
-  return builder.child;
+    .position(node, localSettings.optimizeLayout).child;
 };
 
 const flutterFrame = (
@@ -232,3 +234,6 @@ const addSpacingIfNeeded = (node: SceneNode): string => {
   }
   return "";
 };
+
+export const flutterCodeGenTextStyles = () =>
+  previousExecutionCache.map((style) => `${style}`).join("\n// ---\n");

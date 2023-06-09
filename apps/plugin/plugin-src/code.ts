@@ -1,3 +1,4 @@
+import { tailwindCodeGenTextStyles } from "./../../../packages/backend/src/tailwind/tailwindMain";
 import {
   run,
   flutterMain,
@@ -8,6 +9,9 @@ import {
   PluginSettings,
 } from "backend";
 import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retrieveColors";
+import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
+import { htmlCodeGenTextStyles } from "backend/src/html/htmlMain";
+import { swiftUICodeGenTextStyles } from "backend/src/swiftui/swiftuiMain";
 
 let userPluginSettings: PluginSettings;
 
@@ -109,6 +113,7 @@ switch (figma.mode) {
 
     figma.codegen.on("generate", ({ language, node }) => {
       const convertedSelection = convertIntoNodes([node], null);
+      console.log("language is", language);
 
       switch (language) {
         case "html":
@@ -120,6 +125,11 @@ switch (figma.mode) {
                 { ...defaultPluginSettings, jsx: false },
                 true
               ),
+              language: "HTML",
+            },
+            {
+              title: `Text Styles`,
+              code: htmlCodeGenTextStyles(false),
               language: "HTML",
             },
           ];
@@ -134,6 +144,11 @@ switch (figma.mode) {
               ),
               language: "HTML",
             },
+            {
+              title: `Text Styles`,
+              code: htmlCodeGenTextStyles(true),
+              language: "HTML",
+            },
           ];
         case "tailwind":
           return [
@@ -145,16 +160,16 @@ switch (figma.mode) {
               }),
               language: "HTML",
             },
-            // {
-            //   title: `Style`,
-            //   code: tailwindMain(convertedSelection, defaultPluginSettings),
-            //   language: "HTML",
-            // },
             {
               title: `Colors`,
               code: retrieveGenericSolidUIColors("Tailwind")
                 .map((d) => `#${d.hex} <- ${d.colorName}`)
                 .join("\n"),
+              language: "HTML",
+            },
+            {
+              title: `Text Styles`,
+              code: tailwindCodeGenTextStyles(),
               language: "HTML",
             },
           ];
@@ -180,6 +195,11 @@ switch (figma.mode) {
                 .join("\n"),
               language: "HTML",
             },
+            {
+              title: `Text Styles`,
+              code: tailwindCodeGenTextStyles(),
+              language: "HTML",
+            },
           ];
         case "flutter":
           return [
@@ -191,12 +211,22 @@ switch (figma.mode) {
               }),
               language: "SWIFT",
             },
+            {
+              title: `Text Styles`,
+              code: flutterCodeGenTextStyles(),
+              language: "SWIFT",
+            },
           ];
-        case "swiftui":
+        case "swiftUI":
           return [
             {
               title: `SwiftUI`,
               code: swiftuiMain(convertedSelection, defaultPluginSettings),
+              language: "SWIFT",
+            },
+            {
+              title: `Text Styles`,
+              code: swiftUICodeGenTextStyles(),
               language: "SWIFT",
             },
           ];
@@ -205,11 +235,11 @@ switch (figma.mode) {
       }
 
       const blocks: CodegenResult[] = [
-        {
-          title: `Code`,
-          code: tailwindMain(convertedSelection, defaultPluginSettings),
-          language: "HTML",
-        },
+        // {
+        //   title: `Code`,
+        //   code: tailwindMain(convertedSelection, defaultPluginSettings),
+        //   language: "HTML",
+        // },
         // {
         //   title: `Flutter`,
         //   code: flutterMain(convertedSelection, defaultPluginSettings),

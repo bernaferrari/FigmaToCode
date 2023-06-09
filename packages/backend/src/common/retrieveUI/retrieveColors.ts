@@ -13,7 +13,10 @@ import {
   flutterColor,
   flutterGradient,
 } from "../../flutter/builderImpl/flutterColor";
-import { htmlColor, htmlGradient } from "../../html/builderImpl/htmlColor";
+import {
+  htmlColor,
+  htmlGradientFromFills,
+} from "../../html/builderImpl/htmlColor";
 import { calculateContrastRatio } from "./commonUI";
 import { FrameworkTypes } from "../../code";
 
@@ -96,7 +99,7 @@ export const retrieveGenericLinearGradients = (
           exported = flutterGradient(paint);
           break;
         case "HTML":
-          exported = htmlGradient(paint);
+          exported = htmlGradientFromFills([paint]);
           break;
         case "Tailwind":
           exported = tailwindGradient(paint);
@@ -105,7 +108,10 @@ export const retrieveGenericLinearGradients = (
           exported = swiftuiGradient(paint);
           break;
       }
-      colorStr.push({ cssPreview: htmlGradient(paint), exportValue: exported });
+      colorStr.push({
+        cssPreview: htmlGradientFromFills([paint]),
+        exportValue: exported,
+      });
     }
   });
 

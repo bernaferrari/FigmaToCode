@@ -8,6 +8,8 @@ import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 
 let globalLocalSettings: PluginSettings;
 
+let previousExecutionCache: { style: string; text: string }[];
+
 const selfClosingTags = ["img"];
 
 export const tailwindMain = (
@@ -15,6 +17,8 @@ export const tailwindMain = (
   localSettings: PluginSettings
 ): string => {
   globalLocalSettings = localSettings;
+  previousExecutionCache = [];
+
   let result = tailwindWidgetGenerator(sceneNode, localSettings.jsx);
 
   // remove the initial \n that is made in Container.
@@ -114,6 +118,7 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
     .textAlign(node);
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
+  previousExecutionCache.push(...styledHtml);
 
   let content = "";
   if (styledHtml.length === 1) {
@@ -241,4 +246,10 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
   } else {
     return `\n<div${builder.build()}></div>`;
   }
+};
+
+export const tailwindCodeGenTextStyles = () => {
+  return previousExecutionCache
+    .map((style) => `// ${style.text}\n${style.style}`)
+    .join("\n---\n");
 };

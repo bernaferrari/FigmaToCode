@@ -1,4 +1,3 @@
-import { gradientAngle } from "../../common/color";
 import { sliceNum } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 
@@ -50,34 +49,104 @@ export const htmlGradientFromFills = (
 ): string => {
   const fill = retrieveTopFill(fills);
   if (fill?.type === "GRADIENT_LINEAR") {
-    return htmlGradient(fill);
+    return htmlLinearGradient(fill);
+  } else if (fill?.type === "GRADIENT_ANGULAR") {
+    return htmlAngularGradient(fill);
+  } else if (fill?.type === "GRADIENT_RADIAL") {
+    return htmlRadialGradient(fill);
   }
   return "";
 };
 
-// This was separated from htmlGradient because it is going to be used in the plugin UI and it wants all gradients, not only the top one.
-export const htmlGradient = (fill: GradientPaint): string => {
-  // Adjust angle for HTML.
-  const angle = (gradientAngle(fill) + 90).toFixed(0);
+export const gradientAngle2 = (fill: GradientPaint): number => {
+  const x1 = fill.gradientTransform[0][2];
+  const y1 = fill.gradientTransform[1][2];
+  const x2 = fill.gradientTransform[0][0] + x1;
+  const y2 = fill.gradientTransform[1][0] + y1;
+  const dx = x2 - x1;
+  const dy = y1 - y2;
+  const radians = Math.atan2(dy, dx);
+  const unadjustedAngle = (radians * 180) / Math.PI;
+  const adjustedAngle = unadjustedAngle + 90;
+  return adjustedAngle;
+};
+
+export const cssGradientAngle = (angle: number): number => {
+  // Convert Figma angle to CSS angle.
+  const cssAngle = angle; // Subtract 235 to make it start from the correct angle.
+  // Normalize angle: if negative, add 360 to make it positive.
+  return cssAngle < 0 ? cssAngle + 360 : cssAngle;
+};
+
+export const htmlLinearGradient = (fill: GradientPaint): string => {
+  // Adjust angle for CSS.
+  const figmaAngle = gradientAngle2(fill);
+  const angle = cssGradientAngle(figmaAngle).toFixed(0);
 
   const mappedFill = fill.gradientStops
-    .map((stop, index, stops) => {
-      const alpha = (stop.color.a * (fill.opacity ?? 1)).toFixed(2);
-      const color = `rgba(${Math.round(stop.color.r * 255)}, ${Math.round(
-        stop.color.g * 255
-      )}, ${Math.round(stop.color.b * 255)}, ${alpha})`;
-
-      // Calculate position for all stops except the first and last ones.
-      const position =
-        index > 0 && index < stops.length - 1
-          ? ` ${(stop.position * 100).toFixed(0)}%`
-          : index === 0
-          ? " 0%"
-          : " 100%";
-
-      return `${color}${position}`;
+    .map((stop) => {
+      const color = htmlColor(stop.color, stop.color.a * (fill.opacity ?? 1));
+      const position = `${(stop.position * 100).toFixed(0)}%`;
+      return `${color} ${position}`;
     })
     .join(", ");
 
   return `linear-gradient(${angle}deg, ${mappedFill})`;
+};
+
+export const invertYCoordinate = (y: number): number => 1 - y;
+
+export const getGradientTransformCoordinates = (
+  gradientTransform: number[][]
+): { centerX: string; centerY: string; radiusX: string; radiusY: string } => {
+  const a = gradientTransform[0][0];
+  const b = gradientTransform[0][1];
+  const c = gradientTransform[1][0];
+  const d = gradientTransform[1][1];
+  const e = gradientTransform[0][2];
+  const f = gradientTransform[1][2];
+
+  const scaleX = Math.sqrt(a ** 2 + b ** 2);
+  const scaleY = Math.sqrt(c ** 2 + d ** 2);
+
+  const rotationAngle = Math.atan2(b, a);
+
+  const centerX = ((e * scaleX * 100) / (1 - scaleX)).toFixed(2);
+  const centerY = (((1 - f) * scaleY * 100) / (1 - scaleY)).toFixed(2);
+
+  const radiusX = (scaleX * 100).toFixed(2);
+  const radiusY = (scaleY * 100).toFixed(2);
+
+  return { centerX, centerY, radiusX, radiusY };
+};
+
+export const htmlRadialGradient = (fill: GradientPaint): string => {
+  const mappedFill = fill.gradientStops
+    .map((stop) => {
+      const color = htmlColor(stop.color, stop.color.a * (fill.opacity ?? 1));
+      const position = `${(stop.position * 100).toFixed(0)}%`;
+      return `${color} ${position}`;
+    })
+    .join(", ");
+
+  const { centerX, centerY, radiusX, radiusY } =
+    getGradientTransformCoordinates(fill.gradientTransform);
+
+  return `radial-gradient(${radiusX}% ${radiusY}% at ${centerX}% ${centerY}%, ${mappedFill})`;
+};
+
+export const htmlAngularGradient = (fill: GradientPaint): string => {
+  const angle = gradientAngle2(fill).toFixed(0);
+  const centerX = (fill.gradientTransform[0][2] * 100).toFixed(2);
+  const centerY = (fill.gradientTransform[1][2] * 100).toFixed(2);
+
+  const mappedFill = fill.gradientStops
+    .map((stop) => {
+      const color = htmlColor(stop.color, stop.color.a * (fill.opacity ?? 1));
+      const position = `${(stop.position * 360).toFixed(0)}deg`;
+      return `${color} ${position}`;
+    })
+    .join(", ");
+
+  return `conic-gradient(from ${angle}deg at ${centerX}% ${centerY}%, ${mappedFill})`;
 };

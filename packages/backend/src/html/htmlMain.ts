@@ -13,6 +13,7 @@ const selfClosingTags = ["img"];
 export let isPreviewGlobal = false;
 
 let localSettings: PluginSettings;
+let previousExecutionCache: { style: string; text: string }[];
 
 export const htmlMain = (
   sceneNode: Array<SceneNode>,
@@ -21,6 +22,7 @@ export const htmlMain = (
 ): string => {
   showLayerName = settings.layerName;
   isPreviewGlobal = isPreview;
+  previousExecutionCache = [];
   localSettings = settings;
 
   let result = htmlWidgetGenerator(sceneNode, settings.jsx);
@@ -114,6 +116,7 @@ export const htmlText = (node: TextNode, isJsx: boolean): string => {
     .textAlign(node);
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
+  previousExecutionCache.push(...styledHtml);
 
   let content = "";
   if (styledHtml.length === 1) {
@@ -261,4 +264,13 @@ export const htmlLine = (node: LineNode, isJsx: boolean): string => {
     .commonShapeStyles(node);
 
   return `\n<div${builder.build()}></div>`;
+};
+
+export const htmlCodeGenTextStyles = (isJsx: boolean) => {
+  return previousExecutionCache
+    .map(
+      (style) =>
+        `// ${style.text}\n${style.style.split(isJsx ? "," : ";").join(";\n")}`
+    )
+    .join("\n---\n");
 };

@@ -193,7 +193,11 @@ export class HtmlDefaultBuilder {
       if (paint.type === "SOLID") {
         const color = htmlColorFromFills([paint]);
         return `linear-gradient(0deg, ${color} 0%, ${color} 100%)`;
-      } else if (paint.type === "GRADIENT_LINEAR") {
+      } else if (
+        paint.type === "GRADIENT_LINEAR" ||
+        paint.type === "GRADIENT_RADIAL" ||
+        paint.type === "GRADIENT_ANGULAR"
+      ) {
         return htmlGradientFromFills([paint]);
       }
 
