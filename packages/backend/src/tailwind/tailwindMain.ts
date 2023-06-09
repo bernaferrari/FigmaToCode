@@ -250,6 +250,6 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
 
 export const tailwindCodeGenTextStyles = () => {
   return previousExecutionCache
-    .map((style) => `// ${style.text}\n${style.style}`)
+    .map((style) => `// ${style.text}\n${style.style.split(" ").join("\n")}`)
     .join("\n---\n");
 };

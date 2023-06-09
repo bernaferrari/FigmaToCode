@@ -13,7 +13,6 @@ export const tailwindColorFromFills = (
 
   const fill = retrieveTopFill(fills);
   if (fill && fill.type === "SOLID") {
-    // don't set text color when color is black (default) and opacity is 100%
     return tailwindSolidColor(fill, kind);
   }
 
@@ -21,17 +20,6 @@ export const tailwindColorFromFills = (
 };
 
 export const tailwindSolidColor = (fill: SolidPaint, kind: string): string => {
-  // don't set text color when color is black (default) and opacity is 100%
-  if (
-    kind === "text" &&
-    fill.color.r === 0.0 &&
-    fill.color.g === 0.0 &&
-    fill.color.b === 0.0 &&
-    fill.opacity === 1.0
-  ) {
-    return "";
-  }
-
   const opacity = fill.opacity ?? 1.0;
 
   // example: text-opacity-50

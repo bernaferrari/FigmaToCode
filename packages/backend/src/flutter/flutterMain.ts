@@ -153,9 +153,11 @@ const flutterContainer = (node: SceneNode, child: string): string => {
   //   propChild = generateWidgetCode("Stack", {
   //     children: [prop1, prop2],
   //   });
-  // } else if (child.length > 0) {
-  //   propChild = child;
-  // } else if (image.length > 0) {
+  // }
+  if (child.length > 0) {
+    propChild = child;
+  }
+  //  else if (image.length > 0) {
   //   propChild = image;
   // }
 
