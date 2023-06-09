@@ -54,20 +54,23 @@ export const run = (settings: PluginSettings) => {
     type: "code",
     data: result,
     settings: settings,
-    htmlPreview: {
-      size: convertedSelection.map((node) => ({
-        width: node.width,
-        height: node.height,
-      }))[0],
-      content: htmlMain(
-        convertedSelection,
-        {
-          ...settings,
-          jsx: false,
-        },
-        true
-      ),
-    },
+    htmlPreview:
+      convertedSelection.length > 0
+        ? {
+            size: convertedSelection.map((node) => ({
+              width: node.width,
+              height: node.height,
+            }))[0],
+            content: htmlMain(
+              convertedSelection,
+              {
+                ...settings,
+                jsx: false,
+              },
+              true
+            ),
+          }
+        : null,
     colors: retrieveGenericSolidUIColors(settings.framework),
     gradients: retrieveGenericGradients(settings.framework),
     preferences: settings,

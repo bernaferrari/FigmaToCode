@@ -87,24 +87,12 @@ export const convertIntoNodes = (
   parent: ParentType = null
 ): Array<SceneNode> => {
   const mapped: Array<SceneNode | null> = sceneNode.map((node: SceneNode) => {
+    console.log("trying to read?");
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
         return standardClone(node, parent);
       case "LINE":
-        // Lines have a height of zero, but they must have a height, so add 1.
-        // TODO Bernardo
-        // clonedNode.height = 1;
-
-        // Let them be CENTER, since on Lines this property is ignored.
-        // TODO Bernardo
-        // clonedNode.strokeAlign = "CENTER";
-
-        // Remove 1 since it now has a height of 1. It won't be visually perfect, but will be almost.
-        // TODO Bernardo
-        // if (node.strokeWeight != figma.mixed) {
-        //   node.strokeWeight = node.strokeWeight - 1;
-        // }
         return standardClone(node, parent);
       case "FRAME":
       case "INSTANCE":
@@ -156,16 +144,35 @@ export const convertIntoNodes = (
           "textStyleId",
           "fillStyleId",
         ]);
-
         return standardClone(node, parent);
       case "STAR":
       case "POLYGON":
       case "VECTOR":
         return standardClone(node, parent);
+      case "BOOLEAN_OPERATION":
+        const clonedOperation = standardClone(node, parent);
+        overrideReadonlyProperty(clonedOperation, "type", "RECTANGLE");
+        clonedOperation.fills = [
+          {
+            type: "IMAGE",
+            scaleMode: "FILL",
+            imageHash: "0",
+            opacity: 1,
+            visible: true,
+            blendMode: "NORMAL",
+            imageTransform: [
+              [1, 0, 0],
+              [0, 1, 0],
+            ],
+          },
+        ];
+        return clonedOperation;
       default:
         return null;
     }
   });
+  console.log("mapped is ", mapped);
+
   return mapped.filter(notEmpty);
 };
 

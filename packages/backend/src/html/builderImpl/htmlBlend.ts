@@ -15,9 +15,9 @@ export const htmlOpacity = (
   if (node.opacity !== undefined && node.opacity !== 1) {
     // formatWithJSX is not called here because opacity unit doesn't end in px.
     if (isJsx) {
-      return `opacity: ${sliceNum(node.opacity)}, `;
+      return `opacity: ${sliceNum(node.opacity)}`;
     } else {
-      return `opacity: ${sliceNum(node.opacity)}; `;
+      return `opacity: ${sliceNum(node.opacity)}`;
     }
   }
   return "";
