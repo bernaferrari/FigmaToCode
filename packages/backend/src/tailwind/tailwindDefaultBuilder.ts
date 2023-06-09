@@ -19,6 +19,7 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
+import { pxToBlur } from "./conversionTables";
 
 export class TailwindDefaultBuilder {
   attributes: string[] = [];
@@ -70,33 +71,28 @@ export class TailwindDefaultBuilder {
 
   commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): this {
     this.customColor(node.fills, "bg");
-
-    if (node.type === "ELLIPSE") {
-      this.radiusEllipse(node);
-    } else {
-      this.radiusRectangle(node);
-    }
-
+    this.radius(node);
     this.shadow(node);
     this.border(node);
+    this.blur(node);
     return this;
   }
 
-  radiusEllipse(node: SceneNode): this {
+  radius(node: SceneNode): this {
     if (node.type === "ELLIPSE") {
       this.addAttributes("rounded-full");
+    } else {
+      this.addAttributes(tailwindBorderRadius(node));
     }
     return this;
   }
 
-  radiusRectangle(node: SceneNode): this {
-    this.addAttributes(tailwindBorderRadius(node));
-    return this;
-  }
+  border(node: SceneNode): this {
+    if ("strokes" in node) {
+      this.addAttributes(tailwindBorderWidth(node));
+      this.customColor(node.strokes, "border");
+    }
 
-  border(node: MinimalStrokesMixin): this {
-    this.addAttributes(tailwindBorderWidth(node));
-    this.customColor(node.strokes, "border");
     return this;
   }
 
@@ -108,6 +104,13 @@ export class TailwindDefaultBuilder {
         `top-[${sliceNum(y)}px]`,
         `absolute`
       );
+    } else if (
+      node.type === "GROUP" ||
+      ("layoutMode" in node &&
+        (optimizeLayout ? node.inferredAutoLayout : node)?.layoutMode ===
+          "NONE")
+    ) {
+      this.addAttributes("relative");
     }
     return this;
   }
@@ -162,9 +165,10 @@ export class TailwindDefaultBuilder {
           this.addAttributes(width, height);
           break;
       }
+    } else {
+      this.addAttributes(width, height);
     }
 
-    this.addAttributes(width, height);
     return this;
   }
 
@@ -177,6 +181,34 @@ export class TailwindDefaultBuilder {
       );
     }
     return this;
+  }
+
+  blur(node: SceneNode) {
+    if ("effects" in node && node.effects.length > 0) {
+      const blur = node.effects.find((e) => e.type === "LAYER_BLUR");
+      if (blur) {
+        const blurValue = pxToBlur(blur.radius);
+        if (blurValue) {
+          this.addAttributes(`blur${blurValue}`);
+        } else {
+          this.addAttributes(`blur-[${sliceNum(blur.radius)}px]`);
+        }
+      }
+
+      const backgroundBlur = node.effects.find(
+        (e) => e.type === "BACKGROUND_BLUR"
+      );
+      if (backgroundBlur) {
+        const backgroundBlurValue = pxToBlur(backgroundBlur.radius);
+        if (backgroundBlurValue) {
+          this.addAttributes(`backdrop-blur${backgroundBlurValue}`);
+        } else {
+          this.addAttributes(
+            `backdrop-blur-[${sliceNum(backgroundBlur.radius)}px]`
+          );
+        }
+      }
+    }
   }
 
   build(additionalAttr = ""): string {

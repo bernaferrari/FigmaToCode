@@ -90,7 +90,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
     .position(node, globalLocalSettings.optimizeLayout);
 
   if (builder.attributes || builder.style) {
-    const attr = builder.build("relative");
+    const attr = builder.build("");
 
     const generator = tailwindWidgetGenerator(node.children, isJsx);
 
@@ -144,7 +144,7 @@ const tailwindFrame = (
 
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return tailwindContainer(node, childrenStr, "relative", isJsx);
+    return tailwindContainer(node, childrenStr, "", isJsx);
   }
 };
 

@@ -40,29 +40,29 @@ export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
     node.children.length > 0 &&
     node.clipsContent === true
   ) {
-    if (
-      node.children.some(
-        (child) =>
-          "layoutPositioning" in child && node.layoutPositioning === "AUTO"
-      )
-    ) {
-      if (singleCorner) {
-        comp.push(
-          formatWithJSX(
-            "clip-path",
-            isJsx,
-            `inset(0px round ${singleCorner}px)`
-          )
-        );
-      } else if (cornerValues.filter((d) => d > 0).length > 0) {
-        const insetValues = cornerValues.map((value) => `${value}px`).join(" ");
-        comp.push(
-          formatWithJSX("clip-path", isJsx, `inset(0px round ${insetValues})`)
-        );
-      }
-    } else {
-      comp.push(formatWithJSX("overflow", isJsx, "hidden"));
-    }
+    // if (
+    //   node.children.some(
+    //     (child) =>
+    //       "layoutPositioning" in child && node.layoutPositioning === "AUTO"
+    //   )
+    // ) {
+    //   if (singleCorner) {
+    //     comp.push(
+    //       formatWithJSX(
+    //         "clip-path",
+    //         isJsx,
+    //         `inset(0px round ${singleCorner}px)`
+    //       )
+    //     );
+    //   } else if (cornerValues.filter((d) => d > 0).length > 0) {
+    //     const insetValues = cornerValues.map((value) => `${value}px`).join(" ");
+    //     comp.push(
+    //       formatWithJSX("clip-path", isJsx, `inset(0px round ${insetValues})`)
+    //     );
+    //   }
+    // } else {
+    comp.push(formatWithJSX("overflow", isJsx, "hidden"));
+    // }
   }
 
   return comp;

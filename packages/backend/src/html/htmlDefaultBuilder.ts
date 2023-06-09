@@ -6,6 +6,7 @@ import {
   htmlOpacity,
 } from "./builderImpl/htmlBlend";
 import {
+  htmlColor,
   htmlColorFromFills,
   htmlGradientFromFills,
 } from "./builderImpl/htmlColor";
@@ -16,7 +17,7 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { className } from "../common/numToAutoFixed";
+import { className, sliceNum } from "../common/numToAutoFixed";
 import { commonStroke } from "../common/commonStroke";
 
 export class HtmlDefaultBuilder {
@@ -46,9 +47,13 @@ export class HtmlDefaultBuilder {
   }
 
   commonShapeStyles(node: GeometryMixin & SceneNode): this {
-    this.customColor(node.fills, "background-color");
+    this.applyFillsToStyle(
+      node.fills,
+      node.type === "TEXT" ? "text" : "background"
+    );
     this.shadow(node);
     this.border(node);
+    this.blur(node);
     return this;
   }
 
@@ -85,7 +90,7 @@ export class HtmlDefaultBuilder {
         formatWithJSX(
           "border",
           this.isJSX,
-          `${weight}px ${color} ${borderStyle}`
+          `${sliceNum(weight)}px ${color} ${borderStyle}`
         )
       );
     } else {
@@ -94,7 +99,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-left",
             this.isJSX,
-            `${commonBorder.left}px ${color} ${borderStyle}`
+            `${sliceNum(commonBorder.left)}px ${color} ${borderStyle}`
           )
         );
       }
@@ -103,7 +108,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-top",
             this.isJSX,
-            `${commonBorder.top}px ${color} ${borderStyle}`
+            `${sliceNum(commonBorder.top)}px ${color} ${borderStyle}`
           )
         );
       }
@@ -112,7 +117,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-right",
             this.isJSX,
-            `${commonBorder.right}px ${color} ${borderStyle}`
+            `${sliceNum(commonBorder.right)}px ${color} ${borderStyle}`
           )
         );
       }
@@ -121,7 +126,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-bottom",
             this.isJSX,
-            `${commonBorder.bottom}px ${color} ${borderStyle}`
+            `${sliceNum(commonBorder.bottom)}px ${color} ${borderStyle}`
           )
         );
       }
@@ -138,58 +143,65 @@ export class HtmlDefaultBuilder {
         formatWithJSX("top", this.isJSX, y),
         formatWithJSX("position", this.isJSX, "absolute")
       );
+    } else {
+      if (
+        node.type === "GROUP" ||
+        ("layoutMode" in node &&
+          (optimizeLayout ? node.inferredAutoLayout : node)?.layoutMode ===
+            "NONE")
+      ) {
+        this.addStyles(formatWithJSX("position", this.isJSX, "relative"));
+      }
     }
 
     return this;
   }
 
-  customColor(
+  applyFillsToStyle(
     paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"],
-    property: "text" | "background-color"
+    property: "text" | "background"
   ): this {
-    const fill = this.retrieveFill(paintArray);
+    if (property === "text") {
+      this.addStyles(
+        formatWithJSX("text", this.isJSX, htmlColorFromFills(paintArray))
+      );
+      return this;
+    }
 
-    if (fill.kind === "solid") {
-      const prop = property === "text" ? "color" : property;
-      this.addStyles(formatWithJSX(prop, this.isJSX, fill.prop));
-    } else if (fill.kind === "gradient") {
-      this.applyGradientStyle(fill, property);
+    const backgroundValues = this.buildBackgroundValues(paintArray);
+
+    if (backgroundValues) {
+      this.addStyles(formatWithJSX("background", this.isJSX, backgroundValues));
     }
 
     return this;
   }
 
-  applyGradientStyle(
-    fill: { prop: string; kind: "solid" | "gradient" | "none" },
-    property: "text" | "background-color"
-  ) {
-    if (property === "background-color") {
-      this.addStyles(formatWithJSX("background-image", this.isJSX, fill.prop));
-    } else if (property === "text") {
-      this.addStyles(
-        formatWithJSX("background", this.isJSX, fill.prop),
-        formatWithJSX("-webkit-background-clip", this.isJSX, "text"),
-        formatWithJSX("-webkit-text-fill-color", this.isJSX, "transparent")
-      );
+  buildBackgroundValues(
+    paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  ): string {
+    if (paintArray === figma.mixed) {
+      return "";
     }
-  }
 
-  retrieveFill(paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"]): {
-    prop: string;
-    kind: "solid" | "gradient" | "none";
-  } {
-    if (this.visible) {
-      const gradient = htmlGradientFromFills(paintArray);
-      if (gradient) {
-        return { prop: gradient, kind: "gradient" };
+    // If one fill and it's a solid, return the solid RGB color
+    if (paintArray.length === 1 && paintArray[0].type === "SOLID") {
+      return htmlColorFromFills(paintArray);
+    }
+
+    // If multiple fills, deal with gradients and convert solid colors to a "dumb" linear-gradient
+    const styles = paintArray.map((paint) => {
+      if (paint.type === "SOLID") {
+        const color = htmlColorFromFills([paint]);
+        return `linear-gradient(0deg, ${color} 0%, ${color} 100%)`;
+      } else if (paint.type === "GRADIENT_LINEAR") {
+        return htmlGradientFromFills([paint]);
       }
 
-      const color = htmlColorFromFills(paintArray);
-      if (color) {
-        return { prop: color, kind: "solid" };
-      }
-    }
-    return { prop: "", kind: "none" };
+      return ""; // Handle other paint types safely
+    });
+
+    return styles.filter((value) => value !== "").join(", ");
   }
 
   shadow(node: SceneNode): this {
@@ -236,6 +248,34 @@ export class HtmlDefaultBuilder {
       );
     }
     return this;
+  }
+
+  blur(node: SceneNode) {
+    if ("effects" in node && node.effects.length > 0) {
+      const blur = node.effects.find((e) => e.type === "LAYER_BLUR");
+      if (blur) {
+        this.addStyles(
+          formatWithJSX(
+            "filter",
+            this.isJSX,
+            `blur(${sliceNum(blur.radius)}px)`
+          )
+        );
+      }
+
+      const backgroundBlur = node.effects.find(
+        (e) => e.type === "BACKGROUND_BLUR"
+      );
+      if (backgroundBlur) {
+        this.addStyles(
+          formatWithJSX(
+            "backdrop-filter",
+            this.isJSX,
+            `blur(${sliceNum(backgroundBlur.radius)}px)`
+          )
+        );
+      }
+    }
   }
 
   build(additionalStyle: Array<string> = []): string {

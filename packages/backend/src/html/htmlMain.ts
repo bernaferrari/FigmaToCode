@@ -1,4 +1,3 @@
-import { formatWithJSX } from "../common/parseJSX";
 import { indentString } from "../common/indentString";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { HtmlTextBuilder } from "./htmlTextBuilder";
@@ -93,7 +92,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
   ).commonPositionStyles(node, localSettings.optimizeLayout);
 
   if (builder.styles) {
-    const attr = builder.build([formatWithJSX("position", isJsx, "relative")]);
+    const attr = builder.build();
 
     const generator = htmlWidgetGenerator(node.children, isJsx);
 
@@ -145,12 +144,7 @@ const htmlFrame = (
 
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return htmlContainer(
-      node,
-      childrenStr,
-      [formatWithJSX("position", isJsx, "relative")],
-      isJsx
-    );
+    return htmlContainer(node, childrenStr, [], isJsx);
   }
 };
 

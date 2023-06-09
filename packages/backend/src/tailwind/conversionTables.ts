@@ -30,13 +30,29 @@ export const exactValue = (
 const pixelToTailwindValue = (
   value: number,
   conversionMap: Record<number, string>
-) => {
+): string => {
   return conversionMap[
     nearestValue(
       value / 16,
       Object.keys(conversionMap).map((d) => +d)
     )
   ];
+};
+
+const pixelToExactTailwindValue = (
+  value: number,
+  conversionMap: Record<number, string>
+): string | null => {
+  const convertedValue = exactValue(
+    value,
+    Object.keys(conversionMap).map((d) => +d)
+  );
+
+  if (!convertedValue) {
+    return null;
+  }
+
+  return conversionMap[convertedValue];
 };
 
 const mapLetterSpacing: Record<number, string> = {
@@ -87,6 +103,18 @@ const mapBorderRadius: Record<number, string> = {
   1.0: "-2xl",
   1.5: "-3xl",
   10: "-full",
+};
+
+// This uses pixels.
+const mapBlur: Record<number, string> = {
+  0: "-none",
+  4: "sm",
+  8: "",
+  12: "-md",
+  16: "-lg",
+  24: "-xl",
+  40: "-2xl",
+  64: "-3xl",
 };
 
 const mapWidthHeightSize: Record<number, string> = {
@@ -144,6 +172,9 @@ export const pxToFontSize = (value: number): string =>
 
 export const pxToBorderRadius = (value: number): string =>
   pixelToTailwindValue(value, mapBorderRadius);
+
+export const pxToBlur = (value: number): string | null =>
+  pixelToExactTailwindValue(value, mapBlur);
 
 export const pxToLayoutSize = (value: number): string => {
   if (value > 384) {
