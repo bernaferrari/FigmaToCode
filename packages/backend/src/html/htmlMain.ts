@@ -243,7 +243,7 @@ export const htmlSection = (
     .applyFillsToStyle(node.fills, "background");
 
   if (childrenStr) {
-    return `\n<div${builder.build()}>\n${indentString(childrenStr)}\n</div>`;
+    return `\n<div${builder.build()}>${indentString(childrenStr)}\n</div>`;
   } else {
     return `\n<div${builder.build()}></div>`;
   }

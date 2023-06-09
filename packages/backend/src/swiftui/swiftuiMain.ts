@@ -256,7 +256,7 @@ const widgetGeneratorWithLimits = (
   for (let i = 0, j = slicedChildren.length; i < j; i += chunk) {
     const chunkChildren = slicedChildren.slice(i, i + chunk);
     const strChildren = swiftuiWidgetGenerator(chunkChildren, indentLevel);
-    strBuilder += `\nGroup {${strChildren}\n}`;
+    strBuilder += `Group {\n${indentString(strChildren)}\n}`;
   }
 
   return strBuilder;
