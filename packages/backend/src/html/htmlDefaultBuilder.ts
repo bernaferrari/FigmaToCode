@@ -137,7 +137,6 @@ export class HtmlDefaultBuilder {
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-
       this.addStyles(
         formatWithJSX("left", this.isJSX, x),
         formatWithJSX("top", this.isJSX, y),
@@ -147,8 +146,8 @@ export class HtmlDefaultBuilder {
       if (
         node.type === "GROUP" ||
         ("layoutMode" in node &&
-          (optimizeLayout ? node.inferredAutoLayout : node)?.layoutMode ===
-            "NONE")
+          ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
+            ?.layoutMode === "NONE")
       ) {
         this.addStyles(formatWithJSX("position", this.isJSX, "relative"));
       }
@@ -219,12 +218,8 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  size(node: SceneNode, optimizedLayout: boolean): this {
-    const { width, height } = htmlSizePartial(
-      node,
-      this.isJSX,
-      optimizedLayout
-    );
+  size(node: SceneNode, optimize: boolean): this {
+    const { width, height } = htmlSizePartial(node, this.isJSX, optimize);
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {

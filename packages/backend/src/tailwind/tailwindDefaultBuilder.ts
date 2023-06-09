@@ -107,7 +107,7 @@ export class TailwindDefaultBuilder {
     } else if (
       node.type === "GROUP" ||
       ("layoutMode" in node &&
-        (optimizeLayout ? node.inferredAutoLayout : node)?.layoutMode ===
+        ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)?.layoutMode ===
           "NONE")
     ) {
       this.addAttributes("relative");

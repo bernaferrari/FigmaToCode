@@ -131,12 +131,12 @@ export const commonIsAbsolutePosition = (
     "layoutMode" in node.parent &&
     node.parent.inferredAutoLayout !== null
   ) {
-    return this;
+    return false;
   }
 
   if ("layoutAlign" in node) {
     if (!node.parent || node.parent === undefined) {
-      return this;
+      return false;
     }
 
     const parentLayoutIsNone =

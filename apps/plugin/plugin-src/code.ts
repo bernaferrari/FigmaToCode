@@ -111,7 +111,6 @@ switch (figma.mode) {
 
     figma.codegen.on("generate", ({ language, node }) => {
       const convertedSelection = convertIntoNodes([node], null);
-      console.log("language is", language);
 
       switch (language) {
         case "html":
