@@ -215,10 +215,8 @@ export class HtmlDefaultBuilder {
           this.addStyles(width);
           break;
         case "NONE":
-          this.addStyles(width, height);
-          break;
         case "TRUNCATE":
-          // TODO make this work?
+          this.addStyles(width, height);
           break;
       }
     } else {

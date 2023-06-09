@@ -169,13 +169,16 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     const { width, height } = swiftuiSize(node);
 
     let comp: string[] = [];
-    if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
-      comp.push(width);
-    }
-
-    if (node.textAutoResize === "NONE") {
-      // if it is NONE, it isn't WIDTH_AND_HEIGHT, which means the comma must be added.
-      comp.push(height);
+    switch (node.textAutoResize) {
+      case "WIDTH_AND_HEIGHT":
+        break;
+      case "HEIGHT":
+        comp.push(width);
+        break;
+      case "NONE":
+      case "TRUNCATE":
+        comp.push(width, height);
+        break;
     }
 
     if (comp.length > 0) {

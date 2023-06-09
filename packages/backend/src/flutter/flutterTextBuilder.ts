@@ -151,21 +151,23 @@ export const wrapTextAutoResize = (node: TextNode, child: string): string => {
   const { width, height, isExpanded } = flutterSize(node);
   let result = "";
 
-  if (node.textAutoResize === "NONE") {
-    // = instead of += because we want to replace it
-    result = generateWidgetCode("SizedBox", {
-      width: width,
-      height: height,
-      child: child,
-    });
-  } else if (node.textAutoResize === "HEIGHT") {
-    // if HEIGHT is set, it means HEIGHT will be calculated automatically, but width won't
-    // = instead of += because we want to replace it
-
-    result = generateWidgetCode("SizedBox", {
-      width: width,
-      child: child,
-    });
+  switch (node.textAutoResize) {
+    case "WIDTH_AND_HEIGHT":
+      break;
+    case "HEIGHT":
+      result = generateWidgetCode("SizedBox", {
+        width: width,
+        child: child,
+      });
+      break;
+    case "NONE":
+    case "TRUNCATE":
+      result = generateWidgetCode("SizedBox", {
+        width: width,
+        height: height,
+        child: child,
+      });
+      break;
   }
 
   if (isExpanded) {

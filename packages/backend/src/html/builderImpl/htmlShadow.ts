@@ -38,7 +38,7 @@ export const htmlShadow = (node: BlendMixin): string => {
       }
 
       // Return box-shadow in the desired format
-      return `${x}px ${y}px ${blur}px ${spread}${color}${inner};`;
+      return `${x}px ${y}px ${blur}px ${spread}${color}${inner}`;
     }
   }
   return "";

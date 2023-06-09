@@ -158,10 +158,8 @@ export class TailwindDefaultBuilder {
           this.addAttributes(width);
           break;
         case "NONE":
-          this.addAttributes(width, height);
-          break;
         case "TRUNCATE":
-          // TODO make this work?
+          this.addAttributes(width, height);
           break;
       }
     }
