@@ -9,7 +9,7 @@ import { swiftuiSize } from "./builderImpl/swiftuiSize";
 import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { SwiftUIElement } from "./builderImpl/swiftuiParser";
 import { parseTextAsCode } from "../flutter/flutterTextBuilder";
-import { swiftuiColorFromFills } from "./builderImpl/swiftuiColor";
+import { swiftuiSolidColor } from "./builderImpl/swiftuiColor";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   modifiers: string[] = [];
@@ -41,7 +41,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   }
 
   textColor(fills: Paint[]): string {
-    const fillColor = swiftuiColorFromFills(fills);
+    const fillColor = swiftuiSolidColor(fills);
     if (fillColor) {
       return fillColor;
     }

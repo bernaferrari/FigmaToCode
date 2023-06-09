@@ -11,10 +11,33 @@ export const swiftUISolidColor = (fill: Paint): string => {
   return "";
 };
 
-/**
- * Retrieve the SOLID color for SwiftUI when existent, otherwise ""
- */
-export const swiftuiColorFromFills = (
+export const swiftuiSolidColor = (
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+): string => {
+  const fill = retrieveTopFill(fills);
+
+  if (fill && fill.type === "SOLID") {
+    // opacity should only be null on set, not on get. But better be prevented.
+    const opacity = fill.opacity ?? 1.0;
+    return swiftuiColor(fill.color, opacity);
+  } else if (fill?.type === "GRADIENT_LINEAR") {
+    return swiftuiRGBAColor(fill.gradientStops[0].color);
+  } else if (fill?.type === "IMAGE") {
+    return swiftuiColor(
+      {
+        r: 0.5,
+        g: 0.23,
+        b: 0.27,
+      },
+      0.5
+    );
+  }
+
+  return "";
+};
+
+export const swiftuiBackground = (
+  node: SceneNode,
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): string => {
   const fill = retrieveTopFill(fills);
@@ -26,15 +49,9 @@ export const swiftuiColorFromFills = (
   } else if (fill?.type === "GRADIENT_LINEAR") {
     return swiftuiGradient(fill);
   } else if (fill?.type === "IMAGE") {
-    // placeholder for the image. Apparently SwiftUI doesn't support Image.network(...).
-    return swiftuiColor(
-      {
-        r: 0.5,
-        g: 0.23,
-        b: 0.27,
-      },
-      0.5
-    );
+    return `AsyncImage(url: URL(string: "https://via.placeholder.com/${node.width.toFixed(
+      0
+    )}x${node.height.toFixed(0)}"))`;
   }
 
   return "";
@@ -73,6 +90,8 @@ const gradientDirection = (angle: number): string => {
       return "startPoint: .trailing, endPoint: .leading";
   }
 };
+
+export const swiftuiRGBAColor = (color: RGBA) => swiftuiColor(color, color.a);
 
 export const swiftuiColor = (color: RGB, opacity: number): string => {
   // Using Color.black.opacity() is not reccomended, as per:
