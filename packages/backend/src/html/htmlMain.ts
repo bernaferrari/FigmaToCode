@@ -4,6 +4,7 @@ import { HtmlTextBuilder } from "./htmlTextBuilder";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { PluginSettings } from "../code";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
+import { formatWithJSX } from "../common/parseJSX";
 
 let showLayerName = false;
 
@@ -56,7 +57,11 @@ const htmlWidgetGenerator = (
       case "FRAME":
       case "COMPONENT":
       case "INSTANCE":
+      case "COMPONENT_SET":
         comp += htmlFrame(node, isJsx);
+        break;
+      case "SECTION":
+        comp += htmlSection(node, isJsx);
         break;
       case "TEXT":
         comp += htmlText(node, isJsx);
@@ -124,7 +129,7 @@ export const htmlText = (node: TextNode, isJsx: boolean): string => {
 };
 
 const htmlFrame = (
-  node: FrameNode | InstanceNode | ComponentNode,
+  node: SceneNode & BaseFrameMixin,
   isJsx: boolean = false
 ): string => {
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
@@ -174,7 +179,12 @@ export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const htmlContainer = (
-  node: FrameNode | InstanceNode | ComponentNode | RectangleNode | EllipseNode,
+  node: SceneNode &
+    SceneNodeMixin &
+    BlendMixin &
+    LayoutMixin &
+    GeometryMixin &
+    MinimalBlendMixin,
   children: string,
   additionalStyles: string[] = [],
   isJsx: boolean
@@ -191,14 +201,24 @@ export const htmlContainer = (
     .commonShapeStyles(node);
 
   if (builder.styles || additionalStyles) {
-    const build = builder.build(additionalStyles);
-
     let tag = "div";
     let src = "";
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
-      tag = "img";
-      src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+      if (!("children" in node) || node.children.length === 0) {
+        tag = "img";
+        src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+      } else {
+        builder.addStyles(
+          formatWithJSX(
+            "background-image",
+            isJsx,
+            `url(https://via.placeholder.com/${node.width}x${node.height})`
+          )
+        );
+      }
     }
+
+    const build = builder.build(additionalStyles);
 
     if (children) {
       return `\n<${tag}${build}${src}>${indentString(children)}\n</${tag}>`;
@@ -210,6 +230,23 @@ export const htmlContainer = (
   }
 
   return children;
+};
+
+export const htmlSection = (
+  node: SectionNode,
+  isJsx: boolean = false
+): string => {
+  const childrenStr = htmlWidgetGenerator(node.children, isJsx);
+  const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
+    .size(node)
+    .position(node, localSettings.optimizeLayout)
+    .applyFillsToStyle(node.fills, "background");
+
+  if (childrenStr) {
+    return `\n<div${builder.build()}>\n${indentString(childrenStr)}\n</div>`;
+  } else {
+    return `\n<div${builder.build()}></div>`;
+  }
 };
 
 export const htmlLine = (node: LineNode, isJsx: boolean): string => {

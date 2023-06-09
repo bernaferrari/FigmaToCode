@@ -4,8 +4,8 @@ import { FrameNodeMock } from "./altMixins2";
  * Identify all nodes that are inside Rectangles and transform those Rectangles into Frames containing those nodes.
  */
 export const convertNodesOnRectangle = (
-  node: FrameNode | GroupNode | InstanceNode | ComponentNode
-): FrameNode | GroupNode | InstanceNode | ComponentNode => {
+  node: FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode
+): FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode => {
   if (node.children.length < 2) {
     return node;
   }
@@ -14,7 +14,7 @@ export const convertNodesOnRectangle = (
       "Node is missing an id! This error should only happen in tests."
     );
   }
-  
+
   const colliding = retrieveCollidingItems(node.children);
 
   const parentsKeys = Object.keys(colliding);

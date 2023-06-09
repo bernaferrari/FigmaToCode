@@ -8,10 +8,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "eslint": "^8.41.0",
+    "eslint": "^8.42.0",
     "eslint-config-custom": "workspace:*",
     "prettier": "^2.8.8",
-    "turbo": "^1.10.1"
+    "turbo": "^1.10.2"
   },
   "packageManager": "pnpm@7.15.0"
 }

@@ -69,16 +69,17 @@ const swiftuiWidgetGenerator = (
         comp.push(swiftuiContainer(node, indentLevel));
         break;
       case "GROUP":
+      case "SECTION":
         comp.push(swiftuiGroup(node, indentLevel));
         break;
       case "FRAME":
       case "INSTANCE":
       case "COMPONENT":
+      case "COMPONENT_SET":
         comp.push(swiftuiFrame(node, indentLevel));
         break;
       case "TEXT":
         comp.push(swiftuiText(node));
-        console.log("text is:\n", swiftuiText(node));
         break;
       default:
         break;
@@ -95,10 +96,6 @@ export const swiftuiContainer = (
   indentLevel: number,
   stack: string = ""
 ): string => {
-  if (!("layoutAlign" in node) || !("opacity" in node)) {
-    return "";
-  }
-
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -129,12 +126,15 @@ export const swiftuiContainer = (
   return result;
 };
 
-const swiftuiGroup = (node: GroupNode, indentLevel: number): string => {
+const swiftuiGroup = (
+  node: GroupNode | SectionNode,
+  indentLevel: number
+): string => {
   const children = widgetGeneratorWithLimits(node, indentLevel);
   return swiftuiContainer(
     node,
     indentLevel,
-    `ZStack() {\n${indentString(children)}\n}`
+    children ? generateSwiftViewCode("ZStack", {}, children) : `ZStack() { }`
   );
 };
 
@@ -147,7 +147,7 @@ const swiftuiText = (node: TextNode): string => {
 };
 
 const swiftuiFrame = (
-  node: FrameNode | InstanceNode | ComponentNode,
+  node: SceneNode & BaseFrameMixin,
   indentLevel: number
 ): string => {
   const children = widgetGeneratorWithLimits(
@@ -233,7 +233,7 @@ export const generateSwiftViewCode = (
 
 // todo should the plugin manually Group items? Ideally, it would detect the similarities and allow a ForEach.
 const widgetGeneratorWithLimits = (
-  node: FrameNode | InstanceNode | ComponentNode | GroupNode,
+  node: ChildrenMixin,
   indentLevel: number
 ) => {
   if (node.children.length < 10) {

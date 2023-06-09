@@ -35,12 +35,11 @@ export class SwiftuiDefaultBuilder {
     });
   }
 
-  commonPositionStyles(
-    node: SceneNode & LayoutMixin & MinimalBlendMixin,
-    optimizeLayout: boolean
-  ): this {
+  commonPositionStyles(node: SceneNode, optimizeLayout: boolean): this {
     this.position(node, optimizeLayout);
-    this.blend(node);
+    if ("layoutAlign" in node && "opacity" in node) {
+      this.blend(node);
+    }
     return this;
   }
 

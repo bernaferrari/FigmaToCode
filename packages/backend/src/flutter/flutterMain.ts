@@ -97,7 +97,11 @@ const flutterWidgetGenerator = (
       case "FRAME":
       case "INSTANCE":
       case "COMPONENT":
+      case "COMPONENT_SET":
         comp.push(flutterFrame(node));
+        break;
+      case "SECTION":
+        comp.push(flutterContainer(node, ""));
         break;
       case "TEXT":
         comp.push(flutterText(node));
@@ -126,10 +130,7 @@ const flutterGroup = (node: GroupNode): string => {
   );
 };
 
-const flutterContainer = (
-  node: SceneNode & BlendMixin & LayoutMixin,
-  child: string
-): string => {
+const flutterContainer = (node: SceneNode, child: string): string => {
   let propChild = "";
 
   let image = "";
@@ -173,7 +174,7 @@ const flutterText = (node: TextNode): string => {
 };
 
 const flutterFrame = (
-  node: FrameNode | InstanceNode | ComponentNode
+  node: SceneNode & BaseFrameMixin & MinimalBlendMixin
 ): string => {
   const children = flutterWidgetGenerator(node.children);
 
@@ -196,7 +197,7 @@ const flutterFrame = (
 };
 
 const makeRowColumn = (
-  node: FrameNode | InstanceNode | ComponentNode,
+  node: BaseFrameMixin,
   autoLayout: inferredAutoLayoutResult,
   children: string
 ): string => {

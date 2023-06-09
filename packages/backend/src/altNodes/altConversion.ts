@@ -7,7 +7,6 @@ export let globalTextStyleSegments: Record<string, StyledTextSegment[]> = {};
 export const cloneNode = <T extends BaseNode>(node: T): T => {
   // Create the cloned object with the correct prototype
   const cloned = {} as T;
-
   // Create a new object with only the desired descriptors (excluding 'parent' and 'children')
   for (const prop in node) {
     if (
@@ -16,7 +15,9 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
       prop !== "horizontalPadding" &&
       prop !== "verticalPadding" &&
       prop !== "mainComponent" &&
-      prop !== "masterComponent"
+      prop !== "masterComponent" &&
+      prop !== "componentPropertyDefinitions" &&
+      prop !== "exposedInstances"
     ) {
       cloned[prop as keyof T] = node[prop as keyof T];
     }
@@ -26,9 +27,15 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
 };
 
 export const frameNodeTo = (
-  node: FrameNode | InstanceNode | ComponentNode,
+  node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   parent: ParentType
-): RectangleNode | FrameNode | InstanceNode | ComponentNode | GroupNode => {
+):
+  | RectangleNode
+  | FrameNode
+  | InstanceNode
+  | ComponentNode
+  | GroupNode
+  | ComponentSetNode => {
   if (node.children.length === 0) {
     // if it has no children, convert frame to rectangle
     return frameToRectangleNode(node, parent);
@@ -44,7 +51,7 @@ export const frameNodeTo = (
 
 // auto convert Frame to Rectangle when Frame has no Children
 const frameToRectangleNode = (
-  node: FrameNode | InstanceNode | ComponentNode,
+  node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   parent: ParentType
 ): RectangleNode => {
   const clonedNode = cloneNode(node);
@@ -87,7 +94,6 @@ export const convertIntoNodes = (
   parent: ParentType = null
 ): Array<SceneNode> => {
   const mapped: Array<SceneNode | null> = sceneNode.map((node: SceneNode) => {
-    console.log("trying to read?");
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
@@ -97,6 +103,7 @@ export const convertIntoNodes = (
       case "FRAME":
       case "INSTANCE":
       case "COMPONENT":
+      case "COMPONENT_SET":
         // TODO Fix asset export. Use the new API.
         // const iconToRect = iconToRectangle(node, parent);
         // if (iconToRect != null) {
@@ -149,6 +156,14 @@ export const convertIntoNodes = (
       case "POLYGON":
       case "VECTOR":
         return standardClone(node, parent);
+      case "SECTION":
+        const sectionClone = standardClone(node, parent);
+        overrideReadonlyProperty(
+          sectionClone,
+          "children",
+          convertIntoNodes(node.children, sectionClone)
+        );
+        return sectionClone;
       case "BOOLEAN_OPERATION":
         const clonedOperation = standardClone(node, parent);
         overrideReadonlyProperty(clonedOperation, "type", "RECTANGLE");
@@ -171,7 +186,6 @@ export const convertIntoNodes = (
         return null;
     }
   });
-  console.log("mapped is ", mapped);
 
   return mapped.filter(notEmpty);
 };

@@ -169,7 +169,6 @@ export class HtmlDefaultBuilder {
     }
 
     const backgroundValues = this.buildBackgroundValues(paintArray);
-
     if (backgroundValues) {
       this.addStyles(formatWithJSX("background", this.isJSX, backgroundValues));
     }
@@ -252,7 +251,9 @@ export class HtmlDefaultBuilder {
 
   blur(node: SceneNode) {
     if ("effects" in node && node.effects.length > 0) {
-      const blur = node.effects.find((e) => e.type === "LAYER_BLUR");
+      const blur = node.effects.find(
+        (e) => e.type === "LAYER_BLUR" && e.visible
+      );
       if (blur) {
         this.addStyles(
           formatWithJSX(
@@ -264,7 +265,7 @@ export class HtmlDefaultBuilder {
       }
 
       const backgroundBlur = node.effects.find(
-        (e) => e.type === "BACKGROUND_BLUR"
+        (e) => e.type === "BACKGROUND_BLUR" && e.visible
       );
       if (backgroundBlur) {
         this.addStyles(

@@ -46,6 +46,7 @@ const tailwindWidgetGenerator = (
       case "FRAME":
       case "COMPONENT":
       case "INSTANCE":
+      case "COMPONENT_SET":
         comp += tailwindFrame(node, isJsx);
         break;
       case "TEXT":
@@ -53,6 +54,9 @@ const tailwindWidgetGenerator = (
         break;
       case "LINE":
         comp += tailwindLine(node, isJsx);
+        break;
+      case "SECTION":
+        comp += tailwindSection(node, isJsx);
         break;
       // case "VECTOR":
       //   comp += htmlAsset(node, isJsx);
@@ -125,7 +129,7 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
 };
 
 const tailwindFrame = (
-  node: FrameNode | InstanceNode | ComponentNode,
+  node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   isJsx: boolean
 ): string => {
   const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
@@ -151,7 +155,12 @@ const tailwindFrame = (
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
 export const tailwindContainer = (
-  node: FrameNode | ComponentNode | InstanceNode | RectangleNode | EllipseNode,
+  node: SceneNode &
+    SceneNodeMixin &
+    BlendMixin &
+    LayoutMixin &
+    GeometryMixin &
+    MinimalBlendMixin,
   children: string,
   additionalAttr: string,
   isJsx: boolean
@@ -178,8 +187,14 @@ export const tailwindContainer = (
     let tag = "div";
     let src = "";
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
-      tag = "img";
-      src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+      if (!("children" in node) || node.children.length === 0) {
+        tag = "img";
+        src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+      } else {
+        builder.addAttributes(
+          `bg-[url(https://via.placeholder.com/${node.width}x${node.height})]`
+        );
+      }
     }
 
     if (children) {
@@ -204,4 +219,22 @@ export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
     .commonShapeStyles(node);
 
   return `\n<div${builder.build()}></div>`;
+};
+
+export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
+  const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
+  const builder = new TailwindDefaultBuilder(
+    node,
+    globalLocalSettings.layerName,
+    isJsx
+  )
+    .size(node)
+    .position(node, globalLocalSettings.optimizeLayout)
+    .customColor(node.fills, "bg");
+
+  if (childrenStr) {
+    return `\n<div${builder.build()}>${indentString(childrenStr)}\n</div>`;
+  } else {
+    return `\n<div${builder.build()}></div>`;
+  }
 };

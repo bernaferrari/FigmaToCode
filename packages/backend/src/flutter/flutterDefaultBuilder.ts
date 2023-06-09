@@ -23,10 +23,12 @@ export class FlutterDefaultBuilder {
     return this;
   }
 
-  blendAttr(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
-    this.child = flutterVisibility(node, this.child);
-    this.child = flutterRotation(node, this.child);
-    this.child = flutterOpacity(node, this.child);
+  blendAttr(node: SceneNode): this {
+    if ("layoutAlign" in node && "opacity" in node && "visible" in node) {
+      this.child = flutterVisibility(node, this.child);
+      this.child = flutterRotation(node, this.child);
+      this.child = flutterOpacity(node, this.child);
+    }
     return this;
   }
 
