@@ -142,24 +142,9 @@ const flutterContainer = (node: SceneNode, child: string): string => {
     )}x${node.height.toFixed(0)}")`;
   }
 
-  // if (child.length > 0 && image.length > 0) {
-  //   const prop1 = generateWidgetCode("Positioned.fill", {
-  //     child: child,
-  //   });
-  //   const prop2 = generateWidgetCode("Positioned.fill", {
-  //     child: image,
-  //   });
-
-  //   propChild = generateWidgetCode("Stack", {
-  //     children: [prop1, prop2],
-  //   });
-  // }
   if (child.length > 0) {
     propChild = child;
   }
-  //  else if (image.length > 0) {
-  //   propChild = image;
-  // }
 
   const builder = new FlutterDefaultBuilder(propChild)
     .createContainer(node, localSettings.optimizeLayout)

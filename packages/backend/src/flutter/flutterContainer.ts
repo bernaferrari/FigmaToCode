@@ -28,7 +28,7 @@ export const flutterContainer = (
 
   // ignore for Groups
   const propBoxDecoration = getDecoration(node);
-  const { width, height, isExpanded } = flutterSize(node);
+  const { width, height, isExpanded } = flutterSize(node, optimizeLayout);
   const clipBehavior =
     "clipsContent" in node && node.clipsContent === true
       ? "Clip.antiAlias"

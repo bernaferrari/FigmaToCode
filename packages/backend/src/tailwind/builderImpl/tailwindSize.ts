@@ -3,9 +3,10 @@ import { nodeSize } from "../../common/nodeWidthHeight";
 import { formatWithJSX } from "../../common/parseJSX";
 
 export const tailwindSizePartial = (
-  node: SceneNode
+  node: SceneNode,
+  optimizeLayout: boolean
 ): { width: string; height: string } => {
-  const size = nodeSize(node);
+  const size = nodeSize(node, optimizeLayout);
 
   let w = "";
   if (typeof size.width === "number") {
@@ -40,7 +41,6 @@ export const tailwindSizePartial = (
 
   return { width: w, height: h };
 };
-
 
 export const htmlSizePartialForTailwind = (
   node: SceneNode,

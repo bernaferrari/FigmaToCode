@@ -3,15 +3,16 @@ import { sliceNum } from "../../common/numToAutoFixed";
 
 // Used in tests.
 export const flutterSizeWH = (node: SceneNode): string => {
-  const fSize = flutterSize(node);
+  const fSize = flutterSize(node, false);
   const size = fSize.width + fSize.height;
   return size;
 };
 
 export const flutterSize = (
-  node: SceneNode
+  node: SceneNode,
+  optimizeLayout: boolean
 ): { width: string; height: string; isExpanded: boolean } => {
-  const size = nodeSize(node);
+  const size = nodeSize(node, optimizeLayout);
   let isExpanded: boolean = false;
 
   // this cast will always be true, since nodeWidthHeight was called with false to relative.

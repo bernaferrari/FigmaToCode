@@ -100,7 +100,7 @@ export const swiftuiContainer = (
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
-  if (node.width <= 0 || node.height <= 0) {
+  if (node.width < 0 || node.height < 0) {
     return stack;
   }
 

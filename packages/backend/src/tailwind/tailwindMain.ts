@@ -75,7 +75,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
   // also ignore if there are no children inside, which makes no sense
-  if (node.width <= 0 || node.height <= 0 || node.children.length === 0) {
+  if (node.width < 0 || node.height <= 0 || node.children.length === 0) {
     return "";
   }
 
@@ -94,7 +94,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
     isJsx
   )
     .blend(node)
-    .size(node)
+    .size(node, globalLocalSettings.optimizeLayout)
     .position(node, globalLocalSettings.optimizeLayout);
 
   if (builder.attributes || builder.style) {
@@ -173,7 +173,7 @@ export const tailwindContainer = (
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
-  if (node.width <= 0 || node.height <= 0) {
+  if (node.width < 0 || node.height < 0) {
     return children;
   }
 
@@ -237,7 +237,7 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
     globalLocalSettings.layerName,
     isJsx
   )
-    .size(node)
+    .size(node, globalLocalSettings.optimizeLayout)
     .position(node, globalLocalSettings.optimizeLayout)
     .customColor(node.fills, "bg");
 

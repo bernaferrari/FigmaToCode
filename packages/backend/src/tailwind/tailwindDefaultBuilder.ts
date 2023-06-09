@@ -62,7 +62,7 @@ export class TailwindDefaultBuilder {
       MinimalBlendMixin,
     optimizeLayout: boolean
   ): this {
-    this.size(node);
+    this.size(node, optimizeLayout);
     this.autoLayoutPadding(node, optimizeLayout);
     this.position(node, optimizeLayout);
     this.blend(node);
@@ -150,8 +150,8 @@ export class TailwindDefaultBuilder {
   }
 
   // must be called before Position, because of the hasFixedSize attribute.
-  size(node: SceneNode): this {
-    const { width, height } = tailwindSizePartial(node);
+  size(node: SceneNode, optimizeLayout: boolean): this {
+    const { width, height } = tailwindSizePartial(node, optimizeLayout);
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {

@@ -84,7 +84,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
   // also ignore if there are no children inside, which makes no sense
-  if (node.width <= 0 || node.height <= 0 || node.children.length === 0) {
+  if (node.width < 0 || node.height <= 0 || node.children.length === 0) {
     return "";
   }
 
@@ -197,7 +197,7 @@ export const htmlContainer = (
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
-  if (node.width <= 0 || node.height <= 0) {
+  if (node.width < 0 || node.height <= 0) {
     return children;
   }
 
@@ -247,7 +247,7 @@ export const htmlSection = (
 ): string => {
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
   const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
-    .size(node)
+    .size(node, localSettings.optimizeLayout)
     .position(node, localSettings.optimizeLayout)
     .applyFillsToStyle(node.fills, "background");
 

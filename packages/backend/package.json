@@ -19,12 +19,12 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.6",
+    "@types/react": "^18.2.9",
     "@types/react-dom": "^18.2.4",
-    "eslint": "^8.36.0",
+    "eslint": "^8.42.0",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
     "tsup": "^6.7.0",
-    "typescript": "^5.0.2"
+    "typescript": "^5.1.3"
   }
 }

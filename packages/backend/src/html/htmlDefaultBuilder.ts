@@ -39,7 +39,7 @@ export class HtmlDefaultBuilder {
     node: SceneNode & LayoutMixin & MinimalBlendMixin,
     optimizeLayout: boolean
   ): this {
-    this.size(node);
+    this.size(node, optimizeLayout);
     this.autoLayoutPadding(node, optimizeLayout);
     this.position(node, optimizeLayout);
     this.blend(node);
@@ -219,8 +219,12 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  size(node: SceneNode): this {
-    const { width, height } = htmlSizePartial(node, this.isJSX);
+  size(node: SceneNode, optimizedLayout: boolean): this {
+    const { width, height } = htmlSizePartial(
+      node,
+      this.isJSX,
+      optimizedLayout
+    );
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {
