@@ -20,6 +20,7 @@ export const flutterColorFromFills = (
 };
 
 export const flutterBoxDecorationColor = (
+  node: SceneNode,
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): Record<string, string> => {
   const fill = retrieveTopFill(fills);
@@ -33,9 +34,35 @@ export const flutterBoxDecorationColor = (
     fill?.type === "GRADIENT_ANGULAR"
   ) {
     return { gradient: flutterGradient(fill) };
+  } else if (fill?.type === "IMAGE") {
+    return { image: flutterDecorationImage(node, fill) };
   }
 
   return {};
+};
+
+export const flutterDecorationImage = (node: SceneNode, fill: ImagePaint) => {
+  return generateWidgetCode("DecorationImage", {
+    image: `NetworkImage("https://via.placeholder.com/${node.width.toFixed(
+      0
+    )}x${node.height.toFixed(0)}")`,
+    fit: fitToBoxFit(fill),
+  });
+};
+
+const fitToBoxFit = (fill: ImagePaint): string => {
+  switch (fill.scaleMode) {
+    case "FILL":
+      return "BoxFit.fill";
+    case "FIT":
+      return "BoxFit.contain";
+    case "CROP":
+      return "BoxFit.cover";
+    case "TILE":
+      return "BoxFit.none";
+    default:
+      return "BoxFit.cover";
+  }
 };
 
 export const flutterGradient = (fill: GradientPaint): string => {

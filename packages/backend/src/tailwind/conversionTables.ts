@@ -39,7 +39,23 @@ const pixelToTailwindValue = (
   ];
 };
 
-const pixelToExactTailwindValue = (
+const pixelToTailwindRemExact = (
+  value: number,
+  conversionMap: Record<number, string>
+): string | null => {
+  const convertedValue = exactValue(
+    value / 16,
+    Object.keys(conversionMap).map((d) => +d)
+  );
+
+  if (!convertedValue) {
+    return null;
+  }
+
+  return conversionMap[convertedValue];
+};
+
+const pixelToTailwindPxExact = (
   value: number,
   conversionMap: Record<number, string>
 ): string | null => {
@@ -174,11 +190,13 @@ export const pxToBorderRadius = (value: number): string =>
   pixelToTailwindValue(value, mapBorderRadius);
 
 export const pxToBlur = (value: number): string | null =>
-  pixelToExactTailwindValue(value, mapBlur);
+  pixelToTailwindPxExact(value, mapBlur);
 
 export const pxToLayoutSize = (value: number): string => {
-  if (value > 384) {
-    return `[${sliceNum(value)}px]`;
+  const tailwindValue = pixelToTailwindRemExact(value, mapWidthHeightSize);
+  if (tailwindValue) {
+    return tailwindValue;
   }
-  return pixelToTailwindValue(value, mapWidthHeightSize);
+
+  return `[${sliceNum(value)}px]`;
 };

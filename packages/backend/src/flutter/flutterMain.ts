@@ -135,25 +135,27 @@ const flutterContainer = (node: SceneNode, child: string): string => {
 
   let image = "";
   if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
-    image = `FlutterLogo(size: ${Math.min(node.width, node.height)})`;
+    image = `Image.network("https://via.placeholder.com/${node.width.toFixed(
+      0
+    )}x${node.height.toFixed(0)}")`;
   }
 
-  if (child.length > 0 && image.length > 0) {
-    const prop1 = generateWidgetCode("Positioned.fill", {
-      child: child,
-    });
-    const prop2 = generateWidgetCode("Positioned.fill", {
-      child: image,
-    });
+  // if (child.length > 0 && image.length > 0) {
+  //   const prop1 = generateWidgetCode("Positioned.fill", {
+  //     child: child,
+  //   });
+  //   const prop2 = generateWidgetCode("Positioned.fill", {
+  //     child: image,
+  //   });
 
-    propChild = generateWidgetCode("Stack", {
-      children: [prop1, prop2],
-    });
-  } else if (child.length > 0) {
-    propChild = child;
-  } else if (image.length > 0) {
-    propChild = image;
-  }
+  //   propChild = generateWidgetCode("Stack", {
+  //     children: [prop1, prop2],
+  //   });
+  // } else if (child.length > 0) {
+  //   propChild = child;
+  // } else if (image.length > 0) {
+  //   propChild = image;
+  // }
 
   const builder = new FlutterDefaultBuilder(propChild)
     .createContainer(node, localSettings.optimizeLayout)

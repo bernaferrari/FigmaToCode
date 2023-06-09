@@ -80,7 +80,7 @@ const getDecoration = (node: SceneNode): string => {
   }
 
   const propBoxShadow = flutterShadow(node);
-  const decorationBackground = flutterBoxDecorationColor(node.fills);
+  const decorationBackground = flutterBoxDecorationColor(node, node.fills);
 
   let shapeDecorationBorder = "";
   if (node.type === "STAR") {

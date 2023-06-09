@@ -189,10 +189,14 @@ export const tailwindContainer = (
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
-        src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+        src = ` src="https://via.placeholder.com/${node.width.toFixed(
+          0
+        )}x${node.height.toFixed(0)}"`;
       } else {
         builder.addAttributes(
-          `bg-[url(https://via.placeholder.com/${node.width}x${node.height})]`
+          `bg-[url(https://via.placeholder.com/${node.width.toFixed(
+            0
+          )}x${node.height.toFixed(0)})]`
         );
       }
     }

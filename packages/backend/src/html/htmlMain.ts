@@ -166,7 +166,9 @@ export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
   let src = "";
   if (retrieveTopFill(node.fills)?.type === "IMAGE") {
     tag = "img";
-    src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+    src = ` src="https://via.placeholder.com/${node.width.toFixed(
+      0
+    )}x${node.height.toFixed(0)}"`;
   }
 
   if (tag === "div") {
@@ -206,13 +208,17 @@ export const htmlContainer = (
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
-        src = ` src="https://via.placeholder.com/${node.width}x${node.height}"`;
+        src = ` src="https://via.placeholder.com/${node.width.toFixed(
+          0
+        )}x${node.height.toFixed(0)}"`;
       } else {
         builder.addStyles(
           formatWithJSX(
             "background-image",
             isJsx,
-            `url(https://via.placeholder.com/${node.width}x${node.height})`
+            `url(https://via.placeholder.com/${node.width.toFixed(
+              0
+            )}x${node.height.toFixed(0)})`
           )
         );
       }
