@@ -19,7 +19,7 @@ const defaultPluginSettings: PluginSettings = {
   framework: "HTML",
   jsx: false,
   optimizeLayout: true,
-  layerName: true,
+  layerName: false,
   inlineStyle: true,
   responsiveRoot: false,
   flutterGenerationMode: "snippet",
