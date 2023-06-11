@@ -39,6 +39,8 @@ type PluginUIProps = {
 };
 
 export const PluginUI = (props: PluginUIProps) => {
+  const [isResponsiveExpanded, setIsResponsiveExpanded] = useState(false);
+
   return (
     <div className="flex flex-col h-full dark:text-white">
       <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
@@ -66,12 +68,18 @@ export const PluginUI = (props: PluginUIProps) => {
         }}
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
-        <div className="flex flex-col items-center px-2 py-2 gap-2 dark:bg-transparent">
+        <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
           {/* <div className="flex flex-col items-center p-4 bg-neutral-50 dark:bg-neutral-800 rounded">
             <Description selected={props.selectedFramework} />
           </div> */}
 
-          {props.htmlPreview && <Preview htmlPreview={props.htmlPreview} />}
+          {props.htmlPreview && (
+            <Preview
+              htmlPreview={props.htmlPreview}
+              isResponsiveExpanded={isResponsiveExpanded}
+              setIsResponsiveExpanded={setIsResponsiveExpanded}
+            />
+          )}
           {/* <ResponsiveGrade /> */}
           {/* <div className="h-2"></div>
         <div className="flex justify-end w-full mb-1">
@@ -79,7 +87,6 @@ export const PluginUI = (props: PluginUIProps) => {
             Copy
           </button>
         </div> */}
-          {/* Code View */}
           <CodePanel
             code={props.code}
             selectedFramework={props.selectedFramework}
@@ -448,8 +455,6 @@ export const GradientsPanel = (props: {
     props.onColorClick(value);
   };
 
-  console.log(props.gradients);
-
   return (
     <div className="bg-gray-100 dark:bg-neutral-900 w-full rounded-lg p-2 flex flex-col gap-2">
       <h2 className="text-gray-800 dark:text-gray-200 text-lg font-medium">
@@ -580,18 +585,28 @@ export const Preview: React.FC<{
     size: { width: number; height: number };
     content: string;
   };
+  isResponsiveExpanded: boolean;
+  setIsResponsiveExpanded: (value: boolean) => void;
 }> = (props) => {
   const previewWidths = [45, 80, 140];
   const labels = ["sm", "md", "lg"];
 
   return (
-    <div className="flex flex-col">
-      <p className="px-4 py-1.5 text-lg font-medium text-center dark:text-white rounded-lg">
-        Responsive Preview
-      </p>
+    <div className="flex flex-col w-full">
+      <div className="py-1.5 flex gap-2 w-full text-lg font-medium text-center dark:text-white rounded-lg justify-between">
+        <span>Responsive Preview</span>
+        <button
+          className={`px-2 py-1 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${"bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600"}`}
+          onClick={() => {
+            props.setIsResponsiveExpanded(!props.isResponsiveExpanded);
+          }}
+        >
+          <ExpandIcon size={16} />
+        </button>
+      </div>
       <div className="flex gap-2 justify-center items-center">
         {previewWidths.map((targetWidth, index) => {
-          const targetHeight = 80;
+          const targetHeight = props.isResponsiveExpanded ? 260 : 120;
           const scaleFactor = Math.min(
             targetWidth / props.htmlPreview.size.width,
             targetHeight / props.htmlPreview.size.height
@@ -654,3 +669,15 @@ export const viewDocumentationWebsite = () => {
     </div>
   );
 };
+
+const ExpandIcon = (props: { size: number }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={props.size}
+    height={props.size}
+    fill="currentColor"
+    viewBox="0 0 256 256"
+  >
+    <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM101.66,53.66,120,35.31V96a8,8,0,0,0,16,0V35.31l18.34,18.35a8,8,0,0,0,11.32-11.32l-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32Zm52.68,148.68L136,220.69V160a8,8,0,0,0-16,0v60.69l-18.34-18.35a8,8,0,0,0-11.32,11.32l32,32a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Z"></path>
+  </svg>
+);

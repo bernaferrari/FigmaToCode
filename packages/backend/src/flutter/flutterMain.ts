@@ -225,5 +225,13 @@ const addSpacingIfNeeded = (node: SceneNode): string => {
   return "";
 };
 
-export const flutterCodeGenTextStyles = () =>
-  previousExecutionCache.map((style) => `${style}`).join("\n// ---\n");
+export const flutterCodeGenTextStyles = () => {
+  const result = previousExecutionCache
+    .map((style) => `${style}`)
+    .join("\n// ---\n");
+
+  if (!result) {
+    return "// No text styles in this selection";
+  }
+  return result;
+};

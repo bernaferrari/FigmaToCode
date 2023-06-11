@@ -274,5 +274,12 @@ const widgetGeneratorWithLimits = (
   return strBuilder;
 };
 
-export const swiftUICodeGenTextStyles = () =>
-  previousExecutionCache.map((style) => `${style}`).join("\n// ---\n");
+export const swiftUICodeGenTextStyles = () => {
+  const result = previousExecutionCache
+    .map((style) => `${style}`)
+    .join("\n// ---\n");
+  if (!result) {
+    return "// No text styles in this selection";
+  }
+  return result;
+};

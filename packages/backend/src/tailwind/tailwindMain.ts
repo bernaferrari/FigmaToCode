@@ -249,7 +249,13 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
 };
 
 export const tailwindCodeGenTextStyles = () => {
-  return previousExecutionCache
+  const result = previousExecutionCache
     .map((style) => `// ${style.text}\n${style.style.split(" ").join("\n")}`)
     .join("\n---\n");
+
+  if (!result) {
+    return "// No text styles in this selection";
+  }
+
+  return result;
 };

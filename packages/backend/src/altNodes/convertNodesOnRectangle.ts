@@ -15,39 +15,43 @@ export const convertNodesOnRectangle = (
     );
   }
 
-  const colliding = retrieveCollidingItems(node.children);
+  // TODO Make a return?
+  // const colliding = retrieveCollidingItems(node.children);
 
-  const parentsKeys = Object.keys(colliding);
-  // start with all children. This is going to be filtered.
-  let updatedChildren: Array<SceneNode> = [...node.children];
+  // const parentsKeys = Object.keys(colliding);
+  // // start with all children. This is going to be filtered.
+  // let updatedChildren: Array<SceneNode> = [...node.children];
 
-  parentsKeys.forEach((key) => {
-    // dangerous cast, but this is always true
-    const parentNode = node.children.find((d) => d.id === key) as RectangleNode;
+  // console.log("colliding are", parentsKeys);
 
-    // retrieve the position. Key should always be at the left side, so even when other items are removed, the index is kept the same.
-    // const indexPosition = updatedChildren.findIndex((d) => d.id === key);
+  // parentsKeys.forEach((key) => {
+  //   // dangerous cast, but this is always true
+  //   const parentNode = node.children.find((d) => d.id === key) as RectangleNode;
 
-    // filter the children to remove those that are being modified
-    updatedChildren = updatedChildren.filter(
-      (d) => !colliding[key].map((dd) => dd.id).includes(d.id) && key !== d.id
-    );
+  //   // retrieve the position. Key should always be at the left side, so even when other items are removed, the index is kept the same.
+  //   // const indexPosition = updatedChildren.findIndex((d) => d.id === key);
 
-    const frameNode = convertRectangleToFrame(parentNode);
+  //   // filter the children to remove those that are being modified
+  //   updatedChildren = updatedChildren.filter(
+  //     (d) => !colliding[key].map((dd) => dd.id).includes(d.id) && key !== d.id
+  //   );
 
-    // todo when the soon-to-be-parent is larger than its parent, things get weird. Happens, for example, when a large image is used in the background. Should this be handled or is this something user should never do?
+  //   console.log("updatedChildren is now ", updatedChildren);
+  //   const frameNode = convertRectangleToFrame(parentNode);
 
-    Object.assign(frameNode, { children: [...colliding[key]] });
-    colliding[key].forEach((d) => {
-      Object.assign(d, { parent: frameNode });
-      d.x = d.x - frameNode.x;
-      d.y = d.y - frameNode.y;
-    });
-  });
+  //   // todo when the soon-to-be-parent is larger than its parent, things get weird. Happens, for example, when a large image is used in the background. Should this be handled or is this something user should never do?
+  //   overrideReadonlyProperty(frameNode, "children", [...colliding[key]]);
 
-  if (updatedChildren.length > 0) {
-    Object.assign(node, { children: updatedChildren });
-  }
+  //   colliding[key].forEach((d) => {
+  //     overrideReadonlyProperty(d, "parent", frameNode);
+  //     d.x = d.x - frameNode.x;
+  //     d.y = d.y - frameNode.y;
+  //   });
+  // });
+
+  // if (updatedChildren.length > 0) {
+  //   overrideReadonlyProperty(node, "children", updatedChildren);
+  // }
 
   return node;
 };

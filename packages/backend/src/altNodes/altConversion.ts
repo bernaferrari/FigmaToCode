@@ -16,6 +16,7 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
       prop !== "verticalPadding" &&
       prop !== "mainComponent" &&
       prop !== "masterComponent" &&
+      prop !== "variantProperties" &&
       prop !== "componentPropertyDefinitions" &&
       prop !== "exposedInstances"
     ) {

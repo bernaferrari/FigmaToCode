@@ -274,10 +274,15 @@ export const htmlLine = (node: LineNode, isJsx: boolean): string => {
 };
 
 export const htmlCodeGenTextStyles = (isJsx: boolean) => {
-  return previousExecutionCache
+  const result = previousExecutionCache
     .map(
       (style) =>
         `// ${style.text}\n${style.style.split(isJsx ? "," : ";").join(";\n")}`
     )
     .join("\n---\n");
+
+  if (!result) {
+    return "// No text styles in this selection";
+  }
+  return result;
 };
