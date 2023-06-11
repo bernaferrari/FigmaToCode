@@ -3,6 +3,7 @@ import { className, sliceNum } from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { PluginSettings } from "../code";
+import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -68,6 +69,7 @@ const swiftuiWidgetGenerator = (
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
+      case "LINE":
         comp.push(swiftuiContainer(node));
         break;
       case "GROUP":
@@ -105,7 +107,7 @@ export const swiftuiContainer = (
   }
 
   let kind = "";
-  if (node.type === "RECTANGLE") {
+  if (node.type === "RECTANGLE" || node.type === "LINE") {
     kind = "Rectangle()";
   } else if (node.type === "ELLIPSE") {
     kind = "Ellipse()";
@@ -234,17 +236,26 @@ export const generateSwiftViewCode = (
 
 // todo should the plugin manually Group items? Ideally, it would detect the similarities and allow a ForEach.
 const widgetGeneratorWithLimits = (
-  node: ChildrenMixin,
+  node: SceneNode & ChildrenMixin,
   indentLevel: number
 ) => {
   if (node.children.length < 10) {
     // standard way
-    return swiftuiWidgetGenerator(node.children, indentLevel);
+    return swiftuiWidgetGenerator(
+      commonSortChildrenWhenInferredAutoLayout(
+        node,
+        localSettings.optimizeLayout
+      ),
+      indentLevel
+    );
   }
 
   const chunk = 10;
   let strBuilder = "";
-  const slicedChildren = node.children.slice(0, 100);
+  const slicedChildren = commonSortChildrenWhenInferredAutoLayout(
+    node,
+    localSettings.optimizeLayout
+  ).slice(0, 100);
 
   // I believe no one should have more than 100 items in a single nesting level. If you do, please email me.
   if (node.children.length > 100) {

@@ -10,7 +10,16 @@ export const nodeSize = (
   const hasLayout =
     "layoutAlign" in node && node.parent && "layoutMode" in node.parent;
 
-  if (!hasLayout || ("layoutMode" in node && node.layoutMode === "NONE")) {
+  if (!hasLayout) {
+    return { width: node.width, height: node.height };
+  }
+
+  const nodeAuto =
+    (optimizeLayout && "inferredAutoLayout" in node
+      ? node.inferredAutoLayout
+      : null) ?? node;
+
+  if ("layoutMode" in nodeAuto && nodeAuto.layoutMode === "NONE") {
     return { width: node.width, height: node.height };
   }
 
@@ -18,11 +27,6 @@ export const nodeSize = (
   const parentLayoutMode = optimizeLayout
     ? node.parent.inferredAutoLayout?.layoutMode
     : null ?? node.parent.layoutMode;
-
-  const nodeAuto =
-    (optimizeLayout && "inferredAutoLayout" in node
-      ? node.inferredAutoLayout
-      : null) ?? node;
 
   const isWidthFill =
     (parentLayoutMode === "HORIZONTAL" && nodeAuto.layoutGrow === 1) ||

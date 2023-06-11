@@ -41,6 +41,7 @@ export const frameNodeTo = (
     return frameToRectangleNode(node, parent);
   }
   const clone = standardClone(node, parent);
+
   overrideReadonlyProperty(
     clone,
     "children",

@@ -108,7 +108,6 @@ switch (figma.mode) {
     // figma.codegen.on("preferenceschange", (preferences) => {
 
     // });
-
     figma.codegen.on("generate", ({ language, node }) => {
       const convertedSelection = convertIntoNodes([node], null);
 

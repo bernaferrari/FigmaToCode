@@ -8,6 +8,7 @@ import {
   getCrossAxisAlignment,
   getMainAxisAlignment,
 } from "./builderImpl/flutterAutoLayout";
+import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -167,7 +168,9 @@ const flutterText = (node: TextNode): string => {
 const flutterFrame = (
   node: SceneNode & BaseFrameMixin & MinimalBlendMixin
 ): string => {
-  const children = flutterWidgetGenerator(node.children);
+  const children = flutterWidgetGenerator(
+    commonSortChildrenWhenInferredAutoLayout(node, localSettings.optimizeLayout)
+  );
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = makeRowColumn(node, node, children);

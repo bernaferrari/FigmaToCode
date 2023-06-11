@@ -5,6 +5,7 @@ import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { PluginSettings } from "../code";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
+import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 
 let showLayerName = false;
 
@@ -135,7 +136,13 @@ const htmlFrame = (
   node: SceneNode & BaseFrameMixin,
   isJsx: boolean = false
 ): string => {
-  const childrenStr = htmlWidgetGenerator(node.children, isJsx);
+  const childrenStr = htmlWidgetGenerator(
+    commonSortChildrenWhenInferredAutoLayout(
+      node,
+      localSettings.optimizeLayout
+    ),
+    isJsx
+  );
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = htmlAutoLayoutProps(node, node, isJsx);
