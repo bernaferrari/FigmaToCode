@@ -13,6 +13,20 @@ export const htmlColorFromFills = (
     // if fill isn't visible, it shouldn't be painted.
     return htmlColor(fill.color, fill.opacity);
   }
+  if (
+    fill &&
+    (fill.type === "GRADIENT_LINEAR" ||
+      fill.type === "GRADIENT_ANGULAR" ||
+      fill.type === "GRADIENT_RADIAL" ||
+      fill.type === "GRADIENT_DIAMOND")
+  ) {
+    if (fill.gradientStops.length > 0) {
+      return htmlColor(
+        fill.gradientStops[0].color,
+        fill.opacity
+      );
+    }
+  }
 
   return "";
 };

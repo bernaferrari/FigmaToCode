@@ -68,7 +68,7 @@ const convertSolidColor = (
     const kind = "solid";
     const hex = rgbTo6hex(fill.color);
     const hexNearestColor = tailwindNearestColor(hex);
-    exported = tailwindSolidColor(fill, kind);
+    exported = tailwindSolidColor(fill.color, fill.opacity, kind);
     colorName = tailwindColors[hexNearestColor];
   } else if (framework === "SwiftUI") {
     exported = swiftuiColor(fill.color, opacity);

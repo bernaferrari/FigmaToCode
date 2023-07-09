@@ -13,22 +13,39 @@ export const tailwindColorFromFills = (
 
   const fill = retrieveTopFill(fills);
   if (fill && fill.type === "SOLID") {
-    return tailwindSolidColor(fill, kind);
+    return tailwindSolidColor(fill.color, fill.opacity, kind);
+  } else if (
+    fill &&
+    (fill.type === "GRADIENT_LINEAR" ||
+      fill.type === "GRADIENT_ANGULAR" ||
+      fill.type === "GRADIENT_RADIAL" ||
+      fill.type === "GRADIENT_DIAMOND")
+  ) {
+    if (fill.gradientStops.length > 0) {
+      return tailwindSolidColor(
+        fill.gradientStops[0].color,
+        fill.opacity,
+        kind
+      );
+    }
   }
-
   return "";
 };
 
-export const tailwindSolidColor = (fill: SolidPaint, kind: string): string => {
-  const opacity = fill.opacity ?? 1.0;
-
+export const tailwindSolidColor = (
+  color: RGB,
+  opacity: number | undefined,
+  kind: string
+): string => {
   // example: text-opacity-50
   // ignore the 100. If opacity was changed, let it be visible.
   const opacityProp =
-    opacity !== 1.0 ? `${kind}-opacity-${nearestOpacity(opacity)}` : null;
+    opacity !== 1.0
+      ? `${kind}-opacity-${nearestOpacity(opacity ?? 1.0)}`
+      : null;
 
   // example: text-red-500
-  const colorProp = `${kind}-${getTailwindFromFigmaRGB(fill.color)}`;
+  const colorProp = `${kind}-${getTailwindFromFigmaRGB(color)}`;
 
   // if fill isn't visible, it shouldn't be painted.
   return [colorProp, opacityProp].filter((d) => d).join(" ");

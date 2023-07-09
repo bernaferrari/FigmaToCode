@@ -12,8 +12,16 @@ export const flutterColorFromFills = (
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
-    const opacity = fill.opacity ?? 1.0;
-    return flutterColor(fill.color, opacity);
+    return flutterColor(fill.color, fill.opacity ?? 1.0);
+  } else if (
+    fill &&
+    (fill.type === "GRADIENT_LINEAR" ||
+      fill.type === "GRADIENT_ANGULAR" ||
+      fill.type === "GRADIENT_RADIAL")
+  ) {
+    if (fill.gradientStops.length > 0) {
+      return flutterColor(fill.gradientStops[0].color, fill.opacity ?? 1.0);
+    }
   }
 
   return "";

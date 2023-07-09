@@ -35,7 +35,7 @@ type PluginUIProps = {
     contrastWhite: number;
     contrastBlack: number;
   }[];
-  gradients: { cssPreview: string; exportedValue: string }[];
+  gradients: { cssPreview: string; exportValue: string }[];
 };
 
 export const PluginUI = (props: PluginUIProps) => {
@@ -443,7 +443,7 @@ export const ColorsPanel = (props: {
 export const GradientsPanel = (props: {
   gradients: {
     cssPreview: string;
-    exportedValue: string;
+    exportValue: string;
   }[];
   onColorClick: (color: string) => void;
 }) => {
@@ -471,7 +471,7 @@ export const GradientsPanel = (props: {
             }`}
             style={{ background: gradient.cssPreview }}
             onClick={() => {
-              handleButtonClick(gradient.exportedValue, idx);
+              handleButtonClick(gradient.exportValue, idx);
             }}
           ></button>
         ))}

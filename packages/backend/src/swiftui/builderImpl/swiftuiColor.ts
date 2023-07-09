@@ -6,6 +6,15 @@ import { sliceNum } from "../../common/numToAutoFixed";
 export const swiftUISolidColor = (fill: Paint): string => {
   if (fill && fill.type === "SOLID") {
     return swiftuiColor(fill.color, fill.opacity ?? 1.0);
+  } else if (
+    fill &&
+    (fill.type === "GRADIENT_LINEAR" ||
+      fill.type === "GRADIENT_ANGULAR" ||
+      fill.type === "GRADIENT_RADIAL")
+  ) {
+    if (fill.gradientStops.length > 0) {
+      return swiftuiColor(fill.gradientStops[0].color, fill.opacity ?? 1.0);
+    }
   }
 
   return "";
