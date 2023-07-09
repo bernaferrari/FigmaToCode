@@ -81,19 +81,16 @@ export class HtmlDefaultBuilder {
     const color = htmlColorFromFills(node.strokes);
     const borderStyle = node.dashPattern.length > 0 ? "dotted" : "solid";
 
+    const consolidateBorders = (border: number): string =>
+      [`${sliceNum(border)}px`, color, borderStyle].filter((d) => d).join(" ");
+
     if ("all" in commonBorder) {
       if (commonBorder.all === 0) {
         return this;
       }
       const weight = commonBorder.all;
       this.addStyles(
-        formatWithJSX(
-          "border",
-          this.isJSX,
-          [`${sliceNum(weight)}px`, color, borderStyle]
-            .filter((d) => d)
-            .join(" ")
-        )
+        formatWithJSX("border", this.isJSX, consolidateBorders(weight))
       );
     } else {
       if (commonBorder.left !== 0) {
@@ -101,7 +98,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-left",
             this.isJSX,
-            `${sliceNum(commonBorder.left)}px ${color} ${borderStyle}`
+            consolidateBorders(commonBorder.left)
           )
         );
       }
@@ -110,7 +107,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-top",
             this.isJSX,
-            `${sliceNum(commonBorder.top)}px ${color} ${borderStyle}`
+            consolidateBorders(commonBorder.top)
           )
         );
       }
@@ -119,7 +116,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-right",
             this.isJSX,
-            `${sliceNum(commonBorder.right)}px ${color} ${borderStyle}`
+            consolidateBorders(commonBorder.right)
           )
         );
       }
@@ -128,7 +125,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-bottom",
             this.isJSX,
-            `${sliceNum(commonBorder.bottom)}px ${color} ${borderStyle}`
+            consolidateBorders(commonBorder.bottom)
           )
         );
       }
