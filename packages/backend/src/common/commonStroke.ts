@@ -13,6 +13,14 @@ export const commonStroke = (node: SceneNode): BorderSideType | null => {
   }
 
   if ("strokeTopWeight" in node) {
+    if (
+      node.strokeTopWeight === node.strokeBottomWeight &&
+      node.strokeTopWeight === node.strokeLeftWeight &&
+      node.strokeTopWeight === node.strokeRightWeight
+    ) {
+      return { all: node.strokeTopWeight / 2 };
+    }
+
     return {
       left: node.strokeLeftWeight / 2,
       top: node.strokeTopWeight / 2,

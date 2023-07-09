@@ -90,7 +90,7 @@ export class HtmlDefaultBuilder {
         formatWithJSX(
           "border",
           this.isJSX,
-          `${sliceNum(weight)}px ${color} ${borderStyle}`
+          [sliceNum(weight), color, borderStyle].filter((d) => d).join(" ")
         )
       );
     } else {

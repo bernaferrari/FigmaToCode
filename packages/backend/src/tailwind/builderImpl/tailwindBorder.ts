@@ -18,7 +18,7 @@ export const tailwindBorderWidth = (node: SceneNode): string => {
     const nearest = nearestValue(weight, allowedValues);
     if (nearest === 1) {
       // special case
-      return "border";
+      return `border${kind}`;
     } else {
       return `border${kind}-${nearest}`;
     }
