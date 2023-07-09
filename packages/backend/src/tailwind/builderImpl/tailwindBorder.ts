@@ -58,12 +58,16 @@ export const tailwindBorderRadius = (node: SceneNode): string => {
   }
 
   const getRadius = (radius: number) => {
-    if (radius > 24) {
-      // special case. If height is 90 and cornerRadius is 45, it is full.
-      return `-[${sliceNum(radius)}px]`;
-    } else {
-      return pxToBorderRadius(radius);
+    // if (radius > 24) {
+    //   // special case. If height is 90 and cornerRadius is 45, it is full.
+    //   return `[${sliceNum(radius)}px]`;
+    // } else {
+    const r = pxToBorderRadius(radius);
+    if (r) {
+      return `-${r}`;
     }
+    return "";
+    // }
   };
 
   const radius = getCommonRadius(node);

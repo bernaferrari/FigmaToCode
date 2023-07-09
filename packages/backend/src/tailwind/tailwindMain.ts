@@ -7,7 +7,7 @@ import { PluginSettings } from "../code";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 
-let localSettings: PluginSettings;
+export let localTailwindSettings: PluginSettings;
 
 let previousExecutionCache: { style: string; text: string }[];
 
@@ -17,10 +17,10 @@ export const tailwindMain = (
   sceneNode: Array<SceneNode>,
   settings: PluginSettings
 ): string => {
-  localSettings = settings;
+  localTailwindSettings = settings;
   previousExecutionCache = [];
 
-  let result = tailwindWidgetGenerator(sceneNode, localSettings.jsx);
+  let result = tailwindWidgetGenerator(sceneNode, localTailwindSettings.jsx);
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -82,7 +82,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
 
   const vectorIfExists = tailwindVector(
     node,
-    localSettings.layerName,
+    localTailwindSettings.layerName,
     "",
     isJsx
   );
@@ -91,12 +91,12 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
   // this needs to be called after CustomNode because widthHeight depends on it
   const builder = new TailwindDefaultBuilder(
     node,
-    localSettings.layerName,
+    localTailwindSettings.layerName,
     isJsx
   )
     .blend(node)
-    .size(node, localSettings.optimizeLayout)
-    .position(node, localSettings.optimizeLayout);
+    .size(node, localTailwindSettings.optimizeLayout)
+    .position(node, localTailwindSettings.optimizeLayout);
 
   if (builder.attributes || builder.style) {
     const attr = builder.build("");
@@ -112,10 +112,10 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
 export const tailwindText = (node: TextNode, isJsx: boolean): string => {
   let layoutBuilder = new TailwindTextBuilder(
     node,
-    localSettings.layerName,
+    localTailwindSettings.layerName,
     isJsx
   )
-    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .textAlign(node);
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
@@ -141,7 +141,7 @@ const tailwindFrame = (
   const childrenStr = tailwindWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(
       node,
-      localSettings.optimizeLayout
+      localTailwindSettings.optimizeLayout
     ),
     isJsx
   );
@@ -150,7 +150,7 @@ const tailwindFrame = (
     const rowColumn = tailwindAutoLayoutProps(node, node);
     return tailwindContainer(node, childrenStr, rowColumn, isJsx);
   } else {
-    if (localSettings.optimizeLayout && node.inferredAutoLayout !== null) {
+    if (localTailwindSettings.optimizeLayout && node.inferredAutoLayout !== null) {
       const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
       return tailwindContainer(node, childrenStr, rowColumn, isJsx);
     }
@@ -181,8 +181,8 @@ export const tailwindContainer = (
     return children;
   }
 
-  let builder = new TailwindDefaultBuilder(node, localSettings.layerName, isJsx)
-    .commonPositionStyles(node, localSettings.optimizeLayout)
+  let builder = new TailwindDefaultBuilder(node, localTailwindSettings.layerName, isJsx)
+    .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .commonShapeStyles(node);
 
   if (builder.attributes || additionalAttr) {
@@ -221,10 +221,10 @@ export const tailwindContainer = (
 export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
   const builder = new TailwindDefaultBuilder(
     node,
-    localSettings.layerName,
+    localTailwindSettings.layerName,
     isJsx
   )
-    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .commonShapeStyles(node);
 
   return `\n<div${builder.build()}></div>`;
@@ -234,11 +234,11 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
   const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
   const builder = new TailwindDefaultBuilder(
     node,
-    localSettings.layerName,
+    localTailwindSettings.layerName,
     isJsx
   )
-    .size(node, localSettings.optimizeLayout)
-    .position(node, localSettings.optimizeLayout)
+    .size(node, localTailwindSettings.optimizeLayout)
+    .position(node, localTailwindSettings.optimizeLayout)
     .customColor(node.fills, "bg");
 
   if (childrenStr) {

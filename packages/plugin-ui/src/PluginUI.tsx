@@ -205,7 +205,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
   {
     itemType: "individual_select",
     propertyName: "roundTailwind",
-    label: "Round to Tailwind",
+    label: "Round to Tailwind Values",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },

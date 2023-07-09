@@ -1,4 +1,5 @@
 import { sliceNum } from "../common/numToAutoFixed";
+import { localTailwindSettings } from "./tailwindMain";
 
 export const nearestValue = (goal: number, array: Array<number>): number => {
   return array.reduce((prev, curr) => {
@@ -27,65 +28,36 @@ export const exactValue = (
  * Therefore, a conversion is necessary. Rem = Pixel / 16.abs
  * Then, find in the corresponding table the closest value.
  */
-const pixelToTailwindValue = (
+const pxToRemToTailwind = (
   value: number,
   conversionMap: Record<number, string>
 ): string => {
-  return conversionMap[
-    nearestValue(
-      value / 16,
-      Object.keys(conversionMap).map((d) => +d)
-    )
-  ];
-};
+  const keys = Object.keys(conversionMap).map((d) => +d);
+  const convertedValue = exactValue(value / 16, keys);
 
-const pixelToTailwindRemExact = (
-  value: number,
-  conversionMap: Record<number, string>
-): string | null => {
-  const exactValueFound = Object.entries(conversionMap).find(
-    ([_, remValue]) => +remValue === value
-  );
-
-  return exactValueFound ? exactValueFound[0] : null;
-};
-
-const pixelToTailwindPxExact = (
-  value: number,
-  conversionMap: Record<number, string>
-): string | null => {
-  const convertedValue = exactValue(
-    value,
-    Object.keys(conversionMap).map((d) => +d)
-  );
-
-  if (!convertedValue) {
-    return null;
+  if (convertedValue) {
+    return conversionMap[convertedValue];
+  } else if (localTailwindSettings.roundTailwind) {
+    return conversionMap[nearestValue(value / 16, keys)];
   }
 
-  return conversionMap[convertedValue];
+  return `[${sliceNum(value)}px]`;
 };
 
-const mapLetterSpacing: Record<number, string> = {
-  "-0.05": "tighter",
-  "-0.025": "tight",
-  // 0: "normal",
-  0.025: "wide",
-  0.05: "wider",
-  0.1: "widest",
-};
+const pxToTailwind = (
+  value: number,
+  conversionMap: Record<number, string>
+): string | null => {
+  const keys = Object.keys(conversionMap).map((d) => +d);
+  const convertedValue = exactValue(value, keys);
 
-const mapLineHeight: Record<number, string> = {
-  0.75: "3",
-  1: "none",
-  1.25: "tight",
-  1.375: "snug",
-  1.5: "normal",
-  1.625: "relaxed",
-  2: "loose",
-  1.75: "7",
-  2.25: "9",
-  2.5: "10",
+  if (convertedValue) {
+    return conversionMap[convertedValue];
+  } else if (localTailwindSettings.roundTailwind) {
+    return conversionMap[nearestValue(value, keys)];
+  }
+
+  return `[${sliceNum(value)}px]`;
 };
 
 const mapFontSize: Record<number, string> = {
@@ -129,40 +101,41 @@ const mapBlur: Record<number, string> = {
 };
 
 const mapWidthHeightSize: Record<number, string> = {
-  // 0: "0",
-  0.5: "2",
-  1: "4",
-  1.5: "6",
-  2: "8",
-  2.5: "10",
-  3: "12",
-  3.5: "14",
-  4: "16",
-  5: "20",
-  6: "24",
-  7: "28",
-  8: "32",
-  9: "36",
-  10: "40",
-  11: "44",
-  12: "48",
-  14: "56",
-  16: "64",
-  20: "80",
-  24: "96",
-  28: "112",
-  32: "128",
-  36: "144",
-  40: "160",
-  44: "176",
-  48: "192",
-  52: "208",
-  56: "224",
-  60: "240",
-  64: "256",
-  72: "288",
-  80: "320",
-  96: "384",
+  // '0: 0',
+  1: "px",
+  2: "0.5",
+  4: "1",
+  6: "1.5",
+  8: "2",
+  10: "2.5",
+  12: "3",
+  14: "3.5",
+  16: "4",
+  20: "5",
+  24: "6",
+  28: "7",
+  32: "8",
+  36: "9",
+  40: "10",
+  44: "11",
+  48: "12",
+  56: "14",
+  64: "16",
+  80: "20",
+  96: "24",
+  112: "28",
+  128: "32",
+  144: "36",
+  160: "40",
+  176: "44",
+  192: "48",
+  208: "52",
+  224: "56",
+  240: "60",
+  256: "64",
+  288: "72",
+  320: "80",
+  384: "96",
 };
 
 export const opacityValues = [
@@ -172,23 +145,45 @@ export const opacityValues = [
 export const nearestOpacity = (nodeOpacity: number): number =>
   nearestValue(nodeOpacity * 100, opacityValues);
 
+const mapLetterSpacing: Record<number, string> = {
+  "-0.05": "tighter",
+  "-0.025": "tight",
+  // 0: "normal",
+  0.025: "wide",
+  0.05: "wider",
+  0.1: "widest",
+};
+
 export const pxToLetterSpacing = (value: number): string =>
-  pixelToTailwindValue(value, mapLetterSpacing);
+  pxToRemToTailwind(value, mapLetterSpacing);
+
+const mapLineHeight: Record<number, string> = {
+  0.75: "3",
+  1: "none",
+  1.25: "tight",
+  1.375: "snug",
+  1.5: "normal",
+  1.625: "relaxed",
+  2: "loose",
+  1.75: "7",
+  2.25: "9",
+  2.5: "10",
+};
 
 export const pxToLineHeight = (value: number): string =>
-  pixelToTailwindValue(value, mapLineHeight);
+  pxToRemToTailwind(value, mapLineHeight);
 
 export const pxToFontSize = (value: number): string =>
-  pixelToTailwindValue(value, mapFontSize);
+  pxToRemToTailwind(value, mapFontSize);
 
 export const pxToBorderRadius = (value: number): string =>
-  pixelToTailwindValue(value, mapBorderRadius);
+  pxToRemToTailwind(value, mapBorderRadius);
 
 export const pxToBlur = (value: number): string | null =>
-  pixelToTailwindPxExact(value, mapBlur);
+  pxToTailwind(value, mapBlur);
 
 export const pxToLayoutSize = (value: number): string => {
-  const tailwindValue = pixelToTailwindRemExact(value, mapWidthHeightSize);
+  const tailwindValue = pxToTailwind(value, mapWidthHeightSize);
   if (tailwindValue) {
     return tailwindValue;
   }

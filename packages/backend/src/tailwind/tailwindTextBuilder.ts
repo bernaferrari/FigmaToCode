@@ -4,7 +4,11 @@ import {
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
 import { tailwindColorFromFills } from "./builderImpl/tailwindColor";
-import { pxToLetterSpacing, pxToLineHeight } from "./conversionTables";
+import {
+  pxToFontSize,
+  pxToLetterSpacing,
+  pxToLineHeight,
+} from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
@@ -55,22 +59,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     return tailwindColorFromFills(fills, "text");
   };
 
-  getTailwindLetterSpacingStyle = (letterSpacing: any) => {
-    // Convert letterSpacing to the appropriate Tailwind CSS class.
-    // This can be based on your project's configuration and letterSpacing scale.
-    // For example, suppose your project uses the default Tailwind CSS letterSpacing scale:
-    if (letterSpacing.unit === "PIXELS") {
-      return `tracking-${letterSpacing.value}px`;
-    } else {
-      return `tracking-${letterSpacing.value * 100}%`;
-    }
-  };
-
   fontSize = (fontSize: number) => {
-    // Convert fontSize to the appropriate Tailwind CSS class.
-    // This can be based on your project's configuration and fontSize scale.
-    // For example, suppose your project uses the default Tailwind CSS fontSize scale:
-    return `text-[${fontSize}px]`;
+    return `text-${pxToFontSize(fontSize)}`;
   };
 
   fontWeight = (fontWeight: number): string => {
