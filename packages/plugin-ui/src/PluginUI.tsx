@@ -15,6 +15,7 @@ export type PluginSettings = {
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
+  roundTailwind: boolean;
 };
 
 type PluginUIProps = {
@@ -200,6 +201,13 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     label: "Layer Names",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "roundTailwind",
+    label: "Round to Tailwind",
+    isDefault: false,
+    includedLanguages: ["Tailwind"],
   },
   // Add your preferences data here
 ];
