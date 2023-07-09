@@ -99,16 +99,27 @@ export class TailwindDefaultBuilder {
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-      this.addAttributes(
-        `left-[${sliceNum(x)}px]`,
-        `top-[${sliceNum(y)}px]`,
-        `absolute`
-      );
+
+      const parsedX = sliceNum(x);
+      const parsedY = sliceNum(y);
+      if (parsedX === '0') {
+        this.addAttributes(`left-0`);
+      } else {
+        this.addAttributes(`left-[${parsedX}px]`);
+      }
+      if (parsedY === '0') {
+        this.addAttributes(`top-0`);
+      }
+      else {
+        this.addAttributes(`top-[${parsedY}px]`);
+      }
+
+      this.addAttributes(`absolute`);
     } else if (
       node.type === "GROUP" ||
       ("layoutMode" in node &&
         ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)?.layoutMode ===
-          "NONE")
+        "NONE")
     ) {
       this.addAttributes("relative");
     }

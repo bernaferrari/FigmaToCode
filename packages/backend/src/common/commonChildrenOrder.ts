@@ -26,6 +26,5 @@ export const commonSortChildrenWhenInferredAutoLayout = (
         return children.sort((a, b) => a.y - b.y);
     }
   }
-  console.log("no inferredAutoLayout for ", node.name);
   return node.children;
 };

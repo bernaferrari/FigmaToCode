@@ -114,7 +114,7 @@ const flutterWidgetGenerator = (
     }
 
     if (index !== sceneLen - 1) {
-      const spacing = addSpacingIfNeeded(node);
+      const spacing = addSpacingIfNeeded(node, localSettings.optimizeLayout);
       if (spacing) {
         comp.push(spacing);
       }
@@ -173,11 +173,11 @@ const flutterFrame = (
   );
 
   if (node.layoutMode !== "NONE") {
-    const rowColumn = makeRowColumn(node, node, children);
+    const rowColumn = makeRowColumn(node, children);
     return flutterContainer(node, rowColumn);
   } else {
     if (localSettings.optimizeLayout && node.inferredAutoLayout) {
-      const rowColumn = makeRowColumn(node, node.inferredAutoLayout, children);
+      const rowColumn = makeRowColumn(node.inferredAutoLayout, children);
       return flutterContainer(node, rowColumn);
     }
 
@@ -191,11 +191,10 @@ const flutterFrame = (
 };
 
 const makeRowColumn = (
-  node: BaseFrameMixin,
   autoLayout: inferredAutoLayoutResult,
   children: string
 ): string => {
-  const rowOrColumn = node.layoutMode === "HORIZONTAL" ? "Row" : "Column";
+  const rowOrColumn = autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
   const widgetProps = {
     mainAxisSize: "MainAxisSize.min",
@@ -208,16 +207,20 @@ const makeRowColumn = (
   return generateWidgetCode(rowOrColumn, widgetProps);
 };
 
-const addSpacingIfNeeded = (node: SceneNode): string => {
-  if (node.parent?.type === "FRAME" && node.parent.layoutMode !== "NONE") {
-    if (node.parent.itemSpacing > 0) {
-      if (node.parent.layoutMode === "HORIZONTAL") {
+const addSpacingIfNeeded = (node: SceneNode, optimizeLayout: boolean): string => {
+  const nodeParentLayout = optimizeLayout && node.parent && "itemSpacing" in node.parent
+    ? node.parent.inferredAutoLayout
+    : null ?? node.parent;
+
+  if (nodeParentLayout && node.parent?.type === "FRAME" && "itemSpacing" in nodeParentLayout && nodeParentLayout.layoutMode !== "NONE") {
+    if (nodeParentLayout.itemSpacing > 0) {
+      if (nodeParentLayout.layoutMode === "HORIZONTAL") {
         return generateWidgetCode("const SizedBox", {
-          width: node.parent.itemSpacing,
+          width: nodeParentLayout.itemSpacing,
         });
-      } else {
+      } else if (nodeParentLayout.layoutMode === "VERTICAL") {
         return generateWidgetCode("const SizedBox", {
-          height: node.parent.itemSpacing,
+          height: nodeParentLayout.itemSpacing,
         });
       }
     }

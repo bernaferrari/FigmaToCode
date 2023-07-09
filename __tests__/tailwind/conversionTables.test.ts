@@ -31,7 +31,7 @@ describe("Tailwind Conversion Table", () => {
     expect(pxToBorderRadius(2)).toEqual("-sm");
     expect(pxToBorderRadius(8)).toEqual("-lg");
 
-    expect(pxToLayoutSize(4)).toEqual("1");
-    expect(pxToLayoutSize(385)).toEqual("96");
+    expect(pxToLayoutSize(4, false)).toEqual("1");
+    expect(pxToLayoutSize(385, false)).toEqual("96");
   });
 });

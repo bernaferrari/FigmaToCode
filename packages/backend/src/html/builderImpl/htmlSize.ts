@@ -15,15 +15,19 @@ export const htmlSizePartial = (
   }
 
   const size = nodeSize(node, optimizeLayout);
+  const nodeParent =
+    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
+      ? node.parent.inferredAutoLayout
+      : null) ?? node.parent;
 
   let w = "";
   if (typeof size.width === "number") {
     w = formatWithJSX("width", isJsx, size.width);
   } else if (size.width === "fill") {
     if (
-      node.parent &&
-      "layoutMode" in node.parent &&
-      node.parent.layoutMode === "HORIZONTAL"
+      nodeParent &&
+      "layoutMode" in nodeParent &&
+      nodeParent.layoutMode === "HORIZONTAL"
     ) {
       w = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
@@ -36,9 +40,9 @@ export const htmlSizePartial = (
     h = formatWithJSX("height", isJsx, size.height);
   } else if (typeof size.height === "string") {
     if (
-      node.parent &&
-      "layoutMode" in node.parent &&
-      node.parent.layoutMode === "VERTICAL"
+      nodeParent &&
+      "layoutMode" in nodeParent &&
+      nodeParent.layoutMode === "VERTICAL"
     ) {
       h = formatWithJSX("flex", isJsx, "1 1 0");
     } else {

@@ -10,21 +10,21 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "latest",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "backend": "workspace:*",
-    "plugin-ui": "workspace:*"
+    "next": "latest",
+    "plugin-ui": "workspace:*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^18.15.3",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
+    "@types/node": "^18.16.18",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
     "autoprefixer": "^10.4.14",
     "eslint-config-custom": "workspace:*",
-    "postcss": "^8.4.21",
-    "tsconfig": "workspace:*",
+    "postcss": "^8.4.24",
     "tailwindcss": "3.2.7",
-    "typescript": "^5.0.2"
+    "tsconfig": "workspace:*",
+    "typescript": "^5.1.3"
   }
 }

@@ -12,6 +12,9 @@ export const tailwindPadding = (node: inferredAutoLayoutResult): string[] => {
   }
 
   if ("all" in padding) {
+    if (padding.all === 0) {
+      return [];
+    }
     return [`p-${pxToLayoutSize(padding.all)}`];
   }
 
@@ -19,10 +22,10 @@ export const tailwindPadding = (node: inferredAutoLayoutResult): string[] => {
 
   if ("horizontal" in padding) {
     // horizontal and vertical, as the default AutoLayout
-    if (padding.horizontal) {
+    if (padding.horizontal && padding.horizontal !== 0) {
       comp.push(`px-${pxToLayoutSize(padding.horizontal)}`);
     }
-    if (padding.vertical) {
+    if (padding.vertical && padding.vertical !== 0) {
       comp.push(`py-${pxToLayoutSize(padding.vertical)}`);
     }
     return comp;

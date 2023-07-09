@@ -43,16 +43,11 @@ const pixelToTailwindRemExact = (
   value: number,
   conversionMap: Record<number, string>
 ): string | null => {
-  const convertedValue = exactValue(
-    value / 16,
-    Object.keys(conversionMap).map((d) => +d)
+  const exactValueFound = Object.entries(conversionMap).find(
+    ([_, remValue]) => +remValue === value
   );
 
-  if (!convertedValue) {
-    return null;
-  }
-
-  return conversionMap[convertedValue];
+  return exactValueFound ? exactValueFound[0] : null;
 };
 
 const pixelToTailwindPxExact = (

@@ -29,6 +29,7 @@ export const flutterContainer = (
   // ignore for Groups
   const propBoxDecoration = getDecoration(node);
   const { width, height, isExpanded } = flutterSize(node, optimizeLayout);
+
   const clipBehavior =
     "clipsContent" in node && node.clipsContent === true
       ? "Clip.antiAlias"
@@ -46,12 +47,13 @@ export const flutterContainer = (
 
   let result: string;
   if (width || height || propBoxDecoration || clipBehavior) {
+    const parsedDecoration = skipDefaultProperty(propBoxDecoration, "BoxDecoration()");
     result = generateWidgetCode("Container", {
       width: skipDefaultProperty(width, "0"),
       height: skipDefaultProperty(height, "0"),
       padding: propPadding,
       clipBehavior: clipBehavior,
-      decoration: skipDefaultProperty(getDecoration(node), "BoxDecoration()"),
+      decoration: clipBehavior ? propBoxDecoration : parsedDecoration,
       child: child,
     });
   } else if (propPadding) {

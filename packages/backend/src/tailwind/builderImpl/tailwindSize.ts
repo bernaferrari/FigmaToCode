@@ -8,14 +8,19 @@ export const tailwindSizePartial = (
 ): { width: string; height: string } => {
   const size = nodeSize(node, optimizeLayout);
 
+  const nodeParent =
+    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
+      ? node.parent.inferredAutoLayout
+      : null) ?? node.parent;
+
   let w = "";
   if (typeof size.width === "number") {
     w = `w-${pxToLayoutSize(size.width)}`;
   } else if (size.width === "fill") {
     if (
-      node.parent &&
-      "layoutMode" in node.parent &&
-      node.parent.layoutMode === "HORIZONTAL"
+      nodeParent &&
+      "layoutMode" in nodeParent &&
+      nodeParent.layoutMode === "HORIZONTAL"
     ) {
       w = `grow shrink basis-0`;
     } else {
@@ -29,9 +34,9 @@ export const tailwindSizePartial = (
   } else if (size.height === "fill") {
     if (
       size.height === "fill" &&
-      node.parent &&
-      "layoutMode" in node.parent &&
-      node.parent.layoutMode === "VERTICAL"
+      nodeParent &&
+      "layoutMode" in nodeParent &&
+      nodeParent.layoutMode === "VERTICAL"
     ) {
       h = `grow shrink basis-0`;
     } else {

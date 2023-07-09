@@ -15,6 +15,11 @@ export const flutterSize = (
   const size = nodeSize(node, optimizeLayout);
   let isExpanded: boolean = false;
 
+  const nodeParent =
+    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
+      ? node.parent.inferredAutoLayout
+      : null) ?? node.parent;
+
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
   if (typeof size.width === "number") {
@@ -22,9 +27,9 @@ export const flutterSize = (
   } else if (size.width === "fill") {
     // When parent is a Row, child must be Expanded.
     if (
-      node.parent &&
-      "layoutMode" in node.parent &&
-      node.parent.layoutMode === "HORIZONTAL"
+      nodeParent &&
+      "layoutMode" in nodeParent &&
+      nodeParent.layoutMode === "HORIZONTAL"
     ) {
       isExpanded = true;
     } else {
@@ -38,9 +43,9 @@ export const flutterSize = (
   } else if (size.height === "fill") {
     // When parent is a Column, child must be Expanded.
     if (
-      node.parent &&
-      "layoutMode" in node.parent &&
-      node.parent.layoutMode === "VERTICAL"
+      nodeParent &&
+      "layoutMode" in nodeParent &&
+      nodeParent.layoutMode === "VERTICAL"
     ) {
       isExpanded = true;
     } else {
