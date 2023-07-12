@@ -78,26 +78,26 @@ const mapFontSize: Record<number, string> = {
 
 const mapBorderRadius: Record<number, string> = {
   // 0: "none",
-  0.125: "-sm",
+  0.125: "sm",
   0.25: "",
-  0.375: "-md",
-  0.5: "-lg",
-  0.75: "-xl",
-  1.0: "-2xl",
-  1.5: "-3xl",
-  10: "-full",
+  0.375: "md",
+  0.5: "lg",
+  0.75: "xl",
+  1.0: "2xl",
+  1.5: "3xl",
+  10: "full",
 };
 
 // This uses pixels.
 const mapBlur: Record<number, string> = {
-  0: "-none",
+  0: "none",
   4: "sm",
   8: "",
-  12: "-md",
-  16: "-lg",
-  24: "-xl",
-  40: "-2xl",
-  64: "-3xl",
+  12: "md",
+  16: "lg",
+  24: "xl",
+  40: "2xl",
+  64: "3xl",
 };
 
 const mapWidthHeightSize: Record<number, string> = {

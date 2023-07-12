@@ -102,15 +102,14 @@ export class TailwindDefaultBuilder {
 
       const parsedX = sliceNum(x);
       const parsedY = sliceNum(y);
-      if (parsedX === '0') {
+      if (parsedX === "0") {
         this.addAttributes(`left-0`);
       } else {
         this.addAttributes(`left-[${parsedX}px]`);
       }
-      if (parsedY === '0') {
+      if (parsedY === "0") {
         this.addAttributes(`top-0`);
-      }
-      else {
+      } else {
         this.addAttributes(`top-[${parsedY}px]`);
       }
 
@@ -118,8 +117,8 @@ export class TailwindDefaultBuilder {
     } else if (
       node.type === "GROUP" ||
       ("layoutMode" in node &&
-        ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)?.layoutMode ===
-        "NONE")
+        ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
+          ?.layoutMode === "NONE")
     ) {
       this.addAttributes("relative");
     }
@@ -200,9 +199,7 @@ export class TailwindDefaultBuilder {
       if (blur) {
         const blurValue = pxToBlur(blur.radius);
         if (blurValue) {
-          this.addAttributes(`blur${blurValue}`);
-        } else {
-          this.addAttributes(`blur-[${sliceNum(blur.radius)}px]`);
+          this.addAttributes(`blur${blurValue ? `-${blurValue}` : ""}`);
         }
       }
 
@@ -212,10 +209,10 @@ export class TailwindDefaultBuilder {
       if (backgroundBlur) {
         const backgroundBlurValue = pxToBlur(backgroundBlur.radius);
         if (backgroundBlurValue) {
-          this.addAttributes(`backdrop-blur${backgroundBlurValue}`);
-        } else {
           this.addAttributes(
-            `backdrop-blur-[${sliceNum(backgroundBlur.radius)}px]`
+            `backdrop-blur${
+              backgroundBlurValue ? `-${backgroundBlurValue}` : ""
+            }`
           );
         }
       }
