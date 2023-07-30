@@ -118,11 +118,14 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
   }
 
   lineHeight(lineHeight: LineHeight, fontSize: number): string {
-    const value = commonLineHeight(lineHeight, fontSize);
-    if (value) {
-      return sliceNum(value);
+    switch (lineHeight.unit) {
+      case "AUTO":
+        return "";
+      case "PIXELS":
+        return sliceNum(lineHeight.value / fontSize);
+      case "PERCENT":
+        return sliceNum(lineHeight.value / 100);
     }
-    return "";
   }
 
   letterSpacing(letterSpacing: LetterSpacing, fontSize: number): string {
