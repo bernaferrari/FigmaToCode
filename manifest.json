@@ -7,7 +7,9 @@
   "editorType": ["figma", "dev"],
   "capabilities": ["inspect", "codegen"],
   "permissions": [],
-
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
   "codegenLanguages": [
     { "label": "HTML", "value": "html" },
     { "label": "React (JSX)", "value": "html_jsx" },
