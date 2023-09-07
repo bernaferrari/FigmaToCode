@@ -36,6 +36,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         color,
         this.fontSize(segment.fontSize),
         this.fontWeight(segment.fontWeight),
+        this.fontFamily(segment.fontName),
         textDecoration,
         textTransform,
         lineHeightStyle,
@@ -95,10 +96,9 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     return `pl-${Math.round(indentation)}`;
   };
 
-  // todo fontFamily
-  //  fontFamily(node: TextNode): this {
-  //    return this;
-  //  }
+  fontFamily = (fontName: FontName): string => {
+    return "font-['" + fontName.family + "']";
+  };
 
   /**
    * https://tailwindcss.com/docs/font-size/
