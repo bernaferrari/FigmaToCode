@@ -7,10 +7,50 @@ import { exactValue, nearestOpacity, nearestValue } from "../conversionTables";
  * if opacity was changed, let it be visible. Therefore, 98% => 75
  * node.opacity is between [0, 1]; output will be [0, 100]
  */
-export const tailwindOpacity = (node: BlendMixin): string => {
+export const tailwindOpacity = (node: MinimalBlendMixin): string => {
   // [when testing] node.opacity can be undefined
   if (node.opacity !== undefined && node.opacity !== 1) {
     return `opacity-${nearestOpacity(node.opacity)}`;
+  }
+  return "";
+};
+
+// https://tailwindcss.com/docs/mix-blend-mode
+export const tailwindBlendMode = (node: MinimalBlendMixin): string => {
+  if (node.blendMode !== "NORMAL" && node.blendMode !== "PASS_THROUGH") {
+    switch (node.blendMode) {
+      case "MULTIPLY":
+        return "mix-blend-multiply";
+      case "SCREEN":
+        return "mix-blend-screen";
+      case "OVERLAY":
+        return "mix-blend-overlay";
+      case "DARKEN":
+        return "mix-blend-darken";
+      case "LIGHTEN":
+        return "mix-blend-lighten";
+      case "COLOR_DODGE":
+        return "mix-blend-color-dodge";
+      case "COLOR_BURN":
+        return "mix-blend-color-burn";
+      case "HARD_LIGHT":
+        return "mix-blend-hard-light";
+      case "SOFT_LIGHT":
+        return "mix-blend-soft-light";
+      case "DIFFERENCE":
+        return "mix-blend-difference";
+      case "EXCLUSION":
+        return "mix-blend-exclusion";
+      case "HUE":
+        return "mix-blend-hue";
+      case "SATURATION":
+        return "mix-blend-saturation";
+      case "COLOR":
+        return "mix-blend-color";
+      case "LUMINOSITY":
+        return "mix-blend-luminosity";
+    }
+    return "";
   }
   return "";
 };

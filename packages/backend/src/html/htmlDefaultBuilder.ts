@@ -4,6 +4,7 @@ import {
   htmlVisibility,
   htmlRotation,
   htmlOpacity,
+  htmlBlendMode,
 } from "./builderImpl/htmlBlend";
 import {
   htmlColor,
@@ -65,7 +66,8 @@ export class HtmlDefaultBuilder {
     this.addStyles(
       htmlVisibility(node, this.isJSX),
       ...htmlRotation(node, this.isJSX),
-      htmlOpacity(node, this.isJSX)
+      htmlOpacity(node, this.isJSX),
+      htmlBlendMode(node, this.isJSX)
     );
     return this;
   }

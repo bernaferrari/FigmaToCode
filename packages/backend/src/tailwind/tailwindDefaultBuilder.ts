@@ -4,6 +4,7 @@ import {
   tailwindVisibility,
   tailwindRotation,
   tailwindOpacity,
+  tailwindBlendMode,
 } from "./builderImpl/tailwindBlend";
 import {
   tailwindBorderWidth,
@@ -44,11 +45,14 @@ export class TailwindDefaultBuilder {
     this.attributes.push(...newStyles.filter((style) => style !== ""));
   };
 
-  blend(node: SceneNode & SceneNodeMixin & BlendMixin & LayoutMixin): this {
+  blend(
+    node: SceneNode & SceneNodeMixin & MinimalBlendMixin & LayoutMixin
+  ): this {
     this.addAttributes(
       tailwindVisibility(node),
       tailwindRotation(node),
-      tailwindOpacity(node)
+      tailwindOpacity(node),
+      tailwindBlendMode(node)
     );
 
     return this;

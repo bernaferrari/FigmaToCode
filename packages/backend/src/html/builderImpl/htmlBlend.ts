@@ -23,6 +23,64 @@ export const htmlOpacity = (
   return "";
 };
 
+export const htmlBlendMode = (node: MinimalBlendMixin, isJsx: boolean): string => {
+  if (node.blendMode !== "NORMAL" && node.blendMode !== "PASS_THROUGH") {
+    let blendMode = "";
+    switch (node.blendMode) {
+      case "MULTIPLY":
+        blendMode = "multiply";
+        break;
+      case "SCREEN":
+        blendMode = "screen";
+        break;
+      case "OVERLAY":
+        blendMode = "overlay";
+        break;
+      case "DARKEN":
+        blendMode = "darken";
+        break;
+      case "LIGHTEN":
+        blendMode = "lighten";
+        break;
+      case "COLOR_DODGE":
+        blendMode = "color-dodge";
+        break;
+      case "COLOR_BURN":
+        blendMode = "color-burn";
+        break;
+      case "HARD_LIGHT":
+        blendMode = "hard-light";
+        break;
+      case "SOFT_LIGHT":
+        blendMode = "soft-light";
+        break;
+      case "DIFFERENCE":
+        blendMode = "difference";
+        break;
+      case "EXCLUSION":
+        blendMode = "exclusion";
+        break;
+      case "HUE":
+        blendMode = "hue";
+        break;
+      case "SATURATION":
+        blendMode = "saturation";
+        break;
+      case "COLOR":
+        blendMode = "color";
+        break;
+      case "LUMINOSITY":
+        blendMode = "luminosity";
+        break;
+    }
+
+    if (blendMode) {
+      return formatWithJSX("mix-blend-mode", isJsx, blendMode);
+    }
+  }
+  return "";
+};
+
 /**
  * https://tailwindcss.com/docs/visibility/
  * example: invisible

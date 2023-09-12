@@ -9,7 +9,7 @@ const swiftUIStroke = (node: SceneNode): number => {
     return 0;
   }
 
-  const stroke = commonStroke(node);
+  const stroke = commonStroke(node, 2);
 
   if (!stroke) {
     return 0;

@@ -7,7 +7,7 @@ type BorderSideType =
       bottom: number;
     };
 
-export const commonStroke = (node: SceneNode): BorderSideType | null => {
+export const commonStroke = (node: SceneNode, divideBy: number = 1): BorderSideType | null => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
     return null;
   }
@@ -18,17 +18,17 @@ export const commonStroke = (node: SceneNode): BorderSideType | null => {
       node.strokeTopWeight === node.strokeLeftWeight &&
       node.strokeTopWeight === node.strokeRightWeight
     ) {
-      return { all: node.strokeTopWeight / 2 };
+      return { all: node.strokeTopWeight / divideBy };
     }
 
     return {
-      left: node.strokeLeftWeight / 2,
-      top: node.strokeTopWeight / 2,
-      right: node.strokeRightWeight / 2,
-      bottom: node.strokeBottomWeight / 2,
+      left: node.strokeLeftWeight / divideBy,
+      top: node.strokeTopWeight / divideBy,
+      right: node.strokeRightWeight / divideBy,
+      bottom: node.strokeBottomWeight / divideBy,
     };
   } else if (node.strokeWeight !== figma.mixed && node.strokeWeight !== 0) {
-    return { all: node.strokeWeight / 2 };
+    return { all: node.strokeWeight / divideBy };
   }
 
   return null;
