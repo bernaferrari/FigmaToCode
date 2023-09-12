@@ -30,7 +30,9 @@ const getAlignItems = (node: inferredAutoLayoutResult): string => {
 };
 
 const getGap = (node: inferredAutoLayoutResult): string | number =>
-  node.itemSpacing > 0 ? node.itemSpacing : "";
+  node.itemSpacing > 0 && node.primaryAxisAlignItems !== "SPACE_BETWEEN"
+    ? node.itemSpacing
+    : "";
 
 const getFlex = (
   node: SceneNode,
