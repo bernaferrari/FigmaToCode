@@ -1,9 +1,9 @@
 import { pxToLayoutSize } from "../conversionTables";
 
-const getFlexDirection = (node: inferredAutoLayoutResult): string =>
+const getFlexDirection = (node: InferredAutoLayoutResult): string =>
   node.layoutMode === "HORIZONTAL" ? "" : "flex-col";
 
-const getJustifyContent = (node: inferredAutoLayoutResult): string => {
+const getJustifyContent = (node: InferredAutoLayoutResult): string => {
   switch (node.primaryAxisAlignItems) {
     case "MIN":
       return "justify-start";
@@ -16,7 +16,7 @@ const getJustifyContent = (node: inferredAutoLayoutResult): string => {
   }
 };
 
-const getAlignItems = (node: inferredAutoLayoutResult): string => {
+const getAlignItems = (node: InferredAutoLayoutResult): string => {
   switch (node.counterAxisAlignItems) {
     case "MIN":
       return "items-start";
@@ -29,14 +29,14 @@ const getAlignItems = (node: inferredAutoLayoutResult): string => {
   }
 };
 
-const getGap = (node: inferredAutoLayoutResult): string =>
+const getGap = (node: InferredAutoLayoutResult): string =>
   node.itemSpacing > 0 && node.primaryAxisAlignItems !== "SPACE_BETWEEN"
     ? `gap-${pxToLayoutSize(node.itemSpacing)}`
     : "";
 
 const getFlex = (
   node: SceneNode,
-  autoLayout: inferredAutoLayoutResult
+  autoLayout: InferredAutoLayoutResult
 ): string =>
   node.parent &&
   "layoutMode" in node.parent &&
@@ -46,7 +46,7 @@ const getFlex = (
 
 export const tailwindAutoLayoutProps = (
   node: SceneNode,
-  autoLayout: inferredAutoLayoutResult
+  autoLayout: InferredAutoLayoutResult
 ): string =>
   Object.values({
     flexDirection: getFlexDirection(autoLayout),

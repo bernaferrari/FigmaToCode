@@ -1,5 +1,5 @@
 export const getMainAxisAlignment = (
-  node: inferredAutoLayoutResult
+  node: InferredAutoLayoutResult
 ): string => {
   switch (node.primaryAxisAlignItems) {
     case "MIN":
@@ -14,7 +14,7 @@ export const getMainAxisAlignment = (
 };
 
 export const getCrossAxisAlignment = (
-  node: inferredAutoLayoutResult
+  node: InferredAutoLayoutResult
 ): string => {
   switch (node.counterAxisAlignItems) {
     case "MIN":
@@ -30,7 +30,7 @@ export const getCrossAxisAlignment = (
 
 const getFlex = (
   node: SceneNode,
-  autoLayout: inferredAutoLayoutResult
+  autoLayout: InferredAutoLayoutResult
 ): string =>
   node.parent &&
   "layoutMode" in node.parent &&

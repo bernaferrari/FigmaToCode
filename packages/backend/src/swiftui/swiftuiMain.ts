@@ -169,7 +169,7 @@ const swiftuiFrame = (
 
 const createDirectionalStack = (
   children: string,
-  inferredAutoLayout: inferredAutoLayoutResult
+  inferredAutoLayout: InferredAutoLayoutResult
 ): string => {
   if (inferredAutoLayout.layoutMode !== "NONE") {
     return generateSwiftViewCode(
@@ -186,7 +186,7 @@ const createDirectionalStack = (
 };
 
 const getLayoutAlignment = (
-  inferredAutoLayout: inferredAutoLayoutResult
+  inferredAutoLayout: InferredAutoLayoutResult
 ): string => {
   switch (inferredAutoLayout.counterAxisAlignItems) {
     case "MIN":
@@ -202,7 +202,7 @@ const getLayoutAlignment = (
   }
 };
 
-const getSpacing = (inferredAutoLayout: inferredAutoLayoutResult): number => {
+const getSpacing = (inferredAutoLayout: InferredAutoLayoutResult): number => {
   const defaultSpacing = 10;
   return Math.round(inferredAutoLayout.itemSpacing) !== defaultSpacing
     ? inferredAutoLayout.itemSpacing

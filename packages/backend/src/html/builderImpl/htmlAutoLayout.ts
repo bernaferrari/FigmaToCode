@@ -1,9 +1,9 @@
 import { formatMultipleJSXArray } from "../../common/parseJSX";
 
-const getFlexDirection = (node: inferredAutoLayoutResult): string =>
+const getFlexDirection = (node: InferredAutoLayoutResult): string =>
   node.layoutMode === "HORIZONTAL" ? "" : "column";
 
-const getJustifyContent = (node: inferredAutoLayoutResult): string => {
+const getJustifyContent = (node: InferredAutoLayoutResult): string => {
   switch (node.primaryAxisAlignItems) {
     case "MIN":
       return "flex-start";
@@ -16,7 +16,7 @@ const getJustifyContent = (node: inferredAutoLayoutResult): string => {
   }
 };
 
-const getAlignItems = (node: inferredAutoLayoutResult): string => {
+const getAlignItems = (node: InferredAutoLayoutResult): string => {
   switch (node.counterAxisAlignItems) {
     case "MIN":
       return "flex-start";
@@ -29,14 +29,14 @@ const getAlignItems = (node: inferredAutoLayoutResult): string => {
   }
 };
 
-const getGap = (node: inferredAutoLayoutResult): string | number =>
+const getGap = (node: InferredAutoLayoutResult): string | number =>
   node.itemSpacing > 0 && node.primaryAxisAlignItems !== "SPACE_BETWEEN"
     ? node.itemSpacing
     : "";
 
 const getFlex = (
   node: SceneNode,
-  autoLayout: inferredAutoLayoutResult
+  autoLayout: InferredAutoLayoutResult
 ): string =>
   node.parent &&
   "layoutMode" in node.parent &&
@@ -46,7 +46,7 @@ const getFlex = (
 
 export const htmlAutoLayoutProps = (
   node: SceneNode,
-  autoLayout: inferredAutoLayoutResult,
+  autoLayout: InferredAutoLayoutResult,
   isJsx: boolean
 ): string[] =>
   formatMultipleJSXArray(

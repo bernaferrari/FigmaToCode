@@ -6,7 +6,7 @@ import {
 import { commonPadding } from "../../common/commonPadding";
 
 // This must happen before Stack or after the Positioned, but not before.
-export const flutterPadding = (node: inferredAutoLayoutResult): string => {
+export const flutterPadding = (node: InferredAutoLayoutResult): string => {
   if (!("layoutMode" in node)) {
     return "";
   }

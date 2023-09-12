@@ -2,7 +2,7 @@ import { commonPadding } from "../../common/commonPadding";
 import { formatWithJSX } from "../../common/parseJSX";
 
 export const htmlPadding = (
-  node: inferredAutoLayoutResult,
+  node: InferredAutoLayoutResult,
   isJsx: boolean
 ): string[] => {
   const padding = commonPadding(node);

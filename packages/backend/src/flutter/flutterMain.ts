@@ -191,7 +191,7 @@ const flutterFrame = (
 };
 
 const makeRowColumn = (
-  autoLayout: inferredAutoLayoutResult,
+  autoLayout: InferredAutoLayoutResult,
   children: string
 ): string => {
   const rowOrColumn = autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
