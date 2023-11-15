@@ -1,6 +1,7 @@
 {
   "extends": "tsconfig/base.json",
   "compilerOptions": {
+    "sourceMap": true,
     "target": "ES2021",
     "jsx": "react-jsx",
     "typeRoots": ["node_modules/@types", "node_modules/@figma"]
