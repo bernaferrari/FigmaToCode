@@ -20,6 +20,18 @@ import {
 } from "../common/commonPosition";
 import { Modifier, androidElement } from "./builderImpl/androidParser";
 
+export function resourceName(name: string): string {
+  const words = name.split(/[^a-zA-Z0-9]+/);
+  const snakeCaseWords = words.map((word, index) => {
+    if (index === 0) {
+      const cleanedWord = word.replace(/^[^a-zA-Z]+/g, "");
+      return cleanedWord.charAt(0).toLowerCase() + cleanedWord.slice(1);
+    }
+    return word;
+  });
+  return snakeCaseWords.join("_");
+}
+
 export class androidDefaultBuilder {
   element: androidElement;
 
@@ -77,17 +89,9 @@ export class androidDefaultBuilder {
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-      const { centerX, centerY } = this.topLeftToCenterOffset(
-        x,
-        y,
-        node,
-        node.parent
-      );
 
-      this.pushModifier([
-        `offset`,
-        `x: ${sliceNum(centerX)}, y: ${sliceNum(centerY)}`,
-      ]);
+      this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}`]);
+      this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}`]);
     }
     return this;
   }
@@ -139,11 +143,12 @@ export class androidDefaultBuilder {
 
   size(node: SceneNode, optimize: boolean): this {
     const { width, height } = androidSize(node, optimize);
-    const sizes = [width, height].filter((d) => d);
-    if (sizes.length > 0) {
-      this.pushModifier([`frame`, sizes.join(", ")]);
+    if (width) {
+      this.pushModifier(['android:layout_width', `${width}`]);
     }
-
+    if (height) {
+      this.pushModifier(['android:layout_height', `${height}`]);
+    }
     return this;
   }
 
@@ -154,6 +159,16 @@ export class androidDefaultBuilder {
           (optimizeLayout ? node.inferredAutoLayout : null) ?? node
         )
       );
+    }
+    return this;
+  }
+
+  setId(node: SceneNode): this {
+    if ("name" in node && node.name) {
+      const id = resourceName(node.name);
+      if (id) {
+        this.pushModifier(['android:id', `@+id/${id}`]);
+      }
     }
     return this;
   }
