@@ -118,21 +118,15 @@ export class androidTextBuilder extends androidDefaultBuilder {
       segment.fontSize
     );
 
-    let updatedText = parseTextAsCode(characters); //segment.characters); swiftUI only supports a single text.
+    let updatedText = parseTextAsCode(characters);
     if (segment.textCase === "LOWER") {
       updatedText = characters.toLowerCase();
     } else if (segment.textCase === "UPPER") {
       updatedText = characters.toUpperCase();
     }
 
-    const element = new androidElement(
-      "TextView"
-    )
-      .addModifier([
-        "android:text", parseTextAsCode(characters)
-      ])
-      .addModifier(["android:layout_width","wrap_content"])
-      .addModifier(["android:layout_height","wrap_content"])
+    const element = new androidElement("TextView")
+      .addModifier(["android:text", updatedText])
       .addModifier(["android:fontFamily",fontFamily])
       .addModifier(["android:textSize",`${fontSize}sp`])
       .addModifier(["android:lineSpacingExtra",fontWeight])
@@ -168,7 +162,7 @@ export class androidTextBuilder extends androidDefaultBuilder {
   };
 
   wrapTextAutoResize = (node: TextNode): string => {
-    const { width, height } = androidSize(node);
+    const { width, height } = androidSize(node,false);
 
     let comp: string[] = [];
     switch (node.textAutoResize) {

@@ -7,34 +7,23 @@ export const androidSize = (
 ): { width: string; height: string } => {
   const size = nodeSize(node, optimizeLayout);
 
-  // if width is set as maxWidth, height must also be set as maxHeight (not height)
-  const shouldExtend = size.height === "fill" || size.width === "fill";
-
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
-  if (typeof size.width === "number") {
-    const w = sliceNum(size.width);
-
-    if (shouldExtend) {
-      propWidth = `minWidth: ${w}, maxWidth: ${w}`;
-    } else {
-      propWidth = `width: ${w}`;
-    }
-  } else if (size.width === "fill") {
-    propWidth = `maxWidth: .infinity`;
+  if (!size.width || ("layoutSizingHorizontal" in node && node.layoutSizingHorizontal === "HUG")) {
+    propWidth = 'wrap_content';
+  } else if (size.width === "fill" || ("layoutSizingHorizontal" in node && node.layoutSizingHorizontal === "FILL")) {
+    propWidth = 'match_parent';
+  } else if (typeof size.width === "number") {
+    propWidth = `${size.width}dp`;
   }
 
   let propHeight = "";
-  if (typeof size.height === "number") {
-    const h = sliceNum(size.height);
-
-    if (shouldExtend) {
-      propHeight = `minHeight: ${h}, maxHeight: ${h}`;
-    } else {
-      propHeight = `height: ${h}`;
-    }
-  } else if (size.height === "fill") {
-    propHeight = `maxHeight: .infinity`;
+  if (!size.height || ("layoutSizingVertical" in node && node.layoutSizingVertical === "HUG")) {
+    propHeight = 'wrap_content';
+  } else if (size.height === "fill" || ("layoutSizingVertical" in node && node.layoutSizingVertical === "FILL")) {
+    propHeight = 'match_parent';
+  } else if (typeof size.height === "number") {
+    propHeight = `${size.height}dp`;
   }
 
   return { width: propWidth, height: propHeight };

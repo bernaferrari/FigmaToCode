@@ -1,7 +1,7 @@
 import { indentString } from "../common/indentString";
 import { className, sliceNum } from "../common/numToAutoFixed";
 import { androidTextBuilder } from "./androidTextBuilder";
-import { androidDefaultBuilder } from "./androidDefaultBuilder";
+import { androidDefaultBuilder, resourceName } from "./androidDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { androidElement } from "./builderImpl/androidParser";
@@ -78,6 +78,9 @@ const androidWidgetGenerator = (
         else {
           comp.push(androidContainer(node));
         }
+      break;
+      case "VECTOR":
+        comp.push(androidImage(node))
         break;
       default:
       break;
@@ -120,6 +123,7 @@ export const androidContainer = (
     .shapeBorder(node)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .effects(node)
+    .setId(node)
     .build(kind === stack ? -2 : 0);
 
   return result;
@@ -137,21 +141,32 @@ const androidGroup = (
 };
 
 const androidText = (node: TextNode): string => {
-  const result = new androidTextBuilder().createText(node);
+  const result = new androidTextBuilder()
+    .createText(node)
+    .setId(node)
+    .position(node, localSettings.optimizeLayout)
+    .size(node, localSettings.optimizeLayout);
+
   previousExecutionCache.push(result.build());
 
+//  result.element.addModifier(["rawproperty",JSON.stringify(node)]);
   return result
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .build();
 };
 
-const androidImage = (node: RectangleNode): string => {
-  const result = new androidDefaultBuilder();
-  result.element = new androidElement("ImageView")
-    .addModifier(["android:layout_width",node.layoutSizingHorizontal == "FILL" ? "match_parent" : node.layoutSizingHorizontal == "HUG" ? "wrap_content" : `${node.width}dp`])
-    .addModifier(["android:layout_height",node.layoutSizingVertical == "FILL" ? "match_parent" : node.layoutSizingVertical == "HUG" ? "wrap_content" : `${node.height}dp`]);
+const androidImage = (node: RectangleNode | VectorNode): string => {
+  const result = new androidDefaultBuilder("ImageView","")
+    .setId(node)
+    .position(node,localSettings.optimizeLayout)
+    .size(node,localSettings.optimizeLayout);
+  if ("name" in node && node.name) {
+    result.element.addModifier(["app:srcCompat",`@android:drawable/${resourceName(node.name)}`]);
+  }
+  result.element
+    .addModifier(["android:scaleType",'fitXY']);
 
-  return androidContainer(node);
+  return result.build(0);
 };
 
 const androidFrame = (
