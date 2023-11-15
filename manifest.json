@@ -16,6 +16,7 @@
     { "label": "Tailwind", "value": "tailwind" },
     { "label": "Tailwind (JSX)", "value": "tailwind_jsx" },
     { "label": "Flutter", "value": "flutter" },
-    { "label": "SwiftUI", "value": "swiftUI" }
+    { "label": "SwiftUI", "value": "swiftUI" },
+    { "label": "AndroidXML", "value": "androidXML" }
   ]
 }

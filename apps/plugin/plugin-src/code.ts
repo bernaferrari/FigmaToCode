@@ -4,6 +4,7 @@ import {
   flutterMain,
   tailwindMain,
   swiftuiMain,
+  androidMain,
   convertIntoNodes,
   htmlMain,
   PluginSettings,
@@ -12,6 +13,7 @@ import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retr
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
 import { htmlCodeGenTextStyles } from "backend/src/html/htmlMain";
 import { swiftUICodeGenTextStyles } from "backend/src/swiftui/swiftuiMain";
+import { androidCodeGenTextStyles } from "backend/src/android/androidMain";
 
 let userPluginSettings: PluginSettings;
 
@@ -24,6 +26,7 @@ const defaultPluginSettings: PluginSettings = {
   responsiveRoot: false,
   flutterGenerationMode: "snippet",
   swiftUIGenerationMode: "snippet",
+  androidGenerationMode: "snippet",
   roundTailwind: false,
 };
 
@@ -221,6 +224,22 @@ const codegenMode = async () => {
           {
             title: `Text Styles`,
             code: swiftUICodeGenTextStyles(),
+            language: "SWIFT",
+          },
+        ];
+      case "androidXML":
+        return [
+          {
+            title: `AndroidXML`,
+            code: androidMain(convertedSelection, {
+              ...userPluginSettings,
+              androidGenerationMode: "snippet",
+            }),
+            language: "SWIFT",
+          },
+          {
+            title: `Text Styles`,
+            code: androidCodeGenTextStyles(),
             language: "SWIFT",
           },
         ];

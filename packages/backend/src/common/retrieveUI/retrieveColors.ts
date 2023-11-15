@@ -70,7 +70,7 @@ const convertSolidColor = (
     const hexNearestColor = tailwindNearestColor(hex);
     exported = tailwindSolidColor(fill.color, fill.opacity, kind);
     colorName = tailwindColors[hexNearestColor];
-  } else if (framework === "SwiftUI") {
+  } else /*if (framework === "SwiftUI")*/ {
     exported = swiftuiColor(fill.color, opacity);
   }
 
@@ -105,6 +105,7 @@ export const retrieveGenericLinearGradients = (
           exported = tailwindGradient(paint);
           break;
         case "SwiftUI":
+        default:
           exported = swiftuiGradient(paint);
           break;
       }

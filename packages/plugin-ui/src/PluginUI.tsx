@@ -3,7 +3,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 import copy from "copy-to-clipboard";
 
-export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
+export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI" | "AndroidXML";
 
 // This must be kept in sync with the backend.
 export type PluginSettings = {
@@ -15,6 +15,7 @@ export type PluginSettings = {
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
+  androidGenerationMode: string;
   roundTailwind: boolean;
 };
 
@@ -45,7 +46,7 @@ export const PluginUI = (props: PluginUIProps) => {
   return (
     <div className="flex flex-col h-full dark:text-white">
       <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
-        {["HTML", "Tailwind", "Flutter", "SwiftUI"].map((tab) => (
+        {["HTML", "Tailwind", "Flutter", "SwiftUI","AndroidXML"].map((tab) => (
           <button
             key={`tab ${tab}`}
             className={`w-full p-1 text-sm ${
@@ -158,7 +159,7 @@ type LocalCodegenPreference =
     itemType: "individual_select";
     propertyName: Exclude<
       keyof PluginSettings,
-      "framework" | "flutterGenerationMode" | "swiftUIGenerationMode"
+      "framework" | "flutterGenerationMode" | "swiftUIGenerationMode" | "androidGenerationMode"
     >;
     label: string;
     value?: boolean;
@@ -240,6 +241,16 @@ const selectPreferenceOptions: {
       { label: "Snippet", value: "snippet" },
     ],
     includedLanguages: ["SwiftUI"],
+  },
+  {
+    itemType: "select",
+    propertyName: "androidGenerationMode",
+    label: "Mode",
+    options: [
+      { label: "Preview", value: "preview" },
+      { label: "Snippet", value: "snippet" },
+    ],
+    includedLanguages: ["AndroidXML"],
   },
   // {
   //   itemType: "select",

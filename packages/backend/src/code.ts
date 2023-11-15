@@ -6,9 +6,10 @@ import {
 import { flutterMain } from "./flutter/flutterMain";
 import { htmlMain } from "./html/htmlMain";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
+import { androidMain } from "./android/androidMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
 
-export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
+export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind" | "AndroidXML";
 
 export type PluginSettings = {
   framework: FrameworkTypes;
@@ -19,6 +20,7 @@ export type PluginSettings = {
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
+  androidGenerationMode: string;
   roundTailwind: boolean;
 };
 
@@ -49,7 +51,10 @@ export const run = (settings: PluginSettings) => {
     case "SwiftUI":
       result = swiftuiMain(convertedSelection, settings);
       break;
-  }
+    case "AndroidXML":
+      result = androidMain(convertedSelection, settings);
+      break;
+    }
 
   figma.ui.postMessage({
     type: "code",
