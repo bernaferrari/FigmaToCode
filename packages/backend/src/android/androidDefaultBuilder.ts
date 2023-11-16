@@ -15,10 +15,43 @@ import {
   androidBlendMode,
 } from "./builderImpl/androidBlend";
 import {
-  commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
 import { Modifier, androidElement } from "./builderImpl/androidParser";
+
+export const isAbsolutePosition = (
+  node: SceneNode,
+  optimizeLayout: boolean
+) => {
+  // No position when parent is inferred auto layout.
+  if (
+    optimizeLayout &&
+    node.parent &&
+    "layoutMode" in node.parent &&
+    node.parent.inferredAutoLayout !== null
+  ) {
+    return false;
+  }
+
+  if ("layoutAlign" in node) {
+    if (!node.parent || node.parent === undefined) {
+      return true;
+    }
+
+    const parentLayoutIsNone =
+      "layoutMode" in node.parent && node.parent.layoutMode === "NONE";
+    const hasNoLayoutMode = !("layoutMode" in node.parent);
+
+    if (
+      node.layoutPositioning === "ABSOLUTE" ||
+      parentLayoutIsNone ||
+      hasNoLayoutMode
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
 
 export function resourceName(name: string): string {
   const words = name.split(/[^a-zA-Z0-9]+/);
@@ -87,11 +120,26 @@ export class androidDefaultBuilder {
   }
 
   position(node: SceneNode, optimizeLayout: boolean): this {
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+    if (isAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-
-      this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}`]);
-      this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}`]);
+      if (!node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
+        this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
+        this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
+      }
+      else {
+        if ("width" in node.parent && "constraints" in node && "horizontal" in node.constraints && node.constraints.horizontal === "MAX") {
+          this.pushModifier(['android:layout_marginEnd',`${node.parent.width-node.x-node.width}dp`]);
+        }
+        else {
+          this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
+        }
+        if ("height" in node.parent && "constraints" in node && "vertical" in node.constraints && node.constraints.vertical === "MAX") {
+          this.pushModifier(['android:layout_marginBottom',`${node.parent.height-node.y-node.height}dp`]);
+        }
+        else {
+          this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
+        }
+      }
     }
     return this;
   }
@@ -169,6 +217,13 @@ export class androidDefaultBuilder {
       if (id) {
         this.pushModifier(['android:id', `@+id/${id}`]);
       }
+    }
+    return this;
+  }
+
+  setRaw(node: SceneNode): this {
+    if (node) {
+      this.pushModifier(["rawproperty",JSON.stringify(node)]);
     }
     return this;
   }

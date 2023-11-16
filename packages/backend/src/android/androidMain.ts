@@ -1,23 +1,26 @@
 import { indentString } from "../common/indentString";
 import { className, sliceNum } from "../common/numToAutoFixed";
 import { androidTextBuilder } from "./androidTextBuilder";
-import { androidDefaultBuilder, resourceName } from "./androidDefaultBuilder";
+import { androidDefaultBuilder,
+  resourceName,
+  isAbsolutePosition } from "./androidDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { androidElement } from "./builderImpl/androidParser";
+import { getCommonPositionValue } from "../common/commonPosition";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
 
 const getPreviewTemplate = (name: string, injectCode: string): string =>
 `<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
     ${indentString(injectCode, 4).trimStart()}
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
 `;
 
 export const androidMain = (
@@ -124,6 +127,7 @@ export const androidContainer = (
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .effects(node)
     .setId(node)
+//    .setRaw(node)
     .build(kind === stack ? -2 : 0);
 
   return result;
@@ -136,7 +140,7 @@ const androidGroup = (
   const children = widgetGeneratorWithLimits(node, indentLevel);
   return androidContainer(
     node,
-    children ? generateAndroidViewCode("ZStack", {}, children) : `ZStack() { }`
+    generateAndroidViewCode("FrameLayout", {}, children)
   );
 };
 
@@ -178,20 +182,15 @@ const androidFrame = (
     node.children.length > 1 ? indentLevel + 1 : indentLevel
   );
 
-  const anyStack = createDirectionalStack(
-    children,
-    localSettings.optimizeLayout && node.inferredAutoLayout !== null
-      ? node.inferredAutoLayout
-      : node
-  );
+  const anyStack = createDirectionalStack(children, node);
   return androidContainer(node, anyStack);
 };
 
 const getLayoutParam = (
   align: string,
-  width:string
+  width:number
 ):string => {
-  return (align == "STRETCH") ? "match_parent" : "wrap_content";
+  return (align == "FIXED") ? `${width}dp` : (align === 'FILL') ? "match_parent" : "wrap_content";
 };
 
 const getGravity = (
@@ -234,38 +233,42 @@ const getGravityParam = (
 
 const createDirectionalStack = (
   children: string,
-  inferredAutoLayout: InferredAutoLayoutResult
+  node: SceneNode & InferredAutoLayoutResult
 ): string => {
 
-
-  if (inferredAutoLayout.layoutMode !== "NONE") {
-    return generateAndroidViewCode("LinearLayout",
-      {
-        "android:orientation":inferredAutoLayout.layoutMode=="VERTICAL" ? "vertical" : "horizontal",
-        "android:layout_width": getLayoutParam(inferredAutoLayout.layoutAlign,"10dp"),
-        "android:layout_height":"wrap_content",
-        "android:layout_margin": getSpacing(inferredAutoLayout),
-        "android:gravity": getGravityParam(inferredAutoLayout)
-      },
-      children
-    );
-  } else {
-    return generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout",
-      {
-        "android:layout_width":"match_parent",
-        "android:layout_height":"match_parent"
-      },
-      children
-    );
+  const prop:Record<string, string | number> = {
+    "android:layout_width": "layoutSizingHorizontal" in node ? getLayoutParam(node.layoutSizingHorizontal, node.width) : "0dp",
+    "android:layout_height": "layoutSizingVertical" in node ? getLayoutParam(node.layoutSizingVertical, node.height) : "0dp"
+  };
+  if (isAbsolutePosition(node,localSettings.optimizeLayout)) {
+    const { x, y } = getCommonPositionValue(node);
+    if (!node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
+      prop['android:layout_marginStart']=`${sliceNum(x)}dp`;
+      prop['android:layout_marginTop']=`${sliceNum(y)}dp`;
+    }
+    else {
+      if ("width" in node.parent && "constraints" in node && "horizontal" in node.constraints && node.constraints.horizontal === "MAX") {
+        prop['android:layout_marginEnd']=`${node.parent.width-node.x-node.width}dp`;
+      }
+      else {
+        prop['android:layout_marginStart']=`${sliceNum(x)}dp`;
+      }
+      if ("height" in node.parent && "constraints" in node && "vertical" in node.constraints && node.constraints.vertical === "MAX") {
+        prop['android:layout_marginBottom']=`${node.parent.height-node.y-node.height}dp`;
+      }
+      else {
+        prop['android:layout_marginTop']=`${sliceNum(y)}dp`;
+      }
+    }
   }
-};
 
-
-const getSpacing = (inferredAutoLayout: InferredAutoLayoutResult): string => {
-  const defaultSpacing = 10;
-  return Math.round(inferredAutoLayout.itemSpacing) !== defaultSpacing
-    ? `${inferredAutoLayout.itemSpacing}dp`
-    : `${defaultSpacing}dp`;
+  if (node.layoutMode !== "NONE") {
+    prop["android:orientation"] = node.layoutMode=="VERTICAL" ? "vertical" : "horizontal";
+    prop["android:gravity"] = getGravityParam(node);
+    return generateAndroidViewCode("LinearLayout", prop, children);
+  } else {
+    return generateAndroidViewCode("FrameLayout", prop, children);
+  }
 };
 
 export const generateAndroidViewCode = (
@@ -318,13 +321,6 @@ const widgetGeneratorWithLimits = (
     node,
     localSettings.optimizeLayout
   ).slice(0, 100);
-
-  // I believe no one should have more than 100 items in a single nesting level. If you do, please email me.
-  if (node.children.length > 100) {
-    strBuilder += `\n// SwiftUI has a 10 item limit in Stacks. By grouping them, it can grow even more. 
-// It seems, however, that you have more than 100 items at the same level. Wow!
-// This is not yet supported; Limiting to the first 100 items...`;
-  }
 
   // split node.children in arrays of 10, so that it can be Grouped. I feel so guilty of allowing this.
   for (let i = 0, j = slicedChildren.length; i < j; i += chunk) {
