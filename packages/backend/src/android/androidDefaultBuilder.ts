@@ -158,7 +158,7 @@ export class androidDefaultBuilder {
     if ("fills" in node) {
       const background = androidBackground(node, node.fills);
       if (background) {
-        this.pushModifier([`background`, background]);
+        this.pushModifier([`android:background`, background]);
       }
     }
     return this;

@@ -103,22 +103,19 @@ const gradientDirection = (angle: number): string => {
 export const androidRGBAColor = (color: RGBA) => androidColor(color, color.a);
 
 export const androidColor = (color: RGB, opacity: number): string => {
-  // Using Color.black.opacity() is not reccomended, as per:
-  // https://stackoverflow.com/a/56824114/4418073
-  // Therefore, only use Color.black/white when opacity is 1.
   if (color.r + color.g + color.b === 0 && opacity === 1) {
-    return ".black";
+    return "@color/black";
   }
 
   if (color.r + color.g + color.b === 3 && opacity === 1) {
-    return ".white";
+    return "@color/white";
   }
 
-  const r = `red: ${sliceNum(color.r)}`;
-  const g = `green: ${sliceNum(color.g)}`;
-  const b = `blue: ${sliceNum(color.b)}`;
+  return `#${color2hex(opacity)}${color2hex(color.r)}${color2hex(color.g)}${color2hex(color.b)}`;
+};
 
-  const opacityAttr = opacity !== 1.0 ? `.opacity(${sliceNum(opacity)})` : "";
-
-  return `Color(${r}, ${g}, ${b})${opacityAttr}`;
+export const color2hex = (color: number): string => {
+  const i = Math.min(255,Math.round(color * 255));
+  const t = `0${i.toString(16)}`;
+  return t.slice(t.length-2);
 };

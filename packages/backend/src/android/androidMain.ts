@@ -1,5 +1,6 @@
 import { indentString } from "../common/indentString";
 import { className, sliceNum } from "../common/numToAutoFixed";
+import { androidBackground } from "./builderImpl/androidColor";
 import { androidTextBuilder } from "./androidTextBuilder";
 import { androidDefaultBuilder,
   resourceName,
@@ -259,6 +260,12 @@ const createDirectionalStack = (
       else {
         prop['android:layout_marginTop']=`${sliceNum(y)}dp`;
       }
+    }
+  }
+  if ("fills" in node) {
+    const background = androidBackground(node, node.fills);
+    if (background) {
+      prop[`android:background`]=background;
     }
   }
 
