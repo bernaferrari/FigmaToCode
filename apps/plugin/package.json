@@ -34,7 +34,7 @@
     "tailwindcss": "3.3.3",
     "tsconfig": "workspace:*",
     "typescript": "^5.2.2",
-    "vite": "^4.4.9",
+    "vite": "^4.4.12",
     "vite-plugin-singlefile": "^0.13.5"
   }
 }
