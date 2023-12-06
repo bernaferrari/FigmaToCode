@@ -166,7 +166,7 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
   if ("name" in node && node.name) {
-    result.element.addModifier(["app:srcCompat",`@android:drawable/${resourceName(node.name)}`]);
+    result.element.addModifier(["app:srcCompat",`@drawable/${resourceName(node.name)}`]);
   }
   result.element
     .addModifier(["android:scaleType",'fitXY']);
