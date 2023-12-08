@@ -12,7 +12,6 @@ import {
   androidVisibility,
   androidOpacity,
   androidRotation,
-  androidBlendMode,
 } from "./builderImpl/androidBlend";
 import {
   getCommonPositionValue,
@@ -92,8 +91,7 @@ export class androidDefaultBuilder {
     this.pushModifier(
       androidVisibility(node),
       androidRotation(node),
-      androidOpacity(node),
-      androidBlendMode(node)
+      androidOpacity(node)
     );
 
     return this;
