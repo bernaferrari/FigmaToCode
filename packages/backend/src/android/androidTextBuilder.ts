@@ -4,7 +4,6 @@ import {
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
 import { androidDefaultBuilder } from "./androidDefaultBuilder";
-import { androidWeightMatcher } from "./builderImpl/androidTextWeight";
 import { androidSize } from "./builderImpl/androidSize";
 import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { androidElement } from "./builderImpl/androidParser";
@@ -59,8 +58,7 @@ export class androidTextBuilder extends androidDefaultBuilder {
   fontWeight(fontWeight: number): string {
     // for some reason this must be set before the multilineTextAlignment
     if (fontWeight !== 400) {
-      const weight = androidWeightMatcher(fontWeight);
-      return `.weight(${weight})`;
+      return `${fontWeight}`;
     }
     return "";
   }
@@ -129,9 +127,9 @@ export class androidTextBuilder extends androidDefaultBuilder {
       .addModifier(["android:text", updatedText])
       .addModifier(["android:fontFamily",fontFamily])
       .addModifier(["android:textSize",`${fontSize}sp`])
-      .addModifier(["android:lineSpacingExtra",fontWeight])
-      .addModifier(["tracking", letterSpacing])
-      .addModifier(["lineSpacing", lineHeight])
+      .addModifier(["android:textFontWeight",fontWeight])
+      .addModifier(["android:letterSpacing", letterSpacing])
+      .addModifier(["android:lineSpacingExtra", `${lineHeight}px`])
       .addModifier(["android:textStyle",this.textDecoration(segment.textDecoration)])
       .addModifier(["android:typeface",this.textStyle(segment.fontName.style)])
       .addModifier(["android:textColor", this.textColor(segment.fills)]);

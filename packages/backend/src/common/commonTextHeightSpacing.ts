@@ -8,7 +8,7 @@ export const commonLineHeight = (
     case "PIXELS":
       return lineHeight.value;
     case "PERCENT":
-      return (fontSize * lineHeight.value) / 100;
+      return (lineHeight.value) / 100;
   }
 };
 
@@ -20,6 +20,6 @@ export const commonLetterSpacing = (
     case "PIXELS":
       return letterSpacing.value;
     case "PERCENT":
-      return (fontSize * letterSpacing.value) / 100;
+      return (letterSpacing.value) / 100;
   }
 };
