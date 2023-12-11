@@ -10,6 +10,7 @@ import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildr
 import { androidElement } from "./builderImpl/androidParser";
 import { getCommonPositionValue } from "../common/commonPosition";
 import { androidShadow } from "./builderImpl/androidEffects";
+import { TextNode } from "../altNodes/altMixins2";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -58,7 +59,12 @@ const androidWidgetGenerator = (
   let comp: string[] = [];
 
   visibleSceneNode.forEach((node, index) => {
+    if (node.parent && node.parent.type == "COMPONENT") { return }
+
     switch (node.type) {
+      case "COMPONENT":
+        comp.push(androidComponent(node));
+        break;
       case "ELLIPSE":
       case "LINE":
         comp.push(androidContainer(node));
@@ -69,7 +75,6 @@ const androidWidgetGenerator = (
         break;
       case "FRAME":
       case "INSTANCE":
-      case "COMPONENT":
       case "COMPONENT_SET":
         comp.push(androidFrame(node, indentLevel));
         break;
@@ -171,6 +176,29 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
   return result.build(0);
 };
 
+const androidButton = (node: SceneNode & BaseFrameMixin): string => {
+  
+  const childRectAngle = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE")[0]
+  const childText = node.children.filter((child: { type: string; }) => child.type == "TEXT")[0]
+
+  const result = new androidDefaultBuilder(childRectAngle.isAsset ? "ImageButton" : "Button", "")
+    .setId(node)
+    .position(node,localSettings.optimizeLayout)
+    .size(node,localSettings.optimizeLayout);
+  if (childRectAngle && childRectAngle.isAsset) {
+    result.element.addModifier(["android:contentDescription", `@drawable/${resourceName(node.name)}`]);
+  }
+  if (childText && "characters" in childText) {
+    result.element.addModifier(["android:text", `${childText.characters}`])
+  }
+  if (node.name, "name" in node) {
+    result.element.addModifier(["android:background", `@drawable/${node.name}`])
+  }
+
+  result.pushModifier(androidShadow(node));
+  return result.build(0);
+};
+
 const androidFrame = (
   node: SceneNode & BaseFrameMixin,
   indentLevel: number
@@ -182,6 +210,16 @@ const androidFrame = (
 
   const anyStack = createDirectionalStack(children, node);
   return androidContainer(node, anyStack);
+};
+
+const androidComponent = ( node: SceneNode & BaseFrameMixin): string => {
+  switch (node.name.split("_")[0]) {
+    case "btn":
+      return androidButton(node)
+    default:
+      break;
+  }
+  return ""
 };
 
 const getLayoutParam = (
