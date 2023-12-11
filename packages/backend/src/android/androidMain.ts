@@ -9,6 +9,7 @@ import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { androidElement } from "./builderImpl/androidParser";
 import { getCommonPositionValue } from "../common/commonPosition";
+import { androidShadow } from "./builderImpl/androidEffects";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -152,6 +153,7 @@ const androidText = (node: TextNode): string => {
     .position(node, localSettings.optimizeLayout)
     .size(node, localSettings.optimizeLayout);
 
+  result.pushModifier(androidShadow(node));
   previousExecutionCache.push(result.build());
 
 //  result.element.addModifier(["rawproperty",JSON.stringify(node)]);
@@ -168,6 +170,7 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
   if ("name" in node && node.name) {
     result.element.addModifier(["app:srcCompat",`@drawable/${resourceName(node.name)}`]);
   }
+  result.pushModifier(androidShadow(node));
   result.element
     .addModifier(["android:scaleType",'fitXY']);
 

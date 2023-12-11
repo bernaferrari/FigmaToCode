@@ -1,5 +1,5 @@
 import { sliceNum } from "../common/numToAutoFixed";
-import { androidBlur, androidShadow } from "./builderImpl/androidEffects";
+import { androidShadow } from "./builderImpl/androidEffects";
 import {
   androidBorder,
   androidCornerRadius,
@@ -182,7 +182,7 @@ export class androidDefaultBuilder {
       return this;
     }
 
-    this.pushModifier(androidBlur(node), androidShadow(node));
+    this.pushModifier(androidShadow(node));
 
     return this;
   }
