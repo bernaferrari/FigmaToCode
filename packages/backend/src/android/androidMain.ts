@@ -111,12 +111,8 @@ export const androidContainer = (
   let kind = "";
   if (node.type === "RECTANGLE" && node.isAsset) {
     kind = "ImageView";
-  } else if (node.type === "RECTANGLE" || node.type === "LINE") {
-    kind = "Rectangle()";
-  } else if (node.type === "ELLIPSE") {
-    kind = "Ellipse()";
-  } else {
-//    kind = stack;
+  } else if (node.type === "RECTANGLE" || node.type === "LINE" || node.type === "ELLIPSE") {
+    kind = "View";
   }
 
   const result = new androidDefaultBuilder(kind,stack)
