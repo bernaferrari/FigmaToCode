@@ -1,9 +1,5 @@
 import { sliceNum } from "../common/numToAutoFixed";
 import { androidShadow } from "./builderImpl/androidEffects";
-import {
-  androidBorder,
-  androidCornerRadius,
-} from "./builderImpl/androidBorder";
 import { androidBackground } from "./builderImpl/androidColor";
 import { androidPadding } from "./builderImpl/androidPadding";
 import { androidSize } from "./builderImpl/androidSize";
@@ -142,16 +138,6 @@ export class androidDefaultBuilder {
     return this;
   }
 
-  shapeBorder(node: SceneNode): this {
-    const borders = androidBorder(node);
-    if (borders) {
-      borders.forEach((border) => {
-        this.element.addModifierMixed("overlay", border);
-      });
-    }
-    return this;
-  }
-
   shapeBackground(node: SceneNode): this {
     if ("fills" in node) {
       const background = androidBackground(node, node.fills);
@@ -165,14 +151,6 @@ export class androidDefaultBuilder {
   shapeForeground(node: SceneNode): this {
     if (!("children" in node) || node.children.length === 0) {
       this.pushModifier([`foregroundColor`, ".clear"]);
-    }
-    return this;
-  }
-
-  cornerRadius(node: SceneNode): this {
-    const corner = androidCornerRadius(node);
-    if (corner) {
-      this.pushModifier([`cornerRadius`, corner]);
     }
     return this;
   }

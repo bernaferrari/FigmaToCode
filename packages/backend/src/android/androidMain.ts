@@ -124,8 +124,6 @@ export const androidContainer = (
     .autoLayoutPadding(node, localSettings.optimizeLayout)
     .size(node, localSettings.optimizeLayout)
     .shapeBackground(node)
-    .cornerRadius(node)
-    .shapeBorder(node)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .effects(node)
     .setId(node)
