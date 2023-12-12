@@ -199,6 +199,17 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
+const androidList = (node: SceneNode & BaseFrameMixin): string => {
+
+  const result = new androidDefaultBuilder("androidx.recyclerview.widget.RecyclerView", "")
+    .setId(node)
+    .position(node,localSettings.optimizeLayout)
+    .size(node,localSettings.optimizeLayout);
+
+  result.pushModifier(androidShadow(node));
+  return result.build(0);
+};
+
 const androidFrame = (
   node: SceneNode & BaseFrameMixin,
   indentLevel: number
@@ -216,10 +227,11 @@ const androidComponent = ( node: SceneNode & BaseFrameMixin): string => {
   switch (node.name.split("_")[0]) {
     case "btn":
       return androidButton(node)
+    case "list":
+      return androidList(node)
     default:
-      break;
+      return ""
   }
-  return ""
 };
 
 const getLayoutParam = (
