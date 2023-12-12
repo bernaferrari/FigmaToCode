@@ -216,6 +216,17 @@ const androidSwitch = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
+const androidCheckBox = (node: SceneNode & BaseFrameMixin): string => {
+
+  const result = new androidDefaultBuilder("androidx.appcompat.widget.AppCompatCheckBox")
+    .setId(node)
+    .position(node,localSettings.optimizeLayout)
+    .size(node,localSettings.optimizeLayout);
+    result.element.addModifier(["android:checked", `false`])
+
+  return result.build(0);
+};
+
 const androidFrame = (
   node: SceneNode & BaseFrameMixin,
   indentLevel: number
@@ -240,6 +251,8 @@ const androidComponent = (
       return androidList(node)
     case "switch":
       return androidSwitch(node)
+    case "checkBox":
+      return androidCheckBox(node)
     default:
       return androidFrame(node, indentLevel)
   }
