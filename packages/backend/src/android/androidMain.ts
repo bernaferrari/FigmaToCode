@@ -59,11 +59,11 @@ const androidWidgetGenerator = (
   let comp: string[] = [];
 
   visibleSceneNode.forEach((node, index) => {
-    if (node.parent && node.parent.type == "COMPONENT") { return }
-
     switch (node.type) {
       case "COMPONENT":
-        comp.push(androidComponent(node));
+      case "COMPONENT_SET":
+      case "INSTANCE":
+        comp.push(androidComponent(node, indentLevel));
         break;
       case "ELLIPSE":
       case "LINE":
@@ -74,8 +74,6 @@ const androidWidgetGenerator = (
         comp.push(androidGroup(node, indentLevel));
         break;
       case "FRAME":
-      case "INSTANCE":
-      case "COMPONENT_SET":
         comp.push(androidFrame(node, indentLevel));
         break;
       case "TEXT":
@@ -220,14 +218,17 @@ const androidFrame = (
   return androidContainer(node, anyStack);
 };
 
-const androidComponent = ( node: SceneNode & BaseFrameMixin): string => {
+const androidComponent = ( 
+  node: SceneNode & BaseFrameMixin,
+  indentLevel: number
+): string => {
   switch (node.name.split("_")[0]) {
     case "btn":
       return androidButton(node)
     case "list":
       return androidList(node)
     default:
-      return ""
+      return androidFrame(node, indentLevel)
   }
 };
 
