@@ -9,9 +9,7 @@ import {
   androidOpacity,
   androidRotation,
 } from "./builderImpl/androidBlend";
-import {
-  getCommonPositionValue,
-} from "../common/commonPosition";
+import { getCommonPositionValue } from "../common/commonPosition";
 import { Modifier, androidElement } from "./builderImpl/androidParser";
 
 export const isAbsolutePosition = (
@@ -148,13 +146,6 @@ export class androidDefaultBuilder {
     return this;
   }
 
-  shapeForeground(node: SceneNode): this {
-    if (!("children" in node) || node.children.length === 0) {
-      this.pushModifier([`foregroundColor`, ".clear"]);
-    }
-    return this;
-  }
-
   effects(node: SceneNode): this {
     if (node.type === "GROUP") {
       return this;
@@ -193,13 +184,6 @@ export class androidDefaultBuilder {
       if (id) {
         this.pushModifier(['android:id', `@+id/${id}`]);
       }
-    }
-    return this;
-  }
-
-  setRaw(node: SceneNode): this {
-    if (node) {
-      this.pushModifier(["rawproperty",JSON.stringify(node)]);
     }
     return this;
   }

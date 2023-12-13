@@ -121,14 +121,12 @@ export const androidContainer = (
   }
 
   const result = new androidDefaultBuilder(kind,stack)
-    .shapeForeground(node)
     .autoLayoutPadding(node, localSettings.optimizeLayout)
     .size(node, localSettings.optimizeLayout)
     .shapeBackground(node)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .effects(node)
     .setId(node)
-//    .setRaw(node)
     .build(kind === stack ? -2 : 0);
 
   return result;
@@ -155,7 +153,6 @@ const androidText = (node: TextNode): string => {
   result.pushModifier(androidShadow(node));
   previousExecutionCache.push(result.build());
 
-//  result.element.addModifier(["rawproperty",JSON.stringify(node)]);
   return result
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .build();
