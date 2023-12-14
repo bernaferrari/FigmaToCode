@@ -1,4 +1,4 @@
-import { indentString } from "../common/indentString";
+import { compactProp, indentString } from "../common/indentString";
 import { className, sliceNum } from "../common/numToAutoFixed";
 import { androidBackground } from "./builderImpl/androidColor";
 import { androidTextBuilder } from "./androidTextBuilder";
@@ -58,9 +58,10 @@ const androidWidgetGenerator = (
   let comp: string[] = [];
 
   visibleSceneNode.forEach((node, index) => {
+    // if (node.parent && node.parent.type == "COMPONENT") { return }
+
     switch (node.type) {
       case "COMPONENT":
-      case "COMPONENT_SET":
       case "INSTANCE":
         comp.push(androidComponent(node, indentLevel));
         break;
@@ -73,6 +74,7 @@ const androidWidgetGenerator = (
         comp.push(androidGroup(node, indentLevel));
         break;
       case "FRAME":
+      case "COMPONENT_SET":
         comp.push(androidFrame(node, indentLevel));
         break;
       case "TEXT":
@@ -227,6 +229,17 @@ const androidCheckBox = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
+const androidScroll = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
+
+  const children = widgetGeneratorWithLimits(
+    node,
+    node.children.length > 1 ? indentLevel + 1 : indentLevel
+  );
+
+  const anyStack = createDirectionalStackScroll(children, node);
+  return androidContainer(node, anyStack);
+};
+
 const androidFrame = (
   node: SceneNode & BaseFrameMixin,
   indentLevel: number
@@ -240,10 +253,7 @@ const androidFrame = (
   return androidContainer(node, anyStack);
 };
 
-const androidComponent = ( 
-  node: SceneNode & BaseFrameMixin,
-  indentLevel: number
-): string => {
+const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
   switch (node.name.split("_")[0]) {
     case "btn":
       return androidButton(node)
@@ -253,6 +263,10 @@ const androidComponent = (
       return androidSwitch(node)
     case "checkBox":
       return androidCheckBox(node)
+    case "vScroll":
+      return androidScroll(node, indentLevel)
+    case "hScroll":
+      return androidScroll(node, indentLevel)
     default:
       return androidFrame(node, indentLevel)
   }
@@ -349,29 +363,72 @@ const createDirectionalStack = (
   }
 };
 
+const createDirectionalStackScroll = (
+  children: string,
+  node: SceneNode & InferredAutoLayoutResult
+): string => {
+
+  const scrollProp:Record<string, string | number> = {
+    "android:id": `@+id/${resourceName(node.name)}`,
+    "android:layout_width": "layoutSizingHorizontal" in node ? getLayoutParam(node.layoutSizingHorizontal, node.width) : "0dp",
+    "android:layout_height": "layoutSizingVertical" in node ? getLayoutParam(node.layoutSizingVertical, node.height) : "0dp"
+  };
+  if (isAbsolutePosition(node,localSettings.optimizeLayout)) {
+    const { x, y } = getCommonPositionValue(node);
+    if (!node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
+      scrollProp['android:layout_marginStart']=`${sliceNum(x)}dp`;
+      scrollProp['android:layout_marginTop']=`${sliceNum(y)}dp`;
+    }
+    else {
+      if ("width" in node.parent && "constraints" in node && "horizontal" in node.constraints && node.constraints.horizontal === "MAX") {
+        scrollProp['android:layout_marginEnd']=`${node.parent.width-node.x-node.width}dp`;
+      }
+      else {
+        scrollProp['android:layout_marginStart']=`${sliceNum(x)}dp`;
+      }
+      if ("height" in node.parent && "constraints" in node && "vertical" in node.constraints && node.constraints.vertical === "MAX") {
+        scrollProp['android:layout_marginBottom']=`${node.parent.height-node.y-node.height}dp`;
+      }
+      else {
+        scrollProp['android:layout_marginTop']=`${sliceNum(y)}dp`;
+      }
+    }
+  }
+
+  const constraintLayoutProp:Record<string, string | number> = {
+    "android:id": `@+id/constraint_layout_${resourceName(node.name.split("_").filter(x => x != 'vScroll').filter(x => x != 'hScroll').join("_"))}`,
+    "android:layout_width": "wrap_content",
+    "android:layout_height": "match_parent",
+    "app:layout_constraintStart_toStartOf": "parent",
+    "app:layout_constraintTop_toTopOf": "parent",
+  };
+
+  if (node.name.split("_")[0] == "hScroll") {
+    scrollProp["android:scrollbars"]="horizontal";
+    return `<HorizontalScrollView\n${compactProp(scrollProp)}>\n\n${indentString(generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout", constraintLayoutProp, children))}\n</HorizontalScrollView>\n`;
+  } else {
+    scrollProp["android:scrollbars"]="vertical";
+    return `<Scroll\n${compactProp(scrollProp)}>\n\n${indentString(generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout", constraintLayoutProp, children))}\n</Scroll>\n`;
+  }
+};
+
 export const generateAndroidViewCode = (
   className: string,
   properties: Record<string, string | number>,
   children: string
 ): string => {
-  const propertiesArray = Object.entries(properties)
-    .filter(([, value]) => value !== "")
-    .map(
-      ([key, value]) =>
-        `${key}=${typeof value === "number" ? sliceNum(value) : '"'+value+'"'}`
-    );
 
-  const compactPropertiesArray = propertiesArray.join(" \n");
+  const compactPropertiesArray = compactProp(properties)
   if (!className) {
     return `${indentString(
       children
     )}`;
   }
   else if (!children) {
-    return `<${className} ${compactPropertiesArray}/>\n`;
+    return `<${className}\n ${compactPropertiesArray}/>\n`;
   }
   else {
-    return `<${className} ${compactPropertiesArray}>\n\n${indentString(
+    return `<${className}\n ${compactPropertiesArray}>\n\n${indentString(
       children
     )}\n</${className}>\n`;
   }
@@ -404,7 +461,7 @@ const widgetGeneratorWithLimits = (
   for (let i = 0, j = slicedChildren.length; i < j; i += chunk) {
     const chunkChildren = slicedChildren.slice(i, i + chunk);
     const strChildren = androidWidgetGenerator(chunkChildren, indentLevel);
-    strBuilder += `Group {\n${indentString(strChildren)}\n}`;
+    strBuilder += `${indentString(strChildren)}`;
   }
 
   return strBuilder;
