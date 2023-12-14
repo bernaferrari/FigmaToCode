@@ -203,6 +203,19 @@ const androidList = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
+const androidSwitch = (node: SceneNode & BaseFrameMixin): string => {
+
+  const result = new androidDefaultBuilder("androidx.appcompat.widget.SwitchCompat")
+    .setId(node)
+    .position(node,localSettings.optimizeLayout)
+    .size(node,localSettings.optimizeLayout);
+    if (node.name, "name" in node) {
+      result.element.addModifier(["android:theme", `@style/${node.name}`])
+    }
+
+  return result.build(0);
+};
+
 const androidFrame = (
   node: SceneNode & BaseFrameMixin,
   indentLevel: number
@@ -225,6 +238,8 @@ const androidComponent = (
       return androidButton(node)
     case "list":
       return androidList(node)
+    case "switch":
+      return androidSwitch(node)
     default:
       return androidFrame(node, indentLevel)
   }
