@@ -129,7 +129,7 @@ export class androidTextBuilder extends androidDefaultBuilder {
       .addModifier(["android:textSize",`${fontSize}sp`])
       .addModifier(["android:textFontWeight",fontWeight])
       .addModifier(["android:letterSpacing", letterSpacing])
-      .addModifier(["android:lineSpacingExtra", `${lineHeight}px`])
+      .addModifier(["android:lineSpacingExtra", lineHeight ? `${lineHeight}px` : null])
       .addModifier(["android:textStyle",this.textDecoration(segment.textDecoration)])
       .addModifier(["android:typeface",this.textStyle(segment.fontName.style)])
       .addModifier(["android:textColor", this.textColor(segment.fills)]);
