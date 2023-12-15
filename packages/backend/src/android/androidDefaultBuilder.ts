@@ -137,12 +137,7 @@ export class androidDefaultBuilder {
   }
 
   shapeBackground(node: SceneNode): this {
-    if ("fills" in node) {
-      const background = androidBackground(node, node.fills);
-      if (background) {
-        this.pushModifier([`android:background`, background]);
-      }
-    }
+    this.element.addModifier(androidBackground(node));
     return this;
   }
 

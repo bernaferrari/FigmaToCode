@@ -7,7 +7,6 @@ import { androidDefaultBuilder,
   isAbsolutePosition } from "./androidDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { androidElement } from "./builderImpl/androidParser";
 import { getCommonPositionValue } from "../common/commonPosition";
 import { androidShadow } from "./builderImpl/androidEffects";
 import { TextNode } from "../altNodes/altMixins2";
@@ -186,11 +185,10 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   if (childText && "characters" in childText) {
     result.element.addModifier(["android:text", `${childText.characters}`])
   }
-  if (node.name, "name" in node) {
-    result.element.addModifier(["android:background", `@drawable/${node.name}`])
-  }
 
-  result.pushModifier(androidShadow(node));
+  result.element.addModifier(androidBackground(childRectAngle))
+  result.pushModifier(androidShadow(childRectAngle));
+  
   return result.build(0);
 };
 
@@ -308,9 +306,9 @@ const createDirectionalStack = (
     }
   }
   if ("fills" in node) {
-    const background = androidBackground(node, node.fills);
-    if (background) {
-      prop[`android:background`]=background;
+    const background = androidBackground(node);
+    if (background[1]) {
+      prop[`android:background`]=background[1];
     }
   }
 

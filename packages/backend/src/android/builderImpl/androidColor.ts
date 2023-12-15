@@ -1,5 +1,7 @@
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { resourceName } from "../androidDefaultBuilder";
+import { getCommonRadius } from "../../common/commonRadius";
+import { sliceNum } from "../../common/numToAutoFixed";
 
 export const AndroidSolidColor = (fill: Paint): string => {
   if (fill && fill.type === "SOLID") {
@@ -32,21 +34,33 @@ export const androidSolidColor = (
   return "";
 };
 
-export const androidBackground = (
-  node: SceneNode,
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): string => {
-  const fill = retrieveTopFill(fills);
+export const androidBackground = (node: SceneNode): [string, string | null] => {
+  const background: [string, string | null] = ["android:background", null]
+  const cornerRadius = androidCornerRadius(node)
+  if ("fills" in node) {
+    const fill = retrieveTopFill(node.fills)
+    if (fill && fill.type === "SOLID") {
+      // opacity should only be null on set, not on get. But better be prevented.
+      const opacity = fill.opacity ?? 1.0;
+      background[1] = cornerRadius ? cornerRadius + "_" + androidColor(fill.color, opacity) : androidColor(fill.color, opacity);
+    } else if (node.name) {
+      background[1] = `@drawable/${resourceName(node.name)}`
+    }
+  } else if(cornerRadius) {
+    background[1] = cornerRadius
+  } 
+  return background
+}
 
-  if (fill && fill.type === "SOLID") {
-    // opacity should only be null on set, not on get. But better be prevented.
-    const opacity = fill.opacity ?? 1.0;
-    return androidColor(fill.color, opacity);
-  } else if (fill?.type === "GRADIENT_LINEAR" || fill?.type === "IMAGE" && node.name) {
-    return `@drawable/${resourceName(node.name)}`;
+const androidCornerRadius = (node: SceneNode): string|null => {
+  const radius = getCommonRadius(node);
+  if ("all" in radius) {
+    if (radius.all > 0) {
+      return `radius_${sliceNum(radius.all)}`;
+    }
   }
 
-  return "";
+  return null;
 };
 
 export const androidColor = (color: RGB, opacity: number): string => {
