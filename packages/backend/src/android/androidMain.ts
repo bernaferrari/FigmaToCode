@@ -56,6 +56,8 @@ const androidWidgetGenerator = (
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   let comp: string[] = [];
+  let compXml: string[] = [];
+  let listItemCount: number = 0
 
   visibleSceneNode.forEach((node, index) => {
     // if (node.parent && node.parent.type == "COMPONENT") { return }
@@ -63,7 +65,21 @@ const androidWidgetGenerator = (
     switch (node.type) {
       case "COMPONENT":
       case "INSTANCE":
-        comp.push(androidComponent(node, indentLevel));
+        switch (node.name.split("_")[0]) {
+          case "list":
+            comp.push(androidComponent(node, indentLevel));
+            compXml.push(`\n\n<!-- ${node.name}_item.xml -->`)
+            compXml.push(androidWidgetGenerator(node.children, indentLevel));
+            break;
+          case "listItem":
+            if (listItemCount != 0) break;
+            comp.push(androidComponent(node, indentLevel));
+            listItemCount = 1
+            break;
+          default:
+            comp.push(androidComponent(node, indentLevel));
+            break;
+        }
         break;
       case "ELLIPSE":
       case "LINE":
@@ -96,7 +112,7 @@ const androidWidgetGenerator = (
     }
   });
 
-  return comp.join("\n");
+  return comp.join("\n") + compXml.join("\n");
 };
 
 // properties named propSomething always take care of ","
@@ -202,7 +218,20 @@ const androidList = (node: SceneNode & BaseFrameMixin): string => {
     .size(node,localSettings.optimizeLayout);
 
   result.pushModifier(androidShadow(node));
+  result.element.addModifier(["tools:listitem", `@layout/${resourceName(node.name)}_item`])
   return result.build(0);
+};
+
+const androidListItem = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
+
+  const children = widgetGeneratorWithLimits(
+    node,
+    node.children.length > 1 ? indentLevel + 1 : indentLevel
+  );
+
+  const idName = `${node.name}`
+  const anyStack = createDirectionalStackConstraintLayout(children, idName);
+  return androidContainer(node, anyStack);
 };
 
 const androidSwitch = (node: SceneNode & BaseFrameMixin): string => {
@@ -259,6 +288,8 @@ const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number)
       return androidButton(node)
     case "list":
       return androidList(node)
+    case "listItem":
+      return androidListItem(node, indentLevel)
     case "switch":
       return androidSwitch(node)
     case "checkBox":
@@ -395,22 +426,29 @@ const createDirectionalStackScroll = (
     }
   }
 
-  const constraintLayoutProp:Record<string, string | number> = {
-    "android:id": `@+id/constraint_layout_${resourceName(node.name.split("_").filter(x => x != 'vScroll').filter(x => x != 'hScroll').join("_"))}`,
-    "android:layout_width": "wrap_content",
-    "android:layout_height": "match_parent",
-    "app:layout_constraintStart_toStartOf": "parent",
-    "app:layout_constraintTop_toTopOf": "parent",
-  };
-
+  const idName = resourceName(node.name.split("_").filter(x => x != 'vScroll').filter(x => x != 'hScroll').join("_"))
   if (node.name.split("_")[0] == "hScroll") {
     scrollProp["android:scrollbars"]="horizontal";
-    return `<HorizontalScrollView\n${compactProp(scrollProp)}>\n\n${indentString(generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout", constraintLayoutProp, children))}\n</HorizontalScrollView>\n`;
+    return `<HorizontalScrollView\n${compactProp(scrollProp)}>\n\n${indentString(createDirectionalStackConstraintLayout(children, idName))}\n</HorizontalScrollView>\n`;
   } else {
     scrollProp["android:scrollbars"]="vertical";
-    return `<Scroll\n${compactProp(scrollProp)}>\n\n${indentString(generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout", constraintLayoutProp, children))}\n</Scroll>\n`;
+    return `<Scroll\n${compactProp(scrollProp)}>\n\n${indentString(createDirectionalStackConstraintLayout(children, idName))}\n</Scroll>\n`;
   }
 };
+
+const createDirectionalStackConstraintLayout = (
+  children: string,
+  idName: string
+  ): string => {
+    const constraintLayoutProp:Record<string, string | number> = {
+      "android:id": `@+id/constraint_layout_${idName}`,
+      "android:layout_width": "wrap_content",
+      "android:layout_height": "match_parent",
+      "app:layout_constraintStart_toStartOf": "parent",
+      "app:layout_constraintTop_toTopOf": "parent",
+    };
+    return generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout", constraintLayoutProp, children)
+}
 
 export const generateAndroidViewCode = (
   className: string,
