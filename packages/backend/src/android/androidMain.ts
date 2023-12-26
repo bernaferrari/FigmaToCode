@@ -179,7 +179,7 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
   if ("name" in node && node.name) {
-    result.element.addModifier(["app:srcCompat",`@drawable/${resourceName(node.name)}`]);
+    result.element.addModifier(["app:srcCompat",`@drawable/${node.name}`]);
   }
   result.pushModifier(androidShadow(node));
   result.element
@@ -198,7 +198,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
   if (childRectAngle && childRectAngle.isAsset) {
-    result.element.addModifier(["android:contentDescription", `@drawable/${resourceName(node.name)}`]);
+    result.element.addModifier(["android:contentDescription", `@drawable/${node.name}`]);
   }
   if (childText && "characters" in childText) {
     result.element.addModifier(["android:text", `${childText.characters}`])
@@ -218,7 +218,7 @@ const androidList = (node: SceneNode & BaseFrameMixin): string => {
     .size(node,localSettings.optimizeLayout);
 
   result.pushModifier(androidShadow(node));
-  result.element.addModifier(["tools:listitem", `@layout/${resourceName(node.name)}_item`])
+  result.element.addModifier(["tools:listitem", `@layout/${node.name}_item`])
   return result.build(0);
 };
 

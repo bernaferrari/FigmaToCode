@@ -175,7 +175,7 @@ export class androidDefaultBuilder {
 
   setId(node: SceneNode): this {
     if ("name" in node && node.name) {
-      const id = resourceName(node.name);
+      const id = node.name;
       if (id) {
         this.pushModifier(['android:id', `@+id/${id}`]);
       }
