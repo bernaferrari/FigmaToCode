@@ -65,7 +65,7 @@ const androidWidgetGenerator = (
     switch (node.type) {
       case "COMPONENT":
       case "INSTANCE":
-        switch (node.name.split("_")[0]) {
+        switch (node.name.split("_")[1]) {
           case "list":
             comp.push(androidComponent(node, indentLevel));
             compXml.push(`\n\n<!-- ${node.name}_item.xml -->`)
@@ -427,7 +427,7 @@ const createDirectionalStackScroll = (
   }
 
   const idName = resourceName(node.name.split("_").filter(x => x != 'vScroll').filter(x => x != 'hScroll').join("_"))
-  if (node.name.split("_")[0] == "hScroll") {
+  if (node.name.split("_")[1] == "hScroll") {
     scrollProp["android:scrollbars"]="horizontal";
     return `<HorizontalScrollView\n${compactProp(scrollProp)}>\n\n${indentString(createDirectionalStackConstraintLayout(children, idName))}\n</HorizontalScrollView>\n`;
   } else {
