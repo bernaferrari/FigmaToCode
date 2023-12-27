@@ -178,6 +178,8 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
     .setId(node)
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
+
+  result.element.addModifier(["android:contentDescription",`@string/STR_MSG_IMAGEVIEW_CONTENT_DESCRIPTION`]);
   if ("name" in node && node.name) {
     result.element.addModifier(["app:srcCompat",`@drawable/${node.name}`]);
   }
@@ -198,7 +200,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
   if (childRectAngle && childRectAngle.isAsset) {
-    result.element.addModifier(["android:contentDescription", `@drawable/${node.name}`]);
+    result.element.addModifier(["android:src", `@drawable/${resourceName(node.name)}`]);
   }
   if (childText && "characters" in childText) {
     result.element.addModifier(["android:text", `${childText.characters}`])
