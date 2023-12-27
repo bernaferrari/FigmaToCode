@@ -269,6 +269,14 @@ const androidScroll = (node: SceneNode & BaseFrameMixin, indentLevel: number): s
   return androidContainer(node, anyStack);
 };
 
+const androidEditText = (node: SceneNode): string => {
+  const result = new androidDefaultBuilder("EditText")
+  .setId(node)
+  .position(node,localSettings.optimizeLayout)
+  .size(node,localSettings.optimizeLayout);
+  return result.build(0);
+}
+
 const androidFrame = (
   node: SceneNode & BaseFrameMixin,
   indentLevel: number
@@ -298,6 +306,8 @@ const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number)
       return androidScroll(node, indentLevel)
     case "hScroll":
       return androidScroll(node, indentLevel)
+    case "editText":
+      return androidEditText(node)
     default:
       return androidFrame(node, indentLevel)
   }
