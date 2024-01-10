@@ -112,6 +112,31 @@ export class androidDefaultBuilder {
   }
 
   position(node: SceneNode, optimizeLayout: boolean): this {
+    if (node.parent) {
+      const index = node.parent.children.indexOf(node)
+      const preItem = node.parent.children[index - 1]
+      const isFirstItem = node.parent.children[0] === node
+      const name = node.parent.name.split("_")[1]
+      
+      if (name === "vStack") {
+        if (isFirstItem) {
+          this.pushModifier(['app:layout_constraintTop_toTopOf',`parent`]);
+        } else if (preItem && (node.parent.type === "COMPONENT" || node.parent.type === "INSTANCE")) {
+          this.pushModifier(['app:layout_constraintTop_toBottomOf',`@id/${preItem.name}`]);
+          this.pushModifier(['android:layout_marginTop',`${node.parent.itemSpacing}dp`]);
+        }
+        return this;
+      } else if (name === "hStack") {
+        if (isFirstItem) {
+          this.pushModifier(['app:layout_constraintStart_toStartOf',`parent`]);
+        } else if (preItem && (node.parent.type === "COMPONENT" || node.parent.type === "INSTANCE")) {
+          this.pushModifier(['app:layout_constraintStart_toEndOf',`@id/${preItem.name}`]);
+          this.pushModifier(['android:layout_marginStart',`${node.parent.itemSpacing}dp`]);
+        }
+        return this;
+      }
+    } 
+    
     if (isAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
       if (!node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
@@ -153,11 +178,13 @@ export class androidDefaultBuilder {
 
   size(node: SceneNode, optimize: boolean): this {
     const { width, height } = androidSize(node, optimize);
+    const name = node.parent?.name.split("_")[1]
+
     if (width) {
-      this.pushModifier(['android:layout_width', `${width}`]);
+      this.pushModifier(['android:layout_width', `${name === "vStack" ? "match_parent" : width}`]);
     }
     if (height) {
-      this.pushModifier(['android:layout_height', `${height}`]);
+      this.pushModifier(['android:layout_height', `${name === "hStack" ? "match_parent" : height}`]);
     }
     return this;
   }

@@ -10,6 +10,7 @@ import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildr
 import { getCommonPositionValue } from "../common/commonPosition";
 import { androidShadow } from "./builderImpl/androidEffects";
 import { TextNode } from "../altNodes/altMixins2";
+import { androidSize } from "./builderImpl/androidSize";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -65,7 +66,7 @@ const androidWidgetGenerator = (
     switch (node.type) {
       case "COMPONENT":
       case "INSTANCE":
-        switch (node.name.split("_")[0]) {
+        switch (node.name.split("_")[1]) {
           case "list":
             comp.push(androidComponent(node, indentLevel));
             compXml.push(`\n\n<!-- ${node.name}_item.xml -->`)
@@ -230,7 +231,7 @@ const androidListItem = (node: SceneNode & BaseFrameMixin, indentLevel: number):
   );
 
   const idName = `${node.name}`
-  const anyStack = createDirectionalStackConstraintLayout(children, idName);
+  const anyStack = createDirectionalStackConstraintLayout(children, idName, node);
   return androidContainer(node, anyStack);
 };
 
@@ -258,6 +259,16 @@ const androidCheckBox = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
+const androidStack = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
+  const children = widgetGeneratorWithLimits(
+    node,
+    node.children.length > 1 ? indentLevel + 1 : indentLevel
+  );
+
+  const anyStack = createDirectionalStackConstraintLayout(children, node.name, node);
+  return androidContainer(node, anyStack);
+}
+
 const androidScroll = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
 
   const children = widgetGeneratorWithLimits(
@@ -283,7 +294,7 @@ const androidFrame = (
 };
 
 const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
-  switch (node.name.split("_")[0]) {
+  switch (node.name.split("_")[1]) {
     case "btn":
       return androidButton(node)
     case "list":
@@ -298,6 +309,9 @@ const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number)
       return androidScroll(node, indentLevel)
     case "hScroll":
       return androidScroll(node, indentLevel)
+    case "vStack":
+    case "hStack":
+      return androidStack(node, indentLevel)
     default:
       return androidFrame(node, indentLevel)
   }
@@ -429,24 +443,49 @@ const createDirectionalStackScroll = (
   const idName = resourceName(node.name.split("_").filter(x => x != 'vScroll').filter(x => x != 'hScroll').join("_"))
   if (node.name.split("_")[0] == "hScroll") {
     scrollProp["android:scrollbars"]="horizontal";
-    return `<HorizontalScrollView\n${compactProp(scrollProp)}>\n\n${indentString(createDirectionalStackConstraintLayout(children, idName))}\n</HorizontalScrollView>\n`;
+    return `<HorizontalScrollView\n${compactProp(scrollProp)}>\n\n${indentString(createDirectionalStackConstraintLayout(children, idName, node))}\n</HorizontalScrollView>\n`;
   } else {
     scrollProp["android:scrollbars"]="vertical";
-    return `<Scroll\n${compactProp(scrollProp)}>\n\n${indentString(createDirectionalStackConstraintLayout(children, idName))}\n</Scroll>\n`;
+    return `<Scroll\n${compactProp(scrollProp)}>\n\n${indentString(createDirectionalStackConstraintLayout(children, idName, node))}\n</Scroll>\n`;
   }
 };
 
 const createDirectionalStackConstraintLayout = (
   children: string,
-  idName: string
+  idName: string,
+  node: SceneNode
   ): string => {
-    const constraintLayoutProp:Record<string, string | number> = {
-      "android:id": `@+id/constraint_layout_${idName}`,
-      "android:layout_width": "wrap_content",
-      "android:layout_height": "match_parent",
-      "app:layout_constraintStart_toStartOf": "parent",
-      "app:layout_constraintTop_toTopOf": "parent",
-    };
+    
+    const { width, height } = androidSize(node, localSettings.optimizeLayout);
+    let constraintLayoutProp:Record<string, string | number> = {
+      "android:id": `@+id/${idName}`,
+      "android:layout_width": `${width}`,
+      "android:layout_height": `${height}`
+    }
+
+    if (node.parent) {
+      const isFirstItem = node.parent.children[0] === node
+      const index = node.parent.children.indexOf(node)
+      const preItem = node.parent.children[index - 1]
+      const name = node.parent.name.split("_")[1]
+
+      if (name === "vStack") {
+        if (isFirstItem) {
+          constraintLayoutProp["app:layout_constraintTop_toTopOf"] = "parent"
+        } else if (node.parent.type === "COMPONENT" || node.parent.type === "INSTANCE"){
+          constraintLayoutProp["app:layout_constraintTop_toBottomOf"] = `@id/${preItem.name}`
+          constraintLayoutProp["android:layout_marginTop"] = `${node.parent.itemSpacing}dp`
+        }
+      } else if (name === "hStack") {
+        if (isFirstItem) {
+          constraintLayoutProp["app:layout_constraintStart_toStartOf"] = "parent"
+        } else if (node.parent.type === "COMPONENT" || node.parent.type === "INSTANCE"){
+          constraintLayoutProp["app:layout_constraintStart_toEndOf"] = `@id/${preItem.name}`
+          constraintLayoutProp["android:layout_marginStart"] = `${node.parent.itemSpacing}dp`
+        }
+      }
+    }
+
     return generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout", constraintLayoutProp, children)
 }
 
