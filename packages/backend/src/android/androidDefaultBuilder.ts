@@ -162,6 +162,20 @@ export class androidDefaultBuilder {
     return this;
   }
 
+  spaceSize(node: SceneNode): this {
+    if ((node.parent?.type === "COMPONENT" || node.parent?.type === "INSTANCE") ) {
+      if (node.parent.name.split("_")[1] === "vLinear") {
+        this.pushModifier(['android:layout_width', `match_parent`])
+        this.pushModifier(['android:layout_height', `${node.parent.itemSpacing}dp`])
+      } else if (node.parent.name.split("_")[1] === "hLinear") {
+        this.pushModifier(['android:layout_width', `${node.parent.itemSpacing}dp`])
+        this.pushModifier(['android:layout_height', `match_parent`])
+      }
+    }
+
+    return this;
+  }
+  
   autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
     if ("paddingLeft" in node) {
       this.pushModifier(

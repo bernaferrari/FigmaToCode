@@ -10,6 +10,7 @@ import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildr
 import { getCommonPositionValue } from "../common/commonPosition";
 import { androidShadow } from "./builderImpl/androidEffects";
 import { TextNode } from "../altNodes/altMixins2";
+import { androidSize } from "./builderImpl/androidSize";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -60,7 +61,13 @@ const androidWidgetGenerator = (
   let listItemCount: number = 0
 
   visibleSceneNode.forEach((node, index) => {
-    // if (node.parent && node.parent.type == "COMPONENT") { return }
+    const isLinearLayout = node.parent?.name.split("_")[1] === "vLinear" || node.parent?.name.split("_")[1] === "hLinear"
+    const isComponentOrInstanceParent = node.parent?.type === "COMPONENT" || node.parent?.type === "INSTANCE"
+    const isFirstItem = node.parent?.children[0] === node
+
+    if (isLinearLayout && !isFirstItem && isComponentOrInstanceParent && node.parent.itemSpacing !== 0) {
+      comp.push(androidLinearSpace(node));
+    }
 
     switch (node.type) {
       case "COMPONENT":
@@ -156,6 +163,17 @@ const androidGroup = (
     node,
     generateAndroidViewCode("FrameLayout", {}, children)
   );
+};
+
+const androidLinearSpace = (node: SceneNode): string => {
+  const result = new androidDefaultBuilder("Space")
+    .spaceSize(node)
+    
+  previousExecutionCache.push(result.build());
+
+  return result
+    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .build();
 };
 
 const androidText = (node: TextNode): string => {
@@ -260,6 +278,16 @@ const androidCheckBox = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
+const androidLinear = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
+  const children = widgetGeneratorWithLimits(
+    node,
+    node.children.length > 1 ? indentLevel + 1 : indentLevel
+  );
+
+  const anyStack = createDirectionalStackLinearLayout(children, node.name, node);
+  return androidContainer(node, anyStack);
+}
+
 const androidScroll = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
 
   const children = widgetGeneratorWithLimits(
@@ -310,6 +338,9 @@ const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number)
       return androidScroll(node, indentLevel)
     case "editText":
       return androidEditText(node)
+    case "vLinear":
+    case "hLinear":
+      return androidLinear(node, indentLevel)
     default:
       return androidFrame(node, indentLevel)
   }
@@ -460,6 +491,34 @@ const createDirectionalStackConstraintLayout = (
       "app:layout_constraintTop_toTopOf": "parent",
     };
     return generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout", constraintLayoutProp, children)
+}
+
+const createDirectionalStackLinearLayout = (
+  children: string,
+  idName: string,
+  node: SceneNode & InferredAutoLayoutResult
+  ): string => {
+    let linearLayoutProp:Record<string, string | number> = {
+      "android:id": `@+id/${idName}`,
+      "android:layout_width": `wrap_content`,
+      "android:layout_height": `wrap_content`,
+      "android:gravity": `${getGravityParam(node)}`,
+      "android:orientation": `${node.name.split("_")[1] === "vLinear" ? "vertical" : "horizontal"}`
+    }
+    if (node.paddingTop > 0) {
+      linearLayoutProp["android:paddingTop"] = `${node.paddingTop}dp`
+    }
+    if (node.paddingBottom > 0) {
+      linearLayoutProp["android:paddingBottom"] = `${node.paddingBottom}dp`
+    }
+    if (node.paddingRight > 0) {
+      linearLayoutProp["android:paddingRight"] = `${node.paddingRight}dp`
+    }
+    if (node.paddingLeft > 0) {
+      linearLayoutProp["android:paddingLeft"] = `${node.paddingLeft}dp`
+    }
+    
+    return generateAndroidViewCode("LinearLayout", linearLayoutProp, children)
 }
 
 export const generateAndroidViewCode = (
