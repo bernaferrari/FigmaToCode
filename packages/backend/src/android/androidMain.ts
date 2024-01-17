@@ -322,6 +322,10 @@ const androidFrame = (
 
 const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
   switch (node.name.split("_")[1]) {
+    case "text":
+      if ("children" in node && node.children[0].type === "TEXT") {
+        return androidText(node.children[0])
+      }
     case "btn":
       return androidButton(node)
     case "list":

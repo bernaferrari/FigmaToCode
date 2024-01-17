@@ -127,6 +127,7 @@ export class androidTextBuilder extends androidDefaultBuilder {
       .addModifier(["android:text", updatedText])
       .addModifier(["android:fontFamily",fontFamily])
       .addModifier(["android:textSize",`${fontSize}sp`])
+      .addModifier(["android:includeFontPadding","false"])
       .addModifier(["android:textFontWeight",fontWeight])
       .addModifier(["android:letterSpacing", letterSpacing])
       .addModifier(["android:lineSpacingExtra", lineHeight ? `${lineHeight}px` : null])
