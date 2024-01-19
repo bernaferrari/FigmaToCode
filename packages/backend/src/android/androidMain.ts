@@ -211,8 +211,7 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
 const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   
   const childRectAngle = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE")[0]
-  const childText = node.children.filter((child: { type: string; }) => child.type == "TEXT")[0]
-
+  const childText = node.children.filter((child: { type: string; }) => child.type === "COMPONENT" || child.type === "INSTANCE")[0]
   const result = new androidDefaultBuilder(childRectAngle.isAsset ? "ImageButton" : "Button", "")
     .setId(node)
     .position(node,localSettings.optimizeLayout)
@@ -220,8 +219,9 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   if (childRectAngle && childRectAngle.isAsset) {
     result.element.addModifier(["android:src", `@drawable/${resourceName(node.name)}`]);
   }
-  if (childText && "characters" in childText) {
-    result.element.addModifier(["android:text", `${childText.characters}`])
+  if (childText && "children" in childText && "characters" in childText.children[0]) {
+
+    result.element.addModifier(["android:text", `${childText.children[0].characters}`])
   }
 
   result.element.addModifier(androidBackground(childRectAngle))
