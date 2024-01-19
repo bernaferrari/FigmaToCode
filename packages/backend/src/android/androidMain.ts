@@ -352,9 +352,10 @@ const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number)
 
 const getLayoutParam = (
   align: string,
-  width:number
+  width:number,
+  hasParent: boolean
 ):string => {
-  return (align == "FIXED") ? `${width}dp` : (align === 'FILL') ? "match_parent" : "wrap_content";
+  return !hasParent ? "match_parent" : (align == "FIXED") ? `${width}dp` : (align === 'FILL') ? "match_parent" : "wrap_content";
 };
 
 const getGravity = (
@@ -401,16 +402,16 @@ const createDirectionalStack = (
 ): string => {
 
   const prop:Record<string, string | number> = {
-    "android:layout_width": "layoutSizingHorizontal" in node ? getLayoutParam(node.layoutSizingHorizontal, node.width) : "0dp",
-    "android:layout_height": "layoutSizingVertical" in node ? getLayoutParam(node.layoutSizingVertical, node.height) : "0dp"
+    "android:layout_width": "layoutSizingHorizontal" in node ? getLayoutParam(node.layoutSizingHorizontal, node.width, "parent" in node) : "0dp",
+    "android:layout_height": "layoutSizingVertical" in node ? getLayoutParam(node.layoutSizingVertical, node.height, "parent" in node) : "0dp"
   };
   if (isAbsolutePosition(node,localSettings.optimizeLayout)) {
     const { x, y } = getCommonPositionValue(node);
-    if (!node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
+    if (node.parent && ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
       prop['android:layout_marginStart']=`${sliceNum(x)}dp`;
       prop['android:layout_marginTop']=`${sliceNum(y)}dp`;
     }
-    else {
+    else if (node.parent) {
       if ("width" in node.parent && "constraints" in node && "horizontal" in node.constraints && node.constraints.horizontal === "MAX") {
         prop['android:layout_marginEnd']=`${node.parent.width-node.x-node.width}dp`;
       }
