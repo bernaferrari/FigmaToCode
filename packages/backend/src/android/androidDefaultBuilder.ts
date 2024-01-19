@@ -133,6 +133,21 @@ export class androidDefaultBuilder {
         }
       }
     }
+    else if (node.type === "COMPONENT" || node.type === "INSTANCE") {
+      if (node.paddingTop > 0) {
+        this.pushModifier(["android:paddingTop",`${node.paddingTop}dp`]);
+      }
+      if (node.paddingBottom > 0) {
+        this.pushModifier(["android:paddingBottom",`${node.paddingBottom}dp`]);
+      }
+      if (node.paddingRight > 0) {
+        this.pushModifier(["android:paddingRight",`${node.paddingRight}dp`]);
+      }
+      if (node.paddingLeft > 0) {
+        this.pushModifier(["android:paddingLeft",`${node.paddingLeft}dp`]);
+      }
+    }
+
     return this;
   }
 
