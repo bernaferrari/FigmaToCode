@@ -503,12 +503,23 @@ const createDirectionalStackLinearLayout = (
   idName: string,
   node: SceneNode & InferredAutoLayoutResult
   ): string => {
+    const { x, y } = getCommonPositionValue(node);
     let linearLayoutProp:Record<string, string | number> = {
       "android:id": `@+id/${idName}`,
       "android:layout_width": `wrap_content`,
       "android:layout_height": `wrap_content`,
       "android:gravity": `${getGravityParam(node)}`,
       "android:orientation": `${node.name.split("_")[1] === "vLinear" ? "vertical" : "horizontal"}`
+    }
+
+    const hasLinearLayoutParent = 
+    "parent" in node 
+    && (node.parent?.name.split("_")[1] === "hLinear"
+    || node.parent?.name.split("_")[1] === "vLinear")
+    
+    if (!hasLinearLayoutParent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") ) {
+      linearLayoutProp['android:layout_marginStart']=`${sliceNum(x)}dp`;
+      linearLayoutProp['android:layout_marginTop']=`${sliceNum(y)}dp`;
     }
     if (node.paddingTop > 0) {
       linearLayoutProp["android:paddingTop"] = `${node.paddingTop}dp`
