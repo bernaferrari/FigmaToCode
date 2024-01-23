@@ -230,6 +230,23 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
+const androidRadioButton = (node: SceneNode & BaseFrameMixin): string => {
+  const result = new androidDefaultBuilder("RadioButton")
+    .setId(node)
+    .size(node, localSettings.optimizeLayout)
+    .position(node,localSettings.optimizeLayout);
+
+  if (node.name.split("_")[2] === "checked") {
+    result.pushModifier(["android:checked", "true"])
+  }
+
+  result.pushModifier(["android:onClick", "onRadioButtonClicked"])
+  result.element.addModifier(androidBackground(node))
+  result.pushModifier(androidShadow(node));
+  
+  return result.build(0);
+};
+
 const androidList = (node: SceneNode & BaseFrameMixin): string => {
 
   const result = new androidDefaultBuilder("androidx.recyclerview.widget.RecyclerView", "")
@@ -340,6 +357,8 @@ const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLev
       return androidScroll(node, indentLevel)
     case "hScroll":
       return androidScroll(node, indentLevel)
+    case "radioButton":
+      return androidRadioButton(node)
     case "editText":
       return androidEditText(node)
     case "vLinear":
@@ -533,8 +552,19 @@ const createDirectionalStackLinearLayout = (
     if (node.paddingLeft > 0) {
       linearLayoutProp["android:paddingLeft"] = `${node.paddingLeft}dp`
     }
-    
-    return generateAndroidViewCode("LinearLayout", linearLayoutProp, children)
+
+    const grandchildrenHaveRadioButton = 
+    "children" in node 
+    && node.children.filter(node => 
+      "children" in node
+      && (node.name.split("_")[1] === "hLinear" 
+      || node.name.split("_")[1] === "vLinear")
+      && node.children.filter(node => 
+        node.name.split("_")[1] === "radioButton"
+      )
+    ).length !== 0
+
+    return generateAndroidViewCode(grandchildrenHaveRadioButton ? "RadioGroup" : "LinearLayout", linearLayoutProp, children)
 }
 
 export const generateAndroidViewCode = (

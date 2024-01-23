@@ -123,14 +123,14 @@ export class androidDefaultBuilder {
     return { centerX: centerBasedX, centerY: centerBasedY };
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
+  position(node: SceneNod, optimizeLayout: boolean): this {
     if (isAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-      if (!node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
+      if (node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
         this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
         this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
       }
-      else {
+      else if (node.parent) {
         if ("width" in node.parent && "constraints" in node && "horizontal" in node.constraints && node.constraints.horizontal === "MAX") {
           this.pushModifier(['android:layout_marginEnd',`${node.parent.width-node.x-node.width}dp`]);
         }
