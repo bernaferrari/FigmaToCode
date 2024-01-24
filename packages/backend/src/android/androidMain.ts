@@ -176,12 +176,12 @@ const androidLinearSpace = (node: SceneNode): string => {
     .build();
 };
 
-const androidText = (node: TextNode): string => {
+const androidText = (node: SceneNode & TextNode, sizeNode: SceneNode | null = null): string => {
   const result = new androidTextBuilder()
     .createText(node)
     .setId(node)
     .position(node, localSettings.optimizeLayout)
-    .size(node, localSettings.optimizeLayout);
+    .size(sizeNode ? sizeNode : node, localSettings.optimizeLayout);
 
   result.pushModifier(androidShadow(node));
   previousExecutionCache.push(result.build());
@@ -320,11 +320,11 @@ const androidFrame = (
   return androidContainer(node, anyStack);
 };
 
-const androidComponent = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
+const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLevel: number): string => {
   switch (node.name.split("_")[1]) {
     case "text":
       if ("children" in node && node.children[0].type === "TEXT") {
-        return androidText(node.children[0])
+        return androidText(node.children[0], node)
       }
     case "btn":
       return androidButton(node)
