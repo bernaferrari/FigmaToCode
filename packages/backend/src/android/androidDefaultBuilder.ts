@@ -123,7 +123,7 @@ export class androidDefaultBuilder {
     return { centerX: centerBasedX, centerY: centerBasedY };
   }
 
-  position(node: SceneNod, optimizeLayout: boolean): this {
+  position(node: SceneNode, optimizeLayout: boolean): this {
     if (isAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
       if (node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
