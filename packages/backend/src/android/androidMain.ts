@@ -61,7 +61,7 @@ const androidWidgetGenerator = (
   let listItemCount: number = 0
 
   visibleSceneNode.forEach((node, index) => {
-    const isLinearLayout = node.parent?.name.split("_")[1] === "vLinear" || node.parent?.name.split("_")[1] === "hLinear"
+    const isLinearLayout = node.parent?.name.split("_")[1] === "linear"
     const isComponentOrInstanceParent = node.parent?.type === "COMPONENT" || node.parent?.type === "INSTANCE"
     const isFirstItem = node.parent?.children[0] === node
 
@@ -361,8 +361,7 @@ const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLev
       return androidRadioButton(node)
     case "editText":
       return androidEditText(node)
-    case "vLinear":
-    case "hLinear":
+    case "linear":
       return androidLinear(node, indentLevel)
     default:
       return androidFrame(node, indentLevel)
@@ -527,15 +526,14 @@ const createDirectionalStackLinearLayout = (
       "android:id": `@+id/${idName}`,
       "android:layout_width": `wrap_content`,
       "android:layout_height": `wrap_content`,
-      "android:gravity": `${getGravityParam(node)}`,
-      "android:orientation": `${node.name.split("_")[1] === "vLinear" ? "vertical" : "horizontal"}`
+      "android:gravity": `${getGravityParam(node)}`
     }
 
-    const hasLinearLayoutParent = 
-    "parent" in node 
-    && (node.parent?.name.split("_")[1] === "hLinear"
-    || node.parent?.name.split("_")[1] === "vLinear")
-    
+    if (node.layoutMode !== "NONE") {
+      linearLayoutProp["android:orientation"] = node.layoutMode === "VERTICAL" ? "vertical":"horizontal"
+    }
+
+    const hasLinearLayoutParent = node.parent?.name.split("_")[1] === "linear"
     if (!hasLinearLayoutParent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") ) {
       linearLayoutProp['android:layout_marginStart']=`${sliceNum(x)}dp`;
       linearLayoutProp['android:layout_marginTop']=`${sliceNum(y)}dp`;

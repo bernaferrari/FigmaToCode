@@ -191,10 +191,10 @@ export class androidDefaultBuilder {
 
   spaceSize(node: SceneNode): this {
     if ((node.parent?.type === "COMPONENT" || node.parent?.type === "INSTANCE") ) {
-      if (node.parent.name.split("_")[1] === "vLinear") {
+      if (node.parent.layoutMode === "VERTICAL") {
         this.pushModifier(['android:layout_width', `match_parent`])
         this.pushModifier(['android:layout_height', `${node.parent.itemSpacing}dp`])
-      } else if (node.parent.name.split("_")[1] === "hLinear") {
+      } else if (node.parent.layoutMode === "HORIZONTAL") {
         this.pushModifier(['android:layout_width', `${node.parent.itemSpacing}dp`])
         this.pushModifier(['android:layout_height', `match_parent`])
       }
