@@ -3,7 +3,7 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
-import { androidDefaultBuilder } from "./androidDefaultBuilder";
+import { androidDefaultBuilder, resourceFontName } from "./androidDefaultBuilder";
 import { androidSize } from "./builderImpl/androidSize";
 import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { androidElement } from "./builderImpl/androidParser";
@@ -125,7 +125,7 @@ export class androidTextBuilder extends androidDefaultBuilder {
 
     const element = new androidElement("TextView")
       .addModifier(["android:text", updatedText])
-      .addModifier(["android:fontFamily",fontFamily])
+      .addModifier(["android:fontFamily",`@font/${resourceFontName(fontFamily)}`])
       .addModifier(["android:textSize",`${fontSize}sp`])
       .addModifier(["android:includeFontPadding","false"])
       .addModifier(["android:textFontWeight",fontWeight])

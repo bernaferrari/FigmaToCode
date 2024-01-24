@@ -58,6 +58,18 @@ export function resourceName(name: string): string {
   return snakeCaseWords.join("_");
 }
 
+export function resourceFontName(name: string): string {
+  const words = name.toLocaleLowerCase().split(/[^a-zA-Z0-9]+/);
+  const snakeCaseWords = words.map((word, index) => {
+    if (index === 0) {
+      const cleanedWord = word.replace(/^[^a-zA-Z]+/g, "");
+      return cleanedWord.charAt(0) + cleanedWord.slice(1);
+    }
+    return word;
+  });
+  return snakeCaseWords.join("_");
+}
+
 export class androidDefaultBuilder {
   element: androidElement;
 
