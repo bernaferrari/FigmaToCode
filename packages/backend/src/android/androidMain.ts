@@ -522,10 +522,11 @@ const createDirectionalStackLinearLayout = (
   node: SceneNode & InferredAutoLayoutResult
   ): string => {
     const { x, y } = getCommonPositionValue(node);
+    const {height, width} = androidSize(node, localSettings.optimizeLayout);
     let linearLayoutProp:Record<string, string | number> = {
       "android:id": `@+id/${idName}`,
-      "android:layout_width": `wrap_content`,
-      "android:layout_height": `wrap_content`,
+      "android:layout_width": `${width}`,
+      "android:layout_height": `${height}`,
       "android:gravity": `${getGravityParam(node)}`
     }
 
