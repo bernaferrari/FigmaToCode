@@ -129,7 +129,7 @@ export default function App() {
   return (
     <div
       className={`${
-        figmaColorBgValue === "rgba(255, 255, 255, 1)" ? "" : "dark"
+        figmaColorBgValue === "#ffffff" ? "" : "dark"
       }`}
     >
       <PluginUI

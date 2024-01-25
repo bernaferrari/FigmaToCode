@@ -11,20 +11,20 @@
   },
   "dependencies": {
     "backend": "workspace:*",
-    "next": "^13.4.19",
+    "next": "^14.1.0",
     "plugin-ui": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.6.0",
-    "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
-    "autoprefixer": "^10.4.15",
+    "@types/node": "^20.11.6",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.17",
     "eslint-config-custom": "workspace:*",
-    "postcss": "^8.4.29",
-    "tailwindcss": "3.3.3",
+    "postcss": "^8.4.33",
+    "tailwindcss": "3.4.1",
     "tsconfig": "workspace:*",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   }
 }
