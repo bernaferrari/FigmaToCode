@@ -555,8 +555,7 @@ const createDirectionalStackLinearLayout = (
     "children" in node 
     && node.children.filter(node => 
       "children" in node
-      && (node.name.split("_")[1] === "hLinear" 
-      || node.name.split("_")[1] === "vLinear")
+      && node.name.split("_")[1] === "linear" 
       && node.children.filter(node => 
         node.name.split("_")[1] === "radioButton"
       )

@@ -126,7 +126,7 @@ export class androidDefaultBuilder {
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (isAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-      if (node.parent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
+      if (node.parent?.type === "FRAME" || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
         this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
         this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
       }
@@ -145,7 +145,8 @@ export class androidDefaultBuilder {
         }
       }
     }
-    else if (node.type === "COMPONENT" || node.type === "INSTANCE") {
+
+    if (node.type === "COMPONENT" || node.type === "INSTANCE") {
       if (node.paddingTop > 0) {
         this.pushModifier(["android:layout_marginTop",`${node.paddingTop}dp`]);
       }
