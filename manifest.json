@@ -5,7 +5,7 @@
   "main": "apps/plugin/dist/code.js",
   "ui": "apps/plugin/dist/index.html",
   "editorType": ["figma", "dev"],
-  "capabilities": ["inspect", "codegen"],
+  "capabilities": ["inspect", "codegen", "vscode"],
   "permissions": [],
   "networkAccess": {
     "allowedDomains": ["none"]
