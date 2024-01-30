@@ -208,20 +208,32 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
   return result.build(0);
 };
 
-const androidButton = (node: SceneNode & BaseFrameMixin): string => {
-  
+const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean = false): string => {
   const childRectAngle = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE")[0]
   const childText = node.children.filter((child: { type: string; }) => child.type === "COMPONENT" || child.type === "INSTANCE")[0]
-  const result = new androidDefaultBuilder(childRectAngle.isAsset ? "ImageButton" : "Button", "")
+  const hasPadding = childRectAngle.width !== node.width && childRectAngle.height !== node.height
+
+  const result = new androidDefaultBuilder(childRectAngle.isAsset ? "ImageButton" : "Button")
     .setId(node)
-    .position(node,localSettings.optimizeLayout)
-    .size(node,localSettings.optimizeLayout);
+    .size(childRectAngle,localSettings.optimizeLayout);
+
+  if (hasPadding && !setFrameLayout) {
+    const stack = createDirectionalStack(androidButton(node, true), node.name, node, true)
+    return androidContainer(node, stack)
+  }
+
   if (childRectAngle && childRectAngle.isAsset) {
     result.element.addModifier(["android:src", `@drawable/${resourceName(node.name)}`]);
   }
-  if (childText && "children" in childText && "characters" in childText.children[0]) {
 
+  if (childText && "children" in childText && "characters" in childText.children[0]) {
     result.element.addModifier(["android:text", `${childText.children[0].characters}`])
+  }
+
+  if (hasPadding) {
+    result.element.addModifier(["android:layout_gravity", "center"])
+  } else {
+    result.position(node, localSettings.optimizeLayout)
   }
 
   result.element.addModifier(androidBackground(childRectAngle))
@@ -301,7 +313,7 @@ const androidLinear = (node: SceneNode & BaseFrameMixin, indentLevel: number): s
     node.children.length > 1 ? indentLevel + 1 : indentLevel
   );
 
-  const anyStack = createDirectionalStackLinearLayout(children, node.name, node);
+  const anyStack = createDirectionalStack(children, node.name, node);
   return androidContainer(node, anyStack);
 }
 
@@ -333,7 +345,7 @@ const androidFrame = (
     node.children.length > 1 ? indentLevel + 1 : indentLevel
   );
 
-  const anyStack = createDirectionalStack(children, node);
+  const anyStack = createDirectionalStack(children, node.name, node);
   return androidContainer(node, anyStack);
 };
 
@@ -414,52 +426,6 @@ const getGravityParam = (
   return getGravity(inferredAutoLayout.layoutMode, false, inferredAutoLayout.counterAxisAlignItems, primaty);
 }
 
-const createDirectionalStack = (
-  children: string,
-  node: SceneNode & InferredAutoLayoutResult
-): string => {
-
-  const prop:Record<string, string | number> = {
-    "android:layout_width": "layoutSizingHorizontal" in node ? getLayoutParam(node.layoutSizingHorizontal, node.width, "parent" in node) : "0dp",
-    "android:layout_height": "layoutSizingVertical" in node ? getLayoutParam(node.layoutSizingVertical, node.height, "parent" in node) : "0dp"
-  };
-  if (isAbsolutePosition(node,localSettings.optimizeLayout)) {
-    const { x, y } = getCommonPositionValue(node);
-    if (node.parent && ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
-      prop['android:layout_marginStart']=`${sliceNum(x)}dp`;
-      prop['android:layout_marginTop']=`${sliceNum(y)}dp`;
-    }
-    else if (node.parent) {
-      if ("width" in node.parent && "constraints" in node && "horizontal" in node.constraints && node.constraints.horizontal === "MAX") {
-        prop['android:layout_marginEnd']=`${node.parent.width-node.x-node.width}dp`;
-      }
-      else {
-        prop['android:layout_marginStart']=`${sliceNum(x)}dp`;
-      }
-      if ("height" in node.parent && "constraints" in node && "vertical" in node.constraints && node.constraints.vertical === "MAX") {
-        prop['android:layout_marginBottom']=`${node.parent.height-node.y-node.height}dp`;
-      }
-      else {
-        prop['android:layout_marginTop']=`${sliceNum(y)}dp`;
-      }
-    }
-  }
-  if ("fills" in node) {
-    const background = androidBackground(node);
-    if (background[1]) {
-      prop[`android:background`]=background[1];
-    }
-  }
-
-  if (node.layoutMode !== "NONE") {
-    prop["android:orientation"] = node.layoutMode=="VERTICAL" ? "vertical" : "horizontal";
-    prop["android:gravity"] = getGravityParam(node);
-    return generateAndroidViewCode("LinearLayout", prop, children);
-  } else {
-    return generateAndroidViewCode("FrameLayout", prop, children);
-  }
-};
-
 const createDirectionalStackScroll = (
   children: string,
   node: SceneNode & InferredAutoLayoutResult
@@ -516,40 +482,20 @@ const createDirectionalStackConstraintLayout = (
     return generateAndroidViewCode("androidx.constraintlayout.widget.ConstraintLayout", constraintLayoutProp, children)
 }
 
-const createDirectionalStackLinearLayout = (
+const createDirectionalStack = (
   children: string,
   idName: string,
-  node: SceneNode & InferredAutoLayoutResult
+  node: SceneNode & InferredAutoLayoutResult,
+  isClickable: boolean = false
   ): string => {
     const { x, y } = getCommonPositionValue(node);
     const {height, width} = androidSize(node, localSettings.optimizeLayout);
-    let linearLayoutProp:Record<string, string | number> = {
+    const hasLinearLayoutParent = node.parent?.name.split("_")[1] === "linear"
+
+    let prop:Record<string, string | number> = {
       "android:id": `@+id/${idName}`,
       "android:layout_width": `${width}`,
-      "android:layout_height": `${height}`,
-      "android:gravity": `${getGravityParam(node)}`
-    }
-
-    if (node.layoutMode !== "NONE") {
-      linearLayoutProp["android:orientation"] = node.layoutMode === "VERTICAL" ? "vertical":"horizontal"
-    }
-
-    const hasLinearLayoutParent = node.parent?.name.split("_")[1] === "linear"
-    if (!hasLinearLayoutParent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") ) {
-      linearLayoutProp['android:layout_marginStart']=`${sliceNum(x)}dp`;
-      linearLayoutProp['android:layout_marginTop']=`${sliceNum(y)}dp`;
-    }
-    if (node.paddingTop > 0) {
-      linearLayoutProp["android:paddingTop"] = `${node.paddingTop}dp`
-    }
-    if (node.paddingBottom > 0) {
-      linearLayoutProp["android:paddingBottom"] = `${node.paddingBottom}dp`
-    }
-    if (node.paddingRight > 0) {
-      linearLayoutProp["android:paddingRight"] = `${node.paddingRight}dp`
-    }
-    if (node.paddingLeft > 0) {
-      linearLayoutProp["android:paddingLeft"] = `${node.paddingLeft}dp`
+      "android:layout_height": `${height}`
     }
 
     const grandchildrenHaveRadioButton = 
@@ -561,8 +507,35 @@ const createDirectionalStackLinearLayout = (
         node.name.split("_")[1] === "radioButton"
       )
     ).length !== 0
+    
+    if (!hasLinearLayoutParent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") ) {
+      prop['android:layout_marginStart']=`${sliceNum(x)}dp`;
+      prop['android:layout_marginTop']=`${sliceNum(y)}dp`;
+    }
+    if (node.paddingTop > 0) {
+      prop["android:paddingTop"] = `${node.paddingTop}dp`
+    }
+    if (node.paddingBottom > 0) {
+      prop["android:paddingBottom"] = `${node.paddingBottom}dp`
+    }
+    if (node.paddingRight > 0) {
+      prop["android:paddingRight"] = `${node.paddingRight}dp`
+    }
+    if (node.paddingLeft > 0) {
+      prop["android:paddingLeft"] = `${node.paddingLeft}dp`
+    }
 
-    return generateAndroidViewCode(grandchildrenHaveRadioButton ? "RadioGroup" : "LinearLayout", linearLayoutProp, children)
+    if (isClickable) {
+      prop["android:clickable"] = "true"
+    }
+
+    if (node.layoutMode !== "NONE") {
+      prop["android:orientation"] = node.layoutMode === "VERTICAL" ? "vertical":"horizontal"
+      prop["android:gravity"] = `${getGravityParam(node)}`
+      return generateAndroidViewCode(grandchildrenHaveRadioButton ? "RadioGroup" : "LinearLayout", prop, children)
+    } else {
+      return generateAndroidViewCode("FrameLayout", prop, children);
+    }
 }
 
 export const generateAndroidViewCode = (
