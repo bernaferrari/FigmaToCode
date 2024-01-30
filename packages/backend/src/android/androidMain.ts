@@ -218,7 +218,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
     .size(childRectAngle,localSettings.optimizeLayout);
 
   if (hasPadding && !setFrameLayout) {
-    const stack = createDirectionalStack(androidButton(node, true), node.name, node, true)
+    const stack = createDirectionalStack(androidButton(node, true), `${node.name}_frame`, node, true)
     return androidContainer(node, stack)
   }
 
