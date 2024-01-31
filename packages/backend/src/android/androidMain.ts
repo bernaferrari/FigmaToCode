@@ -505,7 +505,7 @@ const createDirectionalStack = (
       && node.name.split("_")[1] === "linear" 
       && node.children.filter(node => 
         node.name.split("_")[1] === "radioButton"
-      )
+      ).length !== 0
     ).length !== 0
     
     if (!hasLinearLayoutParent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") ) {
