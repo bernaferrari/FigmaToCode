@@ -488,14 +488,13 @@ const createDirectionalStack = (
   node: SceneNode & InferredAutoLayoutResult,
   isClickable: boolean = false
   ): string => {
-    const { x, y } = getCommonPositionValue(node);
     const {height, width} = androidSize(node, localSettings.optimizeLayout);
     const hasLinearLayoutParent = node.parent?.name.split("_")[1] === "linear"
 
     let prop:Record<string, string | number> = {
       "android:id": `@+id/${idName}`,
-      "android:layout_width": `${width}`,
-      "android:layout_height": `${height}`
+      "android:layout_width": `${node.parent ? width : "match_parent"}`,
+      "android:layout_height": `${node.parent ? height : "match_parent"}`
     }
 
     const grandchildrenHaveRadioButton = 
@@ -507,11 +506,14 @@ const createDirectionalStack = (
         node.name.split("_")[1] === "radioButton"
       ).length !== 0
     ).length !== 0
-    
-    if (!hasLinearLayoutParent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") ) {
-      prop['android:layout_marginStart']=`${sliceNum(x)}dp`;
-      prop['android:layout_marginTop']=`${sliceNum(y)}dp`;
+
+    if (node.parent && (!hasLinearLayoutParent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE"))) {
+      prop['android:layout_marginStart']=`${sliceNum(node.x)}dp`;
+      prop['android:layout_marginTop']=`${sliceNum(node.y)}dp`;
+    } if (!node.parent) {
+      prop["xmlns:android"]="http://schemas.android.com/apk/res/android"
     }
+
     if (node.paddingTop > 0) {
       prop["android:paddingTop"] = `${node.paddingTop}dp`
     }
