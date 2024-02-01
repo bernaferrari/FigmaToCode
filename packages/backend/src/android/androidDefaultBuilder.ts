@@ -146,7 +146,7 @@ export class androidDefaultBuilder {
       }
     }
 
-    if (node.type === "COMPONENT" || node.type === "INSTANCE") {
+    if (node.parent?.type !== "FRAME" && (node.type === "COMPONENT" || node.type === "INSTANCE")) {
       if (node.paddingTop > 0) {
         this.pushModifier(["android:layout_marginTop",`${node.paddingTop}dp`]);
       }

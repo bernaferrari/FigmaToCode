@@ -180,7 +180,7 @@ const androidText = (node: SceneNode & TextNode, sizeNode: SceneNode | null = nu
   const result = new androidTextBuilder()
     .createText(node)
     .setId(node)
-    .position(node, localSettings.optimizeLayout)
+    .position(sizeNode ? sizeNode : node, localSettings.optimizeLayout)
     .size(sizeNode ? sizeNode : node, localSettings.optimizeLayout);
 
   result.pushModifier(androidShadow(node));
@@ -352,8 +352,13 @@ const androidFrame = (
 const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLevel: number): string => {
   switch (node.name.split("_")[1]) {
     case "text":
-      if ("children" in node && node.children[0].type === "TEXT") {
-        return androidText(node.children[0], node)
+      if (
+        "children" in node &&
+        node.children[0].type === "FRAME" &&
+        "children" in node.children[0] &&
+        node.children[0].children[0].type === "TEXT"
+      ) {
+        return androidText(node.children[0].children[0], node)
       }
     case "btn":
       return androidButton(node)
