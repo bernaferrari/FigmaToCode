@@ -283,6 +283,7 @@ const androidList = (node: SceneNode & BaseFrameMixin): string => {
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
 
+  result.element.addModifier(androidBackground(node))
   result.pushModifier(androidShadow(node));
   result.element.addModifier(["tools:listitem", `@layout/${node.name}_item`])
   return result.build(0);
