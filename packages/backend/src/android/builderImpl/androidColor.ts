@@ -43,8 +43,6 @@ export const androidBackground = (node: SceneNode): [string, string | null] => {
       // opacity should only be null on set, not on get. But better be prevented.
       const opacity = fill.opacity ?? 1.0;
       background[1] = cornerRadius ? cornerRadius + "_" + androidColor(fill.color, opacity) : androidColor(fill.color, opacity);
-    } else if (node.name) {
-      background[1] = `@drawable/${resourceName(node.name)}`
     }
   } else if(cornerRadius) {
     background[1] = cornerRadius
@@ -52,7 +50,7 @@ export const androidBackground = (node: SceneNode): [string, string | null] => {
   return background
 }
 
-const androidCornerRadius = (node: SceneNode): string|null => {
+export const androidCornerRadius = (node: SceneNode): string|null => {
   const radius = getCommonRadius(node);
   if ("all" in radius) {
     if (radius.all > 0) {

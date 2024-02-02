@@ -1,8 +1,8 @@
 import { compactProp, indentString } from "../common/indentString";
 import { className, sliceNum } from "../common/numToAutoFixed";
-import { androidBackground } from "./builderImpl/androidColor";
+import { androidBackground, androidCornerRadius } from "./builderImpl/androidColor";
 import { androidTextBuilder } from "./androidTextBuilder";
-import { androidDefaultBuilder, resourceName} from "./androidDefaultBuilder";
+import { androidDefaultBuilder } from "./androidDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { androidShadow } from "./builderImpl/androidEffects";
@@ -240,7 +240,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
   }
 
   if (childRectAngle && childRectAngle.isAsset) {
-    result.element.addModifier(["android:src", `@drawable/${resourceName(node.name)}`]);
+    result.element.addModifier(["android:src", `@drawable/${node.name}`]);
   }
 
   if (childText && "children" in childText && "characters" in childText.children[0]) {
@@ -489,6 +489,11 @@ const createDirectionalStack = (
 
     if (isClickable) {
       prop["android:clickable"] = "true"
+    }
+
+    if ("fills" in node || androidCornerRadius(node)) {
+      const background = androidBackground(node)
+      prop[background[0]] = background[1] ?? ""
     }
 
     if (node.layoutMode !== "NONE") {
