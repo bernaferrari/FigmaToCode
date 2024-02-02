@@ -8,6 +8,7 @@ import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildr
 import { androidShadow } from "./builderImpl/androidEffects";
 import { TextNode } from "../altNodes/altMixins2";
 import { androidSize } from "./builderImpl/androidSize";
+import { androidIdParser } from "./builderImpl/androidIdParser";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -372,6 +373,7 @@ const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLev
     case "view":
       return androidView(node)
     case "text":
+    case "txt":
       if (
         "children" in node &&
         node.children[0].type === "FRAME" &&
@@ -380,25 +382,35 @@ const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLev
       ) {
         return androidText(node.children[0].children[0], node)
       }
+    case "button":
     case "btn":
       return androidButton(node)
     case "list":
+    case "li":
       return androidList(node)
     case "listItem":
+    case "lii":
       return androidListItem(node, indentLevel)
     case "switch":
+    case "sw":
       return androidSwitch(node)
     case "checkBox":
+    case "cb":
       return androidCheckBox(node)
     case "vScroll":
+    case "vs":
       return androidScroll(node, indentLevel)
     case "hScroll":
+    case "hs":
       return androidScroll(node, indentLevel)
     case "radioButton":
+    case "rbtn":
       return androidRadioButton(node)
     case "editText":
+    case "etxt":
       return androidEditText(node)
     case "linear":
+    case "lin":
       return androidLinear(node, indentLevel)
     default:
       return androidFrame(node, indentLevel)
@@ -453,7 +465,7 @@ const createDirectionalStack = (
     const hasLinearLayoutParent = node.parent?.name.split("_")[1] === "linear"
 
     let prop:Record<string, string | number> = {
-      "android:id": `@+id/${idName}`,
+      "android:id": `@+id/${androidIdParser(idName)}`,
       "android:layout_width": `${node.parent ? width : "match_parent"}`,
       "android:layout_height": `${node.parent ? height : "match_parent"}`
     }

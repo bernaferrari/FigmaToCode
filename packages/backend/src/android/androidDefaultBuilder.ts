@@ -11,6 +11,7 @@ import {
 } from "./builderImpl/androidBlend";
 import { getCommonPositionValue } from "../common/commonPosition";
 import { Modifier, androidElement } from "./builderImpl/androidParser";
+import { androidIdParser } from "./builderImpl/androidIdParser";
 
 export const isAbsolutePosition = (
   node: SceneNode,
@@ -219,7 +220,7 @@ export class androidDefaultBuilder {
     if ("name" in node && node.name) {
       const id = node.name;
       if (id) {
-        this.pushModifier(['android:id', `@+id/${id}`]);
+        this.pushModifier(['android:id', `@+id/${androidIdParser(id)}`]);
       }
     }
     return this;
