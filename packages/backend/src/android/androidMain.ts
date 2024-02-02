@@ -151,6 +151,26 @@ export const androidContainer = (
   return result;
 };
 
+
+const androidView = (node: SceneNode & BaseFrameMixin): string => {
+  const childRectangle = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE")[0]
+
+  const result = new androidDefaultBuilder(childRectangle.isAsset ? "ImageView":"View")
+    .setId(node)
+    .position(node,localSettings.optimizeLayout)
+    .size(node,localSettings.optimizeLayout);
+
+  result.element.addModifier(["android:contentDescription",`@string/STR_MSG_IMAGEVIEW_CONTENT_DESCRIPTION`]);
+  if ("name" in childRectangle && childRectangle.name && childRectangle.isAsset) {
+    result.element.addModifier(["android:src",`@drawable/${childRectangle.name}`]);
+  }
+  result.pushModifier(androidShadow(childRectangle));
+  result.element.addModifier(androidBackground(childRectangle));
+  result.element.addModifier(["android:scaleType",'fitXY']);
+
+  return result.build(0);
+};
+
 const androidGroup = (
   node: GroupNode | SectionNode,
   indentLevel: number
@@ -348,6 +368,8 @@ const androidFrame = (
 
 const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLevel: number): string => {
   switch (node.name.split("_")[1]) {
+    case "view":
+      return androidView(node)
     case "text":
       if (
         "children" in node &&
