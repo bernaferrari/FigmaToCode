@@ -88,7 +88,7 @@ export class androidTextBuilder extends androidDefaultBuilder {
     //     alignHorizontal !== "left" ? `TextAlign.${alignHorizontal}` : "",
     // };
 
-    const segments = this.getTextSegments(node.id, node.characters);
+    const segments = this.getTextSegments(node);
     if (segments) {
       this.element = segments;
     } else {
@@ -98,8 +98,8 @@ export class androidTextBuilder extends androidDefaultBuilder {
     return this;
   }
 
-  getTextSegments(id: string, characters: string): androidElement | null {
-    const segments = globalTextStyleSegments[id];
+  getTextSegments(node: TextNode): androidElement | null {
+    const segments = globalTextStyleSegments[node.id];
     if (!segments) {
       return null;
     }
@@ -116,15 +116,15 @@ export class androidTextBuilder extends androidDefaultBuilder {
       segment.fontSize
     );
 
-    let updatedText = parseTextAsCode(characters);
+    let updatedText = parseTextAsCode(node.characters);
     if (segment.textCase === "LOWER") {
-      updatedText = characters.toLowerCase();
+      updatedText = node.characters.toLowerCase();
     } else if (segment.textCase === "UPPER") {
-      updatedText = characters.toUpperCase();
+      updatedText = node.characters.toUpperCase();
     }
 
     const element = new androidElement("TextView")
-      .addModifier(["android:text", updatedText])
+      .addModifier(["android:text", `@string/${node.name}`])
       .addModifier(["android:fontFamily",`@font/${resourceFontName(fontFamily)}`])
       .addModifier(["android:textSize",`${fontSize}sp`])
       .addModifier(["android:includeFontPadding","false"])

@@ -193,18 +193,18 @@ const androidLinearSpace = (node: SceneNode): string => {
     .build();
 };
 
-const androidText = (node: SceneNode & TextNode, sizeNode: SceneNode | null = null): string => {
+const androidText = (textNode: SceneNode & TextNode, node: SceneNode | null = null): string => {
   const result = new androidTextBuilder()
-    .createText(node)
-    .setId(node)
-    .position(sizeNode ? sizeNode : node, localSettings.optimizeLayout)
-    .size(sizeNode ? sizeNode : node, localSettings.optimizeLayout);
+    .createText(textNode)
+    .setId(node ? node : textNode)
+    .position(node ? node : textNode, localSettings.optimizeLayout)
+    .size(node ? node : textNode, localSettings.optimizeLayout);
 
-  result.pushModifier(androidShadow(node));
+  result.pushModifier(androidShadow(textNode));
   previousExecutionCache.push(result.build());
 
   return result
-    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .commonPositionStyles(textNode, localSettings.optimizeLayout)
     .build();
 };
 
