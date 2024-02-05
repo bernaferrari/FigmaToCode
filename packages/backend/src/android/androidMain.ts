@@ -229,11 +229,20 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
 
 const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean = false): string => {
   const childRectAngle = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE")[0]
-  const childText = node.children.filter((child: { type: string; }) => child.type === "COMPONENT" || child.type === "INSTANCE")[0]
   const hasPadding = childRectAngle.width !== node.width && childRectAngle.height !== node.height
-
+  
+  let childText: SceneNode & TextNode | undefined = undefined
+  if (node.children.filter(child => androidNameParser(child.name).type === AndroidType.text).length !== 0) {
+    childText = node.children.filter((child): child is SceneNode & BaseFrameMixin => 
+      androidNameParser(child.name).type === AndroidType.text
+    )[0].children.filter((child): child is SceneNode & BaseFrameMixin =>
+      androidNameParser(child.name).type === AndroidType.frameLayout
+    )[0].children.filter((child): child is SceneNode & TextNode => child.type === "TEXT")[0]
+  }
+  
   const result = new androidDefaultBuilder(childRectAngle.isAsset ? "ImageButton" : "Button")
     .setId(node)
+    .setText(childText)
     .size(childRectAngle,localSettings.optimizeLayout);
 
   if (hasPadding && !setFrameLayout) {
@@ -243,10 +252,6 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
 
   if (childRectAngle && childRectAngle.isAsset) {
     result.element.addModifier(["android:src", `@drawable/${node.name}`]);
-  }
-
-  if (childText && "children" in childText && "characters" in childText.children[0]) {
-    result.element.addModifier(["android:text", `${childText.children[0].characters}`])
   }
 
   if (hasPadding) {
@@ -348,8 +353,17 @@ const androidScroll = (node: SceneNode & BaseFrameMixin, indentLevel: number): s
   return androidContainer(node, anyStack);
 };
 
-const androidEditText = (node: SceneNode): string => {
+const androidEditText = (node: SceneNode & BaseFrameMixin): string => {
+  let childText: SceneNode & TextNode | undefined = undefined
+  if (node.children.filter(child => androidNameParser(child.name).type === AndroidType.text).length !== 0) {
+    childText = node.children.filter((child): child is SceneNode & BaseFrameMixin => 
+      androidNameParser(child.name).type === AndroidType.text
+    )[0].children.filter((child): child is SceneNode & BaseFrameMixin =>
+      androidNameParser(child.name).type === AndroidType.frameLayout
+    )[0].children.filter((child): child is SceneNode & TextNode => child.type === "TEXT")[0]
+  }
   const result = new androidDefaultBuilder("EditText")
+  .setText(childText, true)
   .setId(node)
   .position(node,localSettings.optimizeLayout)
   .size(node,localSettings.optimizeLayout);

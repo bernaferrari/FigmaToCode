@@ -1,6 +1,6 @@
 import { sliceNum } from "../common/numToAutoFixed";
 import { androidShadow } from "./builderImpl/androidEffects";
-import { androidBackground } from "./builderImpl/androidColor";
+import { androidBackground, androidSolidColor } from "./builderImpl/androidColor";
 import { androidPadding } from "./builderImpl/androidPadding";
 import { androidSize } from "./builderImpl/androidSize";
 
@@ -11,7 +11,8 @@ import {
 } from "./builderImpl/androidBlend";
 import { getCommonPositionValue } from "../common/commonPosition";
 import { Modifier, androidElement } from "./builderImpl/androidParser";
-import { androidNameParser } from "./builderImpl/androidNameParser";
+import { AndroidType, androidNameParser } from "./builderImpl/androidNameParser";
+import { globalTextStyleSegments } from "../altNodes/altConversion";
 
 export const isAbsolutePosition = (
   node: SceneNode,
@@ -221,6 +222,33 @@ export class androidDefaultBuilder {
       this.pushModifier(['android:id', `@+id/${androidNameParser(node.name).id}`]);
     }
     return this;
+  }
+
+  setText(node: TextNode | undefined, isPlaceholder = false): this {
+    if (!node) { return this }
+    const segments = globalTextStyleSegments[node.id];
+    if (segments) {
+      const segment = segments[0];
+      const font = resourceFontName(segment.fontName.family)
+      const textSize = segment.fontSize
+
+      this.element.addModifier([isPlaceholder ? 'android:hint' : 'android:text', `@string/${node.name}`])
+      this.pushModifier(
+        ['android:fontFamily', `@font/${font}`],
+        ['android:textSize', `${textSize}sp`],
+        ['android:textColor', this.textColor(segment.fills)],
+        ['android:includeFontPadding', 'false']
+      )
+    }
+    return this;
+  }
+
+  textColor(fills: Paint[]): string {
+    const fillColor = androidSolidColor(fills);
+    if (fillColor) {
+      return fillColor;
+    }
+    return "";
   }
 
   build(indentLevel: number = 0): string {
