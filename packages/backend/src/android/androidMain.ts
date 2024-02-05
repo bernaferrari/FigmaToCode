@@ -8,7 +8,7 @@ import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildr
 import { androidShadow } from "./builderImpl/androidEffects";
 import { TextNode } from "../altNodes/altMixins2";
 import { androidSize } from "./builderImpl/androidSize";
-import { androidIdParser } from "./builderImpl/androidIdParser";
+import { AndroidType, androidNameParser } from "./builderImpl/androidNameParser";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -59,7 +59,8 @@ const androidWidgetGenerator = (
   let listItemCount: number = 0
 
   visibleSceneNode.forEach((node, index) => {
-    const isLinearLayout = node.parent?.name.split("_")[1] === "linear"
+    const parentType = androidNameParser(node.parent?.name).type
+    const isLinearLayout = parentType === AndroidType.linearLayout
     const isComponentOrInstanceParent = node.parent?.type === "COMPONENT" || node.parent?.type === "INSTANCE"
     const isFirstItem = node.parent?.children[0] === node
 
@@ -70,13 +71,13 @@ const androidWidgetGenerator = (
     switch (node.type) {
       case "COMPONENT":
       case "INSTANCE":
-        switch (node.name.split("_")[1]) {
-          case "list":
+        switch (androidNameParser(node.name).type) {
+          case AndroidType.list:
             comp.push(androidComponent(node, indentLevel));
             compXml.push(`\n\n<!-- ${node.name}_item.xml -->`)
             compXml.push(androidWidgetGenerator(node.children, indentLevel));
             break;
-          case "listItem":
+          case AndroidType.listItem:
             if (listItemCount != 0) break;
             comp.push(androidComponent(node, indentLevel));
             listItemCount = 1
@@ -369,11 +370,11 @@ const androidFrame = (
 };
 
 const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLevel: number): string => {
-  switch (node.name.split("_")[1]) {
-    case "view":
+
+  switch (androidNameParser(node.name).type) {
+    case AndroidType.view:
       return androidView(node)
-    case "text":
-    case "txt":
+    case AndroidType.text:
       if (
         "children" in node &&
         node.children[0].type === "FRAME" &&
@@ -382,34 +383,24 @@ const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLev
       ) {
         return androidText(node.children[0].children[0], node)
       }
-    case "button":
-    case "btn":
+    case AndroidType.button:
       return androidButton(node)
-    case "list":
-    case "li":
+    case AndroidType.list:
       return androidList(node)
-    case "listItem":
-    case "lii":
+    case AndroidType.listItem:
       return androidListItem(node, indentLevel)
-    case "switch":
-    case "sw":
+    case AndroidType.switch:
       return androidSwitch(node)
-    case "checkBox":
-    case "cb":
+    case AndroidType.checkBox:
       return androidCheckBox(node)
-    case "vScroll":
-    case "hScroll":
-    case "vs":
-    case "hs":
+    case AndroidType.verticalScrollView:
+    case AndroidType.horizontalScrollView:
       return androidScroll(node, indentLevel)
-    case "radioButton":
-    case "rbtn":
+    case AndroidType.radioButton:
       return androidRadioButton(node)
-    case "editText":
-    case "etxt":
+    case AndroidType.editText:
       return androidEditText(node)
-    case "linear":
-    case "lin":
+    case AndroidType.linearLayout:
       return androidLinear(node, indentLevel)
     default:
       return androidFrame(node, indentLevel)
@@ -461,10 +452,12 @@ const createDirectionalStack = (
   isClickable: boolean = false
   ): string => {
     const {height, width} = androidSize(node, localSettings.optimizeLayout);
-    const hasLinearLayoutParent = node.parent?.name.split("_")[1] === "linear"
+    const {type, id}  = androidNameParser(idName)
+    const parentType = androidNameParser(node.parent?.name).type
+    const hasLinearLayoutParent = parentType === AndroidType.linearLayout
 
     let prop:Record<string, string | number> = {
-      "android:id": `@+id/${androidIdParser(idName)}`,
+      "android:id": `@+id/${id}`,
       "android:layout_width": `${node.parent ? width : "match_parent"}`,
       "android:layout_height": `${node.parent ? height : "match_parent"}`
     }
@@ -473,9 +466,9 @@ const createDirectionalStack = (
     "children" in node 
     && node.children.filter(node => 
       "children" in node
-      && node.name.split("_")[1] === "linear" 
+      && id
       && node.children.filter(node => 
-        node.name.split("_")[1] === "radioButton"
+        androidNameParser(node.name).type === AndroidType.radioButton
       ).length !== 0
     ).length !== 0
 
@@ -513,11 +506,11 @@ const createDirectionalStack = (
       prop["android:gravity"] = `${getGravityParam(node)}`
       return generateAndroidViewCode(grandchildrenHaveRadioButton ? "RadioGroup" : "LinearLayout", prop, children)
     } 
-    else if (node.name.split("_")[1] === "vScroll" || node.name.split("_")[1] === "vs") {
+    else if (type === AndroidType.verticalScrollView) {
       prop["android:scrollbars"]="vertical";
       return generateAndroidViewCode("ScrollView", prop, children)
     }
-    else if (node.name.split("_")[1] === "hScroll" || node.name.split("_")[1] === "hs") {
+    else if (type === AndroidType.horizontalScrollView) {
       prop["android:scrollbars"]="horizontal";
       return generateAndroidViewCode("HorizontalScrollView", prop, children)
     }
