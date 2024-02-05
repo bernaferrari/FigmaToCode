@@ -370,7 +370,7 @@ const androidFrame = (
 };
 
 const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLevel: number): string => {
-
+  
   switch (androidNameParser(node.name).type) {
     case AndroidType.view:
       return androidView(node)
