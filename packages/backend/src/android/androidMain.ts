@@ -398,9 +398,8 @@ const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLev
     case "cb":
       return androidCheckBox(node)
     case "vScroll":
-    case "vs":
-      return androidScroll(node, indentLevel)
     case "hScroll":
+    case "vs":
     case "hs":
       return androidScroll(node, indentLevel)
     case "radioButton":
@@ -514,11 +513,11 @@ const createDirectionalStack = (
       prop["android:gravity"] = `${getGravityParam(node)}`
       return generateAndroidViewCode(grandchildrenHaveRadioButton ? "RadioGroup" : "LinearLayout", prop, children)
     } 
-    else if (node.name.split("_")[1] === "vScroll") {
+    else if (node.name.split("_")[1] === "vScroll" || node.name.split("_")[1] === "vs") {
       prop["android:scrollbars"]="vertical";
       return generateAndroidViewCode("ScrollView", prop, children)
     }
-    else if (node.name.split("_")[1] === "hScroll") {
+    else if (node.name.split("_")[1] === "hScroll" || node.name.split("_")[1] === "hs") {
       prop["android:scrollbars"]="horizontal";
       return generateAndroidViewCode("HorizontalScrollView", prop, children)
     }

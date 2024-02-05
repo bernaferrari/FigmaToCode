@@ -1,11 +1,8 @@
 export function androidIdParser(idName: string):string {
   let id = idName.split("_")
+  id.shift()
 
-  if (id[0] === "UIkit") {
-    id.shift()
-  }
-
-  switch (id[1]) {
+  switch (id[0]) {
     case "txt":
       id.shift()
       id.unshift("text")
