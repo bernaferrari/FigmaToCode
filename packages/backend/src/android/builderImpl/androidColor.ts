@@ -39,10 +39,25 @@ export const androidBackground = (node: SceneNode): [string, string | null] => {
   const cornerRadius = androidCornerRadius(node)
   if ("fills" in node) {
     const fill = retrieveTopFill(node.fills)
-    if (fill && fill.type === "SOLID") {
-      // opacity should only be null on set, not on get. But better be prevented.
-      const opacity = fill.opacity ?? 1.0;
-      background[1] = cornerRadius ? cornerRadius + "_" + androidColor(fill.color, opacity) : androidColor(fill.color, opacity);
+    if (fill) {
+      switch(fill.type) {
+        case "SOLID":
+          const opacity = fill.opacity ?? 1.0;
+          background[1] = cornerRadius ? cornerRadius + "_" + androidColor(fill.color, opacity) : androidColor(fill.color, opacity);
+          break
+        case "GRADIENT_ANGULAR":
+        case "GRADIENT_DIAMOND":
+        case "GRADIENT_LINEAR":
+        case "GRADIENT_RADIAL":
+          let gradientColor = cornerRadius ? `${cornerRadius}_` : ""
+          gradientColor += `${fill.type}_`
+          fill.gradientStops.forEach((node, i) => {
+            gradientColor += `${androidColor(node.color, node.color.a)}`
+            gradientColor += i === fill.gradientStops.length - 1 ? "" : "_"
+          });
+          background[1] = gradientColor
+          break
+      }
     }
   } else if(cornerRadius) {
     background[1] = cornerRadius
@@ -61,7 +76,7 @@ export const androidCornerRadius = (node: SceneNode): string|null => {
   return null;
 };
 
-export const androidColor = (color: RGB, opacity: number): string => {
+export const androidColor = (color: RGB | RGBA, opacity: number): string => {
   if (color.r + color.g + color.b === 0 && opacity === 1) {
     return "@color/black";
   }
