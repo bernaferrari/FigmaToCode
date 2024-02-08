@@ -251,7 +251,10 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
   }
 
   if (childRectAngle && childRectAngle.isAsset) {
-    result.element.addModifier(["android:src", `@drawable/${node.name}`]);
+    result.element.addModifier(["android:src", `@drawable/${childRectAngle.name}`]);
+    result.element.addModifier(["android:background", "@color/clearColor"]);
+  } else {
+    result.element.addModifier(androidBackground(childRectAngle))
   }
 
   if (hasPadding) {
@@ -260,7 +263,6 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
     result.position(node, localSettings.optimizeLayout)
   }
 
-  result.element.addModifier(androidBackground(childRectAngle))
   result.pushModifier(androidShadow(childRectAngle));
   
   return result.build(0);
@@ -471,16 +473,19 @@ const createDirectionalStack = (
     const hasLinearLayoutParent = parentType === AndroidType.linearLayout
 
     let prop:Record<string, string | number> = {
-      "android:id": `@+id/${id}`,
       "android:layout_width": `${node.parent ? width : "match_parent"}`,
       "android:layout_height": `${node.parent ? height : "match_parent"}`
+    }
+
+    if (id !== "") {
+      prop["andorid:id"] = `@+id/${id}` 
     }
 
     const grandchildrenHaveRadioButton = 
     "children" in node 
     && node.children.filter(node => 
       "children" in node
-      && id
+      && androidNameParser(node.name).type === AndroidType.linearLayout
       && node.children.filter(node => 
         androidNameParser(node.name).type === AndroidType.radioButton
       ).length !== 0

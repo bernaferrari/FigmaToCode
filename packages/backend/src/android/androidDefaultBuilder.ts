@@ -218,8 +218,11 @@ export class androidDefaultBuilder {
   }
 
   setId(node: SceneNode): this {
-    if ("name" in node && node.name) {
-      this.pushModifier(['android:id', `@+id/${androidNameParser(node.name).id}`]);
+    if ("name" in node && node.name ) {
+      let id = androidNameParser(node.name).id
+      if (id !== "") {
+        this.pushModifier(['android:id', `@+id/${id}`]);
+      } 
     }
     return this;
   }

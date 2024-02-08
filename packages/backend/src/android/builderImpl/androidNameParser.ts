@@ -23,6 +23,9 @@ export const androidNameParser = (name: string | undefined): { type: AndroidType
     id.shift()
     let type = AndroidType.frameLayout
     switch (id[0]) {
+      case "view":
+        type = AndroidType.view
+        break
       case "text":
       case "txt":
         type = AndroidType.text
@@ -72,7 +75,10 @@ export const androidNameParser = (name: string | undefined): { type: AndroidType
         break
     }
     id.shift()
-    id.unshift(`${AndroidType[type]}`)
-    return { type: type, id: id.join("_") ?? id }
+    if (id.length !== 0) {
+      id.unshift(`${AndroidType[type]}`)
+    }
+    
+    return { type: type, id: id.join("_") ?? "" }
   }
 }

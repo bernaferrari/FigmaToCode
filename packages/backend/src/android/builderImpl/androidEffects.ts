@@ -2,9 +2,6 @@ import { resourceName } from "../androidDefaultBuilder";
 import { Modifier } from "./androidParser";
 
 export const androidShadow = (node: SceneNode): Modifier | null => {
-  if (node.type === "TEXT" && node.name) {
-    return ["android:textAppearance", `@style/${resourceName(node.name)}`]
-  }
 
   if (!("effects" in node) || node.effects.length === 0) {
     return null;
