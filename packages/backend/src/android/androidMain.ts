@@ -162,9 +162,9 @@ const androidView = (node: SceneNode & BaseFrameMixin): string => {
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
 
-  result.element.addModifier(["android:contentDescription",`@string/STR_MSG_IMAGEVIEW_CONTENT_DESCRIPTION`]);
   if ("name" in childRectangle && childRectangle.name && childRectangle.isAsset) {
     result.element.addModifier(["android:src",`@drawable/${childRectangle.name}`]);
+    result.element.addModifier(["android:contentDescription",`@string/STR_MSG_IMAGEVIEW_CONTENT_DESCRIPTION`]);
   }
   result.pushModifier(androidShadow(childRectangle));
   result.element.addModifier(androidBackground(childRectangle));
@@ -241,13 +241,14 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
   }
   
   const result = new androidDefaultBuilder(childRectAngle.isAsset ? "ImageButton" : "Button")
-    .setId(node)
     .setText(childText)
     .size(childRectAngle,localSettings.optimizeLayout);
 
   if (hasPadding && !setFrameLayout) {
-    const stack = createDirectionalStack(androidButton(node, true), `${node.name}_frame`, node, true)
+    const stack = createDirectionalStack(androidButton(node, true), node.name, node, true)
     return androidContainer(node, stack)
+  } else if (!hasPadding) {
+    result.setId(node)
   }
 
   if (childRectAngle && childRectAngle.isAsset) {
@@ -312,7 +313,7 @@ const androidListItem = (node: SceneNode & BaseFrameMixin, indentLevel: number):
 
 const androidSwitch = (node: SceneNode & BaseFrameMixin): string => {
 
-  const result = new androidDefaultBuilder("androidx.appcompat.widget.SwitchCompat")
+  const result = new androidDefaultBuilder("Switch")
     .setId(node)
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
@@ -320,12 +321,12 @@ const androidSwitch = (node: SceneNode & BaseFrameMixin): string => {
       result.element.addModifier(["android:theme", `@style/${node.name}`])
     }
 
-  return result.build(0);
+  return result.build(0)
 };
 
 const androidCheckBox = (node: SceneNode & BaseFrameMixin): string => {
 
-  const result = new androidDefaultBuilder("androidx.appcompat.widget.AppCompatCheckBox")
+  const result = new androidDefaultBuilder("CheckBox")
     .setId(node)
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
@@ -478,7 +479,7 @@ const createDirectionalStack = (
     }
 
     if (id !== "") {
-      prop["andorid:id"] = `@+id/${id}` 
+      prop["android:id"] = `@+id/${id}` 
     }
 
     const grandchildrenHaveRadioButton = 
@@ -520,7 +521,7 @@ const createDirectionalStack = (
       prop[background[0]] = background[1] ?? ""
     }
 
-    if (node.layoutMode !== "NONE") {
+    if (node.layoutMode !== "NONE" && type !== AndroidType.button) {
       prop["android:orientation"] = node.layoutMode === "VERTICAL" ? "vertical":"horizontal"
       prop["android:gravity"] = `${getGravityParam(node)}`
       return generateAndroidViewCode(grandchildrenHaveRadioButton ? "RadioGroup" : "LinearLayout", prop, children)
