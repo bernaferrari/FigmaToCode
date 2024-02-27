@@ -68,6 +68,8 @@ export const androidNameParser = (name: string | undefined): { type: AndroidType
         break
       case "linear":
       case "lin":
+      case "vLinear":
+      case "hLinear":
         type = AndroidType.linearLayout
         break
       default:
