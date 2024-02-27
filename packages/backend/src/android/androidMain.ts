@@ -61,10 +61,10 @@ const androidWidgetGenerator = (
   visibleSceneNode.forEach((node, index) => {
     const parentType = androidNameParser(node.parent?.name).type
     const isLinearLayout = parentType === AndroidType.linearLayout
-    const isComponentOrInstanceParent = node.parent?.type === "COMPONENT" || node.parent?.type === "INSTANCE"
+    const hasStackParent = node.parent?.type === "COMPONENT" || node.parent?.type === "INSTANCE" || node.parent?.type === "FRAME"
     const isFirstItem = node.parent?.children[0] === node
 
-    if (isLinearLayout && !isFirstItem && isComponentOrInstanceParent && node.parent.itemSpacing !== 0) {
+    if (isLinearLayout && !isFirstItem && hasStackParent && node.parent.itemSpacing !== 0) {
       comp.push(androidLinearSpace(node));
     }
 
@@ -93,6 +93,9 @@ const androidWidgetGenerator = (
         break;
       case "FRAME":
       case "COMPONENT_SET":
+        if (androidNameParser(node.name).type === AndroidType.linearLayout) {
+          comp.push(androidComponent(node, indentLevel))
+        }
         comp.push(androidFrame(node, indentLevel));
         break;
       case "TEXT":
