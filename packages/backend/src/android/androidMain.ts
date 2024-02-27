@@ -91,10 +91,6 @@ const androidWidgetGenerator = (
       case "LINE":
         comp.push(androidContainer(node));
         break;
-      case "GROUP":
-      case "SECTION":
-        comp.push(androidGroup(node, indentLevel));
-        break;
       case "FRAME":
       case "COMPONENT_SET":
         comp.push(androidFrame(node, indentLevel));
@@ -110,9 +106,6 @@ const androidWidgetGenerator = (
           comp.push(androidContainer(node));
         }
       break;
-      case "VECTOR":
-        comp.push(androidImage(node))
-        break;
       default:
       break;
     }
@@ -155,33 +148,23 @@ export const androidContainer = (
 
 
 const androidView = (node: SceneNode & BaseFrameMixin): string => {
-  const childRectangle = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE")[0]
+  const childImage= node.children.filter((child: { type: string; }) => child.type == "RECTANGLE" || child.type == "GROUP")[0]
+  const isAsset = ("isAsset" in childImage && childImage.isAsset) || childImage.type === "GROUP"
 
-  const result = new androidDefaultBuilder(childRectangle.isAsset ? "ImageView":"View")
+  const result = new androidDefaultBuilder(isAsset ? "ImageView":"View")
     .setId(node)
     .position(node,localSettings.optimizeLayout)
     .size(node,localSettings.optimizeLayout);
 
-  if ("name" in childRectangle && childRectangle.name && childRectangle.isAsset) {
-    result.element.addModifier(["android:src",`@drawable/${childRectangle.name}`]);
+  if (isAsset) {
+    result.element.addModifier(["android:src",`@drawable/${childImage.name}`]);
     result.element.addModifier(["android:contentDescription",`@string/STR_MSG_IMAGEVIEW_CONTENT_DESCRIPTION`]);
   }
-  result.pushModifier(androidShadow(childRectangle));
-  result.element.addModifier(androidBackground(childRectangle));
+  result.pushModifier(androidShadow(childImage));
+  result.element.addModifier(androidBackground(childImage));
   result.element.addModifier(["android:scaleType",'fitXY']);
 
   return result.build(0);
-};
-
-const androidGroup = (
-  node: GroupNode | SectionNode,
-  indentLevel: number
-): string => {
-  const children = widgetGeneratorWithLimits(node, indentLevel);
-  return androidContainer(
-    node,
-    generateAndroidViewCode("FrameLayout", {}, children)
-  );
 };
 
 const androidLinearSpace = (node: SceneNode): string => {
@@ -228,9 +211,9 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
 };
 
 const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean = false): string => {
-  const childRectAngle = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE")[0]
-  const hasPadding = childRectAngle.width !== node.width && childRectAngle.height !== node.height
-  
+  const childImage = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE" || child.type == "GROUP")[0]
+  const isAsset = ("isAsset" in childImage && childImage.isAsset) || childImage.type === "GROUP"
+  const hasPadding = childImage.width !== node.width && childImage.height !== node.height
   let childText: SceneNode & TextNode | undefined = undefined
   if (node.children.filter(child => androidNameParser(child.name).type === AndroidType.text).length !== 0) {
     childText = node.children.filter((child): child is SceneNode & BaseFrameMixin => 
@@ -240,9 +223,9 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
     )[0].children.filter((child): child is SceneNode & TextNode => child.type === "TEXT")[0]
   }
   
-  const result = new androidDefaultBuilder(childRectAngle.isAsset ? "ImageButton" : "Button")
+  const result = new androidDefaultBuilder(isAsset ? "ImageButton" : "Button")
     .setText(childText)
-    .size(childRectAngle,localSettings.optimizeLayout);
+    .size(childImage,localSettings.optimizeLayout);
 
   if (hasPadding && !setFrameLayout) {
     const stack = createDirectionalStack(androidButton(node, true), node.name, node, true)
@@ -251,11 +234,11 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
     result.setId(node)
   }
 
-  if (childRectAngle && childRectAngle.isAsset) {
-    result.element.addModifier(["android:src", `@drawable/${childRectAngle.name}`]);
+  if (isAsset) {
+    result.element.addModifier(["android:src", `@drawable/${childImage.name}`]);
     result.element.addModifier(["android:background", "@color/clearColor"]);
   } else {
-    result.element.addModifier(androidBackground(childRectAngle))
+    result.element.addModifier(androidBackground(childImage))
   }
 
   if (hasPadding) {
@@ -264,7 +247,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
     result.position(node, localSettings.optimizeLayout)
   }
 
-  result.pushModifier(androidShadow(childRectAngle));
+  result.pushModifier(androidShadow(childImage));
   
   return result.build(0);
 };
