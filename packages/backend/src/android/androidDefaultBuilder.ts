@@ -182,12 +182,15 @@ export class androidDefaultBuilder {
   }
 
   size(node: SceneNode, optimize: boolean): this {
-    const { width, height } = androidSize(node, optimize);
+    const { width, height, weight} = androidSize(node, optimize);
     if (width) {
       this.pushModifier(['android:layout_width', `${width}`]);
     }
     if (height) {
       this.pushModifier(['android:layout_height', `${height}`]);
+    }
+    if (weight) {
+      this.pushModifier(['android:layout_weight', `1`]);
     }
     return this;
   }

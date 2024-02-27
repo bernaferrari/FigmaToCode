@@ -454,7 +454,7 @@ const createDirectionalStack = (
   node: SceneNode & InferredAutoLayoutResult,
   isClickable: boolean = false
   ): string => {
-    const {height, width} = androidSize(node, localSettings.optimizeLayout);
+    const {height, width, weight} = androidSize(node, localSettings.optimizeLayout);
     const {type, id}  = androidNameParser(idName)
     const parentType = androidNameParser(node.parent?.name).type
     const hasLinearLayoutParent = parentType === AndroidType.linearLayout
@@ -462,6 +462,10 @@ const createDirectionalStack = (
     let prop:Record<string, string | number> = {
       "android:layout_width": `${node.parent ? width : "match_parent"}`,
       "android:layout_height": `${node.parent ? height : "match_parent"}`
+    }
+
+    if (weight) {
+      prop["android:layout_weight"] = `1` 
     }
 
     if (id !== "") {
