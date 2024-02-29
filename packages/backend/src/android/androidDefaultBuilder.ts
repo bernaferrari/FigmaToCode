@@ -126,29 +126,11 @@ export class androidDefaultBuilder {
   }
 
   position(node: SceneNode & BaseFrameMixin, optimizeLayout: boolean): this {
-    if (isAbsolutePosition(node, optimizeLayout)) {
-      const { x, y } = getCommonPositionValue(node);
-      if (node.parent?.type === "FRAME" || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
-        this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
-        this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
-      }
-      else if (node.parent) {
-        if ("width" in node.parent && "constraints" in node && "horizontal" in node.constraints && node.constraints.horizontal === "MAX") {
-          this.pushModifier(['android:layout_marginEnd',`${node.parent.width-node.x-node.width}dp`]);
-        }
-        else {
-          this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
-        }
-        if ("height" in node.parent && "constraints" in node && "vertical" in node.constraints && node.constraints.vertical === "MAX") {
-          this.pushModifier(['android:layout_marginBottom',`${node.parent.height-node.y-node.height}dp`]);
-        }
-        else {
-          this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
-        }
-      }
-    }
-
-    if (androidNameParser(node.parent?.name).type === AndroidType.linearLayout) {
+    const { x, y } = getCommonPositionValue(node);
+    if (androidNameParser(node.parent?.name).type !== AndroidType.linearLayout) {
+      this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
+      this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
+    } else {
       if (node.paddingTop > 0) {
         this.pushModifier(["android:layout_marginTop",`${node.paddingTop}dp`]);
       }

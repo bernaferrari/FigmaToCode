@@ -483,10 +483,12 @@ const createDirectionalStack = (
       ).length !== 0
     ).length !== 0
 
-    if (node.parent && (!hasLinearLayoutParent || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE"))) {
+    if (!hasLinearLayoutParent && node.parent && (node.x > 0 || node.y > 0)) {
       prop['android:layout_marginStart']=`${sliceNum(node.x)}dp`;
       prop['android:layout_marginTop']=`${sliceNum(node.y)}dp`;
-    } if (!node.parent) {
+    } 
+    
+    if (!node.parent) {
       prop["xmlns:android"]="http://schemas.android.com/apk/res/android"
     }
 
