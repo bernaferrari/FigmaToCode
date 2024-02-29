@@ -458,6 +458,7 @@ const createDirectionalStack = (
     const {type, id}  = androidNameParser(idName)
     const parentType = androidNameParser(node.parent?.name).type
     const hasLinearLayoutParent = parentType === AndroidType.linearLayout
+    const layoutPosition = `android:${hasLinearLayoutParent ? "layout_margin" : "padding"}`
 
     let prop:Record<string, string | number> = {
       "android:layout_width": `${node.parent ? width : "match_parent"}`,
@@ -490,16 +491,16 @@ const createDirectionalStack = (
     }
 
     if (node.paddingTop > 0) {
-      prop["android:paddingTop"] = `${node.paddingTop}dp`
+      prop[`${layoutPosition}Top`] = `${node.paddingTop}dp`
     }
     if (node.paddingBottom > 0) {
-      prop["android:paddingBottom"] = `${node.paddingBottom}dp`
+      prop[`${layoutPosition}Bottom`] = `${node.paddingBottom}dp`
     }
     if (node.paddingRight > 0) {
-      prop["android:paddingRight"] = `${node.paddingRight}dp`
+      prop[`${layoutPosition}Right`] = `${node.paddingRight}dp`
     }
     if (node.paddingLeft > 0) {
-      prop["android:paddingLeft"] = `${node.paddingLeft}dp`
+      prop[`${layoutPosition}Left`] = `${node.paddingLeft}dp`
     }
 
     if (isClickable) {
@@ -511,21 +512,19 @@ const createDirectionalStack = (
       prop[background[0]] = background[1] ?? ""
     }
 
-    if (node.layoutMode !== "NONE" && type !== AndroidType.button) {
-      prop["android:orientation"] = node.layoutMode === "VERTICAL" ? "vertical":"horizontal"
-      prop["android:gravity"] = `${getGravityParam(node)}`
-      return generateAndroidViewCode(grandchildrenHaveRadioButton ? "RadioGroup" : "LinearLayout", prop, children)
-    } 
-    else if (type === AndroidType.verticalScrollView) {
-      prop["android:scrollbars"]="vertical";
-      return generateAndroidViewCode("ScrollView", prop, children)
-    }
-    else if (type === AndroidType.horizontalScrollView) {
-      prop["android:scrollbars"]="horizontal";
-      return generateAndroidViewCode("HorizontalScrollView", prop, children)
-    }
-    else {
-      return generateAndroidViewCode("FrameLayout", prop, children);
+    switch(type) {
+      case AndroidType.linearLayout:
+        prop["android:orientation"] = node.layoutMode === "VERTICAL" ? "vertical":"horizontal"
+        prop["android:gravity"] = `${getGravityParam(node)}`
+        return generateAndroidViewCode(grandchildrenHaveRadioButton ? "RadioGroup" : "LinearLayout", prop, children)
+      case AndroidType.verticalScrollView:
+        prop["android:scrollbars"]="vertical";
+        return generateAndroidViewCode("ScrollView", prop, children)
+      case AndroidType.horizontalScrollView:
+        prop["android:scrollbars"]="horizontal";
+        return generateAndroidViewCode("HorizontalScrollView", prop, children)
+      default:
+        return generateAndroidViewCode("FrameLayout", prop, children);
     }
 }
 

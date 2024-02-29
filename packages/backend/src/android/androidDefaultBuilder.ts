@@ -125,7 +125,7 @@ export class androidDefaultBuilder {
     return { centerX: centerBasedX, centerY: centerBasedY };
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
+  position(node: SceneNode & BaseFrameMixin, optimizeLayout: boolean): this {
     if (isAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
       if (node.parent?.type === "FRAME" || ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE")) {
@@ -148,7 +148,7 @@ export class androidDefaultBuilder {
       }
     }
 
-    if (node.parent?.type !== "FRAME" && (node.type === "COMPONENT" || node.type === "INSTANCE")) {
+    if (androidNameParser(node.parent?.name).type === AndroidType.linearLayout) {
       if (node.paddingTop > 0) {
         this.pushModifier(["android:layout_marginTop",`${node.paddingTop}dp`]);
       }
