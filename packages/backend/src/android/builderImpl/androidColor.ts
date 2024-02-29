@@ -1,5 +1,4 @@
 import { retrieveTopFill } from "../../common/retrieveFill";
-import { resourceName } from "../androidDefaultBuilder";
 import { getCommonRadius } from "../../common/commonRadius";
 import { sliceNum } from "../../common/numToAutoFixed";
 
@@ -34,46 +33,62 @@ export const androidSolidColor = (
   return "";
 };
 
-export const androidBackground = (node: SceneNode): [string, string | null] => {
-  const background: [string, string | null] = ["android:background", null]
-  const cornerRadius = androidCornerRadius(node)
+export const androidBackground = (node: SceneNode): [string, string] => {
+  const background: [string, string] = ["android:background", ""]
+  const underScore = background[1] === "" ? "" : "_"
+
+  background[1] += androidCornerRadius(node)
+  background[1] += androidFills(node, background[1] === "")
+  background[1] += androidStrokes(node, background[1] === "")
+
+  return background
+}
+
+const androidStrokes = (node: SceneNode, isFirst: boolean): string => {
+  if ("strokes" in node && node.strokes[0]) {
+    const color = AndroidSolidColor(node.strokes[0])
+    const lineWeight = typeof node.strokeWeight === "number" ? node.strokeWeight : 1
+
+    return `${isFirst ? "" : "_"}border_${color}_weight:${lineWeight}`
+  }
+  return ""
+}
+
+const androidFills = (node: SceneNode, isFirst: boolean): string => {
   if ("fills" in node) {
     const fill = retrieveTopFill(node.fills)
     if (fill) {
       switch(fill.type) {
         case "SOLID":
-          const opacity = fill.opacity ?? 1.0;
-          background[1] = cornerRadius ? cornerRadius + "_" + androidColor(fill.color, opacity) : androidColor(fill.color, opacity);
-          break
+          const solid = androidColor(fill.color, fill.opacity ?? 1.0)
+          return isFirst ? "" : "_" + solid
         case "GRADIENT_ANGULAR":
         case "GRADIENT_DIAMOND":
         case "GRADIENT_LINEAR":
         case "GRADIENT_RADIAL":
-          let gradientColor = cornerRadius ? `${cornerRadius}_` : ""
-          gradientColor += `${fill.type}_`
-          fill.gradientStops.forEach((node, i) => {
-            gradientColor += `${androidColor(node.color, node.color.a)}`
-            gradientColor += i === fill.gradientStops.length - 1 ? "" : "_"
+          let gradient = ""
+          let gradientColors: string[] = []
+          gradient += (isFirst ? "" : "_" + fill.type)
+          fill.gradientStops.forEach((node) => {
+            const color = androidColor(node.color, node.color.a)
+            gradientColors.push(color)
+            gradient += `_${color}`
           });
-          background[1] = gradientColor
-          break
+          return gradient
       }
     }
-  } else if(cornerRadius) {
-    background[1] = cornerRadius
   } 
-  return background
+  return ""
 }
 
-export const androidCornerRadius = (node: SceneNode): string|null => {
+export const androidCornerRadius = (node: SceneNode): string => {
   const radius = getCommonRadius(node);
   if ("all" in radius) {
     if (radius.all > 0) {
-      return `radius_${sliceNum(radius.all)}`;
+      return `radius_${sliceNum(radius.all)}`
     }
   }
-
-  return null;
+  return ""
 };
 
 export const androidColor = (color: RGB | RGBA, opacity: number): string => {
