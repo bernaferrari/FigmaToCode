@@ -124,7 +124,6 @@ export class androidTextBuilder extends androidDefaultBuilder {
     }
 
     const element = new androidElement("TextView")
-      .addModifier(["android:text", `@string/${node.name}`])
       .addModifier(["android:fontFamily",`@font/${resourceFontName(fontFamily)}`])
       .addModifier(["android:textSize",`${fontSize}sp`])
       .addModifier(["android:includeFontPadding","false"])
@@ -134,6 +133,10 @@ export class androidTextBuilder extends androidDefaultBuilder {
       .addModifier(["android:textStyle",this.textDecoration(segment.textDecoration)])
       .addModifier(["android:typeface",this.textStyle(segment.fontName.style)])
       .addModifier(["android:textColor", this.textColor(segment.fills)]);
+
+      if (node.name !== "text_variable") {
+        element.addModifier(["android:text", `@string/${node.name}`])
+      }
 
     return element;
     // });
