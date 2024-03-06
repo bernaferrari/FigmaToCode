@@ -95,6 +95,7 @@ const androidWidgetGenerator = (
       case "COMPONENT_SET":
         if (androidNameParser(node.name).type === AndroidType.linearLayout) {
           comp.push(androidComponent(node, indentLevel))
+          break;
         }
         comp.push(androidFrame(node, indentLevel));
         break;
@@ -233,6 +234,9 @@ const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean
   if (hasPadding && !setFrameLayout) {
     const stack = createDirectionalStack(androidButton(node, true), node.name, node, true)
     return androidContainer(node, stack)
+  } else if (setFrameLayout) {
+    result.element.addModifier(["android:clickable", "false"]);
+    result.element.addModifier(["android:focusable", "false"]);
   } else if (!hasPadding) {
     result.setId(node)
   }
@@ -507,6 +511,7 @@ const createDirectionalStack = (
 
     if (isClickable) {
       prop["android:clickable"] = "true"
+      prop["android:focusable"] = "true"
     }
 
     if ("fills" in node || androidCornerRadius(node)) {
