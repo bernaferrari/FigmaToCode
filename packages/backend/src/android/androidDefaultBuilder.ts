@@ -60,7 +60,7 @@ export function resourceName(name: string): string {
   return snakeCaseWords.join("_");
 }
 
-export function resourceFontName(name: string): string {
+export function resourceLowerCaseName(name: string): string {
   const words = name.toLocaleLowerCase().split(/[^a-zA-Z0-9]+/);
   const snakeCaseWords = words.map((word, index) => {
     if (index === 0) {
@@ -217,7 +217,7 @@ export class androidDefaultBuilder {
     const segments = globalTextStyleSegments[node.id];
     if (segments) {
       const segment = segments[0];
-      const font = resourceFontName(segment.fontName.family)
+      const font = resourceLowerCaseName(segment.fontName.family)
       const textSize = segment.fontSize
 
       this.element.addModifier([isPlaceholder ? 'android:hint' : 'android:text', `@string/${node.name}`])

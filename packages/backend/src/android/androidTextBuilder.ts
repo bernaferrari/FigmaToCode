@@ -3,7 +3,7 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
-import { androidDefaultBuilder, resourceFontName } from "./androidDefaultBuilder";
+import { androidDefaultBuilder, resourceLowerCaseName } from "./androidDefaultBuilder";
 import { androidSize } from "./builderImpl/androidSize";
 import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { androidElement } from "./builderImpl/androidParser";

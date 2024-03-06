@@ -1,6 +1,7 @@
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { getCommonRadius } from "../../common/commonRadius";
 import { sliceNum } from "../../common/numToAutoFixed";
+import { resourceLowerCaseName } from "../androidDefaultBuilder";
 
 export const AndroidSolidColor = (fill: Paint): string => {
   if (fill && fill.type === "SOLID") {
@@ -60,17 +61,16 @@ const androidFills = (node: SceneNode, isFirst: boolean): string => {
     if (fill) {
       switch(fill.type) {
         case "SOLID":
-          const solid = androidColor(fill.color, fill.opacity ?? 1.0)
+          const solid = androidColor(fill.color, fill.opacity ?? 1.0, false)
           return isFirst ? "" : "_" + solid
         case "GRADIENT_ANGULAR":
         case "GRADIENT_DIAMOND":
         case "GRADIENT_LINEAR":
         case "GRADIENT_RADIAL":
-          let gradient = ""
+          let gradient = isFirst ? `${resourceLowerCaseName(fill.type)}` : `_${resourceLowerCaseName(fill.type)}`
           let gradientColors: string[] = []
-          gradient += (isFirst ? "" : "_" + fill.type)
           fill.gradientStops.forEach((node) => {
-            const color = androidColor(node.color, node.color.a)
+            const color = androidColor(node.color, node.color.a, false)
             gradientColors.push(color)
             gradient += `_${color}`
           });
@@ -91,7 +91,7 @@ export const androidCornerRadius = (node: SceneNode): string => {
   return ""
 };
 
-export const androidColor = (color: RGB | RGBA, opacity: number): string => {
+export const androidColor = (color: RGB | RGBA, opacity: number, hasSharp: boolean = true): string => {
   if (color.r + color.g + color.b === 0 && opacity === 1) {
     return "@color/black";
   }
@@ -100,7 +100,7 @@ export const androidColor = (color: RGB | RGBA, opacity: number): string => {
     return "@color/white";
   }
 
-  return `#${color2hex(opacity)}${color2hex(color.r)}${color2hex(color.g)}${color2hex(color.b)}`;
+  return `${hasSharp ? "#" : ""}${color2hex(opacity)}${color2hex(color.r)}${color2hex(color.g)}${color2hex(color.b)}`;
 };
 
 export const color2hex = (color: number): string => {
