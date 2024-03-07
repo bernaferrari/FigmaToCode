@@ -152,8 +152,19 @@ export const androidContainer = (
 
 
 const androidView = (node: SceneNode & BaseFrameMixin): string => {
-  const childImage= node.children.filter((child: { type: string; }) => child.type == "RECTANGLE" || child.type == "GROUP")[0]
-  const isAsset = ("isAsset" in childImage && childImage.isAsset) || childImage.type === "GROUP"
+  const childImage = node.children.filter(child =>
+    child.type == "RECTANGLE" 
+    || child.type == "GROUP" 
+    || (androidNameParser(child.name).type !== AndroidType.text 
+    && (child.type === "COMPONENT" 
+    || child.type === "INSTANCE")))[0]
+
+  const isAsset = ("isAsset" in childImage 
+    && childImage.isAsset) 
+    || childImage.type === "GROUP" 
+    || (androidNameParser(childImage.name).type !== AndroidType.text
+    && (childImage.type === "COMPONENT" 
+    || childImage.type === "INSTANCE"))
 
   const result = new androidDefaultBuilder(isAsset ? "ImageView":"View")
     .setId(node)
@@ -215,8 +226,20 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
 };
 
 const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean = false): string => {
-  const childImage = node.children.filter((child: { type: string; }) => child.type == "RECTANGLE" || child.type == "GROUP")[0]
-  const isAsset = ("isAsset" in childImage && childImage.isAsset) || childImage.type === "GROUP"
+  const childImage = node.children.filter(child =>
+    child.type == "RECTANGLE" 
+    || child.type == "GROUP" 
+    || (androidNameParser(child.name).type !== AndroidType.text 
+    && (child.type === "COMPONENT" 
+    || child.type === "INSTANCE")))[0]
+
+  const isAsset = ("isAsset" in childImage 
+    && childImage.isAsset) 
+    || childImage.type === "GROUP" 
+    || (androidNameParser(childImage.name).type !== AndroidType.text
+    && (childImage.type === "COMPONENT" 
+    || childImage.type === "INSTANCE"))
+
   const hasPadding = childImage.width !== node.width && childImage.height !== node.height
   let childText: SceneNode & TextNode | undefined = undefined
   if (node.children.filter(child => androidNameParser(child.name).type === AndroidType.text).length !== 0) {
