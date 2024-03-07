@@ -204,7 +204,6 @@ const androidText = (textNode: SceneNode & TextNode, node: SceneNode | null = nu
   previousExecutionCache.push(result.build());
 
   return result
-    .commonPositionStyles(textNode, localSettings.optimizeLayout)
     .build();
 };
 
