@@ -3,6 +3,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:watch": "turbo run build:watch",
+    "pack":"rm -f Figma2Code.zip && cd .. && 7zz a -xr'!.*' -xr'!debug' -xr'!node_modules' FigmaToCode/Figma2Code.zip FigmaToCode/apps FigmaToCode/assets  FigmaToCode/manifest.json FigmaToCode/LICENSE  FigmaToCode/README.md",
     "dev": "turbo run dev --concurrency 20",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
