@@ -9,6 +9,7 @@ import { androidShadow } from "./builderImpl/androidEffects";
 import { TextNode } from "../altNodes/altMixins2";
 import { androidSize } from "./builderImpl/androidSize";
 import { AndroidType, androidNameParser } from "./builderImpl/androidNameParser";
+import { ButtonType, androidButtonType } from "./builderImpl/androidButtonType";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -224,59 +225,32 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
   return result.build(0);
 };
 
-const androidButton = (node: SceneNode & BaseFrameMixin, setFrameLayout: boolean = false): string => {
-  const childImage = node.children.filter(child =>
-    child.type == "RECTANGLE" 
-    || child.type == "GROUP" 
-    || (androidNameParser(child.name).type !== AndroidType.text 
-    && (child.type === "COMPONENT" 
-    || child.type === "INSTANCE")))[0]
-
-  const isAsset = ("isAsset" in childImage 
-    && childImage.isAsset) 
-    || childImage.type === "GROUP" 
-    || (androidNameParser(childImage.name).type !== AndroidType.text
-    && (childImage.type === "COMPONENT" 
-    || childImage.type === "INSTANCE"))
-
-  const hasPadding = childImage.width !== node.width && childImage.height !== node.height
-  let childText: SceneNode & TextNode | undefined = undefined
-  if (node.children.filter(child => androidNameParser(child.name).type === AndroidType.text).length !== 0) {
-    childText = node.children.filter((child): child is SceneNode & BaseFrameMixin => 
-      androidNameParser(child.name).type === AndroidType.text
-    )[0].children.filter((child): child is SceneNode & BaseFrameMixin =>
-      androidNameParser(child.name).type === AndroidType.frameLayout
-    )[0].children.filter((child): child is SceneNode & TextNode => child.type === "TEXT")[0]
-  }
+const androidButton = (node: SceneNode & BaseFrameMixin): string => {
+  const buttonNode = androidButtonType(node)
   
-  const result = new androidDefaultBuilder(isAsset ? "ImageButton" : "Button")
-    .setText(childText)
-    .size(childImage,localSettings.optimizeLayout);
+  const result = new androidDefaultBuilder(buttonNode.value)
+    .position(node, localSettings.optimizeLayout)
+    .size(node, localSettings.optimizeLayout)
+    .setText(buttonNode.text);
 
-  if (hasPadding && !setFrameLayout) {
-    const stack = createDirectionalStack(androidButton(node, true), node.name, node, true)
-    return androidContainer(node, stack)
-  } else if (setFrameLayout) {
-    result.element.addModifier(["android:clickable", "false"]);
-    result.element.addModifier(["android:focusable", "false"]);
-  } else if (!hasPadding) {
-    result.setId(node)
+  switch (buttonNode.type) {
+    case ButtonType.ImageButton:
+      result.element.addModifier(["android:src", `@drawable/${buttonNode.layout?.name}`]);
+      result.element.addModifier(["android:background", "@color/clearColor"]);
+      break;
+    case ButtonType.ButtonText:
+      result.element.addModifier(["android:background", `@drawable/${buttonNode.layout?.name}`]) 
+      break;
+    default:
+      if (buttonNode.layout) {
+        result.element.addModifier(androidBackground(buttonNode.layout))
+      }
+      break;
   }
 
-  if (isAsset) {
-    result.element.addModifier(["android:src", `@drawable/${childImage.name}`]);
-    result.element.addModifier(["android:background", "@color/clearColor"]);
-  } else {
-    result.element.addModifier(androidBackground(childImage))
+  if (buttonNode.layout) {
+    result.pushModifier(androidShadow(buttonNode.layout));
   }
-
-  if (hasPadding) {
-    result.element.addModifier(["android:layout_gravity", "center"])
-  } else {
-    result.position(node, localSettings.optimizeLayout)
-  }
-
-  result.pushModifier(androidShadow(childImage));
   
   return result.build(0);
 };
