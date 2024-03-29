@@ -227,6 +227,10 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
 
 const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   const buttonNode = androidButtonType(node)
+
+  if (buttonNode.type === ButtonType.IconTextButton) {
+    return androidIconTextButton(node, buttonNode.layout, buttonNode.text)
+  }
   
   const result = new androidDefaultBuilder(buttonNode.value)
     .position(node, localSettings.optimizeLayout)
@@ -238,7 +242,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
       result.element.addModifier(["android:src", `@drawable/${buttonNode.layout?.name}`]);
       result.element.addModifier(["android:background", "@color/clearColor"]);
       break;
-    case ButtonType.ButtonText:
+    case ButtonType.ImageTextButton:
       result.element.addModifier(["android:background", `@drawable/${buttonNode.layout?.name}`]) 
       break;
     default:
@@ -251,6 +255,26 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   if (buttonNode.layout) {
     result.pushModifier(androidShadow(buttonNode.layout));
   }
+  
+  return result.build(0);
+};
+
+const androidIconTextButton = (node: SceneNode & BaseFrameMixin, layout: SceneNode | undefined, text: TextNode | undefined): string => {
+  const linear = node.children.filter(child => androidNameParser(child.name).type === AndroidType.linearLayout)[0]
+  const isForwardText = "children" in linear && androidNameParser(linear.children[0].name).type === AndroidType.text
+
+  const result = new androidDefaultBuilder("androidx.appcompat.widget.AppCompatButton")
+    .position(node, localSettings.optimizeLayout)
+    .size(node, localSettings.optimizeLayout)
+    .setText(text);
+  
+  if ("layoutMode" in linear && linear.layoutMode === "HORIZONTAL") {
+    result.pushModifier([`android:drawable${isForwardText ? "Right" : "Left"}`, `@drawable/${layout?.name}`])
+  } else {
+    result.pushModifier([`android:drawable${isForwardText ? "Bottom" : "Top"}`, `@drawable/${layout?.name}`])
+  }
+
+  result.element.addModifier(["android:background", "@color/clearColor"]);
   
   return result.build(0);
 };
