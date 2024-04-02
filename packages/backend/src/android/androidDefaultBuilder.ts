@@ -127,7 +127,7 @@ export class androidDefaultBuilder {
 
   position(node: SceneNode & BaseFrameMixin, optimizeLayout: boolean): this {
     const { x, y } = getCommonPositionValue(node);
-    if (androidNameParser(node.parent?.name).type !== AndroidType.linearLayout) {
+    if (node.parent && androidNameParser(node.parent?.name).type !== AndroidType.linearLayout) {
       this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
       this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
     } else {
