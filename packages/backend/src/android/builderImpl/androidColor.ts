@@ -35,17 +35,17 @@ export const androidSolidColor = (
 };
 
 export const androidBackground = (node: SceneNode): [string, string] => {
-  const background: [string, string] = ["android:background", ""]
-  const underScore = background[1] === "" ? "" : "_"
+  const prefix = "@drawable/"
+  const background: [string, string] = ["android:background", prefix]
 
   background[1] += androidCornerRadius(node)
-  background[1] += androidFills(node, background[1] === "")
-  background[1] += androidStrokes(node, background[1] === "")
+  background[1] += androidFills(node, background[1] === prefix)
+  background[1] += androidStrokes(node, background[1] === prefix)
 
   return background
 }
 
-const androidStrokes = (node: SceneNode, isFirst: boolean): string => {
+export const androidStrokes = (node: SceneNode, isFirst: boolean): string => {
   if ("strokes" in node && node.strokes[0]) {
     const color = AndroidSolidColor(node.strokes[0])
     const lineWeight = typeof node.strokeWeight === "number" ? node.strokeWeight : 1

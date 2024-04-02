@@ -1,6 +1,6 @@
 import { compactProp, indentString } from "../common/indentString";
 import { className, sliceNum } from "../common/numToAutoFixed";
-import { androidBackground, androidCornerRadius } from "./builderImpl/androidColor";
+import { androidBackground, androidCornerRadius, androidStrokes } from "./builderImpl/androidColor";
 import { androidTextBuilder } from "./androidTextBuilder";
 import { androidDefaultBuilder } from "./androidDefaultBuilder";
 import { PluginSettings } from "../code";
@@ -535,7 +535,7 @@ const createDirectionalStack = (
       prop["android:focusable"] = "true"
     }
 
-    if ("fills" in node || androidCornerRadius(node)) {
+    if ("fills" in node || androidCornerRadius(node) !== "" || androidStrokes(node, false) !== "") {
       const background = androidBackground(node)
       prop[background[0]] = background[1] ?? ""
     }
