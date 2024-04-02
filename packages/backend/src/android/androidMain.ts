@@ -486,8 +486,8 @@ const createDirectionalStack = (
     const layoutPosition = `android:${hasLinearLayoutParent ? "layout_margin" : "padding"}`
 
     let prop:Record<string, string | number> = {
-      "android:layout_width": `${node.parent ? width : "match_parent"}`,
-      "android:layout_height": `${node.parent ? height : "match_parent"}`
+      "android:layout_width": `${width}`,
+      "android:layout_height": `${height}`
     }
 
     if (weight) {
