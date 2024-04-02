@@ -22,7 +22,7 @@ export class androidTextBuilder extends androidDefaultBuilder {
   }
 
   textAutoSize(node: TextNode): this {
-    this.modifiers.push(this.wrapTextAutoResize(node));
+    this.pushModifier(["android:textAlignment", this.wrapTextAutoResize(node)])
     return this;
   }
 
@@ -166,59 +166,36 @@ export class androidTextBuilder extends androidDefaultBuilder {
   };
 
   wrapTextAutoResize = (node: TextNode): string => {
-    const { width, height } = androidSize(node,false);
+    const { width } = androidSize(node,false);
 
     let comp: string[] = [];
     switch (node.textAutoResize) {
-      case "WIDTH_AND_HEIGHT":
-        break;
       case "HEIGHT":
         comp.push(width);
         break;
-      case "NONE":
-      case "TRUNCATE":
-        comp.push(width, height);
+      default:
         break;
     }
 
     if (comp.length > 0) {
-      const align = this.textAlignment(node);
-      return `.frame(${comp.join(", ")}${align})`;
+      return this.textAlignment(node);
     }
 
     return "";
   };
 
-  // SwiftUI has two alignments for Text, when it is a single line and when it is multiline. This one is for single line.
   textAlignment = (node: TextNode): string => {
     let hAlign = "";
-    if (node.textAlignHorizontal === "LEFT") {
-      hAlign = "leading";
-    } else if (node.textAlignHorizontal === "RIGHT") {
-      hAlign = "trailing";
-    }
-
-    let vAlign = "";
-    if (node.textAlignVertical === "TOP") {
-      vAlign = "top";
-    } else if (node.textAlignVertical === "BOTTOM") {
-      vAlign = "bottom";
-    }
-
-    if (hAlign && !vAlign) {
-      // result should be leading or trailing
-      return `, alignment: .${hAlign}`;
-    } else if (!hAlign && vAlign) {
-      // result should be top or bottom
-      return `, alignment: .${vAlign}`;
-    } else if (hAlign && vAlign) {
-      // make the first char from hAlign uppercase
-      const hAlignUpper = hAlign.charAt(0).toUpperCase() + hAlign.slice(1);
-      // result should be topLeading, topTrailing, bottomLeading or bottomTrailing
-      return `, alignment: .${vAlign}${hAlignUpper}`;
+    switch (node.textAlignHorizontal) {
+      case "LEFT":
+        hAlign = "textStart"
+      case "RIGHT":
+        hAlign = "textEnd"
+      default:
+        hAlign = "center"
     }
 
     // when they are centered
-    return "";
+    return hAlign;
   };
 }

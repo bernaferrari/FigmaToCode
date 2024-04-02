@@ -197,6 +197,7 @@ const androidLinearSpace = (node: SceneNode): string => {
 const androidText = (textNode: SceneNode & TextNode, node: SceneNode | null = null): string => {
   const result = new androidTextBuilder()
     .createText(textNode)
+    .textAutoSize(textNode)
     .setId(node ? node : textNode)
     .position(node ? node : textNode, localSettings.optimizeLayout)
     .size(node ? node : textNode, localSettings.optimizeLayout);
