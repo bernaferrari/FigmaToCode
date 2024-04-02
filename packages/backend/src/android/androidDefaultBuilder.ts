@@ -138,10 +138,10 @@ export class androidDefaultBuilder {
         this.pushModifier(["android:layout_marginBottom",`${node.paddingBottom}dp`]);
       }
       if (node.paddingRight > 0) {
-        this.pushModifier(["android:layout_marginRight",`${node.paddingRight}dp`]);
+        this.pushModifier(["android:layout_marginEnd",`${node.paddingRight}dp`]);
       }
       if (node.paddingLeft > 0) {
-        this.pushModifier(["android:layout_marginLeft",`${node.paddingLeft}dp`]);
+        this.pushModifier(["android:layout_marginStart",`${node.paddingLeft}dp`]);
       }
     }
 

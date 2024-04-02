@@ -524,10 +524,10 @@ const createDirectionalStack = (
       prop[`${layoutPosition}Bottom`] = `${node.paddingBottom}dp`
     }
     if (node.paddingRight > 0) {
-      prop[`${layoutPosition}Right`] = `${node.paddingRight}dp`
+      prop[`${layoutPosition}End`] = `${node.paddingRight}dp`
     }
     if (node.paddingLeft > 0) {
-      prop[`${layoutPosition}Left`] = `${node.paddingLeft}dp`
+      prop[`${layoutPosition}Start`] = `${node.paddingLeft}dp`
     }
 
     if (isClickable) {
