@@ -51,15 +51,16 @@ export const androidMain = (
 
 const androidWidgetGenerator = (
   sceneNode: ReadonlyArray<SceneNode>,
-  indentLevel: number
+  indentLevel: number,
+  hasParentOfComponentSet: boolean = false
 ): string => {
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   let comp: string[] = [];
   let compXml: string[] = [];
-  let listItemCount: number = 0
 
   visibleSceneNode.forEach((node, index) => {
+    const type = androidNameParser(node.name).type
     const parentType = androidNameParser(node.parent?.name).type
     const isLinearLayout = parentType === AndroidType.linearLayout
     const hasStackParent = node.parent?.type === "COMPONENT" || node.parent?.type === "INSTANCE" || node.parent?.type === "FRAME"
@@ -72,16 +73,14 @@ const androidWidgetGenerator = (
     switch (node.type) {
       case "COMPONENT":
       case "INSTANCE":
-        switch (androidNameParser(node.name).type) {
+        switch (hasParentOfComponentSet ? parentType : type ) {
           case AndroidType.list:
             comp.push(androidComponent(node, indentLevel));
             compXml.push(`\n\n<!-- ${node.name}_item.xml -->`)
             compXml.push(androidWidgetGenerator(node.children, indentLevel));
             break;
           case AndroidType.listItem:
-            if (listItemCount != 0) break;
             comp.push(androidComponent(node, indentLevel));
-            listItemCount = 1
             break;
           default:
             comp.push(androidComponent(node, indentLevel));
@@ -93,24 +92,18 @@ const androidWidgetGenerator = (
         comp.push(androidContainer(node));
         break;
       case "FRAME":
-      case "COMPONENT_SET":
-        if (androidNameParser(node.name).type === AndroidType.linearLayout) {
+        if (hasParentOfComponentSet ? parentType : type === AndroidType.linearLayout) {
           comp.push(androidComponent(node, indentLevel))
           break;
         }
         comp.push(androidFrame(node, indentLevel));
         break;
+      case "COMPONENT_SET":
+        comp.push(androidLinear(node, indentLevel));
+        break;
       case "TEXT":
         comp.push(androidText(node));
         break;
-      case "RECTANGLE":
-        if (node.isAsset) {
-          comp.push(androidImage(node))
-        }
-        else {
-          comp.push(androidContainer(node));
-        }
-      break;
       default:
       break;
     }
@@ -399,7 +392,7 @@ const androidFrame = (
 
 const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLevel: number): string => {
   
-  switch (androidNameParser(node.name).type) {
+  switch (androidNameParser(node.parent?.type === "COMPONENT_SET" ? node.parent?.name : node.name).type) {
     case AndroidType.view:
       return androidView(node)
     case AndroidType.text:
@@ -583,6 +576,7 @@ const widgetGeneratorWithLimits = (
   node: SceneNode & ChildrenMixin,
   indentLevel: number
 ) => {
+  const hasParentOfComponentSet = node.type === "COMPONENT_SET"
   if (node.children.length < 10) {
     // standard way
     return androidWidgetGenerator(
@@ -590,7 +584,8 @@ const widgetGeneratorWithLimits = (
         node,
         localSettings.optimizeLayout
       ),
-      indentLevel
+      indentLevel,
+      hasParentOfComponentSet
     );
   }
 
@@ -604,7 +599,7 @@ const widgetGeneratorWithLimits = (
   // split node.children in arrays of 10, so that it can be Grouped. I feel so guilty of allowing this.
   for (let i = 0, j = slicedChildren.length; i < j; i += chunk) {
     const chunkChildren = slicedChildren.slice(i, i + chunk);
-    const strChildren = androidWidgetGenerator(chunkChildren, indentLevel);
+    const strChildren = androidWidgetGenerator(chunkChildren, indentLevel, hasParentOfComponentSet);
     strBuilder += `${indentString(strChildren)}`;
   }
 
