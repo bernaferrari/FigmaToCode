@@ -528,10 +528,8 @@ const createDirectionalStack = (
       prop["android:focusable"] = "true"
     }
 
-    if ("fills" in node || androidCornerRadius(node) !== "" || androidStrokes(node, false) !== "") {
-      const background = androidBackground(node)
-      prop[background[0]] = background[1] ?? ""
-    }
+    const background = androidBackground(node)
+    prop[background[0]] = background[1] ?? ""
 
     switch(type) {
       case AndroidType.linearLayout:

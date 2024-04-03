@@ -42,7 +42,7 @@ export const androidBackground = (node: SceneNode): [string, string] => {
   background[1] += androidFills(node, background[1] === prefix)
   background[1] += androidStrokes(node, background[1] === prefix)
 
-  return background
+  return background[1] === prefix ? ["", ""] : background
 }
 
 export const androidStrokes = (node: SceneNode, isFirst: boolean): string => {
