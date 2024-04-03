@@ -70,6 +70,10 @@ const androidWidgetGenerator = (
       comp.push(androidLinearSpace(node));
     }
 
+    if (hasParentOfComponentSet) {
+      comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item -->`)
+    }
+
     switch (node.type) {
       case "COMPONENT":
       case "INSTANCE":
