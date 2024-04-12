@@ -100,9 +100,13 @@ const androidWidgetGenerator = (
       case "FRAME":
         if (hasParentOfComponentSet ? parentType : type === AndroidType.linearLayout) {
           comp.push(androidComponent(node, indentLevel))
-          break;
         }
-        comp.push(androidFrame(node, indentLevel));
+        if (node.name === "UIkit_Color") {
+          comp.push(androidColorTable(node))
+        }
+        else {
+          comp.push(androidFrame(node, indentLevel));
+        }
         break;
       case "COMPONENT_SET":
         comp.push(androidLinear(node, indentLevel));
@@ -577,39 +581,19 @@ export const generateAndroidViewCode = (
   }
 };
 
-// todo should the plugin manually Group items? Ideally, it would detect the similarities and allow a ForEach.
 const widgetGeneratorWithLimits = (
   node: SceneNode & ChildrenMixin,
   indentLevel: number
 ) => {
   const hasParentOfComponentSet = node.type === "COMPONENT_SET"
-  if (node.children.length < 10) {
-    // standard way
-    return androidWidgetGenerator(
+  return androidWidgetGenerator(
       commonSortChildrenWhenInferredAutoLayout(
-        node,
-        localSettings.optimizeLayout
-      ),
-      indentLevel,
-      hasParentOfComponentSet
-    );
-  }
-
-  const chunk = 10;
-  let strBuilder = "";
-  const slicedChildren = commonSortChildrenWhenInferredAutoLayout(
-    node,
-    localSettings.optimizeLayout
-  ).slice(0, 100);
-
-  // split node.children in arrays of 10, so that it can be Grouped. I feel so guilty of allowing this.
-  for (let i = 0, j = slicedChildren.length; i < j; i += chunk) {
-    const chunkChildren = slicedChildren.slice(i, i + chunk);
-    const strChildren = androidWidgetGenerator(chunkChildren, indentLevel, hasParentOfComponentSet);
-    strBuilder += `${indentString(strChildren)}`;
-  }
-
-  return strBuilder;
+      node,
+      localSettings.optimizeLayout
+    ),
+    indentLevel,
+    hasParentOfComponentSet
+  );
 };
 
 export const androidCodeGenTextStyles = () => {
@@ -620,4 +604,24 @@ export const androidCodeGenTextStyles = () => {
     return "// No text styles in this selection";
   }
   return result;
+};
+
+const androidColorTable = (
+  node: SceneNode
+) : string => {
+  if (node.type === "INSTANCE" && node.name === "ColorStyle") {
+    const frame = (node.children[0] as FrameNode);
+    const grp = (frame.children[0] as GroupNode);
+    return ` ${(grp.children[1] as TextNode).characters}:${(grp.children[0] as TextNode).characters}\n`;
+  }
+  else if (node.type === "FRAME") {
+    let result = "";
+    (node as FrameNode).children.forEach((cnode,index) => {
+      result += androidColorTable(cnode);
+    });
+    return result;
+  }
+  else {
+    return "";
+  }
 };
