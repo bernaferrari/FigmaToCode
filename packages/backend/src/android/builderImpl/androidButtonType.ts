@@ -81,6 +81,14 @@ const getLayout = (node: SceneNode & BaseFrameMixin): { foreground: SceneNode | 
     || child.type === "INSTANCE"))
   )
 
+  layout.forEach((child, index) => {
+    if (androidNameParser(child.name).type === AndroidType.view) {
+      let id = androidNameParser(child.name).id.split("_")
+      id.shift()
+      layout[index].name = id.join("_") ?? child.name
+    }
+  });
+
   switch(layout.length) {
     case 1:
       return { foreground: layout[0], backgorund: undefined }
