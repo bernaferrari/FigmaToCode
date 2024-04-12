@@ -80,8 +80,10 @@ const androidWidgetGenerator = (
         switch (hasParentOfComponentSet ? parentType : type ) {
           case AndroidType.list:
             comp.push(androidComponent(node, indentLevel));
-            compXml.push(`\n\n<!-- ${node.name}_item.xml -->`)
-            compXml.push(androidWidgetGenerator(node.children, indentLevel));
+            if (node.type === "COMPONENT") {
+              compXml.push(`\n\n<!-- ${node.name}_item.xml -->`)
+              compXml.push(androidWidgetGenerator(node.children, indentLevel));
+            }
             break;
           case AndroidType.listItem:
             comp.push(androidComponent(node, indentLevel));
@@ -563,9 +565,7 @@ export const generateAndroidViewCode = (
 
   const compactPropertiesArray = compactProp(properties)
   if (!className) {
-    return `${indentString(
-      children
-    )}`;
+    return `${children}`;
   }
   else if (!children) {
     return `<${className}\n ${compactPropertiesArray}/>\n`;
