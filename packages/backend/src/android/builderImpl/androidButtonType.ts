@@ -4,30 +4,61 @@ export enum ButtonType {
   Button,
   ImageButton,
   ImageTextButton,
-  IconTextButton
+  IconTextButton,
+  BackgroundImageButton
 }
 
 export const androidButtonType = (node: SceneNode & BaseFrameMixin ): {
   type: ButtonType, 
   value: string, 
-  layout: SceneNode | undefined,
+  foreground: SceneNode | undefined,
+  background: SceneNode | undefined,
   text: TextNode | undefined
 } => {
   const linear = node.children.filter(child => androidNameParser(child.name).type === AndroidType.linearLayout)
   const layout = getLayout(node)
-  const isAsset = getIsAsset(layout)
   const childText = getChildText(node)
 
-  if (linear.length !== 0 && getLayout(linear[0]) && getChildText(linear[0])) {
-    const layout = getLayout(linear[0])
-    const text = getChildText(linear[0])
-    return { type: ButtonType.IconTextButton, value: "", layout: layout, text: text }
+  if (getIsAsset(layout.foreground) && getIsAsset(layout.backgorund)) {
+    return {
+      type: ButtonType.BackgroundImageButton,
+      value: "ImageButton",
+      background: layout.backgorund, 
+      foreground: layout.foreground,
+      text: undefined 
+    }
+  } else if (linear.length !== 0 && getLayout(linear[0]).foreground && getChildText(linear[0])) {
+    return {
+      type: ButtonType.IconTextButton,
+      value: "",
+      foreground: getLayout(linear[0]).foreground,
+      background: undefined,
+      text: getChildText(linear[0]) 
+    }
   } else if (childText === undefined) {
-    return { type: ButtonType.ImageButton, value: "ImageButton", layout: layout, text: undefined }
-  } else if (isAsset) {
-    return { type: ButtonType.ImageTextButton, value: "androidx.appcompat.widget.AppCompatButton", layout: layout, text: childText }
+    return {
+      type: ButtonType.ImageButton,
+      value: "ImageButton",
+      foreground: layout.foreground,
+      background: undefined,
+      text: undefined 
+    }
+  } else if (getIsAsset(layout.foreground)) {
+    return {
+      type: ButtonType.ImageTextButton, 
+      value: "androidx.appcompat.widget.AppCompatButton", 
+      foreground: layout.foreground, 
+      background: undefined, 
+      text: childText 
+    }
   } else {
-    return { type: ButtonType.Button, value: "androidx.appcompat.widget.AppCompatButton", layout: layout, text: childText }
+    return {
+      type: ButtonType.Button,
+      value: "androidx.appcompat.widget.AppCompatButton",
+      foreground: layout.foreground,
+      background: undefined,
+      text: childText 
+    }
   }
 }
 
@@ -41,14 +72,23 @@ const getChildText = (node: SceneNode & BaseFrameMixin): TextNode | undefined =>
   }
 }
 
-const getLayout = (node: SceneNode & BaseFrameMixin): SceneNode | undefined => {
-  return node.children.filter(child =>
+const getLayout = (node: SceneNode & BaseFrameMixin): { foreground: SceneNode | undefined, backgorund: SceneNode | undefined} => {
+  const layout = node.children.filter(child =>
     child.type == "RECTANGLE" 
     || child.type == "GROUP" 
     || (androidNameParser(child.name).type !== AndroidType.text 
     && (child.type === "COMPONENT" 
     || child.type === "INSTANCE"))
-  )[0]
+  )
+
+  switch(layout.length) {
+    case 1:
+      return { foreground: layout[0], backgorund: undefined }
+    case 2:
+      return { foreground: layout[1], backgorund: layout[0] }
+    default:
+      return { foreground: undefined, backgorund: undefined }
+  }
 }
 
 const getIsAsset = (layout: SceneNode | undefined): boolean => {

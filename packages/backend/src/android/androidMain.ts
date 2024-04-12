@@ -227,7 +227,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   const buttonNode = androidButtonType(node)
 
   if (buttonNode.type === ButtonType.IconTextButton) {
-    return androidIconTextButton(node, buttonNode.layout, buttonNode.text)
+    return androidIconTextButton(node, buttonNode.foreground, buttonNode.text)
   }
   
   const result = new androidDefaultBuilder(buttonNode.value)
@@ -236,22 +236,26 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
     .setText(buttonNode.text);
 
   switch (buttonNode.type) {
+    case ButtonType.BackgroundImageButton:
+      result.element.addModifier(["android:src", `@drawable/${buttonNode.foreground?.name}`]);
+      result.element.addModifier(["android:background", `@drawable/${buttonNode.background?.name}`]);
+      break;
     case ButtonType.ImageButton:
-      result.element.addModifier(["android:src", `@drawable/${buttonNode.layout?.name}`]);
+      result.element.addModifier(["android:src", `@drawable/${buttonNode.foreground?.name}`]);
       result.element.addModifier(["android:background", "@color/clearColor"]);
       break;
     case ButtonType.ImageTextButton:
-      result.element.addModifier(["android:background", `@drawable/${buttonNode.layout?.name}`]) 
+      result.element.addModifier(["android:background", `@drawable/${buttonNode.foreground?.name}`]) 
       break;
     default:
-      if (buttonNode.layout) {
-        result.element.addModifier(androidBackground(buttonNode.layout))
+      if (buttonNode.foreground) {
+        result.element.addModifier(androidBackground(buttonNode.foreground))
       }
       break;
   }
 
-  if (buttonNode.layout) {
-    result.pushModifier(androidShadow(buttonNode.layout));
+  if (buttonNode.foreground) {
+    result.pushModifier(androidShadow(buttonNode.foreground));
   }
   
   return result.build(0);
