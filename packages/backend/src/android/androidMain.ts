@@ -71,7 +71,13 @@ const androidWidgetGenerator = (
     }
 
     if (hasParentOfComponentSet) {
-      comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item -->`)
+      if (parentType == AndroidType.listItem) {
+        const cols = node.name.split('=');
+        comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item_${cols[1]} -->`)
+      }
+      else {
+        comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item -->`)
+      }
     }
 
     switch (node.type) {
