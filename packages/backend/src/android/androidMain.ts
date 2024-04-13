@@ -71,12 +71,12 @@ const androidWidgetGenerator = (
     }
 
     if (hasParentOfComponentSet) {
-      if (parentType == AndroidType.listItem) {
+      if (parentType == AndroidType.listItem || parentType == AndroidType.button) {
         const cols = node.name.split('=');
         comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item_${cols[1]} -->`)
       }
       else {
-        comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item -->`)
+        comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item_${node.name} -->`)
       }
     }
 
@@ -93,6 +93,14 @@ const androidWidgetGenerator = (
             break;
           case AndroidType.listItem:
             comp.push(androidComponent(node, indentLevel));
+            break;
+          case AndroidType.button:
+            if (node.type !== "COMPONENT" || node.parent?.children?.findIndex((d) => d.id === node.id) === 0) {
+              comp.push(androidComponent(node, indentLevel));
+            }
+            else {
+              comp.push(androidComponent(node, indentLevel, true));
+            }
             break;
           default:
             comp.push(androidComponent(node, indentLevel));
@@ -235,17 +243,19 @@ const androidImage = (node: RectangleNode | VectorNode): string => {
   return result.build(0);
 };
 
-const androidButton = (node: SceneNode & BaseFrameMixin): string => {
+const androidButton = (node: SceneNode & BaseFrameMixin, chopPosition:boolean = false): string => {
   const buttonNode = androidButtonType(node)
 
   if (buttonNode.type === ButtonType.IconTextButton) {
-    return androidIconTextButton(node, buttonNode.foreground, buttonNode.text)
+    return androidIconTextButton(node, buttonNode.foreground, buttonNode.text, chopPosition)
   }
   
-  const result = new androidDefaultBuilder(buttonNode.value)
-    .position(node, localSettings.optimizeLayout)
-    .size(node, localSettings.optimizeLayout)
-    .setText(buttonNode.text);
+  let result = new androidDefaultBuilder(buttonNode.value);
+  if (!chopPosition) {
+    result = result.setText(buttonNode.text)
+              .position(node, localSettings.optimizeLayout)
+              .size(node, localSettings.optimizeLayout);
+  }
 
   switch (buttonNode.type) {
     case ButtonType.BackgroundImageButton:
@@ -273,14 +283,16 @@ const androidButton = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
-const androidIconTextButton = (node: SceneNode & BaseFrameMixin, layout: SceneNode | undefined, text: TextNode | undefined): string => {
+const androidIconTextButton = (node: SceneNode & BaseFrameMixin, layout: SceneNode | undefined, text: TextNode | undefined, chopPosition:boolean = false): string => {
   const linear = node.children.filter(child => androidNameParser(child.name).type === AndroidType.linearLayout)[0]
   const isForwardText = "children" in linear && androidNameParser(linear.children[0].name).type === AndroidType.text
 
-  const result = new androidDefaultBuilder("androidx.appcompat.widget.AppCompatButton")
-    .position(node, localSettings.optimizeLayout)
-    .size(node, localSettings.optimizeLayout)
-    .setText(text);
+  let result = new androidDefaultBuilder("androidx.appcompat.widget.AppCompatButton");
+  if (!chopPosition) {
+    result = result.setText(text)
+                .position(node, localSettings.optimizeLayout)
+                .size(node, localSettings.optimizeLayout);
+  }
   
   if ("layoutMode" in linear && linear.layoutMode === "HORIZONTAL") {
     result.pushModifier([`android:drawable${isForwardText ? "Right" : "Left"}`, `@drawable/${layout?.name}`])
@@ -410,7 +422,7 @@ const androidFrame = (
   return androidContainer(node, anyStack);
 };
 
-const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLevel: number): string => {
+const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLevel: number, chopPosition: boolean = false): string => {
   
   switch (androidNameParser(node.parent?.type === "COMPONENT_SET" ? node.parent?.name : node.name).type) {
     case AndroidType.view:
@@ -425,7 +437,7 @@ const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLev
         return androidText(node.children[0].children[0], node)
       }
     case AndroidType.button:
-      return androidButton(node)
+      return androidButton(node, chopPosition)
     case AndroidType.list:
       return androidList(node)
     case AndroidType.listItem:
