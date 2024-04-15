@@ -73,10 +73,10 @@ const androidWidgetGenerator = (
     if (hasParentOfComponentSet) {
       if (parentType == AndroidType.listItem || parentType == AndroidType.button) {
         const cols = node.name.split('=');
-        comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item_${cols[1]} -->`)
+        comp.push(`\n<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} start -->`)
       }
       else {
-        comp.push(`\n\n<!-- ${node.parent?.name}_Component_Set_Item_${node.name} -->`)
+        comp.push(`\n<!-- Component_Set_Item ${node.parent?.name}_${node.name} start -->`)
       }
     }
 
@@ -87,8 +87,9 @@ const androidWidgetGenerator = (
           case AndroidType.list:
             comp.push(androidComponent(node, indentLevel));
             if (node.type === "COMPONENT") {
-              compXml.push(`\n\n<!-- ${node.name}_item.xml -->`)
+              compXml.push(`\n<!-- ${node.name}_item.xml start -->`)
               compXml.push(androidWidgetGenerator(node.children, indentLevel));
+              compXml.push(`<!-- ${node.name}_item.xml end -->\n`)
             }
             break;
           case AndroidType.listItem:
@@ -130,6 +131,16 @@ const androidWidgetGenerator = (
         break;
       default:
       break;
+    }
+
+    if (hasParentOfComponentSet) {
+      if (parentType == AndroidType.listItem || parentType == AndroidType.button) {
+        const cols = node.name.split('=');
+        comp.push(`<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} end -->\n`)
+      }
+      else {
+        comp.push(`<!-- Component_Set_Item ${node.parent?.name}_${node.name} end -->\n`)
+      }
     }
   });
 
