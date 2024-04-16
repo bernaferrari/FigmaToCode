@@ -5,7 +5,7 @@ import { resourceLowerCaseName } from "../androidDefaultBuilder";
 
 export const AndroidSolidColor = (fill: Paint): string => {
   if (fill && fill.type === "SOLID") {
-    return androidColor(fill.color, fill.opacity ?? 1.0);
+    return androidColor(fill.color, fill.opacity ?? 1.0, false);
   }
 
   return "";
@@ -39,8 +39,12 @@ export const androidBackground = (node: SceneNode): [string, string] => {
   const background: [string, string] = ["android:background", prefix]
 
   background[1] += androidCornerRadius(node)
-  background[1] += androidFills(node, background[1] === prefix)
   background[1] += androidStrokes(node, background[1] === prefix)
+  background[1] += androidFills(node, background[1] === prefix)
+
+  if (background[1].startsWith(prefix+"D_@color") || background[1].startsWith(prefix+"D_#")) {
+    background[1] = background[1].substring(prefix.length+2);
+  }
 
   return background[1] === prefix ? ["", ""] : background
 }
@@ -61,8 +65,8 @@ const androidFills = (node: SceneNode, isFirst: boolean): string => {
     if (fill) {
       switch(fill.type) {
         case "SOLID":
-          const solid = androidColor(fill.color, fill.opacity ?? 1.0, false)
-          return isFirst ? "D_" : "_" + solid
+          const solid = androidColor(fill.color, fill.opacity ?? 1.0, isFirst)
+          return solid ? (isFirst ? `D_${solid}` : `_${solid}`) : ""
         case "GRADIENT_ANGULAR":
         case "GRADIENT_DIAMOND":
         case "GRADIENT_LINEAR":
@@ -92,11 +96,11 @@ export const androidCornerRadius = (node: SceneNode): string => {
 };
 
 export const androidColor = (color: RGB | RGBA, opacity: number, hasSharp: boolean = true): string => {
-  if (color.r + color.g + color.b === 0 && opacity === 1) {
+  if (color.r + color.g + color.b === 0 && opacity === 1 && hasSharp) {
     return "@color/black";
   }
 
-  if (color.r + color.g + color.b === 3 && opacity === 1) {
+  if (color.r + color.g + color.b === 3 && opacity === 1 && hasSharp) {
     return "@color/white";
   }
 
