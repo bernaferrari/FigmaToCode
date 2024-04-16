@@ -50,7 +50,7 @@ export const androidStrokes = (node: SceneNode, isFirst: boolean): string => {
     const color = AndroidSolidColor(node.strokes[0])
     const lineWeight = typeof node.strokeWeight === "number" ? node.strokeWeight : 1
 
-    return `${isFirst ? "" : "_"}border_${color}_weight:${lineWeight}`
+    return `${isFirst ? "D_" : "_"}border_${color}_weight:${lineWeight}`
   }
   return ""
 }
@@ -62,12 +62,12 @@ const androidFills = (node: SceneNode, isFirst: boolean): string => {
       switch(fill.type) {
         case "SOLID":
           const solid = androidColor(fill.color, fill.opacity ?? 1.0, false)
-          return isFirst ? "" : "_" + solid
+          return isFirst ? "D_" : "_" + solid
         case "GRADIENT_ANGULAR":
         case "GRADIENT_DIAMOND":
         case "GRADIENT_LINEAR":
         case "GRADIENT_RADIAL":
-          let gradient = isFirst ? `${resourceLowerCaseName(fill.type)}` : `_${resourceLowerCaseName(fill.type)}`
+          let gradient = isFirst ? `D_${resourceLowerCaseName(fill.type)}` : `_${resourceLowerCaseName(fill.type)}`
           let gradientColors: string[] = []
           fill.gradientStops.forEach((node) => {
             const color = androidColor(node.color, node.color.a, false)
@@ -85,7 +85,7 @@ export const androidCornerRadius = (node: SceneNode): string => {
   const radius = getCommonRadius(node);
   if ("all" in radius) {
     if (radius.all > 0) {
-      return `radius_${sliceNum(radius.all)}`
+      return `D_radius_${sliceNum(radius.all)}`
     }
   }
   return ""
