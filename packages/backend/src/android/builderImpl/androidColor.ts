@@ -50,7 +50,7 @@ export const androidStrokes = (node: SceneNode, isFirst: boolean): string => {
     const color = AndroidSolidColor(node.strokes[0])
     const lineWeight = typeof node.strokeWeight === "number" ? node.strokeWeight : 1
 
-    return `${isFirst ? "D_" : "_"}border_${color}_weight:${lineWeight}`
+    return `${isFirst ? "D_" : "_"}border_${color}_weight_${lineWeight}`
   }
   return ""
 }
