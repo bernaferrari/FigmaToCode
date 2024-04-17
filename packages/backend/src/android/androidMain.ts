@@ -78,14 +78,14 @@ const androidWidgetGenerator = (
 
     if (hasParentOfComponentSet) {
       if (parentType == AndroidType.button && node.parent?.children?.findIndex((d) => d.id === node.id) === 0) {
-        comp.push(`\n<!-- Component_Set_Item ${node.parent?.name} start -->`)
+        comp.push(`\n<!-- Component_Set_Item ${node.parent?.name} start -->`);
       }
       else if (parentType == AndroidType.listItem || parentType == AndroidType.button) {
         const cols = node.name.split('=');
-        comp.push(`\n<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} start -->`)
+        comp.push(`\n<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} start -->`);
       }
       else {
-        comp.push(`\n<!-- Component_Set_Item ${node.parent?.name}_${node.name} start -->`)
+        comp.push(`\n<!-- Component_Set_Item ${node.parent?.name}_${node.name} start -->`);
       }
     }
 
@@ -106,13 +106,13 @@ const androidWidgetGenerator = (
             break;
           case AndroidType.button:
             if (node.type !== "COMPONENT") {
-              comp.push(androidComponent(node, indentLevel));
+              comp.push(androidComponent(node, indentLevel, outputStyle.selectable));
             }
             else if (node.parent?.children?.findIndex((d) => d.id === node.id) === 0) {
               comp.push(androidComponent(node, indentLevel, outputStyle.selectable));
-              comp.push(`<!-- Component_Set_Item ${node.parent?.name} end -->\n`)
+              comp.push(`<!-- Component_Set_Item ${node.parent?.name} end -->\n`);
               const cols = node.name.split('=');
-              comp.push(`\n<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} start -->`)
+              comp.push(`\n<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} start -->`);
               comp.push(androidComponent(node, indentLevel, outputStyle.shrink));
               comp.push(`<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} end -->\n`)
             }
@@ -131,7 +131,7 @@ const androidWidgetGenerator = (
         break;
       case "FRAME":
         if (hasParentOfComponentSet ? parentType : type === AndroidType.linearLayout) {
-          comp.push(androidComponent(node, indentLevel))
+          comp.push(androidComponent(node, indentLevel));
         }
         if (node.name === "UIkit_Color") {
           comp.push(androidColorTable(node))
@@ -156,10 +156,10 @@ const androidWidgetGenerator = (
       }
       else if (parentType == AndroidType.listItem || parentType == AndroidType.button) {
         const cols = node.name.split('=');
-        comp.push(`<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} end -->\n`)
+        comp.push(`<!-- Component_Set_Item ${node.parent?.name}_${cols[1]} end -->\n`);
       }
       else {
-        comp.push(`<!-- Component_Set_Item ${node.parent?.name}_${node.name} end -->\n`)
+        comp.push(`<!-- Component_Set_Item ${node.parent?.name}_${node.name} end -->\n`);
       }
     }
   });
