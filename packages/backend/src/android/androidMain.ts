@@ -130,9 +130,6 @@ const androidWidgetGenerator = (
         comp.push(androidContainer(node));
         break;
       case "FRAME":
-        if (hasParentOfComponentSet ? parentType : type === AndroidType.linearLayout) {
-          comp.push(androidComponent(node, indentLevel));
-        }
         if (node.name === "UIkit_Color") {
           comp.push(androidColorTable(node))
         }
@@ -141,7 +138,7 @@ const androidWidgetGenerator = (
         }
         break;
       case "COMPONENT_SET":
-        comp.push(androidLinear(node, indentLevel));
+        comp.push(androidFrame(node, indentLevel));
         break;
       case "TEXT":
         comp.push(androidText(node));
@@ -427,16 +424,6 @@ const androidCheckBox = (node: SceneNode & BaseFrameMixin): string => {
   return result.build(0);
 };
 
-const androidLinear = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
-  const children = widgetGeneratorWithLimits(
-    node,
-    node.children.length > 1 ? indentLevel + 1 : indentLevel
-  );
-
-  const anyStack = createDirectionalStack(children, node.name, node);
-  return androidContainer(node, anyStack);
-}
-
 const androidScroll = (node: SceneNode & BaseFrameMixin, indentLevel: number): string => {
 
   const children = widgetGeneratorWithLimits(
@@ -509,8 +496,6 @@ const androidComponent = (node: SceneNode & BaseFrameMixin & TextNode, indentLev
       return androidRadioButton(node)
     case AndroidType.editText:
       return androidEditText(node)
-    case AndroidType.linearLayout:
-      return androidLinear(node, indentLevel)
     default:
       return androidFrame(node, indentLevel)
   }
