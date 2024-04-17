@@ -129,12 +129,12 @@ export class androidTextBuilder extends androidDefaultBuilder {
       .addModifier(["android:textStyle",this.textDecoration(segment.textDecoration)])
       .addModifier(["android:typeface",this.textStyle(segment.fontName.style)])
       .addModifier(["android:textColor", this.textColor(segment.fills)])
-      .addModifier(["android:textAppearance", `@style/text_${segment.fontSize}_${segment.fontWeight}`]);
+      .addModifier(["android:textAppearance", `@style/text_${segment.fontSize}_${segment.fontWeight}`])
+      .addModifier(["android:includeFontPadding","false"]);
 
       // .addModifier(["android:textSize",`${fontSize}sp`])
       // .addModifier(["android:textFontWeight",fontWeight])
       // .addModifier(["android:fontFamily",`@font/${resourceFontName(fontFamily)}`])
-      // .addModifier(["android:includeFontPadding","false"])
 
       if (node.name !== "text_variable") {
         element.addModifier(["android:text", `@string/${node.name}`])
