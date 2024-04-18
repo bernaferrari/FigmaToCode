@@ -106,7 +106,12 @@ const androidWidgetGenerator = (
             break;
           case AndroidType.button:
             if (node.type !== "COMPONENT") {
-              comp.push(androidComponent(node, indentLevel, outputStyle.selectable));
+              if (androidButtonType(node).type == ButtonType.Button) {
+                comp.push(androidComponent(node, indentLevel, outputStyle.selectable));
+              }
+              else {
+                comp.push(androidComponent(node, indentLevel));
+              }
             }
             else if (node.parent?.children?.findIndex((d) => d.id === node.id) === 0) {
               comp.push(androidComponent(node, indentLevel, outputStyle.selectable));
@@ -285,7 +290,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin, ostyle:outputStyle = ou
               .size(node, localSettings.optimizeLayout);
   }
 
-  if (ostyle === outputStyle.selectable) {
+  if (ostyle === outputStyle.selectable && node.parent) {
     const resname = node.parent?.name;
     switch (buttonNode.type) {
       case ButtonType.BackgroundImageButton:
