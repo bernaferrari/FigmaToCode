@@ -286,6 +286,7 @@ const androidButton = (node: SceneNode & BaseFrameMixin, ostyle:outputStyle = ou
   let result = new androidDefaultBuilder(buttonNode.value);
   if (ostyle != outputStyle.shrink) {
     result = result.setText(buttonNode.text)
+              .setId(node)
               .position(node, localSettings.optimizeLayout)
               .size(node, localSettings.optimizeLayout);
   }
@@ -348,6 +349,7 @@ const androidIconTextButton = (node: SceneNode & BaseFrameMixin, layout: SceneNo
   let result = new androidDefaultBuilder("androidx.appcompat.widget.AppCompatButton");
   if (ostyle != outputStyle.shrink) {
     result = result.setText(text)
+                .setId(node)
                 .position(node, localSettings.optimizeLayout)
                 .size(node, localSettings.optimizeLayout);
   }
