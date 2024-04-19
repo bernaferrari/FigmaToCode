@@ -54,7 +54,7 @@ export const androidStrokes = (node: SceneNode, isFirst: boolean): string => {
     const color = AndroidSolidColor(node.strokes[0])
     const lineWeight = typeof node.strokeWeight === "number" ? node.strokeWeight : 1
 
-    return `${isFirst ? "D_" : "_"}border_${color}_weight_${lineWeight}`
+    return `${isFirst ? "D_" : "_"}border_${color}_weight_${lineWeight.toString().replace('.','d')}`
   }
   return ""
 }
@@ -89,7 +89,7 @@ export const androidCornerRadius = (node: SceneNode): string => {
   const radius = getCommonRadius(node);
   if ("all" in radius) {
     if (radius.all > 0) {
-      return `D_radius_${sliceNum(radius.all)}`
+      return `D_radius_${sliceNum(radius.all).replace('.','d')}`
     }
   }
   return ""
