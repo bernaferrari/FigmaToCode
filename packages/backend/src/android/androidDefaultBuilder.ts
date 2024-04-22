@@ -221,16 +221,29 @@ export class androidDefaultBuilder {
     const segments = globalTextStyleSegments[node.id];
     if (segments) {
       const segment = segments[0];
-      const font = resourceLowerCaseName(segment.fontName.family)
-      const textSize = segment.fontSize
 
       this.element.addModifier([isPlaceholder ? 'android:hint' : 'android:text', `@string/${node.name}`])
       this.pushModifier(
-        ['android:fontFamily', `@font/${font}`],
-        ['android:textSize', `${textSize}sp`],
         ['android:textColor', this.textColor(segment.fills)],
-        ['android:includeFontPadding', 'false']
+        ['android:includeFontPadding', 'false'],
+        ["android:textAppearance", `@style/text_${segment.fontSize}_${segment.fontWeight}`]
       )
+    }
+
+    if (node != undefined && "textAlignHorizontal" in node) {
+      let hAlign = "";
+      console.log("tharada: " + node.textAlignHorizontal)
+      switch (node.textAlignHorizontal) {
+        case "LEFT":
+          hAlign = "textStart"
+          break;
+        case "RIGHT":
+          hAlign = "textEnd"
+          break;
+        default:
+          hAlign = "center"
+      }
+      this.pushModifier(["android:textAlignment", hAlign])
     }
     return this;
   }
