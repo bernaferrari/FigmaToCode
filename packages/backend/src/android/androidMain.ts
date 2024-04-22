@@ -350,7 +350,7 @@ const androidIconTextButton = (node: SceneNode & BaseFrameMixin, layout: SceneNo
   if (ostyle != outputStyle.shrink) {
     result = result.setText(text)
                 .setId(node)
-                .position(node, localSettings.optimizeLayout)
+                .position(linear, localSettings.optimizeLayout)
                 .size(node, localSettings.optimizeLayout);
   }
   const resname = ostyle===outputStyle.selectable ? node.parent?.name : layout?.name;
@@ -358,6 +358,9 @@ const androidIconTextButton = (node: SceneNode & BaseFrameMixin, layout: SceneNo
     result.pushModifier([`android:drawable${isForwardText ? "Right" : "Left"}`, `@drawable/${resname}`])
   } else {
     result.pushModifier([`android:drawable${isForwardText ? "Bottom" : "Top"}`, `@drawable/${resname}`])
+  }
+  if ("itemSpacing" in linear && linear.itemSpacing > 0) {
+    result.pushModifier(["android:drawablePadding", `${linear.itemSpacing}dp`])
   }
 
   result.element.addModifier(["android:background", "@color/clearColor"]);

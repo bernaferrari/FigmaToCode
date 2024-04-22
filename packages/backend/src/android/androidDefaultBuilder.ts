@@ -127,21 +127,25 @@ export class androidDefaultBuilder {
 
   position(node: SceneNode & BaseFrameMixin, optimizeLayout: boolean): this {
     const { x, y } = getCommonPositionValue(node);
-    if (node.parent && androidNameParser(node.parent?.name).type !== AndroidType.linearLayout) {
+    const parentType = androidNameParser(node.parent?.name).type
+    const hasLinearLayoutParent = parentType === AndroidType.linearLayout
+    const layoutPosition = `android:${hasLinearLayoutParent ? "layout_margin" : "padding"}`
+
+    if (!hasLinearLayoutParent && node.parent && (node.x > 0 || node.y > 0)) {
       this.pushModifier(['android:layout_marginStart',`${sliceNum(x)}dp`]);
       this.pushModifier(['android:layout_marginTop',`${sliceNum(y)}dp`]);
     } else {
       if (node.paddingTop > 0) {
-        this.pushModifier(["android:layout_marginTop",`${node.paddingTop}dp`]);
+        this.pushModifier([`${layoutPosition}Top`,`${node.paddingTop}dp`]);
       }
       if (node.paddingBottom > 0) {
-        this.pushModifier(["android:layout_marginBottom",`${node.paddingBottom}dp`]);
+        this.pushModifier([`${layoutPosition}Bottom`,`${node.paddingBottom}dp`]);
       }
       if (node.paddingRight > 0) {
-        this.pushModifier(["android:layout_marginEnd",`${node.paddingRight}dp`]);
+        this.pushModifier([`${layoutPosition}End`,`${node.paddingRight}dp`]);
       }
       if (node.paddingLeft > 0) {
-        this.pushModifier(["android:layout_marginStart",`${node.paddingLeft}dp`]);
+        this.pushModifier([`${layoutPosition}Start`,`${node.paddingLeft}dp`]);
       }
     }
 
