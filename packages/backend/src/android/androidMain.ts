@@ -135,7 +135,7 @@ const androidWidgetGenerator = (
         comp.push(androidContainer(node));
         break;
       case "FRAME":
-        if (node.name === "UIkit_Color") {
+        if (node.name && node.name.startsWith("UIkit_Color")) {
           comp.push(androidColorTable(node))
         }
         else {
