@@ -174,7 +174,7 @@ describe("AltConversions", () => {
     expect(
       tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
     ).toEqual(
-      `<div class="w-5 h-5 bg-pink-900 bg-opacity-50 rounded-lg"></div>`
+      `<div class="w-5 h-5 bg-pink-900/50 rounded-lg"></div>`
     );
   });
 });

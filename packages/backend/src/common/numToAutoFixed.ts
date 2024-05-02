@@ -43,8 +43,14 @@ export const generateWidgetCode = (
   properties: Record<string, PropertyValueType>,
   positionedValues?: string[]
 ): string => {
+  console.log("properties", properties);
   const propertiesArray = Object.entries(properties)
-    .filter(([, value]) => value !== "")
+    .filter(([, value]) => {
+      if (Array.isArray(value)) {
+        return value.length > 0;
+      }
+      return value !== "";
+    })
     .map(([key, value]) => {
       if (Array.isArray(value)) {
         return `${key}: [\n${indentStringFlutter(value.join(",\n"))},\n],`;

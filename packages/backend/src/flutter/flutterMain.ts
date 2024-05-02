@@ -125,10 +125,11 @@ const flutterWidgetGenerator = (
 };
 
 const flutterGroup = (node: GroupNode): string => {
+  const widget = flutterWidgetGenerator(node.children);
   return flutterContainer(
     node,
     generateWidgetCode("Stack", {
-      children: [flutterWidgetGenerator(node.children)],
+      children: widget ? [widget] : [],
     })
   );
 };
@@ -181,10 +182,14 @@ const flutterFrame = (
       return flutterContainer(node, rowColumn);
     }
 
+    if (node.isAsset) {
+      return flutterContainer(node, generateWidgetCode("FlutterLogo", {}));
+    }
+
     return flutterContainer(
       node,
       generateWidgetCode("Stack", {
-        children: [children],
+        children: children !== "" ? [children] : [],
       })
     );
   }
@@ -207,12 +212,21 @@ const makeRowColumn = (
   return generateWidgetCode(rowOrColumn, widgetProps);
 };
 
-const addSpacingIfNeeded = (node: SceneNode, optimizeLayout: boolean): string => {
-  const nodeParentLayout = optimizeLayout && node.parent && "itemSpacing" in node.parent
-    ? node.parent.inferredAutoLayout
-    : null ?? node.parent;
+const addSpacingIfNeeded = (
+  node: SceneNode,
+  optimizeLayout: boolean
+): string => {
+  const nodeParentLayout =
+    optimizeLayout && node.parent && "itemSpacing" in node.parent
+      ? node.parent.inferredAutoLayout
+      : null ?? node.parent;
 
-  if (nodeParentLayout && node.parent?.type === "FRAME" && "itemSpacing" in nodeParentLayout && nodeParentLayout.layoutMode !== "NONE") {
+  if (
+    nodeParentLayout &&
+    node.parent?.type === "FRAME" &&
+    "itemSpacing" in nodeParentLayout &&
+    nodeParentLayout.layoutMode !== "NONE"
+  ) {
     if (nodeParentLayout.itemSpacing > 0) {
       if (nodeParentLayout.layoutMode === "HORIZONTAL") {
         return generateWidgetCode("const SizedBox", {

@@ -40,15 +40,13 @@ export const tailwindSolidColor = (
   // example: text-opacity-50
   // ignore the 100. If opacity was changed, let it be visible.
   const opacityProp =
-    opacity !== 1.0
-      ? `${kind}-opacity-${nearestOpacity(opacity ?? 1.0)}`
-      : null;
+    opacity !== 1.0 ? `opacity-${nearestOpacity(opacity ?? 1.0)}` : null;
 
   // example: text-red-500
-  const colorProp = `${kind}-${getTailwindFromFigmaRGB(color)}`;
+  const colorProp = `${kind}-${getTailwindFromFigmaRGB(color)}${opacityProp ? `/${opacityProp}` : ""}`;
 
   // if fill isn't visible, it shouldn't be painted.
-  return [colorProp, opacityProp].filter((d) => d).join(" ");
+  return colorProp;
 };
 
 /**
@@ -144,7 +142,6 @@ export const tailwindColors: Record<string, string> = {
   "#1f2937": "gray-800",
   "#111827": "gray-900",
   "#030712": "gray-950",
-  "#fafafa": "neutral-50",
   "#f4f4f5": "zinc-100",
   "#e4e4e7": "zinc-200",
   "#d4d4d8": "zinc-300",
@@ -155,6 +152,7 @@ export const tailwindColors: Record<string, string> = {
   "#27272a": "zinc-800",
   "#18181b": "zinc-900",
   "#09090b": "zinc-950",
+  "#fafafa": "neutral-50",
   "#f5f5f5": "neutral-100",
   "#e5e5e5": "neutral-200",
   "#d4d4d4": "neutral-300",

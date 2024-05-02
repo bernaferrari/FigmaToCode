@@ -152,7 +152,10 @@ export default function App() {
           );
         }}
         colors={state.colors}
-        gradients={state.gradients}
+        gradients={state.gradients.map((gradient) => ({
+          ...gradient,
+          exportValue: gradient.exportedValue,
+        }))}
       />
     </div>
   );
