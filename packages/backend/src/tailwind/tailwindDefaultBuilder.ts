@@ -11,8 +11,8 @@ import {
   tailwindBorderRadius,
 } from "./builderImpl/tailwindBorder";
 import {
-  tailwindColorFromFills,
-  tailwindGradientFromFills,
+    tailwindColorForNodePaint,
+  tailwindGradient as tailwindGradientForNodePaint,
 } from "./builderImpl/tailwindColor";
 import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
@@ -21,6 +21,38 @@ import {
   getCommonPositionValue,
 } from "../common/commonPosition";
 import { pxToBlur } from "./conversionTables";
+import { SupportedNodeForPaintStyle, nodePaintStyle } from "../common/commonStyles.js";
+import { retrieveTopFill } from "../common/retrieveFill.js";
+import { variableNameFromAliasIfAny } from "../common/commonVariables.js";
+import { gradientAngle } from "../common/color.js";
+
+
+export interface NodePaintAgg {
+  name?: string // either a tailwind compliant paint style name or from a variable name
+  opacity?: number // unavailable for gradient
+  solid?: RGB | RGBA
+  gradient?: GradientDef
+}
+
+export interface GenSolidPaint extends NodePaintAgg {
+  gradient?: never
+  solid: RGB
+}
+
+export interface GradientDef {
+  gradientAngle: number
+  stops: GenGradientStop[]
+}
+export interface GenGradientStop extends GenSolidPaint {
+  opacity?: never
+  solid: RGBA
+}
+
+type RequiredKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+export interface GenGradientPaint extends RequiredKey<NodePaintAgg, "gradient"> {
+  solid?: never
+}
+type NodePaint = GenSolidPaint | GenGradientPaint
 
 export class TailwindDefaultBuilder {
   attributes: string[] = [];
@@ -74,7 +106,8 @@ export class TailwindDefaultBuilder {
   }
 
   commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): this {
-    this.customColor(node.fills, "bg");
+    
+    this.customColor(node, "bg");
     this.radius(node);
     this.shadow(node);
     this.border(node);
@@ -94,7 +127,7 @@ export class TailwindDefaultBuilder {
   border(node: SceneNode): this {
     if ("strokes" in node) {
       this.addAttributes(tailwindBorderWidth(node));
-      this.customColor(node.strokes, "border");
+      this.customColor(node, "border");
     }
 
     return this;
@@ -136,19 +169,16 @@ export class TailwindDefaultBuilder {
    * example: bg-blue-500
    */
   customColor(
-    paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
+    node: GeometryMixin & BlendMixin & SceneNode,
     kind: string
   ): this {
-    // visible is true or undefinied (tests)
+    // visible is true or undefined (tests)
     if (this.visible) {
-      let gradient = "";
-      if (kind === "bg") {
-        gradient = tailwindGradientFromFills(paint);
-      }
-      if (gradient) {
-        this.addAttributes(gradient);
-      } else {
-        this.addAttributes(tailwindColorFromFills(paint, kind));
+      const paint = nodePaintStyleForFigNode(node)
+      if (paint?.gradient) {
+        this.addAttributes(tailwindGradientForNodePaint(paint));
+      } else if (paint?.solid) {
+        this.addAttributes(tailwindColorForNodePaint(paint, kind));
       }
     }
     return this;
@@ -245,4 +275,63 @@ export class TailwindDefaultBuilder {
     this.attributes = [];
     this.style = "";
   }
+}
+
+
+function normalizeTwColorName(name: string | undefined): string | undefined {
+  return name?.match(/\p{L}+/gu)?.join("-")
+}
+
+function normalizedFigColorVarName(color: SolidPaint | ColorStop): string | undefined {
+  const name = variableNameFromAliasIfAny(color.boundVariables?.color)
+  return normalizeTwColorName(name)
+}
+
+export function nodePaintFromStyles(paintStyle: PaintStyle | undefined): NodePaint | undefined {
+  let paintSetup 
+  paintSetup = paintStyle?.paints
+  paintSetup &&= retrieveTopFill(paintSetup)
+
+  switch (paintSetup?.type) {
+    case "SOLID":
+      let name = normalizedFigColorVarName(paintSetup)
+      name ||= normalizeTwColorName(paintStyle?.name)
+      const solid = paintSetup.color
+      return { name, solid }
+    case "GRADIENT_LINEAR":
+      const stops = gradientStopsFromColorStops(paintSetup.gradientStops)
+      return { gradient: { gradientAngle: gradientAngle(paintSetup), stops } }
+  }
+}
+
+function gradientStopsFromColorStops(stops: readonly ColorStop[]) {
+    return stops.map((s) => ({ name: normalizedFigColorVarName(s), solid: s.color }));
+}
+
+export function nodePaintFromFills(fills: readonly Paint[] | typeof figma.mixed): NodePaint | undefined {
+  if (fills != figma.mixed) {
+    const topPaint = retrieveTopFill(fills)
+    if (topPaint) {
+      switch (topPaint?.type) {
+        case "SOLID": 
+          return {
+            name:  normalizedFigColorVarName(topPaint),
+            solid: topPaint.color,
+          }
+        case "GRADIENT_LINEAR": {
+          return {
+            gradient: {
+              gradientAngle: gradientAngle(topPaint),
+              stops: gradientStopsFromColorStops(topPaint.gradientStops)
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+export function nodePaintStyleForFigNode(node: SupportedNodeForPaintStyle): NodePaint | undefined {
+  const paintStyle = nodePaintStyle(node)
+  return nodePaintFromStyles(paintStyle) ?? nodePaintFromFills(node.fills) 
 }

@@ -6,6 +6,7 @@ import {
 import {
   tailwindColors,
   tailwindGradient,
+  tailwindNameFromColorSpec,
   tailwindNearestColor,
   tailwindSolidColor,
 } from "../../tailwind/builderImpl/tailwindColor";
@@ -19,6 +20,7 @@ import {
 } from "../../html/builderImpl/htmlColor";
 import { calculateContrastRatio } from "./commonUI";
 import { FrameworkTypes } from "../../code";
+import { nodePaintFromFills, nodePaintFromStyles } from "../../tailwind/tailwindDefaultBuilder.js";
 
 export type ExportSolidColor = {
   hex: string;
@@ -32,50 +34,56 @@ export const retrieveGenericSolidUIColors = (
   framework: FrameworkTypes
 ): Array<ExportSolidColor> => {
   const selectionColors = figma.getSelectionColors();
-  if (!selectionColors || selectionColors.paints.length === 0) return [];
-
-  const colorStr: Array<ExportSolidColor> = [];
+  if (!selectionColors || (selectionColors.paints.length + selectionColors.styles.length) === 0) return [];
+  const colorExports: Array<ExportSolidColor> = [];
   selectionColors.paints.forEach((paint) => {
-    const fill = convertSolidColor(paint, framework);
+    const fill = convertSolidColor(paint, undefined, framework);
     if (fill) {
-      colorStr.push(fill);
+      colorExports.push(fill);
     }
   });
+  selectionColors.styles.forEach((style) => {
+    const paint = style.paints.find((p) => p.type === "SOLID")
+    const fill = paint && convertSolidColor(paint, style, framework);
+    if (fill) {
+      colorExports.push(fill);
+    }
+  })
 
-  return colorStr.sort((a, b) => a.hex.localeCompare(b.hex));
+  return colorExports.sort((a, b) => a.hex.localeCompare(b.hex));
 };
 
 const convertSolidColor = (
-  fill: Paint,
+  paint: Paint,
+  style: PaintStyle | undefined,
   framework: FrameworkTypes
 ): ExportSolidColor | null => {
   const black = { r: 0, g: 0, b: 0 };
   const white = { r: 1, g: 1, b: 1 };
 
-  if (fill.type !== "SOLID") return null;
+  if (paint.type !== "SOLID") return null;
 
-  const opacity = fill.opacity ?? 1.0;
+  const opacity = paint.opacity ?? 1.0;
   let exported = "";
   let colorName = "";
-  let contrastBlack = calculateContrastRatio(fill.color, black);
-  let contrastWhite = calculateContrastRatio(fill.color, white);
+  let contrastBlack = calculateContrastRatio(paint.color, black);
+  let contrastWhite = calculateContrastRatio(paint.color, white);
 
   if (framework === "Flutter") {
-    exported = flutterColor(fill.color, opacity);
+    exported = flutterColor(paint.color, opacity);
   } else if (framework === "HTML") {
-    exported = htmlColor(fill.color, opacity);
+    exported = htmlColor(paint.color, opacity);
   } else if (framework === "Tailwind") {
     const kind = "solid";
-    const hex = rgbTo6hex(fill.color);
-    const hexNearestColor = tailwindNearestColor(hex);
-    exported = tailwindSolidColor(fill.color, fill.opacity, kind);
-    colorName = tailwindColors[hexNearestColor];
+
+    const genPaint = nodePaintFromStyles(style) ?? nodePaintFromFills([paint])
+    colorName = genPaint?.name ?? ""
   } else if (framework === "SwiftUI") {
-    exported = swiftuiColor(fill.color, opacity);
+    exported = swiftuiColor(paint.color, opacity);
   }
 
   return {
-    hex: rgbTo6hex(fill.color).toUpperCase(),
+    hex: rgbTo6hex(paint.color).toUpperCase(),
     colorName,
     exportValue: exported,
     contrastBlack,

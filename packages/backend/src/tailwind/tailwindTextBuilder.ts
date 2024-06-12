@@ -3,13 +3,13 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
-import { tailwindColorFromFills } from "./builderImpl/tailwindColor";
+import { tailwindSolidColor } from "./builderImpl/tailwindColor.js";
 import {
   pxToFontSize,
   pxToLetterSpacing,
   pxToLineHeight,
 } from "./conversionTables";
-import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+import { TailwindDefaultBuilder, nodePaintFromFills, nodePaintStyleForFigNode } from "./tailwindDefaultBuilder";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
   getTextSegments(id: string): { style: string; text: string }[] {
@@ -19,7 +19,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     }
 
     return segments.map((segment) => {
-      const color = this.getTailwindColorFromFills(segment.fills);
+      const color = this.getTailwindColorFromSegment(segment);
       const textDecoration = this.textDecoration(segment.textDecoration);
       const textTransform = this.textTransform(segment.textCase);
       const lineHeightStyle = this.lineHeight(
@@ -51,13 +51,14 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     });
   }
 
-  getTailwindColorFromFills = (
-    fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  getTailwindColorFromSegment = (
+    segment: StyledTextSegment
   ) => {
     // Implement a function to convert fills to the appropriate Tailwind CSS color classes.
     // This can be based on your project's configuration and color palette.
     // For example, suppose your project uses the default Tailwind CSS color palette:
-    return tailwindColorFromFills(fills, "text");
+    const paint = nodePaintStyleForFigNode(segment)
+    return  paint?.solid ? tailwindSolidColor(paint, paint.opacity ?? 1, "text") : "";
   };
 
   fontSize = (fontSize: number) => {

@@ -1,93 +1,73 @@
 import { nearestColorFrom } from "../../nearest-color/nearestColor";
-import { retrieveTopFill } from "../../common/retrieveFill";
-import { gradientAngle } from "../../common/color";
 import { nearestOpacity, nearestValue } from "../conversionTables";
+import { localTailwindSettings } from "../tailwindMain";
+import { htmlColor } from "../../html/builderImpl/htmlColor";
+import { GenGradientPaint, GenGradientStop, GenSolidPaint } from "../tailwindDefaultBuilder";
+
 
 // retrieve the SOLID color for tailwind
-export const tailwindColorFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+export const tailwindColorForNodePaint = (
+  nodePaint: GenSolidPaint,
   kind: string
 ): string => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined
-
-  const fill = retrieveTopFill(fills);
-  if (fill && fill.type === "SOLID") {
-    return tailwindSolidColor(fill.color, fill.opacity, kind);
-  } else if (
-    fill &&
-    (fill.type === "GRADIENT_LINEAR" ||
-      fill.type === "GRADIENT_ANGULAR" ||
-      fill.type === "GRADIENT_RADIAL" ||
-      fill.type === "GRADIENT_DIAMOND")
-  ) {
-    if (fill.gradientStops.length > 0) {
-      return tailwindSolidColor(
-        fill.gradientStops[0].color,
-        fill.opacity,
-        kind
-      );
-    }
-  }
-  return "";
+  return tailwindSolidColor(nodePaint, nodePaint.opacity, kind) ?? "";
 };
 
+
+function tailwindColorFromSpec(colorSpec: GenSolidPaint | GenGradientStop) {
+  colorSpec.solid
+  let color = tailwindNameFromColorSpec(colorSpec);
+  color ||= getTailwindFromFigmaRGB(colorSpec.solid); // if no alias used, try tailwind color
+  color ||= `[color:${htmlColor(colorSpec.solid)}]`; // if none match fallback to raw value
+  return color;
+}
+
+export function tailwindNameFromColorSpec(colorSpec: GenSolidPaint | GenGradientStop) {
+  return localTailwindSettings.preferColorAlias ? colorSpec.name : undefined;
+}
+
 export const tailwindSolidColor = (
-  color: RGB,
+  colorSpec: GenSolidPaint | GenGradientStop,
   opacity: number | undefined,
   kind: string
 ): string => {
   // example: text-opacity-50
   // ignore the 100. If opacity was changed, let it be visible.
   const opacityProp =
-    opacity !== 1.0 ? `opacity-${nearestOpacity(opacity ?? 1.0)}` : null;
+    (opacity ?? 1) !== 1.0 ? `opacity-${nearestOpacity(opacity ?? 1.0)}` : null;
 
   // example: text-red-500
-  const colorProp = `${kind}-${getTailwindFromFigmaRGB(color)}${opacityProp ? `/${opacityProp}` : ""}`;
+  let color = tailwindColorFromSpec(colorSpec); // if none match fallback to raw value
+  const colorProp = `${kind}-${color}${opacityProp ? `/${opacityProp}` : ""}`;
 
   // if fill isn't visible, it shouldn't be painted.
   return colorProp;
 };
 
-/**
- * https://tailwindcss.com/docs/box-shadow/
- * example: shadow
- */
-export const tailwindGradientFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): string => {
-  // [when testing] node.effects can be undefined
 
-  const fill = retrieveTopFill(fills);
-
-  if (fill?.type === "GRADIENT_LINEAR") {
-    return tailwindGradient(fill);
-  }
-
-  return "";
-};
-
-export const tailwindGradient = (fill: GradientPaint): string => {
-  const direction = gradientDirection(gradientAngle(fill));
-
-  if (fill.gradientStops.length === 1) {
-    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
+export const tailwindGradient = (gradientPaint: GenGradientPaint): string => {
+  const direction = gradientDirection(gradientPaint.gradient.gradientAngle);
+  const stops = gradientPaint.gradient.stops
+  if (stops.length === 1) {
+    const fromColor = tailwindColorFromSpec(stops[0]);
 
     return `${direction} from-${fromColor}`;
-  } else if (fill.gradientStops.length === 2) {
-    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
-    const toColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
+  } else if (stops.length === 2) {
+    const fromColor = tailwindColorFromSpec(stops[0]);
+    const toColor = tailwindColorFromSpec(stops[1]);
 
     return `${direction} from-${fromColor} to-${toColor}`;
   } else {
-    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
+    const fromColor = tailwindColorFromSpec(stops[0]);
 
     // middle (second color)
-    const viaColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
+    const viaColor = tailwindColorFromSpec(stops[1]);
 
     // last
-    const toColor = getTailwindFromFigmaRGB(
-      fill.gradientStops[fill.gradientStops.length - 1].color
+    const toColor = tailwindColorFromSpec(
+      stops[stops.length - 1]
     );
 
     return `${direction} from-${fromColor} via-${viaColor} to-${toColor}`;
@@ -368,16 +348,26 @@ export const tailwindNearestColor = nearestColorFrom(
 );
 
 // figma uses r,g,b in [0, 1], while nearestColor uses it in [0, 255]
-export const getTailwindFromFigmaRGB = (color: RGB): string => {
+export const getTailwindFromFigmaRGB = (color: RGB): string | undefined => {
+  // use rounding to ease exact matches with RGB values defined in hex
+  // only applies for color components with a difference less that .0001
+  // the idea is to remove floating point and color space conversion rounding
+  // errors while limiting risks color precision loss with color matching
   const colorMultiplied = {
-    r: color.r * 255,
-    g: color.g * 255,
-    b: color.b * 255,
+    r: Math.trunc(Math.round(color.r * 255 * 1000) / 1000),
+    g: Math.trunc(Math.round(color.g * 255 * 1000) / 1000),
+    b: Math.trunc(Math.round(color.b * 255 * 1000) / 1000),
   };
 
-  return tailwindColors[tailwindNearestColor(colorMultiplied)];
+  const found = tailwindNearestColor(colorMultiplied)
+  if (found) {
+    return tailwindColors[found];
+  }
 };
 
-export const getTailwindColor = (color: string | RGB): string => {
-  return tailwindColors[tailwindNearestColor(color)];
-};
+export const getTailwindColor = (color: string | RGB): string | undefined => {
+  const found = tailwindNearestColor(color);
+  if (found) {
+    return tailwindColors[found];
+  }
+}

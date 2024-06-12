@@ -20,6 +20,8 @@ export type PluginSettings = {
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
   roundTailwind: boolean;
+  roundTailwindColors: boolean;
+  preferColorAlias: boolean;
 };
 
 export const run = (settings: PluginSettings) => {
