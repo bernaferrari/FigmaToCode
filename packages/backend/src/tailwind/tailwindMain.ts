@@ -13,14 +13,14 @@ let previousExecutionCache: { style: string; text: string }[];
 
 const selfClosingTags = ["img"];
 
-export const tailwindMain = (
+export const tailwindMain = async (
   sceneNode: Array<SceneNode>,
   settings: PluginSettings
-): string => {
+): Promise<string> => {
   localTailwindSettings = settings;
   previousExecutionCache = [];
 
-  let result = tailwindWidgetGenerator(sceneNode, localTailwindSettings.jsx);
+  let result = await tailwindWidgetGenerator(sceneNode, localTailwindSettings.jsx);
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -31,47 +31,47 @@ export const tailwindMain = (
 };
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
-const tailwindWidgetGenerator = (
+const tailwindWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
   isJsx: boolean
-): string => {
+): Promise<string> => {
   let comp = "";
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
-  visibleSceneNode.forEach((node) => {
+  for (const node of  visibleSceneNode) {
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
-        comp += tailwindContainer(node, "", "", isJsx);
+        comp += await tailwindContainer(node, "", "", isJsx);
         break;
       case "GROUP":
-        comp += tailwindGroup(node, isJsx);
+        comp += await tailwindGroup(node, isJsx);
         break;
       case "FRAME":
       case "COMPONENT":
       case "INSTANCE":
       case "COMPONENT_SET":
-        comp += tailwindFrame(node, isJsx);
+        comp += await tailwindFrame(node, isJsx);
         break;
       case "TEXT":
-        comp += tailwindText(node, isJsx);
+        comp += await tailwindText(node, isJsx);
         break;
       case "LINE":
-        comp += tailwindLine(node, isJsx);
+        comp += await tailwindLine(node, isJsx);
         break;
       case "SECTION":
-        comp += tailwindSection(node, isJsx);
+        comp += await tailwindSection(node, isJsx);
         break;
       // case "VECTOR":
       //   comp += htmlAsset(node, isJsx);
     }
-  });
+  };
 
   return comp;
 };
 
-const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
+const tailwindGroup = async (node: GroupNode, isJsx: boolean = false): Promise<string> => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -101,15 +101,15 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
   if (builder.attributes || builder.style) {
     const attr = builder.build("");
 
-    const generator = tailwindWidgetGenerator(node.children, isJsx);
+    const generator = await tailwindWidgetGenerator(node.children, isJsx);
 
     return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }
 
-  return tailwindWidgetGenerator(node.children, isJsx);
+  return await tailwindWidgetGenerator(node.children, isJsx);
 };
 
-export const tailwindText = (node: TextNode, isJsx: boolean): string => {
+export const tailwindText = async (node: TextNode, isJsx: boolean): Promise<string> => {
   let layoutBuilder = new TailwindTextBuilder(
     node,
     localTailwindSettings.layerName,
@@ -118,7 +118,7 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .textAlign(node);
 
-  const styledHtml = layoutBuilder.getTextSegments(node.id);
+  const styledHtml = await layoutBuilder.getTextSegments(node.id);
   previousExecutionCache.push(...styledHtml);
 
   let content = "";
@@ -134,11 +134,11 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
   return `\n<div${layoutBuilder.build()}>${content}</div>`;
 };
 
-const tailwindFrame = (
+const tailwindFrame = async (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   isJsx: boolean
-): string => {
-  const childrenStr = tailwindWidgetGenerator(
+): Promise<string> => {
+  const childrenStr = await tailwindWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(
       node,
       localTailwindSettings.optimizeLayout
@@ -148,22 +148,22 @@ const tailwindFrame = (
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = tailwindAutoLayoutProps(node, node);
-    return tailwindContainer(node, childrenStr, rowColumn, isJsx);
+    return await tailwindContainer(node, childrenStr, rowColumn, isJsx);
   } else {
     if (localTailwindSettings.optimizeLayout && node.inferredAutoLayout !== null) {
       const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
-      return tailwindContainer(node, childrenStr, rowColumn, isJsx);
+      return await tailwindContainer(node, childrenStr, rowColumn, isJsx);
     }
 
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return tailwindContainer(node, childrenStr, "", isJsx);
+    return await tailwindContainer(node, childrenStr, "", isJsx);
   }
 };
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
-export const tailwindContainer = (
+export const tailwindContainer = async (
   node: SceneNode &
     SceneNodeMixin &
     BlendMixin &
@@ -173,7 +173,7 @@ export const tailwindContainer = (
   children: string,
   additionalAttr: string,
   isJsx: boolean
-): string => {
+): Promise<string> => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -181,7 +181,7 @@ export const tailwindContainer = (
     return children;
   }
 
-  let builder = new TailwindDefaultBuilder(node, localTailwindSettings.layerName, isJsx)
+  let builder = await new TailwindDefaultBuilder(node, localTailwindSettings.layerName, isJsx)
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .commonShapeStyles(node);
 
@@ -218,8 +218,8 @@ export const tailwindContainer = (
   return children;
 };
 
-export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
-  const builder = new TailwindDefaultBuilder(
+export const tailwindLine = async (node: LineNode, isJsx: boolean): Promise<string> => {
+  const builder = await new TailwindDefaultBuilder(
     node,
     localTailwindSettings.layerName,
     isJsx
@@ -230,16 +230,16 @@ export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
   return `\n<div${builder.build()}></div>`;
 };
 
-export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
-  const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
-  const builder = new TailwindDefaultBuilder(
+export const tailwindSection = async (node: SectionNode, isJsx: boolean): Promise<string> => {
+  const childrenStr = await tailwindWidgetGenerator(node.children, isJsx);
+  const builder = await new TailwindDefaultBuilder(
     node,
     localTailwindSettings.layerName,
     isJsx
   )
     .size(node, localTailwindSettings.optimizeLayout)
     .position(node, localTailwindSettings.optimizeLayout)
-    .customColor(node.fills, "bg");
+    .customColor(node, "bg");
 
   if (childrenStr) {
     return `\n<div${builder.build()}>${indentString(childrenStr)}\n</div>`;

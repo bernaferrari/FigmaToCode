@@ -1,4 +1,4 @@
 
-export function variableNameFromAliasIfAny(alias: VariableAlias | undefined) {
-  return alias ? figma.variables.getVariableById(alias.id)?.name : undefined
+export async function variableNameFromAliasIfAny(alias: VariableAlias | undefined): Promise<string | undefined> {
+  return alias ? (await figma.variables.getVariableByIdAsync(alias.id))?.name : undefined
 }

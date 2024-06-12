@@ -1,9 +1,9 @@
 export interface SupportedNodeForPaintStyle extends Omit<MinimalFillsMixin, "setFillStyleIdAsync"> {}
 
-export function nodePaintStyle(node: SupportedNodeForPaintStyle): PaintStyle | undefined {
+export async function nodePaintStyle(node: SupportedNodeForPaintStyle): Promise<PaintStyle | undefined> {
 	if (node.fillStyleId && node.fillStyleId != figma.mixed) {
 		// TODO: handle mixed mode, maybe ?
-		const style = figma.getStyleById(node.fillStyleId)
+		const style = await figma.getStyleByIdAsync(node.fillStyleId)
 		switch (style?.type) {
 			case "PAINT": 
 				return style

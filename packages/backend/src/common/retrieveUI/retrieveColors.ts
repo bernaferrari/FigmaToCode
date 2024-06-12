@@ -30,34 +30,34 @@ export type ExportSolidColor = {
   contrastBlack: number;
 };
 
-export const retrieveGenericSolidUIColors = (
+export const retrieveGenericSolidUIColors = async (
   framework: FrameworkTypes
-): Array<ExportSolidColor> => {
+): Promise<ExportSolidColor[]> => {
   const selectionColors = figma.getSelectionColors();
   if (!selectionColors || (selectionColors.paints.length + selectionColors.styles.length) === 0) return [];
   const colorExports: Array<ExportSolidColor> = [];
-  selectionColors.paints.forEach((paint) => {
-    const fill = convertSolidColor(paint, undefined, framework);
+  for (const paint of selectionColors.paints) {
+    const fill = await convertSolidColor(paint, undefined, framework);
     if (fill) {
       colorExports.push(fill);
     }
-  });
-  selectionColors.styles.forEach((style) => {
+  }
+  for (const style of selectionColors.styles) {
     const paint = style.paints.find((p) => p.type === "SOLID")
-    const fill = paint && convertSolidColor(paint, style, framework);
+    const fill = paint && await convertSolidColor(paint, style, framework);
     if (fill) {
       colorExports.push(fill);
     }
-  })
+  }
 
   return colorExports.sort((a, b) => a.hex.localeCompare(b.hex));
 };
 
-const convertSolidColor = (
+const convertSolidColor = async (
   paint: Paint,
   style: PaintStyle | undefined,
   framework: FrameworkTypes
-): ExportSolidColor | null => {
+): Promise<ExportSolidColor | null> => {
   const black = { r: 0, g: 0, b: 0 };
   const white = { r: 1, g: 1, b: 1 };
 
@@ -76,7 +76,7 @@ const convertSolidColor = (
   } else if (framework === "Tailwind") {
     const kind = "solid";
 
-    const genPaint = nodePaintFromStyles(style) ?? nodePaintFromFills([paint])
+    const genPaint = await nodePaintFromStyles(style) ?? await nodePaintFromFills([paint])
     colorName = genPaint?.name ?? ""
   } else if (framework === "SwiftUI") {
     exported = swiftuiColor(paint.color, opacity);
@@ -93,13 +93,13 @@ const convertSolidColor = (
 
 type ExportLinearGradient = { cssPreview: string; exportValue: string };
 
-export const retrieveGenericLinearGradients = (
+export const retrieveGenericLinearGradients = async (
   framework: FrameworkTypes
-): Array<ExportLinearGradient> => {
+): Promise<ExportLinearGradient[]> => {
   const selectionColors = figma.getSelectionColors();
   const colorStr: Array<ExportLinearGradient> = [];
 
-  selectionColors?.paints.forEach((paint) => {
+  await Promise.all((selectionColors?.paints ?? []).map(async (paint) => {
     if (paint.type === "GRADIENT_LINEAR") {
       let exported = "";
       switch (framework) {
@@ -110,7 +110,10 @@ export const retrieveGenericLinearGradients = (
           exported = htmlGradientFromFills([paint]);
           break;
         case "Tailwind":
-          exported = tailwindGradient(paint);
+          const gradientDef = await nodePaintFromFills([paint])
+          if (gradientDef?.gradient) {
+            exported = tailwindGradient(gradientDef);
+          }
           break;
         case "SwiftUI":
           exported = swiftuiGradient(paint);
@@ -121,7 +124,7 @@ export const retrieveGenericLinearGradients = (
         exportValue: exported,
       });
     }
-  });
+  }));
 
   return colorStr;
 };

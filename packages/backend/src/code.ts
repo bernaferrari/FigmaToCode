@@ -24,7 +24,7 @@ export type PluginSettings = {
   preferColorAlias: boolean;
 };
 
-export const run = (settings: PluginSettings) => {
+export const run = async (settings: PluginSettings) => {
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
@@ -43,7 +43,7 @@ export const run = (settings: PluginSettings) => {
       result = htmlMain(convertedSelection, settings);
       break;
     case "Tailwind":
-      result = tailwindMain(convertedSelection, settings);
+      result = await tailwindMain(convertedSelection, settings);
       break;
     case "Flutter":
       result = flutterMain(convertedSelection, settings);
@@ -74,8 +74,8 @@ export const run = (settings: PluginSettings) => {
             ),
           }
         : null,
-    colors: retrieveGenericSolidUIColors(settings.framework),
-    gradients: retrieveGenericGradients(settings.framework),
+    colors: await retrieveGenericSolidUIColors(settings.framework),
+    gradients: await retrieveGenericGradients(settings.framework),
     preferences: settings,
     // text: retrieveTailwindText(convertedSelection),
   });

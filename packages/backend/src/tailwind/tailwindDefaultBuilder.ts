@@ -105,9 +105,9 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): this {
+  async commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): Promise<this> {
     
-    this.customColor(node, "bg");
+    await this.customColor(node, "bg");
     this.radius(node);
     this.shadow(node);
     this.border(node);
@@ -124,10 +124,10 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  border(node: SceneNode): this {
+  async border(node: GeometryMixin & BlendMixin & SceneNode): Promise<this> {
     if ("strokes" in node) {
       this.addAttributes(tailwindBorderWidth(node));
-      this.customColor(node, "border");
+      await this.customColor(node, "border");
     }
 
     return this;
@@ -168,13 +168,13 @@ export class TailwindDefaultBuilder {
    * example: text-opacity-25
    * example: bg-blue-500
    */
-  customColor(
+  async customColor(
     node: GeometryMixin & BlendMixin & SceneNode,
     kind: string
-  ): this {
+  ): Promise<this> {
     // visible is true or undefined (tests)
     if (this.visible) {
-      const paint = nodePaintStyleForFigNode(node)
+      const paint = await nodePaintStyleForFigNode(node)
       if (paint?.gradient) {
         this.addAttributes(tailwindGradientForNodePaint(paint));
       } else if (paint?.solid) {
@@ -282,47 +282,47 @@ function normalizeTwColorName(name: string | undefined): string | undefined {
   return name?.match(/\p{L}+/gu)?.join("-")
 }
 
-function normalizedFigColorVarName(color: SolidPaint | ColorStop): string | undefined {
-  const name = variableNameFromAliasIfAny(color.boundVariables?.color)
+async function normalizedFigColorVarName(color: SolidPaint | ColorStop): Promise<string | undefined> {
+  const name = await variableNameFromAliasIfAny(color.boundVariables?.color)
   return normalizeTwColorName(name)
 }
 
-export function nodePaintFromStyles(paintStyle: PaintStyle | undefined): NodePaint | undefined {
+export async function nodePaintFromStyles(paintStyle: PaintStyle | undefined): Promise<NodePaint | undefined> {
   let paintSetup 
   paintSetup = paintStyle?.paints
   paintSetup &&= retrieveTopFill(paintSetup)
 
   switch (paintSetup?.type) {
     case "SOLID":
-      let name = normalizedFigColorVarName(paintSetup)
+      let name = await normalizedFigColorVarName(paintSetup)
       name ||= normalizeTwColorName(paintStyle?.name)
       const solid = paintSetup.color
       return { name, solid }
     case "GRADIENT_LINEAR":
-      const stops = gradientStopsFromColorStops(paintSetup.gradientStops)
+      const stops = await gradientStopsFromColorStops(paintSetup.gradientStops)
       return { gradient: { gradientAngle: gradientAngle(paintSetup), stops } }
   }
 }
 
-function gradientStopsFromColorStops(stops: readonly ColorStop[]) {
-    return stops.map((s) => ({ name: normalizedFigColorVarName(s), solid: s.color }));
+async function gradientStopsFromColorStops(stops: readonly ColorStop[]) {
+    return await Promise.all(stops.map(async (s) => ({ name: await normalizedFigColorVarName(s), solid: s.color })));
 }
 
-export function nodePaintFromFills(fills: readonly Paint[] | typeof figma.mixed): NodePaint | undefined {
+export async function nodePaintFromFills(fills: readonly Paint[] | typeof figma.mixed): Promise<NodePaint | undefined> {
   if (fills != figma.mixed) {
     const topPaint = retrieveTopFill(fills)
     if (topPaint) {
       switch (topPaint?.type) {
         case "SOLID": 
           return {
-            name:  normalizedFigColorVarName(topPaint),
+            name:  await normalizedFigColorVarName(topPaint),
             solid: topPaint.color,
           }
         case "GRADIENT_LINEAR": {
           return {
             gradient: {
               gradientAngle: gradientAngle(topPaint),
-              stops: gradientStopsFromColorStops(topPaint.gradientStops)
+              stops: await gradientStopsFromColorStops(topPaint.gradientStops)
             }
           }
         }
@@ -331,7 +331,7 @@ export function nodePaintFromFills(fills: readonly Paint[] | typeof figma.mixed)
   }
 }
 
-export function nodePaintStyleForFigNode(node: SupportedNodeForPaintStyle): NodePaint | undefined {
-  const paintStyle = nodePaintStyle(node)
-  return nodePaintFromStyles(paintStyle) ?? nodePaintFromFills(node.fills) 
+export async function nodePaintStyleForFigNode(node: SupportedNodeForPaintStyle): Promise<NodePaint | undefined> {
+  const paintStyle = await nodePaintStyle(node)
+  return await nodePaintFromStyles(paintStyle) ?? await nodePaintFromFills(node.fills) 
 }
