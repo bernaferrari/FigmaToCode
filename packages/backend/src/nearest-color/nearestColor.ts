@@ -10,6 +10,8 @@
  * @property {RGB} rgb The {@link RGB} color values
  */
 
+import { localTailwindSettings } from "../tailwind/tailwindMain.js";
+
 /**
  * Describes a matched color.
  *
@@ -40,9 +42,10 @@
  *     string representing one, e.g., '#FF0'
  * @param {Array.<ColorSpec>=} colors An optional list of available colors
  *     (defaults to {@link nearestColor.DEFAULT_COLORS})
- * @return {ColorMatch|string} If the colors in the provided list had names,
+ * @return {ColorMatch|string|undefined} If the colors in the provided list had names,
  *     then a {@link ColorMatch} object with the name and (hex) value of the
  *     nearest color from the list. Otherwise, simply the hex value.
+ *     returns undefined when match color not withing tolerance
  *
  * @example
  * nearestColor({ r: 200, g: 50, b: 50 }); // => '#f00'
@@ -54,7 +57,7 @@
  * nearestColor('red');                    // => '#f00'
  * nearestColor('foo');                    // => throws
  */
-function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
+function nearestColor(needle: RGB | string, colors: Array<ColorSpec>, exact = false): string | undefined {
   needle = parseColor(needle);
 
   let distanceSq;
@@ -66,7 +69,6 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
 
   for (let i = 0; i < colors.length; ++i) {
     rgb = colors[i].rgb;
-
     distanceSq =
       (needle.r - rgb.r) ** 2 +
       (needle.g - rgb.g) ** 2 +
@@ -78,8 +80,10 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
     }
   }
 
-  // @ts-expect-error this is always not null
-  return value.source;
+  if (!exact || minDistanceSq <= (Number.MIN_VALUE * 6)) {    
+    // @ts-expect-error this is always not null
+    return value.source;
+  } 
 }
 
 /**
@@ -149,9 +153,9 @@ function mapColors(colors: Array<string>): Array<ColorSpec> {
  */
 export const nearestColorFrom = (
   availableColors: Array<string>
-): ((hex: string | RGB) => string) => {
+): ((hex: string | RGB) => string | undefined) => {
   const colors = mapColors(availableColors);
-  return (hex: string | RGB) => nearestColor(hex, colors);
+  return (hex: string | RGB) => nearestColor(hex, colors, localTailwindSettings?.roundTailwindColors !== true);
 };
 
 /**

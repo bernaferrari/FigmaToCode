@@ -3,23 +3,23 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
-import { tailwindColorFromFills } from "./builderImpl/tailwindColor";
+import { tailwindSolidColor } from "./builderImpl/tailwindColor.js";
 import {
   pxToFontSize,
   pxToLetterSpacing,
   pxToLineHeight,
 } from "./conversionTables";
-import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+import { TailwindDefaultBuilder, nodePaintFromFills, nodePaintStyleForFigNode } from "./tailwindDefaultBuilder";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
-  getTextSegments(id: string): { style: string; text: string }[] {
+  async getTextSegments(id: string): Promise<{ style: string; text: string; }[]> {
     const segments = globalTextStyleSegments[id];
     if (!segments) {
       return [];
     }
 
-    return segments.map((segment) => {
-      const color = this.getTailwindColorFromFills(segment.fills);
+    return await Promise.all(segments.map(async (segment) => {
+      const color = await this.getTailwindColorFromSegment(segment);
       const textDecoration = this.textDecoration(segment.textDecoration);
       const textTransform = this.textTransform(segment.textCase);
       const lineHeightStyle = this.lineHeight(
@@ -48,16 +48,17 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
       return { style: styleClasses, text: charsWithLineBreak };
-    });
+    }));
   }
 
-  getTailwindColorFromFills = (
-    fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  getTailwindColorFromSegment = async(
+    segment: StyledTextSegment
   ) => {
     // Implement a function to convert fills to the appropriate Tailwind CSS color classes.
     // This can be based on your project's configuration and color palette.
     // For example, suppose your project uses the default Tailwind CSS color palette:
-    return tailwindColorFromFills(fills, "text");
+    const paint = await nodePaintStyleForFigNode(segment)
+    return  paint?.solid ? tailwindSolidColor(paint, paint.opacity ?? 1, "text") : "";
   };
 
   fontSize = (fontSize: number) => {

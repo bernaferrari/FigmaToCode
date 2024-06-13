@@ -25,6 +25,8 @@ const defaultPluginSettings: PluginSettings = {
   flutterGenerationMode: "snippet",
   swiftUIGenerationMode: "snippet",
   roundTailwind: false,
+  preferColorAlias: false,
+  roundTailwindColors: true,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
@@ -64,9 +66,9 @@ const initSettings = async () => {
   safeRun(userPluginSettings);
 };
 
-const safeRun = (settings: PluginSettings) => {
+const safeRun = async (settings: PluginSettings) => {
   try {
-    run(settings);
+    await run(settings);
   } catch (e) {
     if (e && typeof e === "object" && "message" in e) {
       console.log("error: ", (e as any).stack);
@@ -81,8 +83,8 @@ const safeRun = (settings: PluginSettings) => {
 const standardMode = async () => {
   figma.showUI(__html__, { width: 450, height: 550, themeColors: true });
   await initSettings();
-  figma.on("selectionchange", () => {
-    safeRun(userPluginSettings);
+  figma.on("selectionchange", async () => {
+    await safeRun(userPluginSettings);
   });
   figma.ui.onmessage = (msg) => {
     console.log("[node] figma.ui.onmessage", msg);
@@ -103,7 +105,7 @@ const codegenMode = async () => {
   // figma.showUI(__html__, { visible: false });
   await getUserSettings();
 
-  figma.codegen.on("generate", ({ language, node }) => {
+  figma.codegen.on("generate", async ({ language, node }) => {
     const convertedSelection = convertIntoNodes([node], null);
 
     switch (language) {
@@ -145,7 +147,7 @@ const codegenMode = async () => {
         return [
           {
             title: `Code`,
-            code: tailwindMain(convertedSelection, {
+            code: await tailwindMain(convertedSelection, {
               ...userPluginSettings,
               jsx: false,
             }),
@@ -153,7 +155,7 @@ const codegenMode = async () => {
           },
           {
             title: `Colors`,
-            code: retrieveGenericSolidUIColors("Tailwind")
+            code: (await retrieveGenericSolidUIColors("Tailwind"))
               .map((d) => `#${d.hex} <- ${d.colorName}`)
               .join("\n"),
             language: "HTML",
@@ -168,7 +170,7 @@ const codegenMode = async () => {
         return [
           {
             title: `Code`,
-            code: tailwindMain(convertedSelection, {
+            code: await tailwindMain(convertedSelection, {
               ...userPluginSettings,
               jsx: true,
             }),
@@ -181,7 +183,7 @@ const codegenMode = async () => {
           // },
           {
             title: `Colors`,
-            code: retrieveGenericSolidUIColors("Tailwind")
+            code: (await retrieveGenericSolidUIColors("Tailwind"))
               .map((d) => `#${d.hex} <- ${d.colorName}`)
               .join("\n"),
             language: "HTML",

@@ -4,21 +4,21 @@ import { rgbTo6hex } from "../../common/color";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { convertFontWeight } from "../../common/convertFontWeight";
 
-export const retrieveTailwindText = (
+export const retrieveTailwindText = async (
   sceneNode: Array<SceneNode>
-): Array<namedText> => {
+): Promise<namedText[]> => {
   // convert to Node and then flatten it. Conversion is necessary because of [tailwindText]
   const selectedText = deepFlatten(sceneNode);
 
   const textStr: Array<namedText> = [];
 
-  selectedText.forEach((node) => {
+  for (const node of selectedText) {
     if (node.type === "TEXT") {
       let layoutBuilder = new TailwindTextBuilder(node, false, false)
         .commonPositionStyles(node, false)
         .textAlign(node);
 
-      const styledHtml = layoutBuilder.getTextSegments(node.id);
+      const styledHtml = await layoutBuilder.getTextSegments(node.id);
 
       let content = "";
       if (styledHtml.length === 1) {
@@ -64,7 +64,7 @@ export const retrieveTailwindText = (
         contrastBlack,
       });
     }
-  });
+  };
 
   // retrieve only unique texts (attr + name)
   // from https://stackoverflow.com/a/18923480/4418073

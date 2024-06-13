@@ -16,6 +16,8 @@ export type PluginSettings = {
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
   roundTailwind: boolean;
+  roundTailwindColors: boolean;
+  preferColorAlias: boolean;
 };
 
 type PluginUIProps = {
@@ -207,6 +209,20 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     propertyName: "roundTailwind",
     label: "Round to Tailwind Values",
     isDefault: false,
+    includedLanguages: ["Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "roundTailwindColors",
+    label: "Round to Tailwind Colors",
+    isDefault: true,
+    includedLanguages: ["Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "preferColorAlias",
+    label: "Use color alias for CSS class",
+    isDefault: true,
     includedLanguages: ["Tailwind"],
   },
   // Add your preferences data here

@@ -11,8 +11,8 @@ import {
   tailwindBorderRadius,
 } from "./builderImpl/tailwindBorder";
 import {
-  tailwindColorFromFills,
-  tailwindGradientFromFills,
+    tailwindColorForNodePaint,
+  tailwindGradient as tailwindGradientForNodePaint,
 } from "./builderImpl/tailwindColor";
 import { tailwindSizePartial } from "./builderImpl/tailwindSize";
 import { tailwindPadding } from "./builderImpl/tailwindPadding";
@@ -21,6 +21,38 @@ import {
   getCommonPositionValue,
 } from "../common/commonPosition";
 import { pxToBlur } from "./conversionTables";
+import { SupportedNodeForPaintStyle, nodePaintStyle } from "../common/commonStyles.js";
+import { retrieveTopFill } from "../common/retrieveFill.js";
+import { variableNameFromAliasIfAny } from "../common/commonVariables.js";
+import { gradientAngle } from "../common/color.js";
+
+
+export interface NodePaintAgg {
+  name?: string // either a tailwind compliant paint style name or from a variable name
+  opacity?: number // unavailable for gradient
+  solid?: RGB | RGBA
+  gradient?: GradientDef
+}
+
+export interface GenSolidPaint extends NodePaintAgg {
+  gradient?: never
+  solid: RGB
+}
+
+export interface GradientDef {
+  gradientAngle: number
+  stops: GenGradientStop[]
+}
+export interface GenGradientStop extends GenSolidPaint {
+  opacity?: never
+  solid: RGBA
+}
+
+type RequiredKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+export interface GenGradientPaint extends RequiredKey<NodePaintAgg, "gradient"> {
+  solid?: never
+}
+type NodePaint = GenSolidPaint | GenGradientPaint
 
 export class TailwindDefaultBuilder {
   attributes: string[] = [];
@@ -73,8 +105,9 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): this {
-    this.customColor(node.fills, "bg");
+  async commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): Promise<this> {
+    
+    await this.customColor(node, "bg");
     this.radius(node);
     this.shadow(node);
     this.border(node);
@@ -91,10 +124,10 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  border(node: SceneNode): this {
+  async border(node: GeometryMixin & BlendMixin & SceneNode): Promise<this> {
     if ("strokes" in node) {
       this.addAttributes(tailwindBorderWidth(node));
-      this.customColor(node.strokes, "border");
+      await this.customColor(node, "border");
     }
 
     return this;
@@ -135,20 +168,17 @@ export class TailwindDefaultBuilder {
    * example: text-opacity-25
    * example: bg-blue-500
    */
-  customColor(
-    paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  async customColor(
+    node: GeometryMixin & BlendMixin & SceneNode,
     kind: string
-  ): this {
-    // visible is true or undefinied (tests)
+  ): Promise<this> {
+    // visible is true or undefined (tests)
     if (this.visible) {
-      let gradient = "";
-      if (kind === "bg") {
-        gradient = tailwindGradientFromFills(paint);
-      }
-      if (gradient) {
-        this.addAttributes(gradient);
-      } else {
-        this.addAttributes(tailwindColorFromFills(paint, kind));
+      const paint = await nodePaintStyleForFigNode(node)
+      if (paint?.gradient) {
+        this.addAttributes(tailwindGradientForNodePaint(paint));
+      } else if (paint?.solid) {
+        this.addAttributes(tailwindColorForNodePaint(paint, kind));
       }
     }
     return this;
@@ -245,4 +275,63 @@ export class TailwindDefaultBuilder {
     this.attributes = [];
     this.style = "";
   }
+}
+
+
+function normalizeTwColorName(name: string | undefined): string | undefined {
+  return name?.match(/\p{L}+/gu)?.join("-")
+}
+
+async function normalizedFigColorVarName(color: SolidPaint | ColorStop): Promise<string | undefined> {
+  const name = await variableNameFromAliasIfAny(color.boundVariables?.color)
+  return normalizeTwColorName(name)
+}
+
+export async function nodePaintFromStyles(paintStyle: PaintStyle | undefined): Promise<NodePaint | undefined> {
+  let paintSetup 
+  paintSetup = paintStyle?.paints
+  paintSetup &&= retrieveTopFill(paintSetup)
+
+  switch (paintSetup?.type) {
+    case "SOLID":
+      let name = await normalizedFigColorVarName(paintSetup)
+      name ||= normalizeTwColorName(paintStyle?.name)
+      const solid = paintSetup.color
+      return { name, solid }
+    case "GRADIENT_LINEAR":
+      const stops = await gradientStopsFromColorStops(paintSetup.gradientStops)
+      return { gradient: { gradientAngle: gradientAngle(paintSetup), stops } }
+  }
+}
+
+async function gradientStopsFromColorStops(stops: readonly ColorStop[]) {
+    return await Promise.all(stops.map(async (s) => ({ name: await normalizedFigColorVarName(s), solid: s.color })));
+}
+
+export async function nodePaintFromFills(fills: readonly Paint[] | typeof figma.mixed): Promise<NodePaint | undefined> {
+  if (fills != figma.mixed) {
+    const topPaint = retrieveTopFill(fills)
+    if (topPaint) {
+      switch (topPaint?.type) {
+        case "SOLID": 
+          return {
+            name:  await normalizedFigColorVarName(topPaint),
+            solid: topPaint.color,
+          }
+        case "GRADIENT_LINEAR": {
+          return {
+            gradient: {
+              gradientAngle: gradientAngle(topPaint),
+              stops: await gradientStopsFromColorStops(topPaint.gradientStops)
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+export async function nodePaintStyleForFigNode(node: SupportedNodeForPaintStyle): Promise<NodePaint | undefined> {
+  const paintStyle = await nodePaintStyle(node)
+  return await nodePaintFromStyles(paintStyle) ?? await nodePaintFromFills(node.fills) 
 }
