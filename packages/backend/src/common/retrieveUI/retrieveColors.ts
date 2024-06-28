@@ -4,10 +4,11 @@ import {
   swiftuiGradient,
 } from "../../swiftui/builderImpl/swiftuiColor";
 import {
+  getTailwindFromVariable,
   tailwindColors,
   tailwindGradient,
   tailwindNearestColor,
-  tailwindSolidColor,
+  tailwindSolidColor
 } from "../../tailwind/builderImpl/tailwindColor";
 import {
   flutterColor,
@@ -68,8 +69,11 @@ const convertSolidColor = (
     const kind = "solid";
     const hex = rgbTo6hex(fill.color);
     const hexNearestColor = tailwindNearestColor(hex);
-    exported = tailwindSolidColor(fill.color, fill.opacity, kind);
-    colorName = tailwindColors[hexNearestColor];
+    const colorVar = fill.boundVariables?.color
+    exported = tailwindSolidColor(fill, kind);
+    colorName = colorVar
+      ? getTailwindFromVariable(colorVar)
+      : tailwindColors[hexNearestColor];
   } else if (framework === "SwiftUI") {
     exported = swiftuiColor(fill.color, opacity);
   }
