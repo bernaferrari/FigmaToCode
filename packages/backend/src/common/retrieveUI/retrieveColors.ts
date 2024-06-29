@@ -1,22 +1,8 @@
 import { rgbTo6hex } from "../color";
-import {
-  swiftuiColor,
-  swiftuiGradient,
-} from "../../swiftui/builderImpl/swiftuiColor";
-import {
-  tailwindColors,
-  tailwindGradient,
-  tailwindNearestColor,
-  tailwindSolidColor,
-} from "../../tailwind/builderImpl/tailwindColor";
-import {
-  flutterColor,
-  flutterGradient,
-} from "../../flutter/builderImpl/flutterColor";
-import {
-  htmlColor,
-  htmlGradientFromFills,
-} from "../../html/builderImpl/htmlColor";
+import { swiftuiColor, swiftuiGradient } from "../../swiftui/builderImpl/swiftuiColor";
+import { tailwindColor, tailwindGradient } from "../../tailwind/builderImpl/tailwindColor";
+import { flutterColor, flutterGradient } from "../../flutter/builderImpl/flutterColor";
+import { htmlColor, htmlGradientFromFills } from "../../html/builderImpl/htmlColor";
 import { calculateContrastRatio } from "./commonUI";
 import { FrameworkTypes } from "../../code";
 
@@ -26,6 +12,7 @@ export type ExportSolidColor = {
   exportValue: string;
   contrastWhite: number;
   contrastBlack: number;
+  meta?: string
 };
 
 export const retrieveGenericSolidUIColors = (
@@ -55,32 +42,25 @@ const convertSolidColor = (
   if (fill.type !== "SOLID") return null;
 
   const opacity = fill.opacity ?? 1.0;
-  let exported = "";
-  let colorName = "";
-  let contrastBlack = calculateContrastRatio(fill.color, black);
-  let contrastWhite = calculateContrastRatio(fill.color, white);
+  const output = {
+    hex: rgbTo6hex(fill.color).toUpperCase(),
+    colorName: "",
+    exportValue: "",
+    contrastBlack: calculateContrastRatio(fill.color, black),
+    contrastWhite: calculateContrastRatio(fill.color, white),
+  };
 
   if (framework === "Flutter") {
-    exported = flutterColor(fill.color, opacity);
+    output.exportValue = flutterColor(fill.color, opacity);
   } else if (framework === "HTML") {
-    exported = htmlColor(fill.color, opacity);
+    output.exportValue = htmlColor(fill.color, opacity);
   } else if (framework === "Tailwind") {
-    const kind = "solid";
-    const hex = rgbTo6hex(fill.color);
-    const hexNearestColor = tailwindNearestColor(hex);
-    exported = tailwindSolidColor(fill.color, fill.opacity, kind);
-    colorName = tailwindColors[hexNearestColor];
+    Object.assign(output, tailwindColor(fill));
   } else if (framework === "SwiftUI") {
-    exported = swiftuiColor(fill.color, opacity);
+    output.exportValue = swiftuiColor(fill.color, opacity);
   }
 
-  return {
-    hex: rgbTo6hex(fill.color).toUpperCase(),
-    colorName,
-    exportValue: exported,
-    contrastBlack,
-    contrastWhite,
-  };
+  return output;
 };
 
 type ExportLinearGradient = { cssPreview: string; exportValue: string };
@@ -93,24 +73,24 @@ export const retrieveGenericLinearGradients = (
 
   selectionColors?.paints.forEach((paint) => {
     if (paint.type === "GRADIENT_LINEAR") {
-      let exported = "";
+      let exportValue = "";
       switch (framework) {
         case "Flutter":
-          exported = flutterGradient(paint);
+          exportValue = flutterGradient(paint);
           break;
         case "HTML":
-          exported = htmlGradientFromFills([paint]);
+          exportValue = htmlGradientFromFills([paint]);
           break;
         case "Tailwind":
-          exported = tailwindGradient(paint);
+          exportValue = tailwindGradient(paint);
           break;
         case "SwiftUI":
-          exported = swiftuiGradient(paint);
+          exportValue = swiftuiGradient(paint);
           break;
       }
       colorStr.push({
         cssPreview: htmlGradientFromFills([paint]),
-        exportValue: exported,
+        exportValue,
       });
     }
   });

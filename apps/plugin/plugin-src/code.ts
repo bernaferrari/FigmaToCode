@@ -142,35 +142,13 @@ const codegenMode = async () => {
           },
         ];
       case "tailwind":
-        return [
-          {
-            title: `Code`,
-            code: tailwindMain(convertedSelection, {
-              ...userPluginSettings,
-              jsx: false,
-            }),
-            language: "HTML",
-          },
-          {
-            title: `Colors`,
-            code: retrieveGenericSolidUIColors("Tailwind")
-              .map((d) => `#${d.hex} <- ${d.colorName}`)
-              .join("\n"),
-            language: "HTML",
-          },
-          {
-            title: `Text Styles`,
-            code: tailwindCodeGenTextStyles(),
-            language: "HTML",
-          },
-        ];
       case "tailwind_jsx":
         return [
           {
             title: `Code`,
             code: tailwindMain(convertedSelection, {
               ...userPluginSettings,
-              jsx: true,
+              jsx: language === 'tailwind_jsx',
             }),
             language: "HTML",
           },
@@ -180,11 +158,11 @@ const codegenMode = async () => {
           //   language: "HTML",
           // },
           {
-            title: `Colors`,
+            title: `Tailwind Colors`,
             code: retrieveGenericSolidUIColors("Tailwind")
-              .map((d) => `#${d.hex} <- ${d.colorName}`)
+              .map((d) => `#${d.hex}; // ${d.colorName}${d.meta || ''}`)
               .join("\n"),
-            language: "HTML",
+            language: "JAVASCRIPT",
           },
           {
             title: `Text Styles`,
