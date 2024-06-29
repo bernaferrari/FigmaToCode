@@ -1,8 +1,8 @@
-import { tailwindNearestColor } from "../builderImpl/tailwindColor";
 import { TailwindTextBuilder } from "../tailwindTextBuilder";
 import { rgbTo6hex } from "../../common/color";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { convertFontWeight } from "../../common/convertFontWeight";
+import { nearestColor } from "../conversionTables";
 
 export const retrieveTailwindText = (
   sceneNode: Array<SceneNode>
@@ -103,7 +103,7 @@ const style = (node: TextNode): string => {
       .replace(" ", "")
       .toLowerCase();
 
-    const weight = convertFontWeight(value);
+    const weight = convertFontWeight(Number(value));
     if (weight) {
       comp += `font-weight: ${weight};`;
     }
@@ -144,7 +144,7 @@ const convertColor = (
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
-    return tailwindNearestColor(rgbTo6hex(fill.color));
+    return nearestColor(rgbTo6hex(fill.color));
   }
 
   return undefined;

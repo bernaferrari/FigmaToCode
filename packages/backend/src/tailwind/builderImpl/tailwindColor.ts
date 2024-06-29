@@ -1,19 +1,40 @@
-import { nearestColorFrom } from "../../nearest-color/nearestColor";
 import { retrieveTopFill } from "../../common/retrieveFill";
-import { gradientAngle } from "../../common/color";
-import { nearestOpacity, nearestValue } from "../conversionTables";
+import { gradientAngle, rgbTo6hex } from "../../common/color";
+import { nearestColor, nearestColorFromRgb, nearestOpacity, nearestValue, variableToToken } from "../conversionTables";
+import { config } from "../tailwindConfig";
+
+type Kind = 'text' | 'bg' | 'border' | 'solid'
+
+export function tailwindColor(fill: SolidPaint) {
+  const hex = rgbTo6hex(fill.color);
+  const hexNearestColor = nearestColor(hex);
+  const exportValue = tailwindSolidColor(fill, 'solid');
+  const colorVar = fill.boundVariables?.color;
+  if (colorVar) {
+    return {
+      exportValue,
+      colorName: variableToToken(colorVar),
+    }
+  }
+  else {
+    return {
+      exportValue,
+      colorName: config.color[hexNearestColor],
+      meta: ' (closest)',
+    }
+  }
+}
 
 // retrieve the SOLID color for tailwind
 export const tailwindColorFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
-  kind: string
+  kind: Kind
 ): string => {
-  // kind can be text, bg, border...
   // [when testing] fills can be undefined
 
   const fill = retrieveTopFill(fills);
   if (fill && fill.type === "SOLID") {
-    return tailwindSolidColor(fill, kind)
+    return tailwindSolidColor(fill, kind);
   } else if (
     fill &&
     (fill.type === "GRADIENT_LINEAR" ||
@@ -34,21 +55,21 @@ export const tailwindColorFromFills = (
  * - variables: uses the tokenised variable name
  * - colors:    uses the nearest Tailwind color name
  */
-export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: string): string => {
+export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: Kind): string => {
   // example: stone-500 or custom-color-700
   const colorName = fill.boundVariables?.color
-    ? getTailwindFromVariable(fill.boundVariables.color)
-    : getTailwindFromFigmaRGB(fill.color);
+    ? variableToToken(fill.boundVariables.color)
+    : nearestColorFromRgb(fill.color);
 
   // if no kind, it's a variable stop, so just return the name
   if (!kind) {
-    return colorName
+    return colorName;
   }
 
   // grab opacity, or set it to full
   const opacity = "opacity" in fill
     ? fill.opacity ?? 1
-    : 1
+    : 1;
 
   // example: opacity-50
   const opacityProp = opacity !== 1.0
@@ -56,7 +77,7 @@ export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: string):
     : "";
 
   // example: text-red-500, text-custom-color-700/opacity-25
-  return `${kind}-${colorName}${opacityProp ? `/${opacityProp}` : ""}`
+  return `${kind}-${colorName}${opacityProp ? `/${opacityProp}` : ""}`;
 };
 
 /**
