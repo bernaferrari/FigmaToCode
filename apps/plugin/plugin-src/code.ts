@@ -162,7 +162,7 @@ const codegenMode = async () => {
             code: retrieveGenericSolidUIColors("Tailwind")
               .map((d) => `#${d.hex}; // ${d.colorName}${d.meta || ''}`)
               .join("\n"),
-            language: "HTML",
+            language: "JAVASCRIPT",
           },
           {
             title: `Text Styles`,

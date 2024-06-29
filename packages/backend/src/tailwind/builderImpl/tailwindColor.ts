@@ -13,12 +13,14 @@ export function tailwindColor(fill: SolidPaint) {
   if (colorVar) {
     return {
       exportValue,
+      hex: hex.toUpperCase(),
       colorName: variableToToken(colorVar),
     }
   }
   else {
     return {
       exportValue,
+      hex: hexNearestColor.substring(1).toUpperCase(),
       colorName: config.color[hexNearestColor],
       meta: ' (closest)',
     }
