@@ -34,7 +34,7 @@ export const tailwindColorFromFills = (
  * - variables: uses the tokenised variable name
  * - colors:    uses the nearest Tailwind color name
  */
-export function tailwindSolidColor(fill: SolidPaint | ColorStop, kind?: string): string {
+export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: string): string => {
   // example: stone-500 or custom-color-700
   const colorName = fill.boundVariables?.color
     ? getTailwindFromVariable(fill.boundVariables.color)
@@ -57,7 +57,7 @@ export function tailwindSolidColor(fill: SolidPaint | ColorStop, kind?: string):
 
   // example: text-red-500, text-custom-color-700/opacity-25
   return `${kind}-${colorName}${opacityProp ? `/${opacityProp}` : ""}`
-}
+};
 
 /**
  * https://tailwindcss.com/docs/box-shadow/
