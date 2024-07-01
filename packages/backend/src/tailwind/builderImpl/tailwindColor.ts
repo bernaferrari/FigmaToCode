@@ -13,7 +13,7 @@ export const tailwindColorFromFills = (
 
   const fill = retrieveTopFill(fills);
   if (fill && fill.type === "SOLID") {
-    return tailwindSolidColor(fill.color, fill.opacity, kind);
+    return tailwindSolidColor(fill, kind)
   } else if (
     fill &&
     (fill.type === "GRADIENT_LINEAR" ||
@@ -22,31 +22,36 @@ export const tailwindColorFromFills = (
       fill.type === "GRADIENT_DIAMOND")
   ) {
     if (fill.gradientStops.length > 0) {
-      return tailwindSolidColor(
-        fill.gradientStops[0].color,
-        fill.opacity,
-        kind
-      );
+      return tailwindSolidColor(fill.gradientStops[0], kind);
     }
   }
   return "";
 };
 
-export const tailwindSolidColor = (
-  color: RGB,
-  opacity: number | undefined,
-  kind: string
-): string => {
-  // example: text-opacity-50
-  // ignore the 100. If opacity was changed, let it be visible.
-  const opacityProp =
-    opacity !== 1.0 ? `opacity-${nearestOpacity(opacity ?? 1.0)}` : null;
+/**
+ * Get the tailwind token name for a given color
+ *
+ * - variables: uses the tokenised variable name
+ * - colors:    uses the nearest Tailwind color name
+ */
+export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: string): string => {
+  // example: stone-500 or custom-color-700
+  const colorName = fill.boundVariables?.color
+    ? getTailwindFromVariable(fill.boundVariables.color)
+    : getTailwindFromFigmaRGB(fill.color);
 
-  // example: text-red-500
-  const colorProp = `${kind}-${getTailwindFromFigmaRGB(color)}${opacityProp ? `/${opacityProp}` : ""}`;
+  // if no kind, it's a variable stop, so just return the name
+  if (!kind) {
+    return colorName
+  }
 
-  // if fill isn't visible, it shouldn't be painted.
-  return colorProp;
+  // grab opacity, or set it to full
+  const opacity = "opacity" in fill && fill.opacity !== 1.0
+    ? `/${nearestOpacity(fill.opacity ?? 1.0)}`
+    : "";
+
+  // example: text-red-500, text-custom-color-700/25
+  return `${kind}-${colorName}${opacity}`
 };
 
 /**
@@ -71,24 +76,22 @@ export const tailwindGradient = (fill: GradientPaint): string => {
   const direction = gradientDirection(gradientAngle(fill));
 
   if (fill.gradientStops.length === 1) {
-    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
+    const fromColor = tailwindSolidColor(fill.gradientStops[0]);
 
     return `${direction} from-${fromColor}`;
   } else if (fill.gradientStops.length === 2) {
-    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
-    const toColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
+    const fromColor = tailwindSolidColor(fill.gradientStops[0]);
+    const toColor = tailwindSolidColor(fill.gradientStops[1]);
 
     return `${direction} from-${fromColor} to-${toColor}`;
   } else {
-    const fromColor = getTailwindFromFigmaRGB(fill.gradientStops[0].color);
+    const fromColor = tailwindSolidColor(fill.gradientStops[0]);
 
     // middle (second color)
-    const viaColor = getTailwindFromFigmaRGB(fill.gradientStops[1].color);
+    const viaColor = tailwindSolidColor(fill.gradientStops[1]);
 
     // last
-    const toColor = getTailwindFromFigmaRGB(
-      fill.gradientStops[fill.gradientStops.length - 1].color
-    );
+    const toColor = tailwindSolidColor(fill.gradientStops[fill.gradientStops.length - 1]);
 
     return `${direction} from-${fromColor} via-${viaColor} to-${toColor}`;
   }
@@ -378,6 +381,6 @@ export const getTailwindFromFigmaRGB = (color: RGB): string => {
   return tailwindColors[tailwindNearestColor(colorMultiplied)];
 };
 
-export const getTailwindColor = (color: string | RGB): string => {
-  return tailwindColors[tailwindNearestColor(color)];
-};
+export const getTailwindFromVariable = (alias: VariableAlias) => {
+  return figma.variables.getVariableById(alias.id)?.name.replaceAll("/", "-") || alias.id
+}
