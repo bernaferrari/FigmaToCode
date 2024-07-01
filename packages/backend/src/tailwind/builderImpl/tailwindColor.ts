@@ -46,17 +46,12 @@ export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: string):
   }
 
   // grab opacity, or set it to full
-  const opacity = "opacity" in fill
-    ? fill.opacity ?? 1
-    : 1
-
-  // example: opacity-50
-  const opacityProp = opacity !== 1.0
-    ? `opacity-${nearestOpacity(opacity ?? 1.0)}`
+  const opacity = "opacity" in fill && fill.opacity !== 1.0
+    ? `/${nearestOpacity(fill.opacity ?? 1.0)}`
     : "";
 
-  // example: text-red-500, text-custom-color-700/opacity-25
-  return `${kind}-${colorName}${opacityProp ? `/${opacityProp}` : ""}`
+  // example: text-red-500, text-custom-color-700/25
+  return `${kind}-${colorName}${opacity}`
 };
 
 /**
