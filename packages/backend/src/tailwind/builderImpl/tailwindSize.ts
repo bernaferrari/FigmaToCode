@@ -14,7 +14,11 @@ export const tailwindSizePartial = (
       : null) ?? node.parent;
 
   let w = "";
-  if (typeof size.width === "number") {
+  if (
+    typeof size.width === "number" &&
+    'layoutSizingHorizontal' in node &&
+    node.layoutSizingHorizontal === 'FIXED'
+  ) {
     w = `w-${pxToLayoutSize(size.width)}`;
   } else if (size.width === "fill") {
     if (
