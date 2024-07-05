@@ -1,4 +1,6 @@
 import { formatMultipleJSXArray } from "../../common/parseJSX";
+import { hasProp, MapInterface } from "../../common/utils";
+
 
 const getFlexDirection = (node: InferredAutoLayoutResult): string =>
   node.layoutMode === "HORIZONTAL" ? "" : "column";
@@ -29,10 +31,24 @@ const getAlignItems = (node: InferredAutoLayoutResult): string => {
   }
 };
 
-const getGap = (node: InferredAutoLayoutResult): string | number =>
-  node.itemSpacing > 0 && node.primaryAxisAlignItems !== "SPACE_BETWEEN"
+const getAlignContent = (node: InferredAutoLayoutResult): string => {
+  switch (node.primaryAxisAlignItems) {
+    case "MIN":
+      return "flex-start";
+    case "CENTER":
+      return "center";
+    case "MAX":
+      return "flex-end";
+    default:
+      return "";
+  }
+};
+
+const getGap = (node: InferredAutoLayoutResult): string | number => {
+  return node.itemSpacing > 0 && node.primaryAxisAlignItems !== "SPACE_BETWEEN"
     ? node.itemSpacing
     : "";
+};
 
 const getFlex = (
   node: SceneNode,
@@ -44,18 +60,26 @@ const getFlex = (
     ? "flex"
     : "inline-flex";
 
+const getFlexWrap = (node: SceneNode) =>
+  "layoutWrap" in node && node.layoutWrap === "WRAP"
+    ? "wrap"
+    : "";
+
 export const htmlAutoLayoutProps = (
   node: SceneNode,
   autoLayout: InferredAutoLayoutResult,
   isJsx: boolean
-): string[] =>
-  formatMultipleJSXArray(
-    {
-      "flex-direction": getFlexDirection(autoLayout),
-      "justify-content": getJustifyContent(autoLayout),
-      "align-items": getAlignItems(autoLayout),
-      gap: getGap(autoLayout),
-      display: getFlex(node, autoLayout),
-    },
-    isJsx
-  );
+): string[] => {
+  const wrap = getFlexWrap(node);
+  const align = wrap ? "align-content" : "align-items";
+  const props = {
+    display: getFlex(node, autoLayout),
+    "flex-direction": getFlexDirection(autoLayout),
+    "justify-content": getJustifyContent(autoLayout),
+    [align]: getAlignItems(autoLayout),
+    "flex-wrap": wrap,
+    gap: getGap(autoLayout),
+  }
+  return formatMultipleJSXArray(props, isJsx);
+};
+

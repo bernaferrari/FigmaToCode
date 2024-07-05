@@ -221,7 +221,7 @@ export class HtmlDefaultBuilder {
   }
 
   size(node: SceneNode, optimize: boolean): this {
-    const { width, height } = htmlSizePartial(node, this.isJSX, optimize);
+    const { width, height, shrink } = htmlSizePartial(node, this.isJSX, optimize);
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {
@@ -236,7 +236,7 @@ export class HtmlDefaultBuilder {
           break;
       }
     } else {
-      this.addStyles(width, height);
+      this.addStyles(width, height, shrink);
     }
 
     return this;
