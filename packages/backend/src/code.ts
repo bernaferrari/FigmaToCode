@@ -19,7 +19,9 @@ export type PluginSettings = {
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
-  roundTailwind: boolean;
+  roundTailwindValues: boolean;
+  roundTailwindColors: boolean,
+  customTailwindColors: boolean,
 };
 
 export const run = (settings: PluginSettings) => {

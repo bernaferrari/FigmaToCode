@@ -37,7 +37,7 @@ const pxToRemToTailwind = (
 
   if (convertedValue) {
     return conversionMap[convertedValue];
-  } else if (localTailwindSettings.roundTailwind) {
+  } else if (localTailwindSettings.roundTailwindValues) {
     return conversionMap[nearestValue(value / 16, keys)];
   }
 
@@ -53,7 +53,7 @@ const pxToTailwind = (
 
   if (convertedValue) {
     return conversionMap[convertedValue];
-  } else if (localTailwindSettings.roundTailwind) {
+  } else if (localTailwindSettings.roundTailwindValues) {
     return conversionMap[nearestValue(value, keys)];
   }
 

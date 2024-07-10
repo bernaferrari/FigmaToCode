@@ -24,7 +24,9 @@ const defaultPluginSettings: PluginSettings = {
   responsiveRoot: false,
   flutterGenerationMode: "snippet",
   swiftUIGenerationMode: "snippet",
-  roundTailwind: false,
+  roundTailwindValues: false,
+  roundTailwindColors: false,
+  customTailwindColors: false,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type

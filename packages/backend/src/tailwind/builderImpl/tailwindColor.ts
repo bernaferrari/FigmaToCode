@@ -1,7 +1,8 @@
 import { nearestColorFrom } from "../../nearest-color/nearestColor";
 import { retrieveTopFill } from "../../common/retrieveFill";
-import { gradientAngle } from "../../common/color";
+import { gradientAngle, rgbTo6hex } from "../../common/color";
 import { nearestOpacity, nearestValue } from "../conversionTables";
+import { localTailwindSettings } from "../tailwindMain";
 
 // retrieve the SOLID color for tailwind
 export const tailwindColorFromFills = (
@@ -36,9 +37,11 @@ export const tailwindColorFromFills = (
  */
 export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: string): string => {
   // example: stone-500 or custom-color-700
-  const colorName = fill.boundVariables?.color
+  const colorName = localTailwindSettings.customTailwindColors && fill.boundVariables?.color
     ? getTailwindFromVariable(fill.boundVariables.color)
-    : getTailwindFromFigmaRGB(fill.color);
+    : localTailwindSettings.roundTailwindColors
+      ? getTailwindFromFigmaRGB(fill.color)
+      : `[#${rgbTo6hex(fill.color)}]`;
 
   // if no kind, it's a variable stop, so just return the name
   if (!kind) {

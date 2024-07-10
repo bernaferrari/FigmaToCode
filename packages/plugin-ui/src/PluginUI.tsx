@@ -15,7 +15,9 @@ export type PluginSettings = {
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
-  roundTailwind: boolean;
+  roundTailwindValues: boolean;
+  roundTailwindColors: boolean;
+  customTailwindColors: boolean;
 };
 
 type PluginUIProps = {
@@ -191,21 +193,35 @@ export const preferenceOptions: LocalCodegenPreference[] = [
   {
     itemType: "individual_select",
     propertyName: "optimizeLayout",
-    label: "Optimize Layout",
+    label: "Optimize layout",
     isDefault: true,
     includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
   },
   {
     itemType: "individual_select",
     propertyName: "layerName",
-    label: "Layer Names",
+    label: "Include layer names in classes",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
   {
     itemType: "individual_select",
-    propertyName: "roundTailwind",
-    label: "Round to Tailwind Values",
+    propertyName: "roundTailwindValues",
+    label: "Round pixel values to Tailwind defaults",
+    isDefault: false,
+    includedLanguages: ["Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "roundTailwindColors",
+    label: "Round color values to Tailwind defaults",
+    isDefault: false,
+    includedLanguages: ["Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "customTailwindColors",
+    label: "Use variables as custom color tokens",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
