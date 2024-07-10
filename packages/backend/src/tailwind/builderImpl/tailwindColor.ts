@@ -14,7 +14,7 @@ export const tailwindColorFromFills = (
 
   const fill = retrieveTopFill(fills);
   if (fill && fill.type === "SOLID") {
-    return tailwindSolidColor(fill, kind)
+    return tailwindSolidColor(fill, kind);
   } else if (
     fill &&
     (fill.type === "GRADIENT_LINEAR" ||
@@ -37,15 +37,22 @@ export const tailwindColorFromFills = (
  */
 export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: string): string => {
   // example: stone-500 or custom-color-700
-  const colorName = localTailwindSettings.customTailwindColors && fill.boundVariables?.color
-    ? getTailwindFromVariable(fill.boundVariables.color)
-    : localTailwindSettings.roundTailwindColors
-      ? getTailwindFromFigmaRGB(fill.color)
-      : `[#${rgbTo6hex(fill.color)}]`;
+  let color: string;
+  if (localTailwindSettings.customTailwindColors && fill.boundVariables?.color) {
+    color = getTailwindFromVariable(fill.boundVariables.color);
+  } else {
+    const colorValue = "#" + rgbTo6hex(fill.color);
+    const { name, value } = getTailwindFromFigmaRGB(fill.color);
+    if (localTailwindSettings.roundTailwindColors || colorValue === value) {
+      color = name;
+    } else {
+      color = `[#${rgbTo6hex(fill.color)}]`;
+    }
+  }
 
   // if no kind, it's a variable stop, so just return the name
   if (!kind) {
-    return colorName
+    return color;
   }
 
   // grab opacity, or set it to full
@@ -54,7 +61,7 @@ export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: string):
     : "";
 
   // example: text-red-500, text-custom-color-700/25
-  return `${kind}-${colorName}${opacity}`
+  return `${kind}-${color}${opacity}`;
 };
 
 /**
@@ -374,16 +381,17 @@ export const tailwindNearestColor = nearestColorFrom(
 );
 
 // figma uses r,g,b in [0, 1], while nearestColor uses it in [0, 255]
-export const getTailwindFromFigmaRGB = (color: RGB): string => {
+export const getTailwindFromFigmaRGB = (color: RGB) => {
   const colorMultiplied = {
     r: color.r * 255,
     g: color.g * 255,
     b: color.b * 255,
   };
-
-  return tailwindColors[tailwindNearestColor(colorMultiplied)];
+  const value = tailwindNearestColor(colorMultiplied);
+  const name = tailwindColors[value];
+  return { name, value };
 };
 
 export const getTailwindFromVariable = (alias: VariableAlias) => {
-  return figma.variables.getVariableById(alias.id)?.name.replaceAll("/", "-") || alias.id
-}
+  return figma.variables.getVariableById(alias.id)?.name.replaceAll("/", "-") || alias.id;
+};
