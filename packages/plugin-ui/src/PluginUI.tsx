@@ -15,7 +15,9 @@ export type PluginSettings = {
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
-  roundTailwind: boolean;
+  roundTailwindValues: boolean;
+  roundTailwindColors: boolean;
+  customTailwindColors: boolean;
 };
 
 type PluginUIProps = {
@@ -161,6 +163,7 @@ type LocalCodegenPreference =
       "framework" | "flutterGenerationMode" | "swiftUIGenerationMode"
     >;
     label: string;
+    description: string;
     value?: boolean;
     isDefault?: boolean;
     includedLanguages?: FrameworkTypes[];
@@ -171,6 +174,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     itemType: "individual_select",
     propertyName: "jsx",
     label: "React (JSX)",
+    description: 'Render "class" attributes as "className"',
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
@@ -191,21 +195,40 @@ export const preferenceOptions: LocalCodegenPreference[] = [
   {
     itemType: "individual_select",
     propertyName: "optimizeLayout",
-    label: "Optimize Layout",
+    label: "Optimize layout",
+    description: 'Attempt to auto-layout suitable element groups',
     isDefault: true,
     includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
   },
   {
     itemType: "individual_select",
     propertyName: "layerName",
-    label: "Layer Names",
+    label: "Layer names",
+    description: 'Include layer names in classes',
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
   {
     itemType: "individual_select",
-    propertyName: "roundTailwind",
-    label: "Round to Tailwind Values",
+    propertyName: "roundTailwindValues",
+    label: "Round values",
+    description: 'Round pixel values to nearest Tailwind sizes',
+    isDefault: false,
+    includedLanguages: ["Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "roundTailwindColors",
+    label: "Round colors",
+    description: 'Round color values to nearest Tailwind colors',
+    isDefault: false,
+    includedLanguages: ["Tailwind"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "customTailwindColors",
+    label: "Custom colors",
+    description: 'Use color variable names as custom color names',
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
@@ -318,6 +341,7 @@ export const CodePanel = (props: {
                 <SelectableToggle
                   key={preference.propertyName}
                   title={preference.label}
+                  description={preference.description}
                   isSelected={
                     props.preferences?.[preference.propertyName] ??
                     preference.isDefault
@@ -547,6 +571,7 @@ type SelectableToggleProps = {
   onSelect: (isSelected: boolean) => void;
   isSelected?: boolean;
   title: string;
+  description?: string;
   buttonClass: string;
   checkClass: string;
 };
@@ -555,6 +580,7 @@ const SelectableToggle = ({
   onSelect,
   isSelected = false,
   title,
+  description,
   buttonClass,
   checkClass,
 }: SelectableToggleProps) => {
@@ -565,6 +591,7 @@ const SelectableToggle = ({
   return (
     <button
       onClick={handleClick}
+      title={description}
       className={`h-8 px-2 truncate flex items-center justify-center rounded-md cursor-pointer transition-all duration-300
       hover:bg-neutral-200 dark:hover:bg-neutral-700 gap-2 text-sm ring-1 
       ${
