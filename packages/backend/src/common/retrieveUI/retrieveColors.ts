@@ -25,7 +25,7 @@ export const retrieveGenericSolidUIColors = (
   selectionColors.paints.forEach((paint) => {
     const fill = convertSolidColor(paint, framework);
     if (fill) {
-      const exists = colors.find(col => col.colorName === fill.colorName)
+      const exists = colors.find(col => col.exportValue === fill.exportValue)
       if (!exists) {
         colors.push(fill);
       }
