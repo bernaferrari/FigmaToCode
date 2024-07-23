@@ -609,7 +609,7 @@ const SelectableToggle = ({
         style={{
           borderRadius: 4,
         }}
-      ></span>
+      />
       {title}
     </button>
   );
