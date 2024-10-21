@@ -1,54 +1,66 @@
 import { nodeSize } from "../../common/nodeWidthHeight";
 import { formatWithJSX } from "../../common/parseJSX";
 import { isPreviewGlobal } from "../htmlMain";
+import { getProp, hasProp } from "../../common/utils";
+
+type Size = {
+  width: string
+  height: string
+  shrink: string
+}
 
 export const htmlSizePartial = (
   node: SceneNode,
   isJsx: boolean,
   optimizeLayout: boolean
-): { width: string; height: string } => {
-  if (isPreviewGlobal && node.parent === undefined) {
+): Size => {
+  // variables
+  const parent = node.parent;
+
+  if (isPreviewGlobal && parent === undefined) {
     return {
       width: formatWithJSX("width", isJsx, "100%"),
       height: formatWithJSX("height", isJsx, "100%"),
+      shrink: "",
     };
   }
 
+  // variables
   const size = nodeSize(node, optimizeLayout);
-  const nodeParent =
-    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
-      ? node.parent.inferredAutoLayout
-      : null) ?? node.parent;
+  const layoutMode = getProp(node.parent as AutoLayoutMixin | undefined, 'layoutMode')
+  const isWrap = hasProp(parent, "layoutWrap", "WRAP");
 
-  let w = "";
+  // variables
+  let width = "";
+  let height = "";
+  let shrink = "";
+
+  // width
   if (typeof size.width === "number") {
-    w = formatWithJSX("width", isJsx, size.width);
+    width = formatWithJSX("width", isJsx, size.width);
   } else if (size.width === "fill") {
-    if (
-      nodeParent &&
-      "layoutMode" in nodeParent &&
-      nodeParent.layoutMode === "HORIZONTAL"
-    ) {
-      w = formatWithJSX("flex", isJsx, "1 1 0");
+    if (layoutMode === "HORIZONTAL") {
+      width = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
-      w = formatWithJSX("align-self", isJsx, "stretch");
+      width = formatWithJSX("align-self", isJsx, "stretch");
     }
   }
 
-  let h = "";
+  // height
   if (typeof size.height === "number") {
-    h = formatWithJSX("height", isJsx, size.height);
+    height = formatWithJSX("height", isJsx, size.height);
   } else if (typeof size.height === "string") {
-    if (
-      nodeParent &&
-      "layoutMode" in nodeParent &&
-      nodeParent.layoutMode === "VERTICAL"
-    ) {
-      h = formatWithJSX("flex", isJsx, "1 1 0");
+    if (layoutMode === "VERTICAL") {
+      height = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
-      h = formatWithJSX("align-self", isJsx, "stretch");
+      height = formatWithJSX("align-self", isJsx, "stretch");
     }
   }
 
-  return { width: w, height: h };
+  // shrink
+  if (layoutMode && !isWrap && (typeof size.height === "number" || typeof size.width === "number")) {
+    shrink = 'flex-shrink: 0';
+  }
+
+  return { width, height, shrink };
 };
