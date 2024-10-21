@@ -127,7 +127,7 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
     content = styledHtml[0].text;
   } else {
     content = styledHtml
-      .map((style) => `<span style="${style.style}">${style.text}</span>`)
+      .map((style) => `<span class="${style.style}">${style.text}</span>`)
       .join("");
   }
 
