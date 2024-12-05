@@ -1,5 +1,7 @@
 {
+  "name": "figma-to-code",
   "private": true,
+  "packageManager": "pnpm@9.14.4",
   "scripts": {
     "build": "turbo run build",
     "build:watch": "turbo run build:watch",
