@@ -88,7 +88,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
           "TextDecoration.none"
         ),
         // textTransform: textTransform,
-        height: lineHeight/fontSize,
+        height: lineHeight,
         letterSpacing: letterSpacing,
       });
 
