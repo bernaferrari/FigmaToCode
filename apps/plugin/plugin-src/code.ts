@@ -83,9 +83,17 @@ const safeRun = (settings: PluginSettings) => {
 const standardMode = async () => {
   figma.showUI(__html__, { width: 450, height: 550, themeColors: true });
   await initSettings();
+  
+  // Listen for selection changes
   figma.on("selectionchange", () => {
     safeRun(userPluginSettings);
   });
+
+  // Listen for document changes
+  figma.on("documentchange", () => {
+    safeRun(userPluginSettings);
+  });
+
   figma.ui.onmessage = (msg) => {
     console.log("[node] figma.ui.onmessage", msg);
 
