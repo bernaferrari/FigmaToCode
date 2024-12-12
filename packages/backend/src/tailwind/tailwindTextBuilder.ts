@@ -97,6 +97,46 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   };
 
   fontFamily = (fontName: FontName): string => {
+    const sansSerif = [
+      'ui-sans-serif',
+      'system-ui',
+      'sans-serif',
+      'Apple Color Emoji',
+      'Segoe UI Emoji',
+      'Segoe UI Symbol',
+      'Noto Color Emoji'
+    ];
+
+    const serif = [
+      'ui-serif',
+      'Georgia',
+      'Cambria',
+      'Times New Roman',
+      'Times',
+      'serif'
+    ];
+
+    const mono = [
+      'ui-monospace',
+      'SFMono-Regular',
+      'Menlo',
+      'Monaco',
+      'Consolas',
+      'Liberation Mono',
+      'Courier New',
+      'monospace'
+    ];
+
+    if (sansSerif.includes(fontName.family)) {
+      return 'font-sans';
+    }
+    if (serif.includes(fontName.family)) {
+      return 'font-serif';
+    }
+    if (mono.includes(fontName.family)) {
+      return 'font-mono';
+    }
+
     return "font-['" + fontName.family + "']";
   };
 
