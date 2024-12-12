@@ -114,7 +114,7 @@ export const nearestColorFromRgb = (color: RGB) => {
 }
 
 export const variableToColorName = (alias: VariableAlias) => {
-  return figma.variables.getVariableById(alias.id)?.name.replaceAll("/", "-") || alias.id.toLowerCase().replaceAll(":", "-");
+  return figma.variables.getVariableById(alias.id)?.name.replaceAll("/", "-").replaceAll(" ", "-") || alias.id.toLowerCase().replaceAll(":", "-");
 };
 
 /**
