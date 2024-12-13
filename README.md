@@ -86,6 +86,8 @@ The plugin is built using Turbo which in turn builds the internal packages.
 
 When running the `dev` task, you can open `http://localhost:3000` to see the debug version of the UI.
 
+<img width="600" alt="Screenshot 2024-12-13 at 16 26 43" src="https://github.com/user-attachments/assets/427fb066-70e1-47bd-8718-51f7f4d83e35" />
+
 ## Issues
 
 The Figma file for this README and icon is also open and welcome to changes! [Check it here.](https://www.figma.com/file/8buWpm6Mpq4yK9MhbkcdJB/Figma-to-Code)
