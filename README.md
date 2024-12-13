@@ -60,15 +60,15 @@ The project is configured for [pnpm](https://pnpm.io/). To install, see the [ins
 
 The plugin is organized as a monorepo. There are several packages:
 
-- packages/backend - Contains the business logic that reads the Figma API and converts nodes
-- packages/plugin-ui - Contains the common UI for the plugin
-- packages/eslint-config-custom - Config file for ESLint
-- packages/tsconfig - Collection of TSConfig files used throughout the project
+- `packages/backend` - Contains the business logic that reads the Figma API and converts nodes
+- `packages/plugin-ui` - Contains the common UI for the plugin
+- `packages/eslint-config-custom` - Config file for ESLint
+- `packages/tsconfig` - Collection of TSConfig files used throughout the project
 
-- apps/plugin - This is the actual plugin assembled from the parts in backend & plugin-ui. Within this folder it's divided between:
-  - plugin-src - loads the backend and compiles to code.js
-  - ui-src - loads the common plugin-ui and compiles to index.html
-- apps/debug - This is a debug mode plugin that is a more convenient way to see all the UI elements.
+- `apps/plugin` - This is the actual plugin assembled from the parts in `backend` & `plugin-ui`. Within this folder it's divided between:
+  - `plugin-src` - loads from `backend` and compiles to `code.js`
+  - `ui-src` - loads the common `plugin-ui` and compiles to `index.html`
+- `apps/debug` - This is a debug mode plugin that is a more convenient way to see all the UI elements.
 
 The plugin is built using Turbo which in turn builds the internal packages.
 
@@ -76,11 +76,17 @@ The plugin is built using Turbo which in turn builds the internal packages.
 
 `pnpm run ...`
 
-- `dev` - runs the app in dev mode
+- `dev` - runs the app in dev mode. This can be run in the Figma editor.
 - `build`
 - `build:watch`
 - `lint`
 - `format` - formats with prettier (warning: may edit files!)
+
+#### Debug mode
+
+When running the `dev` task, you can open `http://localhost:3000` to see the debug version of the UI.
+
+<img width="600" alt="Screenshot 2024-12-13 at 16 26 43" src="https://github.com/user-attachments/assets/427fb066-70e1-47bd-8718-51f7f4d83e35" />
 
 ## Issues
 
