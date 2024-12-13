@@ -61,11 +61,11 @@ The project is configured for [pnpm](https://pnpm.io/). To install, see the [ins
 The plugin is organized as a monorepo. There are several packages:
 
 - packages/backend - Contains the business logic that reads the Figma API and converts nodes
-- packages/plugin-ui - Contains the common UI for the plugin 
+- packages/plugin-ui - Contains the common UI for the plugin
 - packages/eslint-config-custom - Config file for ESLint
 - packages/tsconfig - Collection of TSConfig files used throughout the project
 
-- apps/plugin - This is the actual plugin assembled from the parts in backend & plugin-ui. Within this folder it's divided between: 
+- apps/plugin - This is the actual plugin assembled from the parts in backend & plugin-ui. Within this folder it's divided between:
   - plugin-src - loads the backend and compiles to code.js
   - ui-src - loads the common plugin-ui and compiles to index.html
 - apps/debug - This is a debug mode plugin that is a more convenient way to see all the UI elements.
