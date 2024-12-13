@@ -1,11 +1,13 @@
 {
+  "name": "figma-to-code",
   "private": true,
+  "packageManager": "pnpm@9.14.4",
   "scripts": {
     "build": "turbo run build",
     "build:watch": "turbo run build:watch",
     "dev": "turbo run dev --concurrency 20",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,css,md}\""
   },
   "devDependencies": {
     "eslint": "^9.7.0",

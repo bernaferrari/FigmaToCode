@@ -52,7 +52,35 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 ## How to build the project
 
-The project is configured to be built with Webpack or Rollup. The author couldn't find a way to correctly configure Svelte in Webpack, so Rollup was added. But Rollup is a lot less stable than Webpack and crashes regularly in watch mode when editing Typescript files. So, if you are going to work with Typescript only, I recommend sticking with Webpack. If you are going to make changes in the UI, you **need** to use Rollup for now.
+### Package Manager
+
+The project is configured for [pnpm](https://pnpm.io/). To install, see the [installation notes for pnpm](https://pnpm.io/installation).
+
+### Monorepo
+
+The plugin is organized as a monorepo. There are several packages:
+
+- packages/backend - Contains the business logic that reads the Figma API and converts nodes
+- packages/plugin-ui - Contains the common UI for the plugin
+- packages/eslint-config-custom - Config file for ESLint
+- packages/tsconfig - Collection of TSConfig files used throughout the project
+
+- apps/plugin - This is the actual plugin assembled from the parts in backend & plugin-ui. Within this folder it's divided between:
+  - plugin-src - loads the backend and compiles to code.js
+  - ui-src - loads the common plugin-ui and compiles to index.html
+- apps/debug - This is a debug mode plugin that is a more convenient way to see all the UI elements.
+
+The plugin is built using Turbo which in turn builds the internal packages.
+
+#### Commands
+
+`pnpm run ...`
+
+- `dev` - runs the app in dev mode
+- `build`
+- `build:watch`
+- `lint`
+- `format` - formats with prettier (warning: may edit files!)
 
 ## Issues
 
