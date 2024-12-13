@@ -6,7 +6,7 @@
  * Input is expected to be node.parent.
  */
 export const parentCoordinates = (
-  node: DimensionAndPositionMixin
+  node: DimensionAndPositionMixin,
 ): [number, number] => {
   const parentX = "layoutMode" in node ? 0 : node.x;
   const parentY = "layoutMode" in node ? 0 : node.y;

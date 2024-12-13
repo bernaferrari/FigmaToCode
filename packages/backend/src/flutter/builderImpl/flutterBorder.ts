@@ -18,12 +18,12 @@ export const flutterBorder = (node: SceneNode): string => {
 
   const color = skipDefaultProperty(
     flutterColorFromFills(node.strokes),
-    "Colors.black"
+    "Colors.black",
   );
 
   const strokeAlign = skipDefaultProperty(
     getStrokeAlign(node, 2),
-    "BorderSide.strokeAlignInside"
+    "BorderSide.strokeAlignInside",
   );
 
   if ("all" in stroke) {
@@ -49,7 +49,7 @@ export const flutterBorder = (node: SceneNode): string => {
 const generateBorderSideCode = (
   width: number,
   strokeAlign: string,
-  color: string
+  color: string,
 ): string => {
   return generateWidgetCode("BorderSide", {
     width: skipDefaultProperty(width, 0),

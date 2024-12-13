@@ -5,7 +5,7 @@ import { convertFontWeight } from "../../common/convertFontWeight";
 import { nearestColor } from "../conversionTables";
 
 export const retrieveTailwindText = (
-  sceneNode: Array<SceneNode>
+  sceneNode: Array<SceneNode>,
 ): Array<namedText> => {
   // convert to Node and then flatten it. Conversion is necessary because of [tailwindText]
   const selectedText = deepFlatten(sceneNode);
@@ -136,7 +136,7 @@ function deepFlatten(arr: Array<SceneNode>): Array<SceneNode> {
 }
 
 const convertColor = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string | undefined => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined

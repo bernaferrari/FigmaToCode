@@ -42,7 +42,7 @@ describe("Flutter Shadow", () => {
         blurRadius: 8,
         offset: Offset(4, 4),
     ),
-],`
+],`,
     );
 
     const [elev, color] = flutterElevationAndShadowColor(node);

@@ -36,7 +36,7 @@ const getGap = (node: InferredAutoLayoutResult): string | number =>
 
 const getFlex = (
   node: SceneNode,
-  autoLayout: InferredAutoLayoutResult
+  autoLayout: InferredAutoLayoutResult,
 ): string =>
   node.parent &&
   "layoutMode" in node.parent &&
@@ -47,7 +47,7 @@ const getFlex = (
 export const htmlAutoLayoutProps = (
   node: SceneNode,
   autoLayout: InferredAutoLayoutResult,
-  isJsx: boolean
+  isJsx: boolean,
 ): string[] =>
   formatMultipleJSXArray(
     {
@@ -57,5 +57,5 @@ export const htmlAutoLayoutProps = (
       gap: getGap(autoLayout),
       display: getFlex(node, autoLayout),
     },
-    isJsx
+    isJsx,
   );

@@ -17,11 +17,11 @@ export const flutterShadow = (node: SceneNode): string => {
           boxShadow += generateWidgetCode("BoxShadow", {
             color: `Color(0x${rgbTo8hex(
               effect.color,
-              effect.color.a
+              effect.color.a,
             ).toUpperCase()})`,
             blurRadius: sliceNum(effect.radius),
             offset: `Offset(${sliceNum(effect.offset.x)}, ${sliceNum(
-              effect.offset.y
+              effect.offset.y,
             )})`,
             spreadRadius: effect.spread ? sliceNum(effect.spread) : "0",
           });

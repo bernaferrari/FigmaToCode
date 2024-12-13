@@ -134,12 +134,12 @@ describe("Tailwind Main", () => {
     expect(tailwindMain([frameNode])).toEqual(
       `<div class="inline-flex items-center justify-between">
     <p class="text-2xl">username</p>
-</div>`
+</div>`,
     );
 
     frameNode.name = "this is the InPuT";
     expect(tailwindMain([frameNode])).toEqual(
-      '<input class="text-2xl" placeholder="username"></input>'
+      '<input class="text-2xl" placeholder="username"></input>',
     );
   });
 

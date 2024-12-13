@@ -17,7 +17,7 @@ describe("Flutter Blend", () => {
       `Opacity(
     opacity: 0.50,
     child: test
-),`
+),`,
     );
 
     node.opacity = 1.0;
@@ -33,7 +33,7 @@ describe("Flutter Blend", () => {
       `Visibility(
     visible: false,
     child: test
-),`
+),`,
     );
 
     node.visible = true;
@@ -53,7 +53,7 @@ describe("Flutter Blend", () => {
       `Transform.rotate(
     angle: -0.79,
     child: test
-),`
+),`,
     );
 
     node.rotation = -45;
@@ -61,7 +61,7 @@ describe("Flutter Blend", () => {
       `Transform.rotate(
     angle: 0.79,
     child: test
-),`
+),`,
     );
 
     node.rotation = 90;
@@ -69,7 +69,7 @@ describe("Flutter Blend", () => {
       `Transform.rotate(
     angle: -1.57,
     child: test
-),`
+),`,
     );
   });
 });

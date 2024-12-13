@@ -79,7 +79,7 @@ const getViewType = (node: SceneNode): string => {
 
 const strokeInset = (
   node: MinimalStrokesMixin,
-  width: number
+  width: number,
 ): [string, string | null] => {
   switch (node.strokeAlign) {
     case "INSIDE":
@@ -114,7 +114,7 @@ export const swiftuiCornerRadius = (node: SceneNode): string => {
     radius.topLeft,
     radius.topRight,
     radius.bottomLeft,
-    radius.bottomRight
+    radius.bottomRight,
   );
 
   if (maxBorder > 0) {

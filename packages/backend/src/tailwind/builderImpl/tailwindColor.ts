@@ -1,8 +1,12 @@
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
-import { getColorInfo, nearestOpacity, nearestValue } from "../conversionTables";
+import {
+  getColorInfo,
+  nearestOpacity,
+  nearestValue,
+} from "../conversionTables";
 
-type Kind = "text" | "bg" | "border" | "solid"
+type Kind = "text" | "bg" | "border" | "solid";
 
 /**
  * Get a tailwind color value object
@@ -16,7 +20,7 @@ export function tailwindColor(fill: SolidPaint) {
     colorName,
     colorType,
     hex,
-    meta
+    meta,
   };
 }
 
@@ -26,7 +30,10 @@ export function tailwindColor(fill: SolidPaint) {
  * - variables: uses the tokenised variable name
  * - colors:    uses the nearest Tailwind color name
  */
-export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: Kind): string => {
+export const tailwindSolidColor = (
+  fill: SolidPaint | ColorStop,
+  kind?: Kind,
+): string => {
   // example: stone-500 or custom-color-700
   const { colorName } = getColorInfo(fill);
 
@@ -36,9 +43,10 @@ export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: Kind): s
   }
 
   // grab opacity, or set it to full
-  const opacity = "opacity" in fill && fill.opacity !== 1.0
-    ? `/${nearestOpacity(fill.opacity ?? 1.0)}`
-    : "";
+  const opacity =
+    "opacity" in fill && fill.opacity !== 1.0
+      ? `/${nearestOpacity(fill.opacity ?? 1.0)}`
+      : "";
 
   // example: text-red-500, text-[#123abc], text-custom-color-700/25
   return `${kind}-${colorName}${opacity}`;
@@ -47,7 +55,7 @@ export const tailwindSolidColor = (fill: SolidPaint | ColorStop, kind?: Kind): s
 // retrieve the SOLID color for tailwind
 export const tailwindColorFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
-  kind: Kind
+  kind: Kind,
 ): string => {
   // [when testing] fills can be undefined
 
@@ -73,7 +81,7 @@ export const tailwindColorFromFills = (
  * example: shadow
  */
 export const tailwindGradientFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   // [when testing] node.effects can be undefined
 
@@ -105,7 +113,9 @@ export const tailwindGradient = (fill: GradientPaint): string => {
     const viaColor = tailwindSolidColor(fill.gradientStops[1]);
 
     // last
-    const toColor = tailwindSolidColor(fill.gradientStops[fill.gradientStops.length - 1]);
+    const toColor = tailwindSolidColor(
+      fill.gradientStops[fill.gradientStops.length - 1],
+    );
 
     return `${direction} from-${fromColor} via-${viaColor} to-${toColor}`;
   }

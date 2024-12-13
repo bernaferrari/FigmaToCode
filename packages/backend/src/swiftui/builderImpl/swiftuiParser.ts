@@ -13,7 +13,7 @@ export class SwiftUIElement {
 
   addModifierMixed(
     property: string,
-    value: string | Modifier | Modifier[]
+    value: string | Modifier | Modifier[],
   ): this {
     this.modifiers.push([property, value]);
     return this;
@@ -38,16 +38,16 @@ export class SwiftUIElement {
         Array.isArray(value)
           ? `${indent}.${property}(${new SwiftUIElement(
               property,
-              value as Modifier[]
+              value as Modifier[],
             )
               .toString()
               .trim()})`
           : value.length > 60
-          ? `${indent}.${property}(\n${indentString(
-              value,
-              indentLevel + 2
-            )}\n${indent})`
-          : `${indent}.${property}(${value})`
+            ? `${indent}.${property}(\n${indentString(
+                value,
+                indentLevel + 2,
+              )}\n${indent})`
+            : `${indent}.${property}(${value})`,
       )
       .join("\n");
   }

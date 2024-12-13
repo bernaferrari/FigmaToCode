@@ -40,7 +40,7 @@ export const tailwindPadding = (node: InferredAutoLayoutResult): string[] => {
     comp.push(
       ...(left && right && pxToLayoutSize(left) === pxToLayoutSize(right)
         ? [`px-${pxToLayoutSize(left)}`]
-        : [pl, pr])
+        : [pl, pr]),
     );
   }
 
@@ -50,7 +50,7 @@ export const tailwindPadding = (node: InferredAutoLayoutResult): string[] => {
     comp.push(
       ...(top && bottom && pxToLayoutSize(top) === pxToLayoutSize(bottom)
         ? [`py-${pxToLayoutSize(top)}`]
-        : [pt, pb])
+        : [pt, pb]),
     );
   }
 

@@ -75,7 +75,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.center,
         child: child
     ),
-),`
+),`,
     );
 
     // top-left
@@ -87,7 +87,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.topLeft,
         child: child
     ),
-),`
+),`,
     );
 
     // top-right
@@ -99,7 +99,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.topRight,
         child: child
     ),
-),`
+),`,
     );
 
     // bottom-left
@@ -111,7 +111,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.bottomLeft,
         child: child
     ),
-),`
+),`,
     );
 
     // bottom-right
@@ -123,7 +123,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.bottomRight,
         child: child
     ),
-),`
+),`,
     );
 
     // top-center
@@ -135,7 +135,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.topCenter,
         child: child
     ),
-),`
+),`,
     );
 
     // left-center
@@ -147,7 +147,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.centerLeft,
         child: child
     ),
-),`
+),`,
     );
 
     // bottom-center
@@ -159,7 +159,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.bottomCenter,
         child: child
     ),
-),`
+),`,
     );
 
     // right-center
@@ -171,7 +171,7 @@ describe("Flutter Position", () => {
         alignment: Alignment.centerRight,
         child: child
     ),
-),`
+),`,
     );
 
     // center Y, random X
@@ -182,7 +182,7 @@ describe("Flutter Position", () => {
     left: 22,
     top: 37,
     child: child
-),`
+),`,
     );
 
     // center X, random Y
@@ -193,7 +193,7 @@ describe("Flutter Position", () => {
     left: 37,
     top: 22,
     child: child
-),`
+),`,
     );
 
     // without position
@@ -204,7 +204,7 @@ describe("Flutter Position", () => {
     left: 45,
     top: 88,
     child: child
-),`
+),`,
     );
   });
 

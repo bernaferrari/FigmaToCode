@@ -23,7 +23,7 @@ export const gradientAngle = (fill: GradientPaint): number => {
   // Thanks Gleb and Liam for helping!
   const decomposed = decomposeRelativeTransform(
     fill.gradientTransform[0],
-    fill.gradientTransform[1]
+    fill.gradientTransform[1],
   );
 
   return (decomposed.rotation * 180) / Math.PI;
@@ -31,7 +31,7 @@ export const gradientAngle = (fill: GradientPaint): number => {
 // from https://math.stackexchange.com/a/2888105
 export const decomposeRelativeTransform = (
   t1: [number, number, number],
-  t2: [number, number, number]
+  t2: [number, number, number],
 ): {
   translation: [number, number];
   rotation: number;

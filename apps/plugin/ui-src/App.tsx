@@ -90,7 +90,7 @@ export default function App() {
     if (state.selectedFramework === null) {
       const timer = setTimeout(
         () => setState((prevState) => ({ ...prevState, isLoading: true })),
-        300
+        300,
       );
       return () => clearTimeout(timer);
     } else {
@@ -121,17 +121,13 @@ export default function App() {
           value: updatedFramework,
         },
       },
-      "*"
+      "*",
     );
   };
   console.log("state.code", state.code.slice(0, 25));
 
   return (
-    <div
-      className={`${
-        figmaColorBgValue === "#ffffff" ? "" : "dark"
-      }`}
-    >
+    <div className={`${figmaColorBgValue === "#ffffff" ? "" : "dark"}`}>
       <PluginUI
         code={state.code}
         emptySelection={false}
@@ -148,7 +144,7 @@ export default function App() {
                 value: value,
               },
             },
-            "*"
+            "*",
           );
         }}
         colors={state.colors}

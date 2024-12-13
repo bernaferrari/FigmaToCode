@@ -42,32 +42,32 @@ describe("HTML Border", () => {
     node.cornerRadius = figma.mixed;
     node.topLeftRadius = 4;
     expect(htmlBorderRadius(node, false)).toEqual(
-      "border-top-left-radius: 4px; "
+      "border-top-left-radius: 4px; ",
     );
 
     node.topLeftRadius = 0;
     node.topRightRadius = 4;
     expect(htmlBorderRadius(node, false)).toEqual(
-      "border-top-right-radius: 4px; "
+      "border-top-right-radius: 4px; ",
     );
 
     node.topRightRadius = 0;
     node.bottomLeftRadius = 4;
     expect(htmlBorderRadius(node, false)).toEqual(
-      "border-bottom-left-radius: 4px; "
+      "border-bottom-left-radius: 4px; ",
     );
 
     node.bottomLeftRadius = 0;
     node.bottomRightRadius = 4;
     expect(htmlBorderRadius(node, false)).toEqual(
-      "border-bottom-right-radius: 4px; "
+      "border-bottom-right-radius: 4px; ",
     );
   });
 
   it("other nodes", () => {
     // Ellipses are always round
     expect(htmlBorderRadius(new AltEllipseNode(), false)).toEqual(
-      "border-radius: 9999px; "
+      "border-radius: 9999px; ",
     );
 
     // Text is unsupported

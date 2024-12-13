@@ -32,7 +32,7 @@ struct ContentView_Previews: PreviewProvider {
 
 export const swiftuiMain = (
   sceneNode: Array<SceneNode>,
-  settings: PluginSettings
+  settings: PluginSettings,
 ): string => {
   localSettings = settings;
   previousExecutionCache = [];
@@ -59,7 +59,7 @@ export const swiftuiMain = (
 
 const swiftuiWidgetGenerator = (
   sceneNode: ReadonlyArray<SceneNode>,
-  indentLevel: number
+  indentLevel: number,
 ): string => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
@@ -97,7 +97,7 @@ const swiftuiWidgetGenerator = (
 // sometimes a property might not exist, so it doesn't add ","
 export const swiftuiContainer = (
   node: SceneNode,
-  stack: string = ""
+  stack: string = "",
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -131,12 +131,12 @@ export const swiftuiContainer = (
 
 const swiftuiGroup = (
   node: GroupNode | SectionNode,
-  indentLevel: number
+  indentLevel: number,
 ): string => {
   const children = widgetGeneratorWithLimits(node, indentLevel);
   return swiftuiContainer(
     node,
-    children ? generateSwiftViewCode("ZStack", {}, children) : `ZStack() { }`
+    children ? generateSwiftViewCode("ZStack", {}, children) : `ZStack() { }`,
   );
 };
 
@@ -151,25 +151,25 @@ const swiftuiText = (node: TextNode): string => {
 
 const swiftuiFrame = (
   node: SceneNode & BaseFrameMixin,
-  indentLevel: number
+  indentLevel: number,
 ): string => {
   const children = widgetGeneratorWithLimits(
     node,
-    node.children.length > 1 ? indentLevel + 1 : indentLevel
+    node.children.length > 1 ? indentLevel + 1 : indentLevel,
   );
 
   const anyStack = createDirectionalStack(
     children,
     localSettings.optimizeLayout && node.inferredAutoLayout !== null
       ? node.inferredAutoLayout
-      : node
+      : node,
   );
   return swiftuiContainer(node, anyStack);
 };
 
 const createDirectionalStack = (
   children: string,
-  inferredAutoLayout: InferredAutoLayoutResult
+  inferredAutoLayout: InferredAutoLayoutResult,
 ): string => {
   if (inferredAutoLayout.layoutMode !== "NONE") {
     return generateSwiftViewCode(
@@ -178,7 +178,7 @@ const createDirectionalStack = (
         alignment: getLayoutAlignment(inferredAutoLayout),
         spacing: getSpacing(inferredAutoLayout),
       },
-      children
+      children,
     );
   } else {
     return generateSwiftViewCode("ZStack", {}, children);
@@ -186,7 +186,7 @@ const createDirectionalStack = (
 };
 
 const getLayoutAlignment = (
-  inferredAutoLayout: InferredAutoLayoutResult
+  inferredAutoLayout: InferredAutoLayoutResult,
 ): string => {
   switch (inferredAutoLayout.counterAxisAlignItems) {
     case "MIN":
@@ -212,41 +212,41 @@ const getSpacing = (inferredAutoLayout: InferredAutoLayoutResult): number => {
 export const generateSwiftViewCode = (
   className: string,
   properties: Record<string, string | number>,
-  children: string
+  children: string,
 ): string => {
   const propertiesArray = Object.entries(properties)
     .filter(([, value]) => value !== "")
     .map(
       ([key, value]) =>
-        `${key}: ${typeof value === "number" ? sliceNum(value) : value}`
+        `${key}: ${typeof value === "number" ? sliceNum(value) : value}`,
     );
 
   const compactPropertiesArray = propertiesArray.join(", ");
   if (compactPropertiesArray.length > 60) {
     const formattedProperties = propertiesArray.join(",\n");
     return `${className}(\n${formattedProperties}\n) {${indentString(
-      children
+      children,
     )}\n}`;
   }
 
   return `${className}(${compactPropertiesArray}) {\n${indentString(
-    children
+    children,
   )}\n}`;
 };
 
 // todo should the plugin manually Group items? Ideally, it would detect the similarities and allow a ForEach.
 const widgetGeneratorWithLimits = (
   node: SceneNode & ChildrenMixin,
-  indentLevel: number
+  indentLevel: number,
 ) => {
   if (node.children.length < 10) {
     // standard way
     return swiftuiWidgetGenerator(
       commonSortChildrenWhenInferredAutoLayout(
         node,
-        localSettings.optimizeLayout
+        localSettings.optimizeLayout,
       ),
-      indentLevel
+      indentLevel,
     );
   }
 
@@ -254,7 +254,7 @@ const widgetGeneratorWithLimits = (
   let strBuilder = "";
   const slicedChildren = commonSortChildrenWhenInferredAutoLayout(
     node,
-    localSettings.optimizeLayout
+    localSettings.optimizeLayout,
   ).slice(0, 100);
 
   // I believe no one should have more than 100 items in a single nesting level. If you do, please email me.

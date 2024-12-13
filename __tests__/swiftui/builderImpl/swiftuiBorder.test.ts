@@ -42,7 +42,7 @@ describe("SwiftUI Border", () => {
 
     expect(swiftuiBorder(node)).toEqual("");
     expect(swiftuiShapeStroke(node)).toEqual(
-      "\n.stroke(Color.black, lineWidth: 10)"
+      "\n.stroke(Color.black, lineWidth: 10)",
     );
 
     node.topLeftRadius = 0;
@@ -50,7 +50,7 @@ describe("SwiftUI Border", () => {
     node.strokeWeight = 10;
 
     expect(swiftuiBorder(node)).toEqual(
-      "\n.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 10))"
+      "\n.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 10))",
     );
     expect(swiftuiShapeStroke(node)).toEqual("");
 
@@ -61,7 +61,7 @@ describe("SwiftUI Border", () => {
     node.bottomRightRadius = 2;
 
     expect(swiftuiBorder(node)).toEqual(
-      `\n.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 10))`
+      `\n.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 10))`,
     );
     expect(swiftuiShapeStroke(node)).toEqual("");
 
@@ -82,13 +82,13 @@ describe("SwiftUI Border", () => {
 
     expect(swiftuiBorder(node)).toEqual("");
     expect(swiftuiShapeStroke(node)).toEqual(
-      "\n.stroke(Color.black, lineWidth: 10)"
+      "\n.stroke(Color.black, lineWidth: 10)",
     );
 
     node.fills = [blackFill];
 
     expect(swiftuiBorder(node)).toEqual(
-      "\n.overlay(Ellipse().stroke(Color.black, lineWidth: 10))"
+      "\n.overlay(Ellipse().stroke(Color.black, lineWidth: 10))",
     );
     expect(swiftuiShapeStroke(node)).toEqual("");
   });
@@ -110,7 +110,7 @@ describe("SwiftUI Border", () => {
     node.strokeWeight = 10;
 
     expect(swiftuiBorder(node)).toEqual(
-      "\n.overlay(RoundedRectangle(cornerRadius: 8).stroke(LinearGradient(gradient: Gradient(colors: []), startPoint: .leading, endPoint: .trailing), lineWidth: 10))"
+      "\n.overlay(RoundedRectangle(cornerRadius: 8).stroke(LinearGradient(gradient: Gradient(colors: []), startPoint: .leading, endPoint: .trailing), lineWidth: 10))",
     );
     expect(swiftuiShapeStroke(node)).toEqual("");
   });

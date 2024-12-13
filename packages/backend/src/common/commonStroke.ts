@@ -7,7 +7,10 @@ type BorderSideType =
       bottom: number;
     };
 
-export const commonStroke = (node: SceneNode, divideBy: number = 1): BorderSideType | null => {
+export const commonStroke = (
+  node: SceneNode,
+  divideBy: number = 1,
+): BorderSideType | null => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
     return null;
   }

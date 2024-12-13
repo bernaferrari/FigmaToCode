@@ -9,7 +9,7 @@ type exportFramework = "flutter" | "swiftui" | "html" | "tailwind";
 
 export const retrieveGenericUIText = (
   sceneNode: Array<SceneNode>,
-  framework: exportFramework
+  framework: exportFramework,
 ): Array<namedText> => {
   // convert to Node and then flatten it. Conversion is necessary because of [tailwindText]
   const selectedText = deepFlatten(sceneNode);
