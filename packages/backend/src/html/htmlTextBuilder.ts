@@ -31,12 +31,12 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
           "line-height": this.lineHeight(segment.lineHeight, segment.fontSize),
           "letter-spacing": this.letterSpacing(
             segment.letterSpacing,
-            segment.fontSize
+            segment.fontSize,
           ),
           // "text-indent": segment.indentation,
           "word-wrap": "break-word",
         },
-        this.isJSX
+        this.isJSX,
       );
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");

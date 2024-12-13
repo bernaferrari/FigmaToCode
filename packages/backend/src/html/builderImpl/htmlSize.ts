@@ -5,7 +5,7 @@ import { isPreviewGlobal } from "../htmlMain";
 export const htmlSizePartial = (
   node: SceneNode,
   isJsx: boolean,
-  optimizeLayout: boolean
+  optimizeLayout: boolean,
 ): { width: string; height: string } => {
   if (isPreviewGlobal && node.parent === undefined) {
     return {

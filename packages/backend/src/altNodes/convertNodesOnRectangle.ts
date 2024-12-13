@@ -4,14 +4,14 @@ import { FrameNodeMock } from "./altMixins2";
  * Identify all nodes that are inside Rectangles and transform those Rectangles into Frames containing those nodes.
  */
 export const convertNodesOnRectangle = (
-  node: FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode
+  node: FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode,
 ): FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode => {
   if (node.children.length < 2) {
     return node;
   }
   if (!node.id) {
     throw new Error(
-      "Node is missing an id! This error should only happen in tests."
+      "Node is missing an id! This error should only happen in tests.",
     );
   }
 
@@ -118,7 +118,7 @@ const convertRectangleToFrame = (rect: RectangleNode) => {
  * A Node can only have a single parent. The order is defined by layer order.
  */
 const retrieveCollidingItems = (
-  children: ReadonlyArray<SceneNode>
+  children: ReadonlyArray<SceneNode>,
 ): Record<string, Array<SceneNode>> => {
   const used: Record<string, boolean> = {};
   const groups: Record<string, Array<SceneNode>> = {};

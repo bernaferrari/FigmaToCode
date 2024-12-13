@@ -115,7 +115,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     const lineHeight = this.lineHeight(segment.lineHeight, segment.fontSize);
     const letterSpacing = this.letterSpacing(
       segment.letterSpacing,
-      segment.fontSize
+      segment.fontSize,
     );
 
     let updatedText = parseTextAsCode(characters); //segment.characters); swiftUI only supports a single text.
@@ -126,7 +126,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     }
 
     const element = new SwiftUIElement(
-      `Text(${parseTextAsCode(`"${characters}"`)})`
+      `Text(${parseTextAsCode(`"${characters}"`)})`,
     )
       .addModifier([
         "font",
@@ -146,7 +146,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
 
   letterSpacing = (
     letterSpacing: LetterSpacing,
-    fontSize: number
+    fontSize: number,
   ): string | null => {
     const value = commonLetterSpacing(letterSpacing, fontSize);
     if (value > 0) {

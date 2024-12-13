@@ -3,7 +3,7 @@ import { commonPadding } from "../../common/commonPadding";
 import { Modifier } from "./swiftuiParser";
 
 export const swiftuiPadding = (
-  node: InferredAutoLayoutResult
+  node: InferredAutoLayoutResult,
 ): Modifier | null => {
   if (!("layoutMode" in node)) {
     return null;

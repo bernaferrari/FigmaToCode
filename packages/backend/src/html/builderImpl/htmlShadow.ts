@@ -12,7 +12,7 @@ export const htmlShadow = (node: BlendMixin): string => {
         (d.type === "DROP_SHADOW" ||
           d.type === "INNER_SHADOW" ||
           d.type === "LAYER_BLUR") &&
-        d.visible
+        d.visible,
     );
     // simple shadow from tailwind
     if (shadowEffects.length > 0) {

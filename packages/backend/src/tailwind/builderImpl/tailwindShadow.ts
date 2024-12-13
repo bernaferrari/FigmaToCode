@@ -6,7 +6,7 @@ export const tailwindShadow = (node: BlendMixin): string[] => {
   // [when testing] node.effects can be undefined
   if (node.effects && node.effects.length > 0) {
     const dropShadow = node.effects.filter(
-      (d) => d.type === "DROP_SHADOW" && d.visible
+      (d) => d.type === "DROP_SHADOW" && d.visible,
     );
     let boxShadow = "";
     // simple shadow from tailwind

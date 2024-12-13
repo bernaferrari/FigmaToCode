@@ -51,7 +51,7 @@ describe("Flutter Text", () => {
             ),
         ],
     ),
-)`
+)`,
     );
   });
   it("textAutoResize", () => {
@@ -68,7 +68,7 @@ describe("Flutter Text", () => {
     child: Text(
         "",
     ),
-)`
+)`,
     );
 
     node.textAutoResize = "HEIGHT";
@@ -78,7 +78,7 @@ describe("Flutter Text", () => {
     child: Text(
         "",
     ),
-)`
+)`,
     );
 
     node.textAutoResize = "WIDTH_AND_HEIGHT";
@@ -109,7 +109,7 @@ describe("Flutter Text", () => {
         "",
         textAlign: TextAlign.center,
     ),
-)`
+)`,
     );
 
     node.textAlignHorizontal = "JUSTIFIED";
@@ -121,7 +121,7 @@ describe("Flutter Text", () => {
         "",
         textAlign: TextAlign.justify,
     ),
-)`
+)`,
     );
   });
   it("fontSize", () => {
@@ -138,7 +138,7 @@ describe("Flutter Text", () => {
     style: TextStyle(
         fontSize: 16,
     ),
-)`
+)`,
     );
   });
 
@@ -210,7 +210,7 @@ describe("Flutter Text", () => {
         fontSize: 24,
         letterSpacing: 26.40,
     ),
-)`
+)`,
     );
 
     node.letterSpacing = {
@@ -224,7 +224,7 @@ describe("Flutter Text", () => {
         fontSize: 24,
         letterSpacing: 10,
     ),
-)`
+)`,
     );
   });
 
@@ -312,7 +312,7 @@ describe("Flutter Text", () => {
     style: TextStyle(
         decoration: TextDecoration.underline,
     ),
-)`
+)`,
     );
   });
 

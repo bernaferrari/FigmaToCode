@@ -1,6 +1,6 @@
 export const commonSortChildrenWhenInferredAutoLayout = (
   node: SceneNode & ChildrenMixin,
-  optimize: boolean
+  optimize: boolean,
 ) => {
   if (node.children.length <= 1) {
     return node.children;
@@ -21,7 +21,7 @@ export const commonSortChildrenWhenInferredAutoLayout = (
         console.log(
           "ordering",
           children.map((c) => c.name),
-          children.sort((a, b) => a.y - b.y).map((c) => c.name)
+          children.sort((a, b) => a.y - b.y).map((c) => c.name),
         );
         return children.sort((a, b) => a.y - b.y);
     }

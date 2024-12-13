@@ -40,7 +40,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
           ...basicTextStyle,
           style: segments[0].style,
         },
-        [`'${segments[0].text}'`]
+        [`'${segments[0].text}'`],
       );
     } else {
       this.child = generateWidgetCode("Text.rich", basicTextStyle, [
@@ -49,7 +49,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
             generateWidgetCode("TextSpan", {
               text: `'${segment.text}'`,
               style: segment.style,
-            })
+            }),
           ),
         }),
       ]);
@@ -74,7 +74,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
       const lineHeight = this.lineHeight(segment.lineHeight, segment.fontSize);
       const letterSpacing = this.letterSpacing(
         segment.letterSpacing,
-        segment.fontSize
+        segment.fontSize,
       );
 
       const style = generateWidgetCode("TextStyle", {
@@ -85,10 +85,10 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         fontWeight: fontWeight,
         textDecoration: skipDefaultProperty(
           this.getFlutterTextDecoration(segment.textDecoration),
-          "TextDecoration.none"
+          "TextDecoration.none",
         ),
         // textTransform: textTransform,
-        height: lineHeight/fontSize,
+        height: lineHeight / fontSize,
         letterSpacing: letterSpacing,
       });
 

@@ -21,7 +21,7 @@ export const swiftUISolidColor = (fill: Paint): string => {
 };
 
 export const swiftuiSolidColor = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   const fill = retrieveTopFill(fills);
 
@@ -38,7 +38,7 @@ export const swiftuiSolidColor = (
         g: 0.23,
         b: 0.27,
       },
-      0.5
+      0.5,
     );
   }
 
@@ -47,7 +47,7 @@ export const swiftuiSolidColor = (
 
 export const swiftuiBackground = (
   node: SceneNode,
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   const fill = retrieveTopFill(fills);
 
@@ -59,7 +59,7 @@ export const swiftuiBackground = (
     return swiftuiGradient(fill);
   } else if (fill?.type === "IMAGE") {
     return `AsyncImage(url: URL(string: "https://via.placeholder.com/${node.width.toFixed(
-      0
+      0,
     )}x${node.height.toFixed(0)}"))`;
   }
 

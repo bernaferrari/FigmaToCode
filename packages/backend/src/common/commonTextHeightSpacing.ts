@@ -1,6 +1,6 @@
 export const commonLineHeight = (
   lineHeight: LineHeight,
-  fontSize: number
+  fontSize: number,
 ): number => {
   switch (lineHeight.unit) {
     case "AUTO":
@@ -14,7 +14,7 @@ export const commonLineHeight = (
 
 export const commonLetterSpacing = (
   letterSpacing: LetterSpacing,
-  fontSize: number
+  fontSize: number,
 ): number => {
   switch (letterSpacing.unit) {
     case "PIXELS":

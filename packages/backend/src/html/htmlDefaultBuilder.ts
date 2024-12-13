@@ -38,7 +38,7 @@ export class HtmlDefaultBuilder {
 
   commonPositionStyles(
     node: SceneNode & LayoutMixin & MinimalBlendMixin,
-    optimizeLayout: boolean
+    optimizeLayout: boolean,
   ): this {
     this.size(node, optimizeLayout);
     this.autoLayoutPadding(node, optimizeLayout);
@@ -50,7 +50,7 @@ export class HtmlDefaultBuilder {
   commonShapeStyles(node: GeometryMixin & SceneNode): this {
     this.applyFillsToStyle(
       node.fills,
-      node.type === "TEXT" ? "text" : "background"
+      node.type === "TEXT" ? "text" : "background",
     );
     this.shadow(node);
     this.border(node);
@@ -67,7 +67,7 @@ export class HtmlDefaultBuilder {
       htmlVisibility(node, this.isJSX),
       ...htmlRotation(node, this.isJSX),
       htmlOpacity(node, this.isJSX),
-      htmlBlendMode(node, this.isJSX)
+      htmlBlendMode(node, this.isJSX),
     );
     return this;
   }
@@ -92,7 +92,7 @@ export class HtmlDefaultBuilder {
       }
       const weight = commonBorder.all;
       this.addStyles(
-        formatWithJSX("border", this.isJSX, consolidateBorders(weight))
+        formatWithJSX("border", this.isJSX, consolidateBorders(weight)),
       );
     } else {
       if (commonBorder.left !== 0) {
@@ -100,8 +100,8 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-left",
             this.isJSX,
-            consolidateBorders(commonBorder.left)
-          )
+            consolidateBorders(commonBorder.left),
+          ),
         );
       }
       if (commonBorder.top !== 0) {
@@ -109,8 +109,8 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-top",
             this.isJSX,
-            consolidateBorders(commonBorder.top)
-          )
+            consolidateBorders(commonBorder.top),
+          ),
         );
       }
       if (commonBorder.right !== 0) {
@@ -118,8 +118,8 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-right",
             this.isJSX,
-            consolidateBorders(commonBorder.right)
-          )
+            consolidateBorders(commonBorder.right),
+          ),
         );
       }
       if (commonBorder.bottom !== 0) {
@@ -127,8 +127,8 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "border-bottom",
             this.isJSX,
-            consolidateBorders(commonBorder.bottom)
-          )
+            consolidateBorders(commonBorder.bottom),
+          ),
         );
       }
     }
@@ -142,7 +142,7 @@ export class HtmlDefaultBuilder {
       this.addStyles(
         formatWithJSX("left", this.isJSX, x),
         formatWithJSX("top", this.isJSX, y),
-        formatWithJSX("position", this.isJSX, "absolute")
+        formatWithJSX("position", this.isJSX, "absolute"),
       );
     } else {
       if (
@@ -160,11 +160,11 @@ export class HtmlDefaultBuilder {
 
   applyFillsToStyle(
     paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"],
-    property: "text" | "background"
+    property: "text" | "background",
   ): this {
     if (property === "text") {
       this.addStyles(
-        formatWithJSX("text", this.isJSX, htmlColorFromFills(paintArray))
+        formatWithJSX("text", this.isJSX, htmlColorFromFills(paintArray)),
       );
       return this;
     }
@@ -178,7 +178,7 @@ export class HtmlDefaultBuilder {
   }
 
   buildBackgroundValues(
-    paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"]
+    paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"],
   ): string {
     if (paintArray === figma.mixed) {
       return "";
@@ -213,7 +213,7 @@ export class HtmlDefaultBuilder {
       const shadow = htmlShadow(node);
       if (shadow) {
         this.addStyles(
-          formatWithJSX("box-shadow", this.isJSX, htmlShadow(node))
+          formatWithJSX("box-shadow", this.isJSX, htmlShadow(node)),
         );
       }
     }
@@ -247,8 +247,8 @@ export class HtmlDefaultBuilder {
       this.addStyles(
         ...htmlPadding(
           (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
-          this.isJSX
-        )
+          this.isJSX,
+        ),
       );
     }
     return this;
@@ -257,28 +257,28 @@ export class HtmlDefaultBuilder {
   blur(node: SceneNode) {
     if ("effects" in node && node.effects.length > 0) {
       const blur = node.effects.find(
-        (e) => e.type === "LAYER_BLUR" && e.visible
+        (e) => e.type === "LAYER_BLUR" && e.visible,
       );
       if (blur) {
         this.addStyles(
           formatWithJSX(
             "filter",
             this.isJSX,
-            `blur(${sliceNum(blur.radius)}px)`
-          )
+            `blur(${sliceNum(blur.radius)}px)`,
+          ),
         );
       }
 
       const backgroundBlur = node.effects.find(
-        (e) => e.type === "BACKGROUND_BLUR" && e.visible
+        (e) => e.type === "BACKGROUND_BLUR" && e.visible,
       );
       if (backgroundBlur) {
         this.addStyles(
           formatWithJSX(
             "backdrop-filter",
             this.isJSX,
-            `blur(${sliceNum(backgroundBlur.radius)}px)`
-          )
+            `blur(${sliceNum(backgroundBlur.radius)}px)`,
+          ),
         );
       }
     }

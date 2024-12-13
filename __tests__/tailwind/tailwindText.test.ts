@@ -43,7 +43,7 @@ describe("Tailwind Text", () => {
 
     node.textAlignHorizontal = "JUSTIFIED";
     expect(tailwindMain([node])).toEqual(
-      '<p class="w-4 h-4 text-justify"></p>'
+      '<p class="w-4 h-4 text-justify"></p>',
     );
   });
   it("fontSize", () => {
@@ -96,7 +96,7 @@ describe("Tailwind Text", () => {
       unit: "PERCENT",
     };
     expect(tailwindMain([node])).toEqual(
-      '<p class="text-2xl tracking-widest"></p>'
+      '<p class="text-2xl tracking-widest"></p>',
     );
 
     node.letterSpacing = {
@@ -104,7 +104,7 @@ describe("Tailwind Text", () => {
       unit: "PIXELS",
     };
     expect(tailwindMain([node])).toEqual(
-      '<p class="text-2xl tracking-widest"></p>'
+      '<p class="text-2xl tracking-widest"></p>',
     );
   });
 
@@ -121,7 +121,7 @@ describe("Tailwind Text", () => {
       unit: "PERCENT",
     };
     expect(tailwindMain([node])).toEqual(
-      '<p class="text-2xl leading-relaxed"></p>'
+      '<p class="text-2xl leading-relaxed"></p>',
     );
 
     node.lineHeight = {

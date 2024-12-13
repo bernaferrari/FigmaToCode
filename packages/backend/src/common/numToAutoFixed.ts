@@ -8,7 +8,7 @@ export const sliceNum = (num: number): string => {
 export const printPropertyIfNotDefault = (
   propertyName: string,
   propertyValue: any,
-  defaultProperty: any
+  defaultProperty: any,
 ): string => {
   if (propertyValue === defaultProperty) {
     return "";
@@ -18,7 +18,7 @@ export const printPropertyIfNotDefault = (
 
 export const skipDefaultProperty = <T>(
   propertyValue: T,
-  defaultProperty: T
+  defaultProperty: T,
 ): T | string => {
   if (propertyValue === defaultProperty) {
     return "";
@@ -28,7 +28,7 @@ export const skipDefaultProperty = <T>(
 
 export const propertyIfNotDefault = (
   propertyValue: any,
-  defaultProperty: any
+  defaultProperty: any,
 ): string => {
   if (propertyValue === defaultProperty) {
     return "";
@@ -41,7 +41,7 @@ type PropertyValueType = number | string | string[];
 export const generateWidgetCode = (
   className: string,
   properties: Record<string, PropertyValueType>,
-  positionedValues?: string[]
+  positionedValues?: string[],
 ): string => {
   console.log("properties", properties);
   const propertiesArray = Object.entries(properties)

@@ -1,6 +1,6 @@
 // Convert generic named weights to numbers, which is the way tailwind understands
 export const convertFontWeight = (
-  weight: number
+  weight: number,
 ):
   | "100"
   | "200"

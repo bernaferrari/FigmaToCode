@@ -4,7 +4,7 @@ export const tailwindVector = (
   node: FrameNode | GroupNode,
   showLayerName: boolean,
   parentId: string,
-  isJsx: boolean
+  isJsx: boolean,
 ): string => {
   // TODO VECTOR
   return "";

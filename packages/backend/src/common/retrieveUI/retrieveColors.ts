@@ -1,8 +1,20 @@
 import { rgbTo6hex } from "../color";
-import { swiftuiColor, swiftuiGradient } from "../../swiftui/builderImpl/swiftuiColor";
-import { tailwindColor, tailwindGradient } from "../../tailwind/builderImpl/tailwindColor";
-import { flutterColor, flutterGradient } from "../../flutter/builderImpl/flutterColor";
-import { htmlColor, htmlGradientFromFills } from "../../html/builderImpl/htmlColor";
+import {
+  swiftuiColor,
+  swiftuiGradient,
+} from "../../swiftui/builderImpl/swiftuiColor";
+import {
+  tailwindColor,
+  tailwindGradient,
+} from "../../tailwind/builderImpl/tailwindColor";
+import {
+  flutterColor,
+  flutterGradient,
+} from "../../flutter/builderImpl/flutterColor";
+import {
+  htmlColor,
+  htmlGradientFromFills,
+} from "../../html/builderImpl/htmlColor";
 import { calculateContrastRatio } from "./commonUI";
 import { FrameworkTypes } from "../../code";
 
@@ -12,11 +24,11 @@ export type ExportSolidColor = {
   exportValue: string;
   contrastWhite: number;
   contrastBlack: number;
-  meta?: string
+  meta?: string;
 };
 
 export const retrieveGenericSolidUIColors = (
-  framework: FrameworkTypes
+  framework: FrameworkTypes,
 ): Array<ExportSolidColor> => {
   const selectionColors = figma.getSelectionColors();
   if (!selectionColors || selectionColors.paints.length === 0) return [];
@@ -25,7 +37,7 @@ export const retrieveGenericSolidUIColors = (
   selectionColors.paints.forEach((paint) => {
     const fill = convertSolidColor(paint, framework);
     if (fill) {
-      const exists = colors.find(col => col.exportValue === fill.exportValue)
+      const exists = colors.find((col) => col.exportValue === fill.exportValue);
       if (!exists) {
         colors.push(fill);
       }
@@ -37,7 +49,7 @@ export const retrieveGenericSolidUIColors = (
 
 const convertSolidColor = (
   fill: Paint,
-  framework: FrameworkTypes
+  framework: FrameworkTypes,
 ): ExportSolidColor | null => {
   const black = { r: 0, g: 0, b: 0 };
   const white = { r: 1, g: 1, b: 1 };
@@ -69,7 +81,7 @@ const convertSolidColor = (
 type ExportLinearGradient = { cssPreview: string; exportValue: string };
 
 export const retrieveGenericLinearGradients = (
-  framework: FrameworkTypes
+  framework: FrameworkTypes,
 ): Array<ExportLinearGradient> => {
   const selectionColors = figma.getSelectionColors();
   const colorStr: Array<ExportLinearGradient> = [];

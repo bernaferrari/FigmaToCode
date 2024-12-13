@@ -148,7 +148,7 @@ function mapColors(colors: Array<string>): Array<ColorSpec> {
  * nearestColor.from(invalidColors); // => throws
  */
 export const nearestColorFrom = (
-  availableColors: Array<string>
+  availableColors: Array<string>,
 ): ((hex: string | RGB) => string) => {
   const colors = mapColors(availableColors);
   return (hex: string | RGB) => nearestColor(hex, colors);

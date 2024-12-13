@@ -30,7 +30,7 @@ export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
             "border-bottom-left-radius",
           ][index];
           return formatWithJSX(property, isJsx, value);
-        })
+        }),
     );
   }
 
