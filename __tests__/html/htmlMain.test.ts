@@ -101,7 +101,7 @@ describe("HTML Main", () => {
 
     // undefined (unitialized, only happen on tests)
     expect(htmlMain([node])).toEqual(
-      '<div style="border-radius: 9999px;"></div>'
+      '<div style="border-radius: 9999px;"></div>',
     );
     // todo verify if it is working properly.
     node.x = 0;
@@ -140,12 +140,12 @@ describe("HTML Main", () => {
     expect(tailwindMain([frameNode])).toEqual(
       `<div class="inline-flex items-center justify-between">
     <p class="text-2xl">username</p>
-</div>`
+</div>`,
     );
 
     frameNode.name = "this is the InPuT";
     expect(htmlMain([frameNode])).toEqual(
-      '<input style="font-size: 26px;" placeholder="username"></input>'
+      '<input style="font-size: 26px;" placeholder="username"></input>',
     );
   });
 

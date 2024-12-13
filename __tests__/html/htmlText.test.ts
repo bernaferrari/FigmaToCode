@@ -14,7 +14,7 @@ describe("HTML Text", () => {
 
     node.textAutoResize = "NONE";
     expect(htmlMain([node])).toEqual(
-      '<p style="width: 16px; height: 16px;"></p>'
+      '<p style="width: 16px; height: 16px;"></p>',
     );
 
     node.textAutoResize = "HEIGHT";
@@ -37,18 +37,18 @@ describe("HTML Text", () => {
     node.textAutoResize = "NONE";
     node.textAlignHorizontal = "CENTER";
     expect(htmlMain([node])).toEqual(
-      '<p style="width: 16px; height: 16px; text-align: center;"></p>'
+      '<p style="width: 16px; height: 16px; text-align: center;"></p>',
     );
 
     node.textAutoResize = "NONE";
     node.textAlignHorizontal = "RIGHT";
     expect(htmlMain([node])).toEqual(
-      '<p style="width: 16px; height: 16px; text-align: right;"></p>'
+      '<p style="width: 16px; height: 16px; text-align: right;"></p>',
     );
 
     node.textAlignHorizontal = "JUSTIFIED";
     expect(htmlMain([node])).toEqual(
-      '<p style="width: 16px; height: 16px; text-align: justify;"></p>'
+      '<p style="width: 16px; height: 16px; text-align: justify;"></p>',
     );
   });
   it("fontSize", () => {
@@ -80,7 +80,7 @@ describe("HTML Text", () => {
       style: "medium italic",
     };
     expect(htmlMain([node])).toEqual(
-      '<p style="font-style: italic; font-weight: 500;"></p>'
+      '<p style="font-style: italic; font-weight: 500;"></p>',
     );
 
     node.fontName = {
@@ -109,7 +109,7 @@ describe("HTML Text", () => {
       unit: "PERCENT",
     };
     expect(htmlMain([node])).toEqual(
-      '<p style="font-size: 24px; letter-spacing: 26.40px;"></p>'
+      '<p style="font-size: 24px; letter-spacing: 26.40px;"></p>',
     );
 
     node.letterSpacing = {
@@ -117,7 +117,7 @@ describe("HTML Text", () => {
       unit: "PIXELS",
     };
     expect(htmlMain([node])).toEqual(
-      '<p style="font-size: 24px; letter-spacing: 10px;"></p>'
+      '<p style="font-size: 24px; letter-spacing: 10px;"></p>',
     );
   });
 
@@ -134,7 +134,7 @@ describe("HTML Text", () => {
       unit: "PERCENT",
     };
     expect(htmlMain([node])).toEqual(
-      '<p style="font-size: 24px; line-height: 110%;"></p>'
+      '<p style="font-size: 24px; line-height: 110%;"></p>',
     );
 
     node.lineHeight = {
@@ -142,14 +142,14 @@ describe("HTML Text", () => {
       unit: "PIXELS",
     };
     expect(htmlMain([node])).toEqual(
-      '<p style="font-size: 24px; line-height: 10px;"></p>'
+      '<p style="font-size: 24px; line-height: 10px;"></p>',
     );
 
     node.lineHeight = {
       unit: "AUTO",
     };
     expect(htmlMain([node])).toEqual(
-      '<p style="font-size: 24px; line-height: 100%;"></p>'
+      '<p style="font-size: 24px; line-height: 100%;"></p>',
     );
   });
 
@@ -159,17 +159,17 @@ describe("HTML Text", () => {
 
     node.textCase = "LOWER";
     expect(htmlMain([node])).toEqual(
-      '<p style="text-transform: lowercase;"></p>'
+      '<p style="text-transform: lowercase;"></p>',
     );
 
     node.textCase = "TITLE";
     expect(htmlMain([node])).toEqual(
-      '<p style="text-transform: capitalize;"></p>'
+      '<p style="text-transform: capitalize;"></p>',
     );
 
     node.textCase = "UPPER";
     expect(htmlMain([node])).toEqual(
-      '<p style="text-transform: uppercase;"></p>'
+      '<p style="text-transform: uppercase;"></p>',
     );
 
     node.textCase = "ORIGINAL";
@@ -185,12 +185,12 @@ describe("HTML Text", () => {
 
     node.textDecoration = "STRIKETHROUGH";
     expect(htmlMain([node])).toEqual(
-      '<p style="text-decoration: line-through;"></p>'
+      '<p style="text-decoration: line-through;"></p>',
     );
 
     node.textDecoration = "UNDERLINE";
     expect(htmlMain([node])).toEqual(
-      '<p style="text-decoration: underline;"></p>'
+      '<p style="text-decoration: underline;"></p>',
     );
   });
 });

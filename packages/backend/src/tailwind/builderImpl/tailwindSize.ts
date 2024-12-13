@@ -4,7 +4,7 @@ import { formatWithJSX } from "../../common/parseJSX";
 
 export const tailwindSizePartial = (
   node: SceneNode,
-  optimizeLayout: boolean
+  optimizeLayout: boolean,
 ): { width: string; height: string } => {
   const size = nodeSize(node, optimizeLayout);
 
@@ -16,8 +16,8 @@ export const tailwindSizePartial = (
   let w = "";
   if (
     typeof size.width === "number" &&
-    'layoutSizingHorizontal' in node &&
-    node.layoutSizingHorizontal === 'FIXED'
+    "layoutSizingHorizontal" in node &&
+    node.layoutSizingHorizontal === "FIXED"
   ) {
     w = `w-${pxToLayoutSize(size.width)}`;
   } else if (size.width === "fill") {
@@ -53,7 +53,7 @@ export const tailwindSizePartial = (
 
 export const htmlSizePartialForTailwind = (
   node: SceneNode,
-  isJSX: boolean
+  isJSX: boolean,
 ): [string, string] => {
   return [
     formatWithJSX("width", isJSX, node.width),

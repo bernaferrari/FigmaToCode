@@ -7,7 +7,7 @@ import { nearestValue } from "../../tailwind/conversionTables";
  * Retrieve the SOLID color for Flutter when existent, otherwise ""
  */
 export const flutterColorFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   const fill = retrieveTopFill(fills);
 
@@ -29,7 +29,7 @@ export const flutterColorFromFills = (
 
 export const flutterBoxDecorationColor = (
   node: SceneNode,
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): Record<string, string> => {
   const fill = retrieveTopFill(fills);
 
@@ -52,7 +52,7 @@ export const flutterBoxDecorationColor = (
 export const flutterDecorationImage = (node: SceneNode, fill: ImagePaint) => {
   return generateWidgetCode("DecorationImage", {
     image: `NetworkImage("https://via.placeholder.com/${node.width.toFixed(
-      0
+      0,
     )}x${node.height.toFixed(0)}")`,
     fit: fitToBoxFit(fill),
   });

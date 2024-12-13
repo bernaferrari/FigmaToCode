@@ -31,7 +31,7 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
 
 export const frameNodeTo = (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
-  parent: ParentType
+  parent: ParentType,
 ):
   | RectangleNode
   | FrameNode
@@ -48,7 +48,7 @@ export const frameNodeTo = (
   overrideReadonlyProperty(
     clone,
     "children",
-    convertIntoNodes(node.children, clone)
+    convertIntoNodes(node.children, clone),
   );
   return convertNodesOnRectangle(clone);
 };
@@ -56,7 +56,7 @@ export const frameNodeTo = (
 // auto convert Frame to Rectangle when Frame has no Children
 const frameToRectangleNode = (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
-  parent: ParentType
+  parent: ParentType,
 ): RectangleNode => {
   const clonedNode = cloneNode(node);
   if (parent) {
@@ -70,7 +70,7 @@ const frameToRectangleNode = (
 export const overrideReadonlyProperty = <T, K extends keyof T>(
   obj: T,
   prop: K,
-  value: any
+  value: any,
 ): void => {
   Object.defineProperty(obj, prop, {
     value: value,
@@ -95,7 +95,7 @@ const standardClone = <T extends SceneNode>(node: T, parent: ParentType): T => {
 
 export const convertIntoNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
-  parent: ParentType = null
+  parent: ParentType = null,
 ): Array<SceneNode> => {
   const mapped: Array<SceneNode | null> = sceneNode.map((node: SceneNode) => {
     switch (node.type) {
@@ -132,7 +132,7 @@ export const convertIntoNodes = (
         overrideReadonlyProperty(
           clone,
           "children",
-          convertIntoNodes(node.children, clone)
+          convertIntoNodes(node.children, clone),
         );
 
         // try to find big rect and regardless of that result, also try to convert to autolayout.
@@ -165,7 +165,7 @@ export const convertIntoNodes = (
         overrideReadonlyProperty(
           sectionClone,
           "children",
-          convertIntoNodes(node.children, sectionClone)
+          convertIntoNodes(node.children, sectionClone),
         );
         return sectionClone;
       case "BOOLEAN_OPERATION":
@@ -196,7 +196,7 @@ export const convertIntoNodes = (
 
 const iconToRectangle = (
   node: FrameNode | InstanceNode | ComponentNode | GroupNode,
-  parent: ParentType
+  parent: ParentType,
 ): RectangleNode | null => {
   // TODO Fix this.
   if (false && node.children.every((d) => d.type === "VECTOR")) {
@@ -236,7 +236,7 @@ const iconToRectangle = (
 };
 
 export function notEmpty<TValue>(
-  value: TValue | null | undefined
+  value: TValue | null | undefined,
 ): value is TValue {
   return value !== null && value !== undefined;
 }
@@ -255,7 +255,7 @@ const applyMatrixToPoint = (matrix: number[][], point: number[]): number[] => {
 // height/width
 // x2/y2 bottom right coordinates
 export const getBoundingRect = (
-  node: LayoutMixin
+  node: LayoutMixin,
 ): {
   x: number;
   y: number;

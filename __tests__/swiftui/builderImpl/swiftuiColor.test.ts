@@ -22,7 +22,7 @@ describe("SwiftUI Color", () => {
     ];
 
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "Color(red: 0.94, green: 0.32, blue: 0.22)"
+      "Color(red: 0.94, green: 0.32, blue: 0.22)",
     );
   });
 
@@ -104,7 +104,7 @@ describe("SwiftUI Color", () => {
       },
     ];
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "Color(red: 0, green: 0, blue: 0, opacity: 0)"
+      "Color(red: 0, green: 0, blue: 0, opacity: 0)",
     );
   });
 
@@ -132,7 +132,7 @@ describe("SwiftUI Color", () => {
     node.fills = [gradientFill];
 
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .leading, endPoint: .trailing)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .leading, endPoint: .trailing)",
     );
 
     // topLeft to bottomRight (135)
@@ -141,7 +141,7 @@ describe("SwiftUI Color", () => {
       [1.3402682542800903, -1.4652644395828247, 0.5407097935676575],
     ]);
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .topLeading, endPoint: .bottomTrailing)",
     );
 
     // bottom to top (-90)
@@ -150,7 +150,7 @@ describe("SwiftUI Color", () => {
       [-2.3507132530212402, -1.0997783306265774e-7, 1.6796307563781738],
     ]);
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottom, endPoint: .top)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottom, endPoint: .top)",
     );
 
     // top to bottom (90)
@@ -159,7 +159,7 @@ describe("SwiftUI Color", () => {
       [3.9725232124328613, -1.4210854715202004e-14, -0.8289895057678223],
     ]);
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .top, endPoint: .bottom)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .top, endPoint: .bottom)",
     );
 
     // left to right (0)
@@ -168,7 +168,7 @@ describe("SwiftUI Color", () => {
       [6.030897026221282e-8, -3.364259719848633, 2.188383102416992],
     ]);
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .leading, endPoint: .trailing)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .leading, endPoint: .trailing)",
     );
 
     // right to left (180)
@@ -177,7 +177,7 @@ describe("SwiftUI Color", () => {
       [0.07747448235750198, 4.357592582702637, -1.0299113988876343],
     ]);
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .trailing, endPoint: .leading)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .trailing, endPoint: .leading)",
     );
 
     // bottom left to top right (-135)
@@ -186,7 +186,7 @@ describe("SwiftUI Color", () => {
       [-3.7344324588775635, 2.3110527992248535, 0.4661891460418701],
     ]);
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottomTrailing, endPoint: .topLeading)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottomTrailing, endPoint: .topLeading)",
     );
 
     // bottom left to top right (-45)
@@ -195,7 +195,7 @@ describe("SwiftUI Color", () => {
       [-1.3051068782806396, -1.3525396585464478, 1.8345310688018799],
     ]);
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottomLeading, endPoint: .topTrailing)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .bottomLeading, endPoint: .topTrailing)",
     );
 
     // top right to bottom left (-45)
@@ -204,7 +204,7 @@ describe("SwiftUI Color", () => {
       [1.5028705596923828, 1.2872726917266846, -1.0877336263656616],
     ]);
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .topTrailing, endPoint: .bottomLeading)"
+      "LinearGradient(gradient: Gradient(colors: [Color.black]), startPoint: .topTrailing, endPoint: .bottomLeading)",
     );
   });
 
@@ -255,7 +255,7 @@ describe("SwiftUI Color", () => {
       `RoundedRectangle(cornerRadius: 16)
 .fill(LinearGradient(gradient: Gradient(colors: [Color.black, Color(red: 1, green: 0, blue: 0)]), startPoint: .topLeading, endPoint: .bottomTrailing))
 .frame(width: 18, height: 18)
-.overlay(RoundedRectangle(cornerRadius: 16).stroke(Color(red: 0.25, green: 0.25, blue: 0.25), lineWidth: 4))`
+.overlay(RoundedRectangle(cornerRadius: 16).stroke(Color(red: 0.25, green: 0.25, blue: 0.25), lineWidth: 4))`,
     );
   });
 
@@ -270,7 +270,7 @@ describe("SwiftUI Color", () => {
     ];
 
     expect(swiftuiColorFromFills(node.fills)).toEqual(
-      "Color(red: 0.50, green: 0.23, blue: 0.27, opacity: 0.50)"
+      "Color(red: 0.50, green: 0.23, blue: 0.27, opacity: 0.50)",
     );
   });
 });

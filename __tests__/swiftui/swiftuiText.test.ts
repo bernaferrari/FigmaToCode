@@ -42,7 +42,7 @@ describe("SwiftUI Text", () => {
     expect(swiftuiMain([node])).toEqual(
       `Text("")
 .multilineTextAlignment(.center)
-.frame(width: 16)`
+.frame(width: 16)`,
     );
   });
 
@@ -86,7 +86,7 @@ describe("SwiftUI Text", () => {
       unit: "PERCENT",
     };
     expect(swiftuiMain([node])).toEqual(
-      'Text("")\n.font(.caption2)\n.tracking(11)'
+      'Text("")\n.font(.caption2)\n.tracking(11)',
     );
 
     node.letterSpacing = {
@@ -94,7 +94,7 @@ describe("SwiftUI Text", () => {
       unit: "PIXELS",
     };
     expect(swiftuiMain([node])).toEqual(
-      'Text("")\n.font(.caption2)\n.tracking(10)'
+      'Text("")\n.font(.caption2)\n.tracking(10)',
     );
   });
 
@@ -111,7 +111,7 @@ describe("SwiftUI Text", () => {
       unit: "PERCENT",
     };
     expect(swiftuiMain([node])).toEqual(
-      'Text("")\n.font(.title)\n.lineSpacing(26.40)'
+      'Text("")\n.font(.title)\n.lineSpacing(26.40)',
     );
 
     node.lineHeight = {
@@ -119,7 +119,7 @@ describe("SwiftUI Text", () => {
       unit: "PIXELS",
     };
     expect(swiftuiMain([node])).toEqual(
-      'Text("")\n.font(.title)\n.lineSpacing(10)'
+      'Text("")\n.font(.title)\n.lineSpacing(10)',
     );
   });
 

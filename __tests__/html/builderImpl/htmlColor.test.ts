@@ -97,7 +97,7 @@ describe("HTML Color", () => {
     node.fills = [gradientFill];
 
     expect(htmlGradientFromFills(node.fills)).toEqual(
-      "linear-gradient(90deg, black)"
+      "linear-gradient(90deg, black)",
     );
 
     // topLeft to bottomRight (135)
@@ -106,7 +106,7 @@ describe("HTML Color", () => {
       [1.3402682542800903, -1.4652644395828247, 0.5407097935676575],
     ]);
     expect(htmlGradientFromFills(node.fills)).toEqual(
-      "linear-gradient(131deg, black)"
+      "linear-gradient(131deg, black)",
     );
   });
 
@@ -156,7 +156,7 @@ describe("HTML Color", () => {
     node.dashPattern = [];
 
     expect(htmlMain([node])).toEqual(
-      `<div style="width: 18px; height: 18px; background-image: linear-gradient(131deg, black, rgba(255, 0, 0, 1)); border-radius: 16px; border-style: solid; border-width: 4px; border-style: solid; border-color: rgba(63.75, 63.75, 63.75, 1);"></div>`
+      `<div style="width: 18px; height: 18px; background-image: linear-gradient(131deg, black, rgba(255, 0, 0, 1)); border-radius: 16px; border-style: solid; border-width: 4px; border-style: solid; border-color: rgba(63.75, 63.75, 63.75, 1);"></div>`,
     );
   });
 

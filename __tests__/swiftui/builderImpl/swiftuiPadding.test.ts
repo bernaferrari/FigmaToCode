@@ -62,7 +62,7 @@ describe("SwiftUI padding", () => {
       `\n.padding(.leading, 1)
 .padding(.trailing, 2)
 .padding(.top, 3)
-.padding(.bottom, 4)`
+.padding(.bottom, 4)`,
     );
 
     const notFrame = new AltRectangleNode();

@@ -16,7 +16,7 @@ describe("AltConversions", () => {
     rectangle.resize(20, 20);
 
     expect(tailwindMain(convertIntoAltNodes([rectangle]))).toEqual(
-      '<div class="w-5 h-5"></div>'
+      '<div class="w-5 h-5"></div>',
     );
   });
 
@@ -42,7 +42,7 @@ describe("AltConversions", () => {
     expect(htmlMain(convertIntoAltNodes([frame]))).toEqual(
       `<div style="width: 20px; height: 20px;">
     <div style="width: 20px; height: 20px;"></div>
-</div>`
+</div>`,
     );
   });
 
@@ -100,7 +100,7 @@ describe("AltConversions", () => {
     node.characters = "";
 
     expect(
-      tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
+      tailwindMain(convertIntoAltNodes([node], new AltFrameNode())),
     ).toEqual(`<p></p>`);
   });
 
@@ -125,7 +125,7 @@ describe("AltConversions", () => {
     Object.defineProperty(node, "height", { value: 20 });
 
     expect(
-      tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
+      tailwindMain(convertIntoAltNodes([node], new AltFrameNode())),
     ).toEqual(`<div class="w-5 h-5 rounded-full"></div>`);
   });
 
@@ -145,7 +145,7 @@ describe("AltConversions", () => {
     Object.defineProperty(node, "width", { value: 20 });
 
     expect(
-      tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
+      tailwindMain(convertIntoAltNodes([node], new AltFrameNode())),
     ).toEqual(`<div class="w-5 h-0.5"></div>`);
   });
 
@@ -172,9 +172,7 @@ describe("AltConversions", () => {
     Object.defineProperty(node, "height", { value: 20 });
 
     expect(
-      tailwindMain(convertIntoAltNodes([node], new AltFrameNode()))
-    ).toEqual(
-      `<div class="w-5 h-5 bg-pink-900/50 rounded-lg"></div>`
-    );
+      tailwindMain(convertIntoAltNodes([node], new AltFrameNode())),
+    ).toEqual(`<div class="w-5 h-5 bg-pink-900/50 rounded-lg"></div>`);
   });
 });

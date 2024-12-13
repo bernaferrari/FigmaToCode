@@ -17,7 +17,7 @@ import { commonStroke } from "../common/commonStroke";
 export const flutterContainer = (
   node: SceneNode,
   child: string,
-  optimizeLayout: boolean
+  optimizeLayout: boolean,
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -41,13 +41,16 @@ export const flutterContainer = (
   let propPadding = "";
   if ("paddingLeft" in node) {
     propPadding = flutterPadding(
-      (optimizeLayout ? node.inferredAutoLayout : null) ?? node
+      (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
     );
   }
 
   let result: string;
   if (width || height || propBoxDecoration || clipBehavior) {
-    const parsedDecoration = skipDefaultProperty(propBoxDecoration, "BoxDecoration()");
+    const parsedDecoration = skipDefaultProperty(
+      propBoxDecoration,
+      "BoxDecoration()",
+    );
     result = generateWidgetCode("Container", {
       width: skipDefaultProperty(width, "0"),
       height: skipDefaultProperty(height, "0"),
@@ -94,7 +97,7 @@ const getDecoration = (node: SceneNode): string => {
   } else if ("strokeWeight" in node && node.strokeWeight !== figma.mixed) {
     shapeDecorationBorder = skipDefaultProperty(
       generateRoundedRectangleBorder(node),
-      "RoundedRectangleBorder()"
+      "RoundedRectangleBorder()",
     );
   }
 
@@ -115,7 +118,7 @@ const getDecoration = (node: SceneNode): string => {
 };
 
 const generateRoundedRectangleBorder = (
-  node: SceneNode & MinimalStrokesMixin
+  node: SceneNode & MinimalStrokesMixin,
 ): string => {
   return generateWidgetCode("RoundedRectangleBorder", {
     side: generateBorderSideCode(node),
@@ -124,7 +127,7 @@ const generateRoundedRectangleBorder = (
 };
 
 const generateBorderSideCode = (
-  node: SceneNode & MinimalStrokesMixin
+  node: SceneNode & MinimalStrokesMixin,
 ): string => {
   const strokeWidth = getSingleStrokeWidth(node);
 
@@ -133,14 +136,14 @@ const generateBorderSideCode = (
       width: skipDefaultProperty(strokeWidth, 0),
       strokeAlign: skipDefaultProperty(
         getStrokeAlign(node, strokeWidth),
-        "BorderSide.strokeAlignInside"
+        "BorderSide.strokeAlignInside",
       ),
       color: skipDefaultProperty(
         flutterColorFromFills(node.strokes),
-        "Colors.black"
+        "Colors.black",
       ),
     }),
-    "BorderSide()"
+    "BorderSide()",
   );
 };
 
@@ -188,7 +191,7 @@ const generateStarBorder = (node: StarNode): string => {
 
 export const getStrokeAlign = (
   node: MinimalStrokesMixin,
-  strokeWeight: number
+  strokeWeight: number,
 ): string => {
   if (strokeWeight === 0) {
     return "";
@@ -233,19 +236,19 @@ const generateBorderRadius = (node: SceneNode): string => {
   return generateWidgetCode("BorderRadius.only", {
     topLeft: skipDefaultProperty(
       `Radius.circular(${sliceNum(radius.topLeft)})`,
-      "Radius.circular(0)"
+      "Radius.circular(0)",
     ),
     topRight: skipDefaultProperty(
       `Radius.circular(${sliceNum(radius.topRight)})`,
-      "Radius.circular(0)"
+      "Radius.circular(0)",
     ),
     bottomLeft: skipDefaultProperty(
       `Radius.circular(${sliceNum(radius.bottomLeft)})`,
-      "Radius.circular(0)"
+      "Radius.circular(0)",
     ),
     bottomRight: skipDefaultProperty(
       `Radius.circular(${sliceNum(radius.bottomRight)})`,
-      "Radius.circular(0)"
+      "Radius.circular(0)",
     ),
   });
 };
