@@ -30,13 +30,13 @@ export class TailwindDefaultBuilder {
   visible: boolean;
   name: string = "";
 
-  constructor(node: SceneNode, showLayerName: boolean, optIsJSX: boolean) {
+  constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = "";
     this.visible = node.visible;
 
-    if (showLayerName) {
+    if (showLayerNames) {
       this.attributes.push(className(node.name));
     }
   }

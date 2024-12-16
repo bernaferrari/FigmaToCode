@@ -27,11 +27,11 @@ export class HtmlDefaultBuilder {
   visible: boolean;
   name: string = "";
 
-  constructor(node: SceneNode, showLayerName: boolean, optIsJSX: boolean) {
+  constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
     this.styles = [];
     this.visible = node.visible;
-    if (showLayerName) {
+    if (showLayerNames) {
       this.name = className(node.name);
     }
   }

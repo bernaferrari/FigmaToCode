@@ -82,7 +82,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
 
   const vectorIfExists = tailwindVector(
     node,
-    localTailwindSettings.layerName,
+    localTailwindSettings.showLayerNames,
     "",
     isJsx,
   );
@@ -91,7 +91,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
   // this needs to be called after CustomNode because widthHeight depends on it
   const builder = new TailwindDefaultBuilder(
     node,
-    localTailwindSettings.layerName,
+    localTailwindSettings.showLayerNames,
     isJsx,
   )
     .blend(node)
@@ -112,7 +112,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
 export const tailwindText = (node: TextNode, isJsx: boolean): string => {
   let layoutBuilder = new TailwindTextBuilder(
     node,
-    localTailwindSettings.layerName,
+    localTailwindSettings.showLayerNames,
     isJsx,
   )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
@@ -186,7 +186,7 @@ export const tailwindContainer = (
 
   let builder = new TailwindDefaultBuilder(
     node,
-    localTailwindSettings.layerName,
+    localTailwindSettings.showLayerNames,
     isJsx,
   )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
@@ -228,7 +228,7 @@ export const tailwindContainer = (
 export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
   const builder = new TailwindDefaultBuilder(
     node,
-    localTailwindSettings.layerName,
+    localTailwindSettings.showLayerNames,
     isJsx,
   )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
@@ -241,7 +241,7 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
   const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
   const builder = new TailwindDefaultBuilder(
     node,
-    localTailwindSettings.layerName,
+    localTailwindSettings.showLayerNames,
     isJsx,
   )
     .size(node, localTailwindSettings.optimizeLayout)
