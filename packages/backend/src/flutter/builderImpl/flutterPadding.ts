@@ -19,7 +19,7 @@ export const flutterPadding = (node: InferredAutoLayoutResult): string => {
   if ("all" in padding) {
     return skipDefaultProperty(
       `const EdgeInsets.all(${sliceNum(padding.all)})`,
-      "const EdgeInsets.all(0)"
+      "const EdgeInsets.all(0)",
     );
   }
 

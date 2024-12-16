@@ -14,7 +14,7 @@ type position =
   | "BottomEnd";
 
 export const commonPosition = (
-  node: SceneNode & DimensionAndPositionMixin
+  node: SceneNode & DimensionAndPositionMixin,
 ): position => {
   // if node is same size as height, position is not necessary
 
@@ -105,7 +105,7 @@ export const commonPosition = (
 };
 
 export const getCommonPositionValue = (
-  node: SceneNode
+  node: SceneNode,
 ): { x: number; y: number } => {
   if (node.parent && node.parent.type === "GROUP") {
     return {
@@ -122,7 +122,7 @@ export const getCommonPositionValue = (
 
 export const commonIsAbsolutePosition = (
   node: SceneNode,
-  optimizeLayout: boolean
+  optimizeLayout: boolean,
 ) => {
   // No position when parent is inferred auto layout.
   if (

@@ -20,8 +20,8 @@ export type PluginSettings = {
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
   roundTailwindValues: boolean;
-  roundTailwindColors: boolean,
-  customTailwindColors: boolean,
+  roundTailwindColors: boolean;
+  customTailwindColors: boolean;
 };
 
 export const run = (settings: PluginSettings) => {
@@ -35,7 +35,7 @@ export const run = (settings: PluginSettings) => {
 
   const convertedSelection = convertIntoNodes(
     figma.currentPage.selection,
-    null
+    null,
   );
   let result = "";
   switch (settings.framework) {
@@ -70,7 +70,7 @@ export const run = (settings: PluginSettings) => {
                 ...settings,
                 jsx: false,
               },
-              true
+              true,
             ),
           }
         : null,

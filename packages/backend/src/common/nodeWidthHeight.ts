@@ -5,7 +5,7 @@ type SizeResult = {
 
 export const nodeSize = (
   node: SceneNode,
-  optimizeLayout: boolean
+  optimizeLayout: boolean,
 ): SizeResult => {
   const hasLayout =
     "layoutAlign" in node && node.parent && "layoutMode" in node.parent;
@@ -26,7 +26,7 @@ export const nodeSize = (
   // const parentLayoutMode = node.parent.layoutMode;
   const parentLayoutMode = optimizeLayout
     ? node.parent.inferredAutoLayout?.layoutMode
-    : null ?? node.parent.layoutMode;
+    : (null ?? node.parent.layoutMode);
 
   const isWidthFill =
     (parentLayoutMode === "HORIZONTAL" && nodeAuto.layoutGrow === 1) ||
@@ -46,12 +46,12 @@ export const nodeSize = (
     width: isWidthFill
       ? "fill"
       : "layoutMode" in nodeAuto && nodeAuto[primaryAxisMode] === "AUTO"
-      ? null
-      : node.width,
+        ? null
+        : node.width,
     height: isHeightFill
       ? "fill"
       : "layoutMode" in nodeAuto && nodeAuto[counterAxisMode] === "AUTO"
-      ? null
-      : node.height,
+        ? null
+        : node.height,
   };
 };

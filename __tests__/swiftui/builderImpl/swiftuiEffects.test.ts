@@ -70,7 +70,7 @@ describe("SwiftUI Shadow and Blur", () => {
     ];
 
     expect(swiftuiShadow(node)).toEqual(
-      "\n.shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 1), radius: 4)"
+      "\n.shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 1), radius: 4)",
     );
   });
 

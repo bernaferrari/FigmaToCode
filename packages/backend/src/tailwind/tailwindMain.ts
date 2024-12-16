@@ -15,7 +15,7 @@ const selfClosingTags = ["img"];
 
 export const tailwindMain = (
   sceneNode: Array<SceneNode>,
-  settings: PluginSettings
+  settings: PluginSettings,
 ): string => {
   localTailwindSettings = settings;
   previousExecutionCache = [];
@@ -33,7 +33,7 @@ export const tailwindMain = (
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const tailwindWidgetGenerator = (
   sceneNode: ReadonlyArray<SceneNode>,
-  isJsx: boolean
+  isJsx: boolean,
 ): string => {
   let comp = "";
 
@@ -84,7 +84,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
     node,
     localTailwindSettings.layerName,
     "",
-    isJsx
+    isJsx,
   );
   if (vectorIfExists) return vectorIfExists;
 
@@ -92,7 +92,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
   const builder = new TailwindDefaultBuilder(
     node,
     localTailwindSettings.layerName,
-    isJsx
+    isJsx,
   )
     .blend(node)
     .size(node, localTailwindSettings.optimizeLayout)
@@ -113,7 +113,7 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
   let layoutBuilder = new TailwindTextBuilder(
     node,
     localTailwindSettings.layerName,
-    isJsx
+    isJsx,
   )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .textAlign(node);
@@ -136,14 +136,14 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
 
 const tailwindFrame = (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
-  isJsx: boolean
+  isJsx: boolean,
 ): string => {
   const childrenStr = tailwindWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(
       node,
-      localTailwindSettings.optimizeLayout
+      localTailwindSettings.optimizeLayout,
     ),
-    isJsx
+    isJsx,
   );
 
   // Add overflow-hidden class if clipsContent is true
@@ -153,7 +153,10 @@ const tailwindFrame = (
     const rowColumn = tailwindAutoLayoutProps(node, node);
     return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
   } else {
-    if (localTailwindSettings.optimizeLayout && node.inferredAutoLayout !== null) {
+    if (
+      localTailwindSettings.optimizeLayout &&
+      node.inferredAutoLayout !== null
+    ) {
       const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
       return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
     }
@@ -175,7 +178,7 @@ export const tailwindContainer = (
     MinimalBlendMixin,
   children: string,
   additionalAttr: string,
-  isJsx: boolean
+  isJsx: boolean,
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -184,7 +187,11 @@ export const tailwindContainer = (
     return children;
   }
 
-  let builder = new TailwindDefaultBuilder(node, localTailwindSettings.layerName, isJsx)
+  let builder = new TailwindDefaultBuilder(
+    node,
+    localTailwindSettings.layerName,
+    isJsx,
+  )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .commonShapeStyles(node);
 
@@ -198,13 +205,13 @@ export const tailwindContainer = (
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
         src = ` src="https://via.placeholder.com/${node.width.toFixed(
-          0
+          0,
         )}x${node.height.toFixed(0)}"`;
       } else {
         builder.addAttributes(
           `bg-[url(https://via.placeholder.com/${node.width.toFixed(
-            0
-          )}x${node.height.toFixed(0)})]`
+            0,
+          )}x${node.height.toFixed(0)})]`,
         );
       }
     }
@@ -225,7 +232,7 @@ export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
   const builder = new TailwindDefaultBuilder(
     node,
     localTailwindSettings.layerName,
-    isJsx
+    isJsx,
   )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .commonShapeStyles(node);
@@ -238,7 +245,7 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
   const builder = new TailwindDefaultBuilder(
     node,
     localTailwindSettings.layerName,
-    isJsx
+    isJsx,
   )
     .size(node, localTailwindSettings.optimizeLayout)
     .position(node, localTailwindSettings.optimizeLayout)

@@ -36,7 +36,7 @@ const getGap = (node: InferredAutoLayoutResult): string =>
 
 const getFlex = (
   node: SceneNode,
-  autoLayout: InferredAutoLayoutResult
+  autoLayout: InferredAutoLayoutResult,
 ): string =>
   node.parent &&
   "layoutMode" in node.parent &&
@@ -46,7 +46,7 @@ const getFlex = (
 
 export const tailwindAutoLayoutProps = (
   node: SceneNode,
-  autoLayout: InferredAutoLayoutResult
+  autoLayout: InferredAutoLayoutResult,
 ): string =>
   Object.values({
     flexDirection: getFlexDirection(autoLayout),

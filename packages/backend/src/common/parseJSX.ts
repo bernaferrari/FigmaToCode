@@ -3,7 +3,7 @@ import { sliceNum } from "./numToAutoFixed";
 export const formatWithJSX = (
   property: string,
   isJsx: boolean,
-  value: number | string
+  value: number | string,
 ): string => {
   // convert font-size to fontSize.
   const jsx_property = property
@@ -26,7 +26,7 @@ export const formatWithJSX = (
 
 export const formatMultipleJSXArray = (
   styles: Record<string, string | number>,
-  isJsx: boolean
+  isJsx: boolean,
 ): string[] =>
   Object.entries(styles)
     .filter(([key, value]) => value !== "")
@@ -34,7 +34,7 @@ export const formatMultipleJSXArray = (
 
 export const formatMultipleJSX = (
   styles: Record<string, string | number | null>,
-  isJsx: boolean
+  isJsx: boolean,
 ): string =>
   Object.entries(styles)
     .filter(([key, value]) => value)

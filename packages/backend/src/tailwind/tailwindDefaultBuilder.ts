@@ -46,13 +46,13 @@ export class TailwindDefaultBuilder {
   };
 
   blend(
-    node: SceneNode & SceneNodeMixin & MinimalBlendMixin & LayoutMixin
+    node: SceneNode & SceneNodeMixin & MinimalBlendMixin & LayoutMixin,
   ): this {
     this.addAttributes(
       tailwindVisibility(node),
       tailwindRotation(node),
       tailwindOpacity(node),
-      tailwindBlendMode(node)
+      tailwindBlendMode(node),
     );
 
     return this;
@@ -64,7 +64,7 @@ export class TailwindDefaultBuilder {
       BlendMixin &
       LayoutMixin &
       MinimalBlendMixin,
-    optimizeLayout: boolean
+    optimizeLayout: boolean,
   ): this {
     this.size(node, optimizeLayout);
     this.autoLayoutPadding(node, optimizeLayout);
@@ -137,7 +137,7 @@ export class TailwindDefaultBuilder {
    */
   customColor(
     paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
-    kind: string
+    kind: string,
   ): this {
     // visible is true or undefinied (tests)
     if (this.visible) {
@@ -190,8 +190,8 @@ export class TailwindDefaultBuilder {
     if ("paddingLeft" in node) {
       this.addAttributes(
         ...tailwindPadding(
-          (optimizeLayout ? node.inferredAutoLayout : null) ?? node
-        )
+          (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
+        ),
       );
     }
     return this;
@@ -208,7 +208,7 @@ export class TailwindDefaultBuilder {
       }
 
       const backgroundBlur = node.effects.find(
-        (e) => e.type === "BACKGROUND_BLUR"
+        (e) => e.type === "BACKGROUND_BLUR",
       );
       if (backgroundBlur) {
         const backgroundBlurValue = pxToBlur(backgroundBlur.radius);
@@ -216,7 +216,7 @@ export class TailwindDefaultBuilder {
           this.addAttributes(
             `backdrop-blur${
               backgroundBlurValue ? `-${backgroundBlurValue}` : ""
-            }`
+            }`,
           );
         }
       }

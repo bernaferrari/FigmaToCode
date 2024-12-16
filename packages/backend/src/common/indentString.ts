@@ -11,7 +11,7 @@ export const indentString = (str: string, indentLevel: number = 2): string => {
 
 export const indentStringFlutter = (
   str: string,
-  indentLevel: number = 2
+  indentLevel: number = 2,
 ): string => {
   // const options = {
   //   includeEmptyLines: false,

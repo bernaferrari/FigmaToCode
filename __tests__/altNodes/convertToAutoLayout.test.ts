@@ -60,7 +60,7 @@ describe("Convert to AutoLayout", () => {
       `<div class="inline-flex items-start justify-end w-12 h-12 pr-2.5 pb-8">
     <div class="w-1/2 h-full bg-white"></div>
     <div class="w-1/2 h-full bg-black"></div>
-</div>`
+</div>`,
     );
 
     // output should be VERTICAL
@@ -73,7 +73,7 @@ describe("Convert to AutoLayout", () => {
       `<div class="inline-flex flex-col items-start justify-end w-12 h-12 pr-8 pb-2.5">
     <div class="w-full h-1/2 bg-white"></div>
     <div class="w-full h-1/2 bg-black"></div>
-</div>`
+</div>`,
     );
 
     // horizontally align while vertical
@@ -88,7 +88,7 @@ describe("Convert to AutoLayout", () => {
       `<div class="inline-flex flex-col space-y-1 items-end justify-end w-12 h-12 pb-1">
     <div class="w-full h-5 bg-white"></div>
     <div class="w-5 h-5 bg-black"></div>
-</div>`
+</div>`,
     );
 
     // vertically align while horizontal
@@ -104,7 +104,7 @@ describe("Convert to AutoLayout", () => {
       `<div class="inline-flex items-end justify-end w-12 h-12 pr-2.5">
     <div class="w-1/2 h-full bg-white"></div>
     <div class="w-1/2 h-5 bg-black"></div>
-</div>`
+</div>`,
     );
 
     node1.height = 20;
@@ -119,7 +119,7 @@ describe("Convert to AutoLayout", () => {
       `<div class="relative" style="width: 50px; height: 50px;">
     <div class="w-5 h-5 absolute bg-black" style="left: 10px; top: 10px;"></div>
     <div class="w-5 h-5 absolute left-0 top-0 bg-white"></div>
-</div>`
+</div>`,
     );
   });
 

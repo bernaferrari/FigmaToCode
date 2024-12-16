@@ -58,7 +58,7 @@ describe("Tailwind Color", () => {
       },
     ];
     expect(tailwindColorFromFills(node.fills, "bg")).toEqual(
-      "bg-black bg-opacity-0 "
+      "bg-black bg-opacity-0 ",
     );
   });
 
@@ -86,7 +86,7 @@ describe("Tailwind Color", () => {
     node.fills = [gradientFill];
 
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-r from-black "
+      "bg-gradient-to-r from-black ",
     );
 
     // topLeft to bottomRight (135)
@@ -95,7 +95,7 @@ describe("Tailwind Color", () => {
       [1.3402682542800903, -1.4652644395828247, 0.5407097935676575],
     ]);
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-br from-black "
+      "bg-gradient-to-br from-black ",
     );
 
     // bottom to top (-90)
@@ -104,7 +104,7 @@ describe("Tailwind Color", () => {
       [-2.3507132530212402, -1.0997783306265774e-7, 1.6796307563781738],
     ]);
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-t from-black "
+      "bg-gradient-to-t from-black ",
     );
 
     // top to bottom (90)
@@ -113,7 +113,7 @@ describe("Tailwind Color", () => {
       [3.9725232124328613, -1.4210854715202004e-14, -0.8289895057678223],
     ]);
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-b from-black "
+      "bg-gradient-to-b from-black ",
     );
 
     // left to right (0)
@@ -122,7 +122,7 @@ describe("Tailwind Color", () => {
       [6.030897026221282e-8, -3.364259719848633, 2.188383102416992],
     ]);
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-r from-black "
+      "bg-gradient-to-r from-black ",
     );
 
     // right to left (180)
@@ -131,7 +131,7 @@ describe("Tailwind Color", () => {
       [0.07747448235750198, 4.357592582702637, -1.0299113988876343],
     ]);
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-l from-black "
+      "bg-gradient-to-l from-black ",
     );
 
     // bottom left to top right (-135)
@@ -140,7 +140,7 @@ describe("Tailwind Color", () => {
       [-3.7344324588775635, 2.3110527992248535, 0.4661891460418701],
     ]);
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-tl from-black "
+      "bg-gradient-to-tl from-black ",
     );
 
     // bottom left to top right (-45)
@@ -149,7 +149,7 @@ describe("Tailwind Color", () => {
       [-1.3051068782806396, -1.3525396585464478, 1.8345310688018799],
     ]);
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-tr from-black "
+      "bg-gradient-to-tr from-black ",
     );
 
     // top right to bottom left (-45)
@@ -158,7 +158,7 @@ describe("Tailwind Color", () => {
       [1.5028705596923828, 1.2872726917266846, -1.0877336263656616],
     ]);
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-bl from-black "
+      "bg-gradient-to-bl from-black ",
     );
 
     const gradientFillTwo: GradientPaint = {
@@ -192,7 +192,7 @@ describe("Tailwind Color", () => {
     node.fills = [gradientFillTwo];
 
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-r from-black to-white "
+      "bg-gradient-to-r from-black to-white ",
     );
 
     const gradientFillThree: GradientPaint = {
@@ -235,7 +235,7 @@ describe("Tailwind Color", () => {
     node.fills = [gradientFillThree];
 
     expect(tailwindGradientFromFills(node.fills)).toEqual(
-      "bg-gradient-to-r from-black via-gray-500 to-white "
+      "bg-gradient-to-r from-black via-gray-500 to-white ",
     );
   });
 
@@ -284,7 +284,7 @@ describe("Tailwind Color", () => {
     node.cornerRadius = 16;
 
     expect(tailwindMain([node])).toEqual(
-      `<div class="w-4 h-4 bg-gradient-to-br from-black to-red-600 border-4 rounded-full border-gray-700"></div>`
+      `<div class="w-4 h-4 bg-gradient-to-br from-black to-red-600 border-4 rounded-full border-gray-700"></div>`,
     );
   });
 

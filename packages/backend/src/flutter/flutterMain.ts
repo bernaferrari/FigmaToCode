@@ -56,7 +56,7 @@ const getStatelessTemplate = (name: string, injectCode: string): string =>
 
 export const flutterMain = (
   sceneNode: ReadonlyArray<SceneNode>,
-  settings: PluginSettings
+  settings: PluginSettings,
 ): string => {
   localSettings = settings;
   previousExecutionCache = [];
@@ -77,7 +77,7 @@ export const flutterMain = (
 };
 
 const flutterWidgetGenerator = (
-  sceneNode: ReadonlyArray<SceneNode>
+  sceneNode: ReadonlyArray<SceneNode>,
 ): string => {
   let comp: string[] = [];
 
@@ -130,7 +130,7 @@ const flutterGroup = (node: GroupNode): string => {
     node,
     generateWidgetCode("Stack", {
       children: widget ? [widget] : [],
-    })
+    }),
   );
 };
 
@@ -140,7 +140,7 @@ const flutterContainer = (node: SceneNode, child: string): string => {
   let image = "";
   if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
     image = `Image.network("https://via.placeholder.com/${node.width.toFixed(
-      0
+      0,
     )}x${node.height.toFixed(0)}")`;
   }
 
@@ -167,10 +167,13 @@ const flutterText = (node: TextNode): string => {
 };
 
 const flutterFrame = (
-  node: SceneNode & BaseFrameMixin & MinimalBlendMixin
+  node: SceneNode & BaseFrameMixin & MinimalBlendMixin,
 ): string => {
   const children = flutterWidgetGenerator(
-    commonSortChildrenWhenInferredAutoLayout(node, localSettings.optimizeLayout)
+    commonSortChildrenWhenInferredAutoLayout(
+      node,
+      localSettings.optimizeLayout,
+    ),
   );
 
   if (node.layoutMode !== "NONE") {
@@ -190,14 +193,14 @@ const flutterFrame = (
       node,
       generateWidgetCode("Stack", {
         children: children !== "" ? [children] : [],
-      })
+      }),
     );
   }
 };
 
 const makeRowColumn = (
   autoLayout: InferredAutoLayoutResult,
-  children: string
+  children: string,
 ): string => {
   const rowOrColumn = autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
@@ -214,12 +217,12 @@ const makeRowColumn = (
 
 const addSpacingIfNeeded = (
   node: SceneNode,
-  optimizeLayout: boolean
+  optimizeLayout: boolean,
 ): string => {
   const nodeParentLayout =
     optimizeLayout && node.parent && "itemSpacing" in node.parent
       ? node.parent.inferredAutoLayout
-      : null ?? node.parent;
+      : (null ?? node.parent);
 
   if (
     nodeParentLayout &&

@@ -25,7 +25,7 @@ describe("HTML padding", () => {
     frameNode.paddingTop = 3;
     frameNode.paddingBottom = 4;
     expect(htmlPadding(frameNode, false)).toEqual(
-      "padding-top: 3px; padding-bottom: 4px; padding-left: 1px; padding-right: 2px; "
+      "padding-top: 3px; padding-bottom: 4px; padding-left: 1px; padding-right: 2px; ",
     );
 
     frameNode.paddingLeft = 4;
@@ -33,7 +33,7 @@ describe("HTML padding", () => {
     frameNode.paddingTop = 8;
     frameNode.paddingBottom = 8;
     expect(htmlPadding(frameNode, false)).toEqual(
-      "padding-left: 4px; padding-right: 4px; padding-top: 8px; padding-bottom: 8px; "
+      "padding-left: 4px; padding-right: 4px; padding-top: 8px; padding-bottom: 8px; ",
     );
 
     frameNode.paddingLeft = 0;

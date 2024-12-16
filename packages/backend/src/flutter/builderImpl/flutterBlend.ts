@@ -5,7 +5,7 @@ import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
  */
 export const flutterOpacity = (
   node: MinimalBlendMixin,
-  child: string
+  child: string,
 ): string => {
   if (node.opacity !== undefined && node.opacity !== 1 && child !== "") {
     return generateWidgetCode("Opacity", {
@@ -44,7 +44,7 @@ export const flutterRotation = (node: LayoutMixin, child: string): string => {
   ) {
     return generateWidgetCode("Transform", {
       transform: `Matrix4.identity()..translate(0.0, 0.0)..rotateZ(${sliceNum(
-        node.rotation * (-3.14159 / 180)
+        node.rotation * (-3.14159 / 180),
       )})`,
       child: child,
     });

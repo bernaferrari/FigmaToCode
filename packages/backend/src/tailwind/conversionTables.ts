@@ -12,7 +12,7 @@ export const nearestValue = (goal: number, array: Array<number>): number => {
 
 export const exactValue = (
   goal: number,
-  array: Array<number>
+  array: Array<number>,
 ): number | null => {
   for (let i = 0; i < array.length; i++) {
     const diff = Math.abs(goal - array[i]);
@@ -33,7 +33,7 @@ export const exactValue = (
  */
 const pxToRemToTailwind = (
   value: number,
-  conversionMap: Record<number, string>
+  conversionMap: Record<number, string>,
 ): string => {
   const keys = Object.keys(conversionMap).map((d) => +d);
   const convertedValue = exactValue(value / 16, keys);
@@ -49,7 +49,7 @@ const pxToRemToTailwind = (
 
 const pxToTailwind = (
   value: number,
-  conversionMap: Record<number, string>
+  conversionMap: Record<number, string>,
 ): string | null => {
   const keys = Object.keys(conversionMap).map((d) => +d);
   const convertedValue = exactValue(value, keys);
@@ -65,23 +65,23 @@ const pxToTailwind = (
 
 export const pxToLetterSpacing = (value: number): string => {
   return pxToRemToTailwind(value, config.letterSpacing);
-}
+};
 
 export const pxToLineHeight = (value: number): string => {
   return pxToRemToTailwind(value, config.lineHeight);
-}
+};
 
 export const pxToFontSize = (value: number): string => {
   return pxToRemToTailwind(value, config.fontSize);
-}
+};
 
 export const pxToBorderRadius = (value: number): string => {
   return pxToRemToTailwind(value, config.borderRadius);
-}
+};
 
 export const pxToBlur = (value: number): string | null => {
   return pxToTailwind(value, config.blur);
-}
+};
 
 export const pxToLayoutSize = (value: number): string => {
   const tailwindValue = pxToTailwind(value, config.layoutSize);
@@ -94,7 +94,7 @@ export const pxToLayoutSize = (value: number): string => {
 
 export const nearestOpacity = (nodeOpacity: number): number => {
   return nearestValue(nodeOpacity * 100, config.opacity);
-}
+};
 
 export const nearestColor = nearestColorFrom(Object.keys(config.color));
 
@@ -111,10 +111,13 @@ export const nearestColorFromRgb = (color: RGB) => {
   const value = nearestColor(colorMultiplied);
   const name = config.color[value];
   return { name, value };
-}
+};
 
 export const variableToColorName = (alias: VariableAlias) => {
-  return figma.variables.getVariableById(alias.id)?.name.replaceAll("/", "-").replaceAll(" ", "-") || alias.id.toLowerCase().replaceAll(":", "-");
+  return (
+    figma.variables.getVariableById(alias.id)?.name.replaceAll("/", "-").replaceAll(" ", "-") || 
+    alias.id.toLowerCase().replaceAll(":", "-")
+  );
 };
 
 /**
@@ -127,13 +130,16 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
   let colorName: string;
   let colorType: "arbitrary" | "tailwind" | "variable";
   let hex: string = "#" + rgbTo6hex(fill.color);
-  let meta: string = ''
+  let meta: string = "";
 
   // variable
-  if (localTailwindSettings.customTailwindColors && fill.boundVariables?.color) {
+  if (
+    localTailwindSettings.customTailwindColors &&
+    fill.boundVariables?.color
+  ) {
     colorName = variableToColorName(fill.boundVariables.color);
     colorType = "variable";
-    meta = 'custom'
+    meta = "custom";
   }
 
   // solid color
@@ -146,7 +152,7 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
       colorName = name;
       colorType = "tailwind";
       if (hex !== value) {
-        meta = 'rounded'
+        meta = "rounded";
       }
 
       // must come last, as previous comparison

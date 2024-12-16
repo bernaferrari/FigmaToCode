@@ -124,7 +124,7 @@ const codegenMode = async () => {
             code: htmlMain(
               convertedSelection,
               { ...userPluginSettings, jsx: false },
-              true
+              true,
             ),
             language: "HTML",
           },
@@ -141,7 +141,7 @@ const codegenMode = async () => {
             code: htmlMain(
               convertedSelection,
               { ...userPluginSettings, jsx: true },
-              true
+              true,
             ),
             language: "HTML",
           },
@@ -158,7 +158,7 @@ const codegenMode = async () => {
             title: `Code`,
             code: tailwindMain(convertedSelection, {
               ...userPluginSettings,
-              jsx: language === 'tailwind_jsx',
+              jsx: language === "tailwind_jsx",
             }),
             language: "HTML",
           },
@@ -171,12 +171,12 @@ const codegenMode = async () => {
             title: `Tailwind Colors`,
             code: retrieveGenericSolidUIColors("Tailwind")
               .map((d) => {
-                let str = `${d.hex};`
+                let str = `${d.hex};`;
                 if (d.colorName !== d.hex) {
-                  str += ` // ${d.colorName}`
+                  str += ` // ${d.colorName}`;
                 }
                 if (d.meta) {
-                  str += ` (${d.meta})`
+                  str += ` (${d.meta})`;
                 }
                 return str;
               })

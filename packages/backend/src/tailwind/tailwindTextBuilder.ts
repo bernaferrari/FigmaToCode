@@ -24,11 +24,11 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       const textTransform = this.textTransform(segment.textCase);
       const lineHeightStyle = this.lineHeight(
         segment.lineHeight,
-        segment.fontSize
+        segment.fontSize,
       );
       const letterSpacingStyle = this.letterSpacing(
         segment.letterSpacing,
-        segment.fontSize
+        segment.fontSize,
       );
       // const textIndentStyle = this.indentStyle(segment.indentation);
 
@@ -52,7 +52,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   }
 
   getTailwindColorFromFills = (
-    fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+    fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
   ) => {
     // Implement a function to convert fills to the appropriate Tailwind CSS color classes.
     // This can be based on your project's configuration and color palette.

@@ -196,7 +196,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     itemType: "individual_select",
     propertyName: "optimizeLayout",
     label: "Optimize layout",
-    description: 'Attempt to auto-layout suitable element groups',
+    description: "Attempt to auto-layout suitable element groups",
     isDefault: true,
     includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
   },
@@ -204,7 +204,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     itemType: "individual_select",
     propertyName: "layerName",
     label: "Layer names",
-    description: 'Include layer names in classes',
+    description: "Include layer names in classes",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
@@ -212,7 +212,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     itemType: "individual_select",
     propertyName: "roundTailwindValues",
     label: "Round values",
-    description: 'Round pixel values to nearest Tailwind sizes',
+    description: "Round pixel values to nearest Tailwind sizes",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
@@ -220,7 +220,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     itemType: "individual_select",
     propertyName: "roundTailwindColors",
     label: "Round colors",
-    description: 'Round color values to nearest Tailwind colors',
+    description: "Round color values to nearest Tailwind colors",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
@@ -228,7 +228,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     itemType: "individual_select",
     propertyName: "customTailwindColors",
     label: "Custom colors",
-    description: 'Use color variable names as custom color names',
+    description: "Use color variable names as custom color names",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
@@ -306,7 +306,7 @@ export const CodePanel = (props: {
   } else {
     const selectablePreferencesFiltered = selectPreferenceOptions.filter(
       (preference) =>
-        preference.includedLanguages?.includes(props.selectedFramework)
+        preference.includedLanguages?.includes(props.selectedFramework),
     );
 
     return (
@@ -335,7 +335,7 @@ export const CodePanel = (props: {
 
             {preferenceOptions
               .filter((preference) =>
-                preference.includedLanguages?.includes(props.selectedFramework)
+                preference.includedLanguages?.includes(props.selectedFramework),
               )
               .map((preference) => (
                 <SelectableToggle
@@ -376,7 +376,7 @@ export const CodePanel = (props: {
                         onSelect={() => {
                           props.onPreferenceChange(
                             preference.propertyName,
-                            option.value
+                            option.value,
                           );
                         }}
                         buttonClass="bg-blue-100 dark:bg-black dark:ring-blue-800"
@@ -644,7 +644,7 @@ export const Preview: React.FC<{
           const targetHeight = props.isResponsiveExpanded ? 260 : 120;
           const scaleFactor = Math.min(
             targetWidth / props.htmlPreview.size.width,
-            targetHeight / props.htmlPreview.size.height
+            targetHeight / props.htmlPreview.size.height,
           );
           return (
             <div

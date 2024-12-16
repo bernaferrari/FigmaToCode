@@ -19,7 +19,7 @@ let previousExecutionCache: { style: string; text: string }[];
 export const htmlMain = (
   sceneNode: Array<SceneNode>,
   settings: PluginSettings,
-  isPreview: boolean = false
+  isPreview: boolean = false,
 ): string => {
   showLayerName = settings.layerName;
   isPreviewGlobal = isPreview;
@@ -39,7 +39,7 @@ export const htmlMain = (
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const htmlWidgetGenerator = (
   sceneNode: ReadonlyArray<SceneNode>,
-  isJsx: boolean
+  isJsx: boolean,
 ): string => {
   let comp = "";
   // filter non visible nodes. This is necessary at this step because conversion already happened.
@@ -96,7 +96,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
   const builder = new HtmlDefaultBuilder(
     node,
     showLayerName,
-    isJsx
+    isJsx,
   ).commonPositionStyles(node, localSettings.optimizeLayout);
 
   if (builder.styles) {
@@ -134,14 +134,14 @@ export const htmlText = (node: TextNode, isJsx: boolean): string => {
 
 const htmlFrame = (
   node: SceneNode & BaseFrameMixin,
-  isJsx: boolean = false
+  isJsx: boolean = false,
 ): string => {
   const childrenStr = htmlWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(
       node,
-      localSettings.optimizeLayout
+      localSettings.optimizeLayout,
     ),
-    isJsx
+    isJsx,
   );
 
   if (node.layoutMode !== "NONE") {
@@ -152,7 +152,7 @@ const htmlFrame = (
       const rowColumn = htmlAutoLayoutProps(
         node,
         node.inferredAutoLayout,
-        isJsx
+        isJsx,
       );
       return htmlContainer(node, childrenStr, rowColumn, isJsx);
     }
@@ -177,7 +177,7 @@ export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
   if (retrieveTopFill(node.fills)?.type === "IMAGE") {
     tag = "img";
     src = ` src="https://via.placeholder.com/${node.width.toFixed(
-      0
+      0,
     )}x${node.height.toFixed(0)}"`;
   }
 
@@ -199,7 +199,7 @@ export const htmlContainer = (
     MinimalBlendMixin,
   children: string,
   additionalStyles: string[] = [],
-  isJsx: boolean
+  isJsx: boolean,
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -219,7 +219,7 @@ export const htmlContainer = (
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
         src = ` src="https://via.placeholder.com/${node.width.toFixed(
-          0
+          0,
         )}x${node.height.toFixed(0)}"`;
       } else {
         builder.addStyles(
@@ -227,9 +227,9 @@ export const htmlContainer = (
             "background-image",
             isJsx,
             `url(https://via.placeholder.com/${node.width.toFixed(
-              0
-            )}x${node.height.toFixed(0)})`
-          )
+              0,
+            )}x${node.height.toFixed(0)})`,
+          ),
         );
       }
     }
@@ -250,7 +250,7 @@ export const htmlContainer = (
 
 export const htmlSection = (
   node: SectionNode,
-  isJsx: boolean = false
+  isJsx: boolean = false,
 ): string => {
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
   const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
@@ -277,7 +277,7 @@ export const htmlCodeGenTextStyles = (isJsx: boolean) => {
   const result = previousExecutionCache
     .map(
       (style) =>
-        `// ${style.text}\n${style.style.split(isJsx ? "," : ";").join(";\n")}`
+        `// ${style.text}\n${style.style.split(isJsx ? "," : ";").join(";\n")}`,
     )
     .join("\n---\n");
 

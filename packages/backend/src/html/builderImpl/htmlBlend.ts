@@ -9,7 +9,7 @@ import { formatWithJSX } from "../../common/parseJSX";
  */
 export const htmlOpacity = (
   node: MinimalBlendMixin,
-  isJsx: boolean
+  isJsx: boolean,
 ): string => {
   // [when testing] node.opacity can be undefined
   if (node.opacity !== undefined && node.opacity !== 1) {
@@ -23,7 +23,10 @@ export const htmlOpacity = (
   return "";
 };
 
-export const htmlBlendMode = (node: MinimalBlendMixin, isJsx: boolean): string => {
+export const htmlBlendMode = (
+  node: MinimalBlendMixin,
+  isJsx: boolean,
+): string => {
   if (node.blendMode !== "NORMAL" && node.blendMode !== "PASS_THROUGH") {
     let blendMode = "";
     switch (node.blendMode) {
@@ -87,7 +90,7 @@ export const htmlBlendMode = (node: MinimalBlendMixin, isJsx: boolean): string =
  */
 export const htmlVisibility = (
   node: SceneNodeMixin,
-  isJsx: boolean
+  isJsx: boolean,
 ): string => {
   // [when testing] node.visible can be undefined
 
@@ -113,7 +116,7 @@ export const htmlRotation = (node: LayoutMixin, isJsx: boolean): string[] => {
       formatWithJSX(
         "transform",
         isJsx,
-        `rotate(${sliceNum(-node.rotation)}deg)`
+        `rotate(${sliceNum(-node.rotation)}deg)`,
       ),
       formatWithJSX("transform-origin", isJsx, "0 0"),
     ];
