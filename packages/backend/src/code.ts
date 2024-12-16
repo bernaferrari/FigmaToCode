@@ -15,7 +15,7 @@ export type PluginSettings = {
   jsx: boolean;
   inlineStyle: boolean;
   optimizeLayout: boolean;
-  layerName: boolean;
+  showLayerNames: boolean;
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;

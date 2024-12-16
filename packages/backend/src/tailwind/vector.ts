@@ -2,7 +2,7 @@
 
 export const tailwindVector = (
   node: FrameNode | GroupNode,
-  showLayerName: boolean,
+  showLayerNames: boolean,
   parentId: string,
   isJsx: boolean,
 ): string => {
