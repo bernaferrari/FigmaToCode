@@ -1,4 +1,4 @@
-import { className, sliceNum } from "./../common/numToAutoFixed";
+import { stringToClassName, sliceNum } from "./../common/numToAutoFixed";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   tailwindVisibility,
@@ -21,6 +21,10 @@ import {
   getCommonPositionValue,
 } from "../common/commonPosition";
 import { pxToBlur } from "./conversionTables";
+import {
+  getClassLabel,
+  formatStyleAttribute,
+} from "../common/commonFormatAttributes";
 
 const isNotEmpty = (s: string) => s !== "";
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
@@ -49,6 +53,9 @@ export class TailwindDefaultBuilder {
 
   addAttributes = (...newStyles: string[]) => {
     this.attributes.push(...dropEmptyStrings(newStyles));
+  };
+  prependAttributes = (...newStyles: string[]) => {
+    this.attributes.unshift(...dropEmptyStrings(newStyles));
   };
 
   blend(
@@ -232,13 +239,17 @@ export class TailwindDefaultBuilder {
   build(additionalAttr = ""): string {
     this.addAttributes(additionalAttr);
 
-    const classOrClassName = this.isJSX ? "className" : "class";
-    const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
+    if (this.name !== "") {
+      this.prependAttributes(stringToClassName(this.name));
+    }
+    const layerName = this.name ? ` data-layer="${this.name}"` : "";
+
+    const classLabel = getClassLabel(this.isJSX);
     const classNames =
       this.attributes.length > 0
-        ? ` ${classOrClassName}="${this.attributes.join(" ")}"`
+        ? ` ${classLabel}="${this.attributes.join(" ")}"`
         : "";
-    const layerName = this.name ? ` data-layer="${this.name}"` : "";
+    const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
 
     return `${layerName}${classNames}${styles}`;
   }

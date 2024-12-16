@@ -1,4 +1,7 @@
-import { className, generateWidgetCode } from "../common/numToAutoFixed";
+import {
+  stringToClassName,
+  generateWidgetCode,
+} from "../common/numToAutoFixed";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { FlutterTextBuilder } from "./flutterTextBuilder";
@@ -67,10 +70,10 @@ export const flutterMain = (
       return result;
     case "stateless":
       result = generateWidgetCode("Column", { children: [result] });
-      return getStatelessTemplate(className(sceneNode[0].name), result);
+      return getStatelessTemplate(stringToClassName(sceneNode[0].name), result);
     case "fullApp":
       result = generateWidgetCode("Column", { children: [result] });
-      return getFullAppTemplate(className(sceneNode[0].name), result);
+      return getFullAppTemplate(stringToClassName(sceneNode[0].name), result);
   }
 
   return result;

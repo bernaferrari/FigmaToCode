@@ -7,7 +7,6 @@ import {
   htmlBlendMode,
 } from "./builderImpl/htmlBlend";
 import {
-  htmlColor,
   htmlColorFromFills,
   htmlGradientFromFills,
 } from "./builderImpl/htmlColor";
@@ -18,8 +17,13 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { className, sliceNum } from "../common/numToAutoFixed";
+import { sliceNum, stringToClassName } from "../common/numToAutoFixed";
 import { commonStroke } from "../common/commonStroke";
+import {
+  formatClassAttribute,
+  formatLayerNameAttribute,
+  formatStyleAttribute,
+} from "../common/commonFormatAttributes";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
@@ -285,21 +289,14 @@ export class HtmlDefaultBuilder {
   build(additionalStyle: Array<string> = []): string {
     this.addStyles(...additionalStyle);
 
-    const styleAttribute = formatStyleAttribute(this.styles, this.isJSX);
     const layerNameAttribute = formatLayerNameAttribute(this.name);
+    const layerNameClass = stringToClassName(this.name);
+    const classAttribute = formatClassAttribute(
+      layerNameClass === "" ? [] : [layerNameClass],
+      this.isJSX,
+    );
+    const styleAttribute = formatStyleAttribute(this.styles, this.isJSX);
 
-    return `${layerNameAttribute}${styleAttribute}`;
+    return `${layerNameAttribute}${classAttribute}${styleAttribute}`;
   }
 }
-
-const formatStyleAttribute = (styles: string[], isJSX: boolean): string => {
-  const joiner = isJSX ? ", " : "; ";
-  const trimmedStyles = styles.map((s) => s.trim()).join(joiner);
-
-  if (trimmedStyles === "") return "";
-
-  return ` style=${isJSX ? `{{${trimmedStyles}}}` : `"${trimmedStyles}"`}`;
-};
-
-const formatLayerNameAttribute = (name: string) =>
-  name === "" ? "" : ` data-layer="${name}"`;
