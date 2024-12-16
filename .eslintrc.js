@@ -1,5 +1,5 @@
 const config = {
-  extends: ["kentcdodds", "kentcdodds/jest"],
+  extends: ["kentcdodds"],
   rules: {
     "valid-jsdoc": "off",
     "max-len": "off",
