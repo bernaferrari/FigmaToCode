@@ -25,15 +25,13 @@ export class HtmlDefaultBuilder {
   styles: Array<string>;
   isJSX: boolean;
   visible: boolean;
-  name: string = "";
+  name: string;
 
   constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
     this.styles = [];
     this.visible = node.visible;
-    if (showLayerNames) {
-      this.name = className(node.name);
-    }
+    this.name = showLayerNames ? node.name : "";
   }
 
   commonPositionStyles(
@@ -287,20 +285,21 @@ export class HtmlDefaultBuilder {
   build(additionalStyle: Array<string> = []): string {
     this.addStyles(...additionalStyle);
 
-    const formattedStyles = this.styles.map((s) => s.trim());
-    let formattedStyle = "";
-    if (this.styles.length > 0) {
-      if (this.isJSX) {
-        formattedStyle = ` style={{${formattedStyles.join(", ")}}}`;
-      } else {
-        formattedStyle = ` style="${formattedStyles.join("; ")}"`;
-      }
-    }
-    if (this.name.length > 0) {
-      const classOrClassName = this.isJSX ? "className" : "class";
-      return ` ${classOrClassName}="${this.name}"${formattedStyle}`;
-    } else {
-      return formattedStyle;
-    }
+    const styleAttribute = formatStyleAttribute(this.styles, this.isJSX);
+    const layerNameAttribute = formatLayerNameAttribute(this.name);
+
+    return `${layerNameAttribute}${styleAttribute}`;
   }
 }
+
+const formatStyleAttribute = (styles: string[], isJSX: boolean): string => {
+  const joiner = isJSX ? ", " : "; ";
+  const trimmedStyles = styles.map((s) => s.trim()).join(joiner);
+
+  if (trimmedStyles === "") return "";
+
+  return ` style=${isJSX ? `{{${trimmedStyles}}}` : `"${trimmedStyles}"`}`;
+};
+
+const formatLayerNameAttribute = (name: string) =>
+  name === "" ? "" : ` data-layer="${name}"`;

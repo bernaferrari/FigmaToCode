@@ -22,27 +22,33 @@ import {
 } from "../common/commonPosition";
 import { pxToBlur } from "./conversionTables";
 
+const isNotEmpty = (s: string) => s !== "";
+const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
+
 export class TailwindDefaultBuilder {
   attributes: string[] = [];
   style: string;
   styleSeparator: string = "";
   isJSX: boolean;
   visible: boolean;
-  name: string = "";
+  name: string;
 
   constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = "";
     this.visible = node.visible;
+    this.name = showLayerNames ? node.name : "";
 
+    /*
     if (showLayerNames) {
       this.attributes.push(className(node.name));
     }
+    */
   }
 
   addAttributes = (...newStyles: string[]) => {
-    this.attributes.push(...newStyles.filter((style) => style !== ""));
+    this.attributes.push(...dropEmptyStrings(newStyles));
   };
 
   blend(
@@ -224,21 +230,17 @@ export class TailwindDefaultBuilder {
   }
 
   build(additionalAttr = ""): string {
-    // this.attributes.unshift(this.name + additionalAttr);
     this.addAttributes(additionalAttr);
 
-    if (this.style.length > 0) {
-      this.style = ` style="${this.style}"`;
-    }
-    if (!this.attributes.length && !this.style) {
-      return "";
-    }
     const classOrClassName = this.isJSX ? "className" : "class";
-    if (this.attributes.length === 0) {
-      return "";
-    }
+    const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
+    const classNames =
+      this.attributes.length > 0
+        ? ` ${classOrClassName}="${this.attributes.join(" ")}"`
+        : "";
+    const layerName = this.name ? ` data-layer="${this.name}"` : "";
 
-    return ` ${classOrClassName}="${this.attributes.join(" ")}"${this.style}`;
+    return `${layerName}${classNames}${styles}`;
   }
 
   reset(): void {
