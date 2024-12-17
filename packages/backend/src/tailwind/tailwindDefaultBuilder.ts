@@ -216,7 +216,9 @@ export class TailwindDefaultBuilder {
       if (blur) {
         const blurValue = pxToBlur(blur.radius);
         if (blurValue) {
-          this.addAttributes(`blur${blurValue ? `-${blurValue}` : ""}`);
+          this.addAttributes(
+            blurValue === "blur" ? "blur" : `blur-${blurValue}`
+          ); // If blur value is 8, it will be "blur". Otherwise, it will be "blur-sm", "blur-md", etc. or "blur-[Xpx]"
         }
       }
 
