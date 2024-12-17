@@ -90,7 +90,7 @@ const letterSpacing = {
 const blur = {
   0: "none",
   4: "sm",
-  8: "",
+  8: "blur", // This is not the official Tailwind class name suffix, but currently needed for the blurValue variable to work.
   12: "md",
   16: "lg",
   24: "xl",
@@ -347,6 +347,48 @@ const color: Record<string, string> = {
   "#4c0519": "rose-950",
 };
 
+const fontWeight: Record<number, string> = {
+  100: "thin",
+  200: "extralight",
+  300: "light",
+  400: "normal",
+  500: "medium",
+  600: "semibold",
+  700: "bold",
+  800: "extrabold",
+  900: "black"
+};
+
+const fontFamily = {
+  sans: [
+    'ui-sans-serif',
+    'system-ui',
+    'sans-serif',
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol',
+    'Noto Color Emoji'
+  ],
+  serif: [
+    'ui-serif',
+    'Georgia',
+    'Cambria',
+    'Times New Roman',
+    'Times',
+    'serif'
+  ],
+  mono: [
+    'ui-monospace',
+    'SFMono-Regular',
+    'Menlo',
+    'Monaco',
+    'Consolas',
+    'Liberation Mono',
+    'Courier New',
+    'monospace'
+  ]
+};
+
 export const config = {
   layoutSize,
   borderRadius,
@@ -356,4 +398,6 @@ export const config = {
   blur,
   opacity,
   color,
+  fontWeight,
+  fontFamily,
 };

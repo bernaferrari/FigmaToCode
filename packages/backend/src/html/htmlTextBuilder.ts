@@ -8,8 +8,8 @@ import {
 } from "../common/commonTextHeightSpacing";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
-  constructor(node: TextNode, showLayerName: boolean, optIsJSX: boolean) {
-    super(node, showLayerName, optIsJSX);
+  constructor(node: TextNode, showLayerNames: boolean, optIsJSX: boolean) {
+    super(node, showLayerNames, optIsJSX);
   }
 
   getTextSegments(id: string): { style: string; text: string }[] {

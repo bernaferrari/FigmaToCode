@@ -7,8 +7,7 @@
   "main": "./src/index.tsx",
   "types": "./src/index.tsx",
   "scripts": {
-    "lint": "eslint \"src/**/*.ts*\"",
-    "test": "jest"
+    "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
     "copy-to-clipboard": "^3.3.3",

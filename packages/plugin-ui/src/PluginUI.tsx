@@ -11,7 +11,7 @@ export type PluginSettings = {
   jsx: boolean;
   inlineStyle: boolean;
   optimizeLayout: boolean;
-  layerName: boolean;
+  showLayerNames: boolean;
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
@@ -202,7 +202,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
   },
   {
     itemType: "individual_select",
-    propertyName: "layerName",
+    propertyName: "showLayerNames",
     label: "Layer names",
     description: "Include layer names in classes",
     isDefault: false,

@@ -86,7 +86,7 @@ function escapeRegExp(string: string) {
 export const replaceAllUtil = (str: string, find: string, replace: string) =>
   str.replace(new RegExp(escapeRegExp(find), "g"), replace);
 
-export function className(name: string): string {
+export function stringToClassName(name: string): string {
   const words = name.split(/[^a-zA-Z0-9]+/);
   const camelCaseWords = words.map((word, index) => {
     if (index === 0) {

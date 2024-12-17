@@ -10,6 +10,7 @@ import {
   pxToLineHeight,
 } from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+import { config } from "./tailwindConfig";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
   getTextSegments(id: string): { style: string; text: string }[] {
@@ -65,28 +66,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   };
 
   fontWeight = (fontWeight: number): string => {
-    switch (fontWeight) {
-      case 100:
-        return "font-thin";
-      case 200:
-        return "font-extralight";
-      case 300:
-        return "font-light";
-      case 400:
-        return "font-normal";
-      case 500:
-        return "font-medium";
-      case 600:
-        return "font-semibold";
-      case 700:
-        return "font-bold";
-      case 800:
-        return "font-extrabold";
-      case 900:
-        return "font-black";
-      default:
-        return "";
-    }
+    const weight = config.fontWeight[fontWeight];
+    return weight ? `font-${weight}` : "";
   };
 
   indentStyle = (indentation: number) => {
@@ -97,6 +78,16 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   };
 
   fontFamily = (fontName: FontName): string => {
+    if (config.fontFamily.sans.includes(fontName.family)) {
+      return 'font-sans';
+    }
+    if (config.fontFamily.serif.includes(fontName.family)) {
+      return 'font-serif';
+    }
+    if (config.fontFamily.mono.includes(fontName.family)) {
+      return 'font-mono';
+    }
+
     return "font-['" + fontName.family + "']";
   };
 

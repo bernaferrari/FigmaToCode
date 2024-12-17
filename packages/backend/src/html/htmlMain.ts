@@ -7,7 +7,7 @@ import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 
-let showLayerName = false;
+let showLayerNames = false;
 
 const selfClosingTags = ["img"];
 
@@ -21,7 +21,7 @@ export const htmlMain = (
   settings: PluginSettings,
   isPreview: boolean = false,
 ): string => {
-  showLayerName = settings.layerName;
+  showLayerNames = settings.showLayerNames;
   isPreviewGlobal = isPreview;
   previousExecutionCache = [];
   localSettings = settings;
@@ -95,7 +95,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
   // this needs to be called after CustomNode because widthHeight depends on it
   const builder = new HtmlDefaultBuilder(
     node,
-    showLayerName,
+    showLayerNames,
     isJsx,
   ).commonPositionStyles(node, localSettings.optimizeLayout);
 
@@ -112,7 +112,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
 
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
 export const htmlText = (node: TextNode, isJsx: boolean): string => {
-  let layoutBuilder = new HtmlTextBuilder(node, showLayerName, isJsx)
+  let layoutBuilder = new HtmlTextBuilder(node, showLayerNames, isJsx)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .textAlign(node);
 
@@ -168,7 +168,7 @@ export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
     return "";
   }
 
-  const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
+  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .commonShapeStyles(node);
 
@@ -208,7 +208,7 @@ export const htmlContainer = (
     return children;
   }
 
-  const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
+  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .commonShapeStyles(node);
 
@@ -253,7 +253,7 @@ export const htmlSection = (
   isJsx: boolean = false,
 ): string => {
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
-  const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
+  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .size(node, localSettings.optimizeLayout)
     .position(node, localSettings.optimizeLayout)
     .applyFillsToStyle(node.fills, "background");
@@ -266,7 +266,7 @@ export const htmlSection = (
 };
 
 export const htmlLine = (node: LineNode, isJsx: boolean): string => {
-  const builder = new HtmlDefaultBuilder(node, showLayerName, isJsx)
+  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .commonShapeStyles(node);
 

@@ -1,4 +1,4 @@
-import { className, sliceNum } from "./../common/numToAutoFixed";
+import { stringToClassName, sliceNum } from "./../common/numToAutoFixed";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   tailwindVisibility,
@@ -21,6 +21,13 @@ import {
   getCommonPositionValue,
 } from "../common/commonPosition";
 import { pxToBlur } from "./conversionTables";
+import {
+  getClassLabel,
+  formatStyleAttribute,
+} from "../common/commonFormatAttributes";
+
+const isNotEmpty = (s: string) => s !== "";
+const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
 
 export class TailwindDefaultBuilder {
   attributes: string[] = [];
@@ -28,21 +35,27 @@ export class TailwindDefaultBuilder {
   styleSeparator: string = "";
   isJSX: boolean;
   visible: boolean;
-  name: string = "";
+  name: string;
 
-  constructor(node: SceneNode, showLayerName: boolean, optIsJSX: boolean) {
+  constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = "";
     this.visible = node.visible;
+    this.name = showLayerNames ? node.name : "";
 
-    if (showLayerName) {
+    /*
+    if (showLayerNames) {
       this.attributes.push(className(node.name));
     }
+    */
   }
 
   addAttributes = (...newStyles: string[]) => {
-    this.attributes.push(...newStyles.filter((style) => style !== ""));
+    this.attributes.push(...dropEmptyStrings(newStyles));
+  };
+  prependAttributes = (...newStyles: string[]) => {
+    this.attributes.unshift(...dropEmptyStrings(newStyles));
   };
 
   blend(
@@ -203,7 +216,9 @@ export class TailwindDefaultBuilder {
       if (blur) {
         const blurValue = pxToBlur(blur.radius);
         if (blurValue) {
-          this.addAttributes(`blur${blurValue ? `-${blurValue}` : ""}`);
+          this.addAttributes(
+            blurValue === "blur" ? "blur" : `blur-${blurValue}`
+          ); // If blur value is 8, it will be "blur". Otherwise, it will be "blur-sm", "blur-md", etc. or "blur-[Xpx]"
         }
       }
 
@@ -224,21 +239,21 @@ export class TailwindDefaultBuilder {
   }
 
   build(additionalAttr = ""): string {
-    // this.attributes.unshift(this.name + additionalAttr);
     this.addAttributes(additionalAttr);
 
-    if (this.style.length > 0) {
-      this.style = ` style="${this.style}"`;
+    if (this.name !== "") {
+      this.prependAttributes(stringToClassName(this.name));
     }
-    if (!this.attributes.length && !this.style) {
-      return "";
-    }
-    const classOrClassName = this.isJSX ? "className" : "class";
-    if (this.attributes.length === 0) {
-      return "";
-    }
+    const layerName = this.name ? ` data-layer="${this.name}"` : "";
 
-    return ` ${classOrClassName}="${this.attributes.join(" ")}"${this.style}`;
+    const classLabel = getClassLabel(this.isJSX);
+    const classNames =
+      this.attributes.length > 0
+        ? ` ${classLabel}="${this.attributes.join(" ")}"`
+        : "";
+    const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
+
+    return `${layerName}${classNames}${styles}`;
   }
 
   reset(): void {

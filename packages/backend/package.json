@@ -10,8 +10,7 @@
     "dist/**"
   ],
   "scripts": {
-    "lint": "eslint \"src/**/*.ts*\"",
-    "test": "jest"
+    "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
     "@figma/plugin-typings": "^1.97.0",

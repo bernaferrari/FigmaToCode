@@ -1,5 +1,5 @@
 import { indentString } from "../common/indentString";
-import { className, sliceNum } from "../common/numToAutoFixed";
+import { stringToClassName, sliceNum } from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { PluginSettings } from "../code";
@@ -43,10 +43,10 @@ export const swiftuiMain = (
       return result;
     case "struct":
       // result = generateWidgetCode("Column", { children: [result] });
-      return getStructTemplate(className(sceneNode[0].name), result);
+      return getStructTemplate(stringToClassName(sceneNode[0].name), result);
     case "preview":
       // result = generateWidgetCode("Column", { children: [result] });
-      return getPreviewTemplate(className(sceneNode[0].name), result);
+      return getPreviewTemplate(stringToClassName(sceneNode[0].name), result);
   }
 
   // remove the initial \n that is made in Container.

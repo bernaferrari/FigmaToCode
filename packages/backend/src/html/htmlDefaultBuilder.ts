@@ -7,7 +7,6 @@ import {
   htmlBlendMode,
 } from "./builderImpl/htmlBlend";
 import {
-  htmlColor,
   htmlColorFromFills,
   htmlGradientFromFills,
 } from "./builderImpl/htmlColor";
@@ -18,22 +17,25 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { className, sliceNum } from "../common/numToAutoFixed";
+import { sliceNum, stringToClassName } from "../common/numToAutoFixed";
 import { commonStroke } from "../common/commonStroke";
+import {
+  formatClassAttribute,
+  formatLayerNameAttribute,
+  formatStyleAttribute,
+} from "../common/commonFormatAttributes";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
   isJSX: boolean;
   visible: boolean;
-  name: string = "";
+  name: string;
 
-  constructor(node: SceneNode, showLayerName: boolean, optIsJSX: boolean) {
+  constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
     this.styles = [];
     this.visible = node.visible;
-    if (showLayerName) {
-      this.name = className(node.name);
-    }
+    this.name = showLayerNames ? node.name : "";
   }
 
   commonPositionStyles(
@@ -287,20 +289,14 @@ export class HtmlDefaultBuilder {
   build(additionalStyle: Array<string> = []): string {
     this.addStyles(...additionalStyle);
 
-    const formattedStyles = this.styles.map((s) => s.trim());
-    let formattedStyle = "";
-    if (this.styles.length > 0) {
-      if (this.isJSX) {
-        formattedStyle = ` style={{${formattedStyles.join(", ")}}}`;
-      } else {
-        formattedStyle = ` style="${formattedStyles.join("; ")}"`;
-      }
-    }
-    if (this.name.length > 0) {
-      const classOrClassName = this.isJSX ? "className" : "class";
-      return ` ${classOrClassName}="${this.name}"${formattedStyle}`;
-    } else {
-      return formattedStyle;
-    }
+    const layerNameAttribute = formatLayerNameAttribute(this.name);
+    const layerNameClass = stringToClassName(this.name);
+    const classAttribute = formatClassAttribute(
+      layerNameClass === "" ? [] : [layerNameClass],
+      this.isJSX,
+    );
+    const styleAttribute = formatStyleAttribute(this.styles, this.isJSX);
+
+    return `${layerNameAttribute}${classAttribute}${styleAttribute}`;
   }
 }
