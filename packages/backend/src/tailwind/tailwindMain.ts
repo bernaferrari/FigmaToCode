@@ -146,21 +146,24 @@ const tailwindFrame = (
     isJsx,
   );
 
+  // Add overflow-hidden class if clipsContent is true
+  const clipsContentClass = node.clipsContent ? " overflow-hidden" : "";
+
   if (node.layoutMode !== "NONE") {
     const rowColumn = tailwindAutoLayoutProps(node, node);
-    return tailwindContainer(node, childrenStr, rowColumn, isJsx);
+    return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
   } else {
     if (
       localTailwindSettings.optimizeLayout &&
       node.inferredAutoLayout !== null
     ) {
       const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
-      return tailwindContainer(node, childrenStr, rowColumn, isJsx);
+      return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
     }
 
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return tailwindContainer(node, childrenStr, "", isJsx);
+    return tailwindContainer(node, childrenStr, clipsContentClass, isJsx);
   }
 };
 
