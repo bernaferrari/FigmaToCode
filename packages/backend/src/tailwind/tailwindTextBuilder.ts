@@ -10,6 +10,7 @@ import {
   pxToLineHeight,
 } from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
+import { config } from "./tailwindConfig";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
   getTextSegments(id: string): { style: string; text: string }[] {
@@ -65,28 +66,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   };
 
   fontWeight = (fontWeight: number): string => {
-    switch (fontWeight) {
-      case 100:
-        return "font-thin";
-      case 200:
-        return "font-extralight";
-      case 300:
-        return "font-light";
-      case 400:
-        return "font-normal";
-      case 500:
-        return "font-medium";
-      case 600:
-        return "font-semibold";
-      case 700:
-        return "font-bold";
-      case 800:
-        return "font-extrabold";
-      case 900:
-        return "font-black";
-      default:
-        return "";
-    }
+    const weight = config.fontWeight[fontWeight];
+    return weight ? `font-${weight}` : "";
   };
 
   indentStyle = (indentation: number) => {
@@ -97,43 +78,13 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   };
 
   fontFamily = (fontName: FontName): string => {
-    const sansSerif = [
-      'ui-sans-serif',
-      'system-ui',
-      'sans-serif',
-      'Apple Color Emoji',
-      'Segoe UI Emoji',
-      'Segoe UI Symbol',
-      'Noto Color Emoji'
-    ];
-
-    const serif = [
-      'ui-serif',
-      'Georgia',
-      'Cambria',
-      'Times New Roman',
-      'Times',
-      'serif'
-    ];
-
-    const mono = [
-      'ui-monospace',
-      'SFMono-Regular',
-      'Menlo',
-      'Monaco',
-      'Consolas',
-      'Liberation Mono',
-      'Courier New',
-      'monospace'
-    ];
-
-    if (sansSerif.includes(fontName.family)) {
+    if (config.fontFamily.sans.includes(fontName.family)) {
       return 'font-sans';
     }
-    if (serif.includes(fontName.family)) {
+    if (config.fontFamily.serif.includes(fontName.family)) {
       return 'font-serif';
     }
-    if (mono.includes(fontName.family)) {
+    if (config.fontFamily.mono.includes(fontName.family)) {
       return 'font-mono';
     }
 

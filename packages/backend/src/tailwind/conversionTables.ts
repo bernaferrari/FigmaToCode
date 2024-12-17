@@ -132,6 +132,25 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
   let hex: string = "#" + rgbTo6hex(fill.color);
   let meta: string = "";
 
+  // Check for pure black/white first
+  if (fill.color.r === 0 && fill.color.g === 0 && fill.color.b === 0) {
+    return {
+      colorType: "tailwind",
+      colorName: "black",
+      hex: "#000000",
+      meta: ''
+    };
+  }
+
+  if (fill.color.r === 1 && fill.color.g === 1 && fill.color.b === 1) {
+    return {
+      colorType: "tailwind", 
+      colorName: "white",
+      hex: "#ffffff",
+      meta: ''
+    };
+  }
+
   // variable
   if (
     localTailwindSettings.customTailwindColors &&
