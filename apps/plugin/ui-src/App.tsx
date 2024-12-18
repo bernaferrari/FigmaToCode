@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+<<<<<<< HEAD
 import { PluginUI } from "plugin-ui";
 import {
   FrameworkTypes,
@@ -12,15 +13,36 @@ import {
   SettingsChangedMessage,
 } from "types";
 import { postUISettingsChangingMessage } from "./messaging";
+=======
+import { FrameworkTypes, PluginSettings, PluginUI } from "plugin-ui";
+import { Warnings } from "backend/src/common/commonConversionWarnings";
+>>>>>>> 4f01feb (Added a method for recording and displaying warnings when doing conversions.)
 
 interface AppState {
   code: string;
   selectedFramework: FrameworkTypes;
   isLoading: boolean;
+<<<<<<< HEAD
   htmlPreview: HTMLPreview;
   settings: PluginSettings | null;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
+=======
+  htmlPreview: {
+    size: { width: number; height: number };
+    content: string;
+  } | null;
+  preferences: PluginSettings | null;
+  colors: {
+    hex: string;
+    colorName: string;
+    exportValue: string;
+    contrastWhite: number;
+    contrastBlack: number;
+  }[];
+  gradients: { cssPreview: string; exportedValue: string }[];
+  warnings: string[];
+>>>>>>> 4f01feb (Added a method for recording and displaying warnings when doing conversions.)
 }
 
 const emptyPreview = { size: { width: 0, height: 0 }, content: "" };
@@ -33,6 +55,7 @@ export default function App() {
     settings: null,
     colors: [],
     gradients: [],
+    warnings: [],
   });
 
   const rootStyles = getComputedStyle(document.documentElement);
@@ -50,8 +73,18 @@ export default function App() {
           const conversionMessage = untypedMessage as ConversionMessage;
           setState((prevState) => ({
             ...prevState,
+<<<<<<< HEAD
             ...conversionMessage,
             selectedFramework: conversionMessage.settings.framework,
+=======
+            code: message.data,
+            htmlPreview: message.htmlPreview,
+            colors: message.colors,
+            gradients: message.gradients,
+            preferences: message.preferences,
+            selectedFramework: message.preferences.framework,
+            warnings: message.warnings,
+>>>>>>> 4f01feb (Added a method for recording and displaying warnings when doing conversions.)
           }));
           break;
 
@@ -68,8 +101,14 @@ export default function App() {
           // const emptyMessage = untypedMessage as EmptyMessage;
           setState((prevState) => ({
             ...prevState,
+<<<<<<< HEAD
             code: "// No layer is selected.",
             htmlPreview: emptyPreview,
+=======
+            code: "",
+            warnings: [],
+            htmlPreview: null,
+>>>>>>> 4f01feb (Added a method for recording and displaying warnings when doing conversions.)
             colors: [],
             gradients: [],
           }));
@@ -131,6 +170,7 @@ export default function App() {
     <div className={`${figmaColorBgValue === "#ffffff" ? "" : "dark"}`}>
       <PluginUI
         code={state.code}
+        warnings={state.warnings}
         emptySelection={false}
         selectedFramework={state.selectedFramework}
         setSelectedFramework={handleFrameworkChange}
