@@ -80,11 +80,11 @@ export default function Web() {
         </div>
       </div>
 
-      <div className="w-1/2">
+      <div className="min-w-1/2">
         <h3 className="text-lg">HTML Output Tester (No JSX)</h3>
         <textarea
           placeholder="Paste generated HTML snippet here"
-          className="border-black border-2 p-2 w-full min-h-10"
+          className="border-black border-2 p-2 w-1/2 min-h-10"
           onChange={(e) => {
             const preview = document.getElementById("preview");
             if (preview) {
@@ -94,7 +94,7 @@ export default function Web() {
         ></textarea>
         <div
           id="preview"
-          className="border-black border-2 p-2 min-w-24 min-h-10"
+          className="border-black border-2 p-2 min-w-24 w-full min-h-10"
         >
           Empty
         </div>
