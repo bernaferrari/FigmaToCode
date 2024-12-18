@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FrameworkTypes, PluginSettings, PluginUI } from "plugin-ui";
+import { Warnings } from "backend/src/common/commonConversionWarnings";
 
 interface AppState {
   code: string;
@@ -18,6 +19,7 @@ interface AppState {
     contrastBlack: number;
   }[];
   gradients: { cssPreview: string; exportedValue: string }[];
+  warnings: string[];
 }
 
 export default function App() {
@@ -29,6 +31,7 @@ export default function App() {
     preferences: null,
     colors: [],
     gradients: [],
+    warnings: [],
   });
 
   const rootStyles = getComputedStyle(document.documentElement);
@@ -50,6 +53,7 @@ export default function App() {
             gradients: message.gradients,
             preferences: message.preferences,
             selectedFramework: message.preferences.framework,
+            warnings: message.warnings,
           }));
           break;
         case "pluginSettingChanged":
@@ -62,7 +66,8 @@ export default function App() {
         case "empty":
           setState((prevState) => ({
             ...prevState,
-            code: "// No layer is selected.",
+            code: "",
+            warnings: [],
             htmlPreview: null,
             colors: [],
             gradients: [],
@@ -130,6 +135,7 @@ export default function App() {
     <div className={`${figmaColorBgValue === "#ffffff" ? "" : "dark"}`}>
       <PluginUI
         code={state.code}
+        warnings={state.warnings}
         emptySelection={false}
         selectedFramework={state.selectedFramework}
         setSelectedFramework={handleFrameworkChange}

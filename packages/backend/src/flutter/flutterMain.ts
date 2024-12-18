@@ -12,6 +12,7 @@ import {
   getMainAxisAlignment,
 } from "./builderImpl/flutterAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { addWarning } from "../common/commonConversionWarnings";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -112,6 +113,9 @@ const flutterWidgetGenerator = (
       case "TEXT":
         comp.push(flutterText(node));
         break;
+      case "VECTOR":
+        addWarning("VectorNodes are not supported in Flutter");
+        break;
       default:
       // do nothing
     }
@@ -142,6 +146,7 @@ const flutterContainer = (node: SceneNode, child: string): string => {
 
   let image = "";
   if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
+    addWarning("Image fills are replaced with placeholders");
     image = `Image.network("https://via.placeholder.com/${node.width.toFixed(
       0,
     )}x${node.height.toFixed(0)}")`;

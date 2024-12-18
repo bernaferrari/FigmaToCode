@@ -5,6 +5,8 @@ export default function Web() {
   const [selectedFramework, setSelectedFramework] =
     React.useState<FrameworkTypes>("HTML");
 
+  const testWarnings = ["This is an example of a conversion warning message."];
+
   return (
     <div className="flex flex-col p-8 space-y-2">
       <p className="text-3xl font-bold">Debug Mode</p>
@@ -26,6 +28,7 @@ export default function Web() {
               onPreferenceChange={() => {}}
               colors={[]}
               gradients={[]}
+              warnings={testWarnings}
             />
           </div>
         </div>
@@ -43,6 +46,7 @@ export default function Web() {
               onPreferenceChange={() => {}}
               colors={[]}
               gradients={[]}
+              warnings={testWarnings}
             />
           </div>
         </div>

@@ -22,6 +22,7 @@ export type PluginSettings = {
 
 type PluginUIProps = {
   code: string;
+  warnings: string[];
   htmlPreview: {
     size: { width: number; height: number };
     content: string;
@@ -41,13 +42,17 @@ type PluginUIProps = {
   gradients: { cssPreview: string; exportValue: string }[];
 };
 
+const frameworks: FrameworkTypes[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
+
 export const PluginUI = (props: PluginUIProps) => {
   const [isResponsiveExpanded, setIsResponsiveExpanded] = useState(false);
+
+  const warnings = props.warnings ?? [];
 
   return (
     <div className="flex flex-col h-full dark:text-white">
       <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
-        {["HTML", "Tailwind", "Flutter", "SwiftUI"].map((tab) => (
+        {frameworks.map((tab) => (
           <button
             key={`tab ${tab}`}
             className={`w-full p-1 text-sm ${
@@ -90,6 +95,18 @@ export const PluginUI = (props: PluginUIProps) => {
             Copy
           </button>
         </div> */}
+          {warnings.length > 0 && (
+            <div className="flex flex-col bg-red-700 text-white p-4 w-full">
+              <h3 className="text-lg">Warnings:</h3>
+              <ul className="list-disc list-inside">
+                {warnings.map((message: string) => (
+                  <li className="list-item">
+                    <em>{message}</em>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <CodePanel
             code={props.code}
             selectedFramework={props.selectedFramework}
@@ -282,7 +299,8 @@ export const CodePanel = (props: {
   preferences: PluginSettings | null;
   onPreferenceChange: (key: string, value: boolean | string) => void;
 }) => {
-  const emptySelection = false;
+  const emptyCodeMessage = "// No layer is selected.";
+  const isEmpty = props.code === "";
   const [isPressed, setIsPressed] = useState(false);
   const [syntaxHovered, setSyntaxHovered] = useState(false);
 
@@ -296,25 +314,18 @@ export const CodePanel = (props: {
   const handleButtonHover = () => setSyntaxHovered(true);
   const handleButtonLeave = () => setSyntaxHovered(false);
 
-  if (emptySelection) {
-    return (
-      <div className="flex flex-col space-y-2 m-auto items-center justify-center p-4 {sectionStyle}">
-        <p className="text-lg font-bold">Nothing is selected</p>
-        <p className="text-xs">Try selecting a layer, any layer</p>
-      </div>
-    );
-  } else {
-    const selectablePreferencesFiltered = selectPreferenceOptions.filter(
-      (preference) =>
-        preference.includedLanguages?.includes(props.selectedFramework),
-    );
+  const selectablePreferencesFiltered = selectPreferenceOptions.filter(
+    (preference) =>
+      preference.includedLanguages?.includes(props.selectedFramework),
+  );
 
-    return (
-      <div className="w-full flex flex-col gap-2 mt-2">
-        <div className="flex items-center justify-between w-full">
-          <p className="text-lg font-medium text-center dark:text-white rounded-lg">
-            Code
-          </p>
+  return (
+    <div className="w-full flex flex-col gap-2 mt-2">
+      <div className="flex items-center justify-between w-full">
+        <p className="text-lg font-medium text-center dark:text-white rounded-lg">
+          Code
+        </p>
+        {isEmpty === false && (
           <button
             className={`px-4 py-1 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${
               isPressed
@@ -327,8 +338,9 @@ export const CodePanel = (props: {
           >
             Copy
           </button>
-        </div>
-
+        )}
+      </div>
+      {isEmpty === false && (
         <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
           <div className="flex gap-2 items-center flex-wrap">
             {/* <span className="min-w-[60px] font-medium">Settings</span> */}
@@ -363,7 +375,7 @@ export const CodePanel = (props: {
                   <>
                     {/* <span className="min-w-[60px] font-medium">
                       {preference.label}
-                    </span> */}
+                      </span> */}
                     {preference.options.map((option) => (
                       <SelectableToggle
                         key={option.label}
@@ -389,32 +401,32 @@ export const CodePanel = (props: {
             </>
           )}
         </div>
+      )}
 
-        <div
-          className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
-            syntaxHovered ? "ring-2" : "ring-0"
-          }`}
+      <div
+        className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
+          syntaxHovered ? "ring-2" : "ring-0"
+        }`}
+      >
+        <SyntaxHighlighter
+          language="dart"
+          style={theme}
+          customStyle={{
+            fontSize: 12,
+            borderRadius: 8,
+            marginTop: 0,
+            marginBottom: 0,
+            backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
+            transitionProperty: "all",
+            transitionTimingFunction: "ease",
+            transitionDuration: "0.2s",
+          }}
         >
-          <SyntaxHighlighter
-            language="dart"
-            style={theme}
-            customStyle={{
-              fontSize: 12,
-              borderRadius: 8,
-              marginTop: 0,
-              marginBottom: 0,
-              backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
-              transitionProperty: "all",
-              transitionTimingFunction: "ease",
-              transitionDuration: "0.2s",
-            }}
-          >
-            {props.code}
-          </SyntaxHighlighter>
-        </div>
+          {props.code || emptyCodeMessage}
+        </SyntaxHighlighter>
       </div>
-    );
-  }
+    </div>
+  );
 };
 
 export const ColorsPanel = (props: {

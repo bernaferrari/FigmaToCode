@@ -4,6 +4,7 @@ import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { addWarning } from "../common/commonConversionWarnings";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -84,6 +85,9 @@ const swiftuiWidgetGenerator = (
         break;
       case "TEXT":
         comp.push(swiftuiText(node));
+        break;
+      case "VECTOR":
+        addWarning("VectorNodes are not supported in SwiftUI");
         break;
       default:
         break;

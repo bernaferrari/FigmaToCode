@@ -154,6 +154,7 @@ export const convertIntoNodes = (
           "textDecoration",
           "textStyleId",
           "fillStyleId",
+          "openTypeFeatures",
         ]);
         return standardClone(node, parent);
       case "STAR":

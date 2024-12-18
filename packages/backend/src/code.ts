@@ -7,6 +7,7 @@ import { flutterMain } from "./flutter/flutterMain";
 import { htmlMain } from "./html/htmlMain";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
+import { clearWarnings, warnings } from "./common/commonConversionWarnings";
 
 export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 
@@ -25,6 +26,8 @@ export type PluginSettings = {
 };
 
 export const run = (settings: PluginSettings) => {
+  clearWarnings();
+
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
@@ -77,6 +80,7 @@ export const run = (settings: PluginSettings) => {
     colors: retrieveGenericSolidUIColors(settings.framework),
     gradients: retrieveGenericGradients(settings.framework),
     preferences: settings,
+    warnings: [...warnings],
     // text: retrieveTailwindText(convertedSelection),
   });
 };

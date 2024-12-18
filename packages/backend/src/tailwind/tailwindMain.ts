@@ -6,6 +6,7 @@ import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { PluginSettings } from "../code";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { addWarning } from "../common/commonConversionWarnings";
 
 export let localTailwindSettings: PluginSettings;
 
@@ -63,7 +64,9 @@ const tailwindWidgetGenerator = (
       case "SECTION":
         comp += tailwindSection(node, isJsx);
         break;
-      // case "VECTOR":
+      case "VECTOR":
+        addWarning("VectorNodes are not supported in Tailwind");
+        break;
       //   comp += htmlAsset(node, isJsx);
     }
   });
@@ -151,14 +154,24 @@ const tailwindFrame = (
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = tailwindAutoLayoutProps(node, node);
-    return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
+    return tailwindContainer(
+      node,
+      childrenStr,
+      rowColumn + clipsContentClass,
+      isJsx,
+    );
   } else {
     if (
       localTailwindSettings.optimizeLayout &&
       node.inferredAutoLayout !== null
     ) {
       const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
-      return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
+      return tailwindContainer(
+        node,
+        childrenStr,
+        rowColumn + clipsContentClass,
+        isJsx,
+      );
     }
 
     // node.layoutMode === "NONE" && node.children.length > 1
@@ -202,6 +215,7 @@ export const tailwindContainer = (
     let tag = "div";
     let src = "";
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
+      addWarning("Image fills are replaced with placeholders");
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
         src = ` src="https://via.placeholder.com/${node.width.toFixed(
