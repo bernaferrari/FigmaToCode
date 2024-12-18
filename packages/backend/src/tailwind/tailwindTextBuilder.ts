@@ -13,7 +13,11 @@ import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { config } from "./tailwindConfig";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
-  getTextSegments(id: string): { style: string; text: string }[] {
+  getTextSegments(id: string): {
+    style: string;
+    text: string;
+    openTypeFeatures: { [key: string]: boolean };
+  }[] {
     const segments = globalTextStyleSegments[id];
     if (!segments) {
       return [];
@@ -48,7 +52,11 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         .join(" ");
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
-      return { style: styleClasses, text: charsWithLineBreak };
+      return {
+        style: styleClasses,
+        text: charsWithLineBreak,
+        openTypeFeatures: segment.openTypeFeatures,
+      };
     });
   }
 
@@ -79,13 +87,13 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
 
   fontFamily = (fontName: FontName): string => {
     if (config.fontFamily.sans.includes(fontName.family)) {
-      return 'font-sans';
+      return "font-sans";
     }
     if (config.fontFamily.serif.includes(fontName.family)) {
-      return 'font-serif';
+      return "font-serif";
     }
     if (config.fontFamily.mono.includes(fontName.family)) {
-      return 'font-mono';
+      return "font-mono";
     }
 
     return "font-['" + fontName.family + "']";

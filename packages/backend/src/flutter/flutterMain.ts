@@ -225,7 +225,7 @@ const addSpacingIfNeeded = (
   const nodeParentLayout =
     optimizeLayout && node.parent && "itemSpacing" in node.parent
       ? node.parent.inferredAutoLayout
-      : (null ?? node.parent);
+      : node.parent;
 
   if (
     nodeParentLayout &&
