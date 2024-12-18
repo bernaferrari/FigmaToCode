@@ -54,10 +54,16 @@ export class HtmlDefaultBuilder {
       node.fills,
       node.type === "TEXT" ? "text" : "background",
     );
-    this.shadow(node);
     this.border(node);
+    this.commonEffectStyles(node);
+    return this;
+  }
+
+  commonEffectStyles(node: GeometryMixin & SceneNode): this {
+    this.shadow(node);
     this.blur(node);
     return this;
+    1;
   }
 
   addStyles = (...newStyles: string[]) => {

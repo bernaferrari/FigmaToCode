@@ -24,7 +24,7 @@ export type PluginSettings = {
   customTailwindColors: boolean;
 };
 
-export const run = (settings: PluginSettings) => {
+export const run = async (settings: PluginSettings) => {
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
@@ -33,7 +33,7 @@ export const run = (settings: PluginSettings) => {
     return;
   }
 
-  const convertedSelection = convertIntoNodes(
+  const convertedSelection = await convertIntoNodes(
     figma.currentPage.selection,
     null,
   );
