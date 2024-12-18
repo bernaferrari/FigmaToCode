@@ -1,11 +1,11 @@
 import { retrieveTopFill } from "../common/retrieveFill";
 import { indentString } from "../common/indentString";
-import { tailwindVector } from "./vector";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { PluginSettings } from "../code";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { SVGNode } from "../altNodes/altConversion";
 
 export let localTailwindSettings: PluginSettings;
 
@@ -62,6 +62,9 @@ const tailwindWidgetGenerator = (
         break;
       case "SECTION":
         comp += tailwindSection(node, isJsx);
+        break;
+      case "VECTOR":
+        comp += tailwindVector(node as SVGNode, isJsx);
         break;
       // case "VECTOR":
       //   comp += htmlAsset(node, isJsx);
@@ -151,14 +154,24 @@ const tailwindFrame = (
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = tailwindAutoLayoutProps(node, node);
-    return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
+    return tailwindContainer(
+      node,
+      childrenStr,
+      rowColumn + clipsContentClass,
+      isJsx,
+    );
   } else {
     if (
       localTailwindSettings.optimizeLayout &&
       node.inferredAutoLayout !== null
     ) {
       const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
-      return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
+      return tailwindContainer(
+        node,
+        childrenStr,
+        rowColumn + clipsContentClass,
+        isJsx,
+      );
     }
 
     // node.layoutMode === "NONE" && node.children.length > 1
@@ -256,6 +269,17 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
   } else {
     return `\n<div${builder.build()}></div>`;
   }
+};
+
+export const tailwindVector = (node: SVGNode, isJsx: boolean): string => {
+  const builder = new TailwindDefaultBuilder(
+    node,
+    localTailwindSettings.showLayerNames,
+    isJsx,
+  );
+  return `\n<div${builder.build()}>
+    ${node.svg}
+  </div>`;
 };
 
 export const tailwindCodeGenTextStyles = () => {

@@ -1,14 +1,14 @@
 // import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 
-export const tailwindVector = (
-  node: FrameNode | GroupNode,
-  showLayerNames: boolean,
-  parentId: string,
-  isJsx: boolean,
-): string => {
-  // TODO VECTOR
-  return "";
-};
+// export const tailwindVector = (
+//   node: FrameNode | GroupNode,
+//   showLayerNames: boolean,
+//   parentId: string,
+//   isJsx: boolean,
+// ): string => {
+//   // TODO VECTOR
+//   return "";
+// };
 
 // import {
 //   FrameMixin,

@@ -29,16 +29,17 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
   return cloned;
 };
 
-export const frameNodeTo = (
+export const frameNodeTo = async (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   parent: ParentType,
-):
+): Promise<
   | RectangleNode
   | FrameNode
   | InstanceNode
   | ComponentNode
   | GroupNode
-  | ComponentSetNode => {
+  | ComponentSetNode
+> => {
   if (node.children.length === 0) {
     // if it has no children, convert frame to rectangle
     return frameToRectangleNode(node, parent);
@@ -48,7 +49,7 @@ export const frameNodeTo = (
   overrideReadonlyProperty(
     clone,
     "children",
-    convertIntoNodes(node.children, clone),
+    await convertIntoNodes(node.children, clone),
   );
   return convertNodesOnRectangle(clone);
 };
@@ -93,17 +94,21 @@ const standardClone = <T extends SceneNode>(node: T, parent: ParentType): T => {
   return clonedNode;
 };
 
-export const convertIntoNodes = (
-  sceneNode: ReadonlyArray<SceneNode>,
-  parent: ParentType = null,
-): Array<SceneNode> => {
-  const mapped: Array<SceneNode | null> = sceneNode.map((node: SceneNode) => {
+const vectorClone = async (
+  node: VectorNode,
+  parent: ParentType,
+): Promise<SVGNode> => ({
+  ...(standardClone(node, parent) as VectorNode),
+  svg: await node.exportAsync({ format: "SVG_STRING" }),
+});
+
+export type SVGNode = VectorNode & { type: "VECTOR"; svg: string };
+export type AltNode = SVGNode | SceneNode;
+
+const convertNode =
+  (parent: ParentType) =>
+  async (node: SceneNode): Promise<AltNode> => {
     switch (node.type) {
-      case "RECTANGLE":
-      case "ELLIPSE":
-        return standardClone(node, parent);
-      case "LINE":
-        return standardClone(node, parent);
       case "FRAME":
       case "INSTANCE":
       case "COMPONENT":
@@ -113,12 +118,12 @@ export const convertIntoNodes = (
         // if (iconToRect != null) {
         //   return iconToRect;
         // }
-        return frameNodeTo(node, parent);
+        return await frameNodeTo(node, parent);
       case "GROUP":
         if (node.children.length === 1 && node.visible) {
           // if Group is visible and has only one child, Group should disappear.
           // there will be a single value anyway.
-          return convertIntoNodes(node.children, parent)[0];
+          return (await convertIntoNodes(node.children, parent))[0];
         }
 
         // TODO see if necessary.
@@ -132,7 +137,7 @@ export const convertIntoNodes = (
         overrideReadonlyProperty(
           clone,
           "children",
-          convertIntoNodes(node.children, clone),
+          await convertIntoNodes(node.children, clone),
         );
 
         // try to find big rect and regardless of that result, also try to convert to autolayout.
@@ -154,18 +159,19 @@ export const convertIntoNodes = (
           "textDecoration",
           "textStyleId",
           "fillStyleId",
+          "openTypeFeatures",
         ]);
         return standardClone(node, parent);
       case "STAR":
       case "POLYGON":
       case "VECTOR":
-        return standardClone(node, parent);
+        return await vectorClone(node as VectorNode, parent);
       case "SECTION":
         const sectionClone = standardClone(node, parent);
         overrideReadonlyProperty(
           sectionClone,
           "children",
-          convertIntoNodes(node.children, sectionClone),
+          await convertIntoNodes(node.children, sectionClone),
         );
         return sectionClone;
       case "BOOLEAN_OPERATION":
@@ -186,10 +192,21 @@ export const convertIntoNodes = (
           },
         ];
         return clonedOperation;
+      case "RECTANGLE":
+      case "ELLIPSE":
+      case "LINE":
       default:
-        return null;
+        return standardClone(node, parent);
     }
-  });
+  };
+
+export const convertIntoNodes = async (
+  sceneNode: ReadonlyArray<SceneNode>,
+  parent: ParentType = null,
+): Promise<AltNode[]> => {
+  const mapped: Array<SceneNode> = await Promise.all(
+    sceneNode.map(convertNode(parent)),
+  );
 
   return mapped.filter(notEmpty);
 };

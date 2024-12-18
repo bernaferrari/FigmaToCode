@@ -6,6 +6,7 @@ import { PluginSettings } from "../code";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { AltNode, SVGNode } from "../altNodes/altConversion";
 
 let showLayerNames = false;
 
@@ -17,10 +18,10 @@ let localSettings: PluginSettings;
 let previousExecutionCache: { style: string; text: string }[];
 
 export const htmlMain = (
-  sceneNode: Array<SceneNode>,
+  sceneNode: Array<AltNode>,
   settings: PluginSettings,
   isPreview: boolean = false,
-): string => {
+) => {
   showLayerNames = settings.showLayerNames;
   isPreviewGlobal = isPreview;
   previousExecutionCache = [];
@@ -40,11 +41,13 @@ export const htmlMain = (
 const htmlWidgetGenerator = (
   sceneNode: ReadonlyArray<SceneNode>,
   isJsx: boolean,
-): string => {
+) => {
   let comp = "";
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
-  visibleSceneNode.forEach((node, index) => {
+  for (let index = 0; index < visibleSceneNode.length; index++) {
+    const node = visibleSceneNode[index];
+
     // if (node.isAsset || ("isMask" in node && node.isMask === true)) {
     //   comp += htmlAsset(node, isJsx);
     // }
@@ -73,10 +76,9 @@ const htmlWidgetGenerator = (
         comp += htmlLine(node, isJsx);
         break;
       case "VECTOR":
-        comp += htmlAsset(node, isJsx);
+        comp += htmlVector(node as SVGNode, isJsx);
     }
-  });
-
+  }
   return comp;
 };
 
@@ -135,7 +137,7 @@ export const htmlText = (node: TextNode, isJsx: boolean): string => {
 const htmlFrame = (
   node: SceneNode & BaseFrameMixin,
   isJsx: boolean = false,
-): string => {
+) => {
   const childrenStr = htmlWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(
       node,
@@ -172,20 +174,14 @@ export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .commonShapeStyles(node);
 
-  let tag = "div";
-  let src = "";
   if (retrieveTopFill(node.fills)?.type === "IMAGE") {
-    tag = "img";
-    src = ` src="https://via.placeholder.com/${node.width.toFixed(
+    const src = ` src="https://via.placeholder.com/${node.width.toFixed(
       0,
     )}x${node.height.toFixed(0)}"`;
+    return `\n<img${builder.build()}${src} />`;
   }
 
-  if (tag === "div") {
-    return `\n<div${builder.build()}${src}></div>`;
-  }
-
-  return `\n<${tag}${builder.build()}${src} />`;
+  return `\n<div${builder.build()}></div>`;
 };
 
 // properties named propSomething always take care of ","
@@ -248,10 +244,7 @@ export const htmlContainer = (
   return children;
 };
 
-export const htmlSection = (
-  node: SectionNode,
-  isJsx: boolean = false,
-): string => {
+export const htmlSection = (node: SectionNode, isJsx: boolean = false) => {
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
   const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .size(node, localSettings.optimizeLayout)
@@ -271,6 +264,13 @@ export const htmlLine = (node: LineNode, isJsx: boolean): string => {
     .commonShapeStyles(node);
 
   return `\n<div${builder.build()}></div>`;
+};
+
+export const htmlVector = (node: SVGNode, isJsx: boolean): string => {
+  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx);
+  return `\n<div${builder.build()}>
+    ${node.svg}
+  </div>`;
 };
 
 export const htmlCodeGenTextStyles = (isJsx: boolean) => {
