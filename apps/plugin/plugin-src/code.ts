@@ -27,6 +27,7 @@ const defaultPluginSettings: PluginSettings = {
   roundTailwindValues: false,
   roundTailwindColors: false,
   customTailwindColors: false,
+  tailwindPrefix: "",
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type

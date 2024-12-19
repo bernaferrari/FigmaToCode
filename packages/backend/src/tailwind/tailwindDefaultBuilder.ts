@@ -25,6 +25,7 @@ import {
   getClassLabel,
   formatStyleAttribute,
 } from "../common/commonFormatAttributes";
+import { PluginSettings } from "../code";
 
 const isNotEmpty = (s: string) => s !== "";
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
@@ -36,13 +37,15 @@ export class TailwindDefaultBuilder {
   isJSX: boolean;
   visible: boolean;
   name: string;
+  settings: PluginSettings;
 
-  constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
+  constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean, settings: PluginSettings) {
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = "";
     this.visible = node.visible;
     this.name = showLayerNames ? node.name : "";
+    this.settings = settings;
 
     /*
     if (showLayerNames) {
@@ -210,7 +213,7 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  blur(node: SceneNode) {
+  blur(node: SceneNode): this {
     if ("effects" in node && node.effects.length > 0) {
       const blur = node.effects.find((e) => e.type === "LAYER_BLUR");
       if (blur) {
@@ -236,6 +239,7 @@ export class TailwindDefaultBuilder {
         }
       }
     }
+    return this;
   }
 
   build(additionalAttr = ""): string {
@@ -247,10 +251,18 @@ export class TailwindDefaultBuilder {
     const layerName = this.name ? ` data-layer="${this.name}"` : "";
 
     const classLabel = getClassLabel(this.isJSX);
-    const classNames =
-      this.attributes.length > 0
-        ? ` ${classLabel}="${this.attributes.join(" ")}"`
-        : "";
+    
+    // Add prefix to each class if it exists
+    const prefix = this.settings?.tailwindPrefix || "";
+    const classNames = this.attributes.length > 0
+      ? ` ${classLabel}="${this.attributes.map(attr => 
+          // Don't add prefix to layer names or custom classes that start with brackets
+          attr.startsWith("[") || attr === stringToClassName(this.name) 
+            ? attr 
+            : `${prefix}${attr}`
+        ).join(" ")}"`
+      : "";
+    
     const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
 
     return `${layerName}${classNames}${styles}`;

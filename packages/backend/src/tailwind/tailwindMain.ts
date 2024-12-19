@@ -93,6 +93,7 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
     node,
     localTailwindSettings.showLayerNames,
     isJsx,
+    localTailwindSettings,
   )
     .blend(node)
     .size(node, localTailwindSettings.optimizeLayout)
@@ -114,9 +115,12 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
     node,
     localTailwindSettings.showLayerNames,
     isJsx,
+    localTailwindSettings
   )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
-    .textAlign(node);
+    .textAlign(node)
+    .shadow(node)
+    .blur(node);
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
   previousExecutionCache.push(...styledHtml);
@@ -150,14 +154,14 @@ const tailwindFrame = (
   const clipsContentClass = node.clipsContent ? " overflow-hidden" : "";
 
   if (node.layoutMode !== "NONE") {
-    const rowColumn = tailwindAutoLayoutProps(node, node);
+    const rowColumn = tailwindAutoLayoutProps(node, node, localTailwindSettings);
     return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
   } else {
     if (
       localTailwindSettings.optimizeLayout &&
       node.inferredAutoLayout !== null
     ) {
-      const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
+      const rowColumn = tailwindAutoLayoutProps(node, node.inferredAutoLayout, localTailwindSettings);
       return tailwindContainer(node, childrenStr, rowColumn + clipsContentClass, isJsx);
     }
 
@@ -191,6 +195,7 @@ export const tailwindContainer = (
     node,
     localTailwindSettings.showLayerNames,
     isJsx,
+    localTailwindSettings,
   )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .commonShapeStyles(node);
@@ -233,6 +238,7 @@ export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
     node,
     localTailwindSettings.showLayerNames,
     isJsx,
+    localTailwindSettings,
   )
     .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
     .commonShapeStyles(node);
@@ -246,6 +252,7 @@ export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
     node,
     localTailwindSettings.showLayerNames,
     isJsx,
+    localTailwindSettings,
   )
     .size(node, localTailwindSettings.optimizeLayout)
     .position(node, localTailwindSettings.optimizeLayout)

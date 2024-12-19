@@ -62,33 +62,37 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   };
 
   fontSize = (fontSize: number) => {
-    return `text-${pxToFontSize(fontSize)}`;
+    const prefix = this.settings?.tailwindPrefix || "";
+    return `${prefix}text-${pxToFontSize(fontSize)}`;
   };
 
   fontWeight = (fontWeight: number): string => {
+    const prefix = this.settings?.tailwindPrefix || "";
     const weight = config.fontWeight[fontWeight];
-    return weight ? `font-${weight}` : "";
+    return weight ? `${prefix}font-${weight}` : "";
   };
 
   indentStyle = (indentation: number) => {
     // Convert indentation to the appropriate Tailwind CSS class.
     // This can be based on your project's configuration and spacing scale.
     // For example, suppose your project uses the default Tailwind CSS spacing scale:
-    return `pl-${Math.round(indentation)}`;
+    const prefix = this.settings?.tailwindPrefix || "";
+    return `${prefix}pl-${Math.round(indentation)}`;
   };
 
   fontFamily = (fontName: FontName): string => {
+    const prefix = this.settings?.tailwindPrefix || "";
     if (config.fontFamily.sans.includes(fontName.family)) {
-      return 'font-sans';
+      return `${prefix}font-sans`;
     }
     if (config.fontFamily.serif.includes(fontName.family)) {
-      return 'font-serif';
+      return `${prefix}font-serif`;
     }
     if (config.fontFamily.mono.includes(fontName.family)) {
-      return 'font-mono';
+      return `${prefix}font-mono`;
     }
 
-    return "font-['" + fontName.family + "']";
+    return `${prefix}font-['${fontName.family}']`;
   };
 
   /**
@@ -152,7 +156,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     const lineHeightProp = commonLineHeight(lineHeight, fontSize);
     if (lineHeightProp > 0) {
       const value = pxToLineHeight(lineHeightProp);
-      return `leading-${value}`;
+      const prefix = this.settings?.tailwindPrefix || "";
+      return `${prefix}leading-${value}`;
     }
 
     return "";
