@@ -66,12 +66,17 @@ export const PluginUI = (props: PluginUIProps) => {
             />
           )}
           {warnings.length > 0 && (
-            <div className="flex flex-col bg-red-700 text-white p-4 w-full">
-              <h3 className="text-lg">Warnings:</h3>
-              <ul className="list-disc list-inside">
+            <div className="flex flex-col bg-yellow-400 text-black p-4 w-full">
+              <div className="flex flex-row gap-1">
+                <div style={{ transform: "translate(2px, 2px) scale(80%)" }}>
+                  <WarningIcon />
+                </div>
+                <h3 className="text-lg font-bold">Warnings:</h3>
+              </div>
+              <ul className="list-disc pl-6">
                 {warnings.map((message: string) => (
                   <li className="list-item">
-                    <em>{message}</em>
+                    <em className="italic">{message}</em>
                   </li>
                 ))}
               </ul>
@@ -584,5 +589,24 @@ const ExpandIcon = (props: { size: number }) => (
     viewBox="0 0 256 256"
   >
     <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM101.66,53.66,120,35.31V96a8,8,0,0,0,16,0V35.31l18.34,18.35a8,8,0,0,0,11.32-11.32l-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32Zm52.68,148.68L136,220.69V160a8,8,0,0,0-16,0v60.69l-18.34-18.35a8,8,0,0,0-11.32,11.32l32,32a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Z"></path>
+  </svg>
+);
+
+const WarningIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    className="lucide lucide-triangle-alert"
+  >
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+    <path d="M12 9v4" />
+    <path d="M12 17h.01" />
   </svg>
 );
