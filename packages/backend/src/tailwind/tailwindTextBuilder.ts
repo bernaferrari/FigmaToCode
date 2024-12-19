@@ -13,7 +13,11 @@ import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { config } from "./tailwindConfig";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
-  getTextSegments(id: string): { style: string; text: string }[] {
+  getTextSegments(id: string): {
+    style: string;
+    text: string;
+    openTypeFeatures: { [key: string]: boolean };
+  }[] {
     const segments = globalTextStyleSegments[id];
     if (!segments) {
       return [];
@@ -48,7 +52,11 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         .join(" ");
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
-      return { style: styleClasses, text: charsWithLineBreak };
+      return {
+        style: styleClasses,
+        text: charsWithLineBreak,
+        openTypeFeatures: segment.openTypeFeatures,
+      };
     });
   }
 

@@ -129,9 +129,29 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
   if (styledHtml.length === 1) {
     layoutBuilder.addAttributes(styledHtml[0].style);
     content = styledHtml[0].text;
+
+    const additionalTag =
+      styledHtml[0].openTypeFeatures.SUBS === true
+        ? "sub"
+        : styledHtml[0].openTypeFeatures.SUPS === true
+          ? "sup"
+          : "";
+
+    if (additionalTag) {
+      content = `<${additionalTag}>${content}</${additionalTag}>`;
+    }
   } else {
     content = styledHtml
-      .map((style) => `<span class="${style.style}">${style.text}</span>`)
+      .map((style) => {
+        const tag =
+          style.openTypeFeatures.SUBS === true
+            ? "sub"
+            : style.openTypeFeatures.SUPS === true
+              ? "sup"
+              : "span";
+
+        return `<${tag} class="${style.style}">${style.text}</${tag}>`;
+      })
       .join("");
   }
 

@@ -17,6 +17,7 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
       prop !== "mainComponent" &&
       prop !== "masterComponent" &&
       prop !== "variantProperties" &&
+      prop !== "get_annotations" &&
       prop !== "componentPropertyDefinitions" &&
       prop !== "exposedInstances" &&
       prop !== "componentProperties" &&
@@ -154,6 +155,7 @@ export const convertIntoNodes = (
           "textDecoration",
           "textStyleId",
           "fillStyleId",
+          "openTypeFeatures",
         ]);
         return standardClone(node, parent);
       case "STAR":

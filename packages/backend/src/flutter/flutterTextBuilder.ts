@@ -58,7 +58,11 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     return this;
   }
 
-  getTextSegments(id: string): { style: string; text: string }[] {
+  getTextSegments(id: string): {
+    style: string;
+    text: string;
+    openTypeFeatures: { [key: string]: boolean };
+  }[] {
     const segments = globalTextStyleSegments[id];
     if (!segments) {
       return [];
@@ -77,7 +81,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         segment.fontSize,
       );
 
-      const style = generateWidgetCode("TextStyle", {
+      const styleProperties: { [key: string]: string } = {
         color: color,
         fontSize: fontSize,
         fontStyle: fontStyle,
@@ -88,9 +92,17 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
           "TextDecoration.none",
         ),
         // textTransform: textTransform,
-        height: lineHeight / fontSize,
+        height: lineHeight,
         letterSpacing: letterSpacing,
-      });
+      };
+
+      if (segment.openTypeFeatures.SUBS === true) {
+        styleProperties.fontFeatures = `[FontFeature.enable("subs")]`;
+      } else if (segment.openTypeFeatures.SUPS === true) {
+        styleProperties.fontFeatures = `[FontFeature.enable("sups")]`;
+      }
+
+      const style = generateWidgetCode("TextStyle", styleProperties);
 
       let text = segment.characters;
       if (segment.textCase === "LOWER") {
@@ -102,6 +114,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
       return {
         style: style,
         text: parseTextAsCode(text).replace(/\$/g, "\\$"),
+        openTypeFeatures: segment.openTypeFeatures,
       };
     });
   }
@@ -151,7 +164,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
 }
 
 export const wrapTextAutoResize = (node: TextNode, child: string): string => {
-  const { width, height, isExpanded } = flutterSize(node);
+  const { width, height, isExpanded } = flutterSize(node, false);
   let result = "";
 
   switch (node.textAutoResize) {

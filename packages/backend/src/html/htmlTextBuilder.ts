@@ -12,7 +12,13 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     super(node, showLayerNames, optIsJSX);
   }
 
-  getTextSegments(id: string): { style: string; text: string }[] {
+  getTextSegments(
+    id: string,
+  ): {
+    style: string;
+    text: string;
+    openTypeFeatures: { [key: string]: boolean };
+  }[] {
     const segments = globalTextStyleSegments[id];
     if (!segments) {
       return [];
@@ -40,7 +46,11 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       );
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
-      return { style: styleAttributes, text: charsWithLineBreak };
+      return {
+        style: styleAttributes,
+        text: charsWithLineBreak,
+        openTypeFeatures: segment.openTypeFeatures,
+      };
     });
   }
 
