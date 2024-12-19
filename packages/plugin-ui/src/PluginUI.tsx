@@ -18,6 +18,7 @@ export type PluginSettings = {
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
   customTailwindColors: boolean;
+  tailwindPrefix: string;
 };
 
 type PluginUIProps = {
@@ -157,14 +158,15 @@ type LocalCodegenPreference =
   //   }
   // |
   {
-    itemType: "individual_select";
+    itemType: "individual_select" | "input";
     propertyName: Exclude<
       keyof PluginSettings,
       "framework" | "flutterGenerationMode" | "swiftUIGenerationMode"
     >;
     label: string;
     description: string;
-    value?: boolean;
+    value?: boolean | string;
+    placeholder?: string;
     isDefault?: boolean;
     includedLanguages?: FrameworkTypes[];
   };
@@ -229,6 +231,15 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     propertyName: "customTailwindColors",
     label: "Custom colors",
     description: "Use color variable names as custom color names",
+    isDefault: false,
+    includedLanguages: ["Tailwind"],
+  },
+  {
+    itemType: "input",
+    propertyName: "tailwindPrefix",
+    label: "Class prefix",
+    description: "Add a custom prefix to all Tailwind classes (e.g. 'tw-')",
+    placeholder: "Enter custom prefix",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
@@ -338,20 +349,28 @@ export const CodePanel = (props: {
                 preference.includedLanguages?.includes(props.selectedFramework),
               )
               .map((preference) => (
-                <SelectableToggle
-                  key={preference.propertyName}
-                  title={preference.label}
-                  description={preference.description}
-                  isSelected={
-                    props.preferences?.[preference.propertyName] ??
-                    preference.isDefault
-                  }
-                  onSelect={(value) => {
-                    props.onPreferenceChange(preference.propertyName, value);
-                  }}
-                  buttonClass="bg-green-100 dark:bg-black dark:ring-green-800 ring-green-500"
-                  checkClass="bg-green-400 dark:bg-black dark:bg-green-500 dark:border-green-500 ring-green-300 border-green-400"
-                />
+                preference.itemType === "input" ? (
+                  <input
+                    key={preference.propertyName}
+                    type="text"
+                    placeholder={preference.placeholder}
+                    value={props.preferences?.[preference.propertyName] as string ?? ""}
+                    onChange={(e) => props.onPreferenceChange(preference.propertyName, e.target.value)}
+                    className="px-2 py-1 text-sm rounded-md border dark:bg-neutral-800 dark:border-neutral-700"
+                  />
+                ) : (
+                  <SelectableToggle
+                    key={preference.propertyName}
+                    title={preference.label}
+                    description={preference.description}
+                    isSelected={props.preferences?.[preference.propertyName] as boolean ?? preference.isDefault}
+                    onSelect={(value) => {
+                      props.onPreferenceChange(preference.propertyName, value);
+                    }}
+                    buttonClass="bg-green-100 dark:bg-black dark:ring-green-800 ring-green-500"
+                    checkClass="bg-green-400 dark:bg-black dark:bg-green-500 dark:border-green-500 ring-green-300 border-green-400"
+                  />
+                )
               ))}
           </div>
           {selectablePreferencesFiltered.length > 0 && (

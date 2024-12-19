@@ -22,6 +22,7 @@ export type PluginSettings = {
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
   customTailwindColors: boolean;
+  tailwindPrefix: string;
 };
 
 export const run = (settings: PluginSettings) => {
