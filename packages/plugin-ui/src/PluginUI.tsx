@@ -66,7 +66,7 @@ export const PluginUI = (props: PluginUIProps) => {
             />
           )}
           {warnings.length > 0 && (
-            <div className="flex flex-col bg-yellow-400 text-black p-4 w-full">
+            <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-4 w-full">
               <div className="flex flex-row gap-1">
                 <div style={{ transform: "translate(2px, 2px) scale(80%)" }}>
                   <WarningIcon />
