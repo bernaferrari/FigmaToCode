@@ -5,6 +5,7 @@ import {
   nearestOpacity,
   nearestValue,
 } from "../conversionTables";
+import { addWarning } from "../../common/commonConversionWarnings";
 
 type Kind = "text" | "bg" | "border" | "solid";
 
@@ -90,6 +91,10 @@ export const tailwindGradientFromFills = (
   if (fill?.type === "GRADIENT_LINEAR") {
     return tailwindGradient(fill);
   }
+
+  addWarning(
+    "Gradients are not fully supported in Tailwind except for Linear Gradients.",
+  );
 
   return "";
 };
