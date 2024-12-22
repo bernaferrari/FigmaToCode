@@ -143,8 +143,15 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+  position(
+    node: SceneNode,
+    optimizeLayout: boolean,
+    forceAbsolutePosition = false,
+  ): this {
+    if (
+      forceAbsolutePosition ||
+      commonIsAbsolutePosition(node, optimizeLayout)
+    ) {
       const { x, y } = getCommonPositionValue(node);
 
       this.addStyles(
