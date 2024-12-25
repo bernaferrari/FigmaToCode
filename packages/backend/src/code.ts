@@ -5,43 +5,29 @@ import {
 } from "./common/retrieveUI/retrieveColors";
 import { flutterMain } from "./flutter/flutterMain";
 import { htmlMain } from "./html/htmlMain";
+import { postEmptyMessage } from "./messaging";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
 import { PluginSettings } from "types";
 
 export const run = (settings: PluginSettings) => {
+  const { selection } = figma.currentPage;
+
   // ignore when nothing was selected
-  if (figma.currentPage.selection.length === 0) {
-    figma.ui.postMessage({
-      type: "empty",
-    });
+  if (selection.length === 0) {
+    postEmptyMessage();
     return;
   }
 
-  const convertedSelection = convertIntoNodes(
-    figma.currentPage.selection,
-    null,
-  );
-  let result = "";
-  switch (settings.framework) {
-    case "HTML":
-      result = htmlMain(convertedSelection, settings);
-      break;
-    case "Tailwind":
-      result = tailwindMain(convertedSelection, settings);
-      break;
-    case "Flutter":
-      result = flutterMain(convertedSelection, settings);
-      break;
-    case "SwiftUI":
-      result = swiftuiMain(convertedSelection, settings);
-      break;
-  }
+  const convertedSelection = convertIntoNodes(selection, null);
+  const data = convertToCode(convertedSelection, settings);
+  const colors = retrieveGenericSolidUIColors(settings.framework);
+  const gradients = retrieveGenericGradients(settings.framework);
 
   figma.ui.postMessage({
     type: "code",
-    data: result,
-    settings: settings,
+    data,
+    settings,
     htmlPreview:
       convertedSelection.length > 0
         ? {
@@ -59,9 +45,22 @@ export const run = (settings: PluginSettings) => {
             ),
           }
         : null,
-    colors: retrieveGenericSolidUIColors(settings.framework),
-    gradients: retrieveGenericGradients(settings.framework),
+    colors,
+    gradients,
     preferences: settings,
-    // text: retrieveTailwindText(convertedSelection),
   });
+};
+
+export const convertToCode = (nodes: SceneNode[], settings: PluginSettings) => {
+  switch (settings.framework) {
+    case "Tailwind":
+      return tailwindMain(nodes, settings);
+    case "Flutter":
+      return flutterMain(nodes, settings);
+    case "SwiftUI":
+      return swiftuiMain(nodes, settings);
+    case "HTML":
+    default:
+      return htmlMain(nodes, settings);
+  }
 };
