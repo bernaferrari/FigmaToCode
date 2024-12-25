@@ -6,5 +6,6 @@
     { "path": "./packages/plugin-ui" },
     { "path": "./apps/plugin" },
     { "path": "./apps/debug" }
-  ]
+  ],
+  "exclude": ["node_modules"]
 }
