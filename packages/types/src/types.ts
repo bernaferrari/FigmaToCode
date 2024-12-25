@@ -15,10 +15,6 @@ export interface PluginSettings {
   customTailwindColors: boolean;
 }
 
-// Nodes
-
-export type ParentNode = (BaseNode & ChildrenMixin) | null;
-
 // Styles & Conversions
 
 export type LayoutMode =

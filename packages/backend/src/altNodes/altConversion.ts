@@ -1,5 +1,4 @@
 import { convertNodesOnRectangle } from "./convertNodesOnRectangle";
-import type { ParentNode } from "types";
 
 type StyledTextSegmentSubset = Omit<
   StyledTextSegment,
@@ -97,6 +96,8 @@ const standardClone = <T extends SceneNode>(node: T, parent: ParentNode): T => {
   }
   return clonedNode;
 };
+
+type ParentNode = (BaseNode & ChildrenMixin) | null;
 
 export const convertIntoNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
