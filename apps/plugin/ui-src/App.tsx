@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { FrameworkTypes, PluginSettings, PluginUI } from "plugin-ui";
+import { PluginUI } from "plugin-ui";
+import { FrameworkTypes, PluginSettings } from "types";
 
 interface AppState {
   code: string;

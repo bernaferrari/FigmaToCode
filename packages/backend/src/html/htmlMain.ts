@@ -2,10 +2,10 @@ import { indentString } from "../common/indentString";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { HtmlTextBuilder } from "./htmlTextBuilder";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
-import { PluginSettings } from "../code";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { PluginSettings } from "types";
 
 let showLayerNames = false;
 

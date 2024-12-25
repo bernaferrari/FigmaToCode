@@ -63,6 +63,9 @@ importers:
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
+      types:
+        specifier: workspace:*
+        version: link:../../packages/types
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
@@ -154,6 +157,9 @@ importers:
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
+      types:
+        specifier: workspace:*
+        version: link:../types
     devDependencies:
       '@types/react':
         specifier: ^18.3.17
@@ -194,6 +200,15 @@ importers:
 
   packages/plugin-ui:
     dependencies:
+      '@types/react':
+        specifier: ^18.3.17
+        version: 18.3.17
+      '@types/react-dom':
+        specifier: ^18.3.5
+        version: 18.3.5(@types/react@18.3.17)
+      '@types/react-syntax-highlighter':
+        specifier: 15.5.13
+        version: 15.5.13
       copy-to-clipboard:
         specifier: ^3.3.3
         version: 3.3.3
@@ -207,15 +222,6 @@ importers:
         specifier: 3.4.6
         version: 3.4.6
     devDependencies:
-      '@types/react':
-        specifier: ^18.3.17
-        version: 18.3.17
-      '@types/react-dom':
-        specifier: ^18.3.5
-        version: 18.3.5(@types/react@18.3.17)
-      '@types/react-syntax-highlighter':
-        specifier: 15.5.13
-        version: 15.5.13
       eslint:
         specifier: ^9.17.0
         version: 9.17.0(jiti@1.21.7)
@@ -225,11 +231,39 @@ importers:
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
+      types:
+        specifier: workspace:*
+        version: link:../types
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
 
   packages/tsconfig: {}
+
+  packages/types:
+    dependencies:
+      '@figma/plugin-typings':
+        specifier: ^1.105.0
+        version: 1.105.0
+      '@types/react':
+        specifier: ^18.3.17
+        version: 18.3.17
+      '@types/react-dom':
+        specifier: ^18.3.5
+        version: 18.3.5(@types/react@18.3.17)
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+    devDependencies:
+      eslint:
+        specifier: ^9.17.0
+        version: 9.17.0(jiti@1.21.7)
+      eslint-config-custom:
+        specifier: workspace:*
+        version: link:../eslint-config-custom
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
 
 packages:
 

@@ -7,22 +7,7 @@ import { flutterMain } from "./flutter/flutterMain";
 import { htmlMain } from "./html/htmlMain";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
-
-export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
-
-export type PluginSettings = {
-  framework: FrameworkTypes;
-  jsx: boolean;
-  inlineStyle: boolean;
-  optimizeLayout: boolean;
-  showLayerNames: boolean;
-  responsiveRoot: boolean;
-  flutterGenerationMode: string;
-  swiftUIGenerationMode: string;
-  roundTailwindValues: boolean;
-  roundTailwindColors: boolean;
-  customTailwindColors: boolean;
-};
+import { PluginSettings } from "types";
 
 export const run = (settings: PluginSettings) => {
   // ignore when nothing was selected

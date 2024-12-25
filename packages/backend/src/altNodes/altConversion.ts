@@ -1,6 +1,5 @@
 import { convertNodesOnRectangle } from "./convertNodesOnRectangle";
-
-type ParentType = (BaseNode & ChildrenMixin) | null;
+import type { ParentNode } from "types";
 
 export let globalTextStyleSegments: Record<string, StyledTextSegment[]> = {};
 
@@ -32,7 +31,7 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
 
 export const frameNodeTo = (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
-  parent: ParentType,
+  parent: ParentNode,
 ):
   | RectangleNode
   | FrameNode
@@ -57,7 +56,7 @@ export const frameNodeTo = (
 // auto convert Frame to Rectangle when Frame has no Children
 const frameToRectangleNode = (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
-  parent: ParentType,
+  parent: ParentNode,
 ): RectangleNode => {
   const clonedNode = cloneNode(node);
   if (parent) {
@@ -80,13 +79,13 @@ export const overrideReadonlyProperty = <T, K extends keyof T>(
   });
 };
 
-const assignParent = (node: SceneNode, parent: ParentType) => {
+const assignParent = (node: SceneNode, parent: ParentNode) => {
   if (parent) {
     overrideReadonlyProperty(node, "parent", parent);
   }
 };
 
-const standardClone = <T extends SceneNode>(node: T, parent: ParentType): T => {
+const standardClone = <T extends SceneNode>(node: T, parent: ParentNode): T => {
   const clonedNode = cloneNode(node);
   if (parent !== null) {
     assignParent(clonedNode, parent);
@@ -96,7 +95,7 @@ const standardClone = <T extends SceneNode>(node: T, parent: ParentType): T => {
 
 export const convertIntoNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
-  parent: ParentType = null,
+  parent: ParentNode = null,
 ): Array<SceneNode> => {
   const mapped: Array<SceneNode | null> = sceneNode.map((node: SceneNode) => {
     switch (node.type) {
@@ -198,7 +197,7 @@ export const convertIntoNodes = (
 
 const iconToRectangle = (
   node: FrameNode | InstanceNode | ComponentNode | GroupNode,
-  parent: ParentType,
+  parent: ParentNode,
 ): RectangleNode | null => {
   // TODO Fix this.
   if (false && node.children.every((d) => d.type === "VECTOR")) {

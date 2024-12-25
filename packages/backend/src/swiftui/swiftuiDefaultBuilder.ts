@@ -18,7 +18,7 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { Modifier, SwiftUIElement } from "./builderImpl/swiftuiParser";
+import { SwiftUIModifier, SwiftUIElement } from "./builderImpl/swiftuiParser";
 
 export class SwiftuiDefaultBuilder {
   element: SwiftUIElement;
@@ -27,7 +27,7 @@ export class SwiftuiDefaultBuilder {
     this.element = new SwiftUIElement(kind);
   }
 
-  pushModifier(...args: (Modifier | null)[]): void {
+  pushModifier(...args: (SwiftUIModifier | null)[]): void {
     args.forEach((modifier) => {
       if (modifier) {
         this.element.addModifier(modifier);

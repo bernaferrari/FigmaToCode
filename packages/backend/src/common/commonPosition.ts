@@ -1,21 +1,9 @@
+import { LayoutMode } from "types";
 import { parentCoordinates } from "./parentCoordinates";
-
-type position =
-  | ""
-  | "Absolute"
-  | "TopStart"
-  | "TopCenter"
-  | "TopEnd"
-  | "CenterStart"
-  | "Center"
-  | "CenterEnd"
-  | "BottomStart"
-  | "BottomCenter"
-  | "BottomEnd";
 
 export const commonPosition = (
   node: SceneNode & DimensionAndPositionMixin,
-): position => {
+): LayoutMode => {
   // if node is same size as height, position is not necessary
 
   // detect if Frame's width is same as Child when Frame has Padding.

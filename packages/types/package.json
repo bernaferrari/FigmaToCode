@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "types",
   "version": "0.0.0",
   "private": true,
   "license": "GPT-3",
@@ -14,17 +14,13 @@
   },
   "dependencies": {
     "@figma/plugin-typings": "^1.105.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "types": "workspace:*"
-  },
-  "devDependencies": {
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
+    "tsconfig": "workspace:*"
+  },
+  "devDependencies": {
     "eslint": "^9.17.0",
     "eslint-config-custom": "workspace:*",
-    "tsconfig": "workspace:*",
-    "tsup": "^8.3.5",
     "typescript": "^5.7.2"
   }
 }

@@ -1,16 +1,9 @@
-type BorderSideType =
-  | { all: number }
-  | {
-      left: number;
-      top: number;
-      right: number;
-      bottom: number;
-    };
+import { BorderSide } from "types";
 
 export const commonStroke = (
   node: SceneNode,
   divideBy: number = 1,
-): BorderSideType | null => {
+): BorderSide | null => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
     return null;
   }

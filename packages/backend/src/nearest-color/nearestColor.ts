@@ -1,32 +1,8 @@
 // https://github.com/dtao/nearest-color converted to ESM and Typescript
 // It was sligtly modified to support Typescript better.
 // It was also slighly simplified because many parts weren't being used.
-/**
- * Defines an available color.
- *
- * @typedef {Object} ColorSpec
- * @property {string=} name A name for the color, e.g., 'red'
- * @property {string} source The hex-based color string, e.g., '#FF0'
- * @property {RGB} rgb The {@link RGB} color values
- */
 
-/**
- * Describes a matched color.
- *
- * @typedef {Object} ColorMatch
- * @property {string} name The name of the matched color, e.g., 'red'
- * @property {string} value The hex-based color string, e.g., '#FF0'
- * @property {RGB} rgb The {@link RGB} color values.
- */
-
-/**
- * Provides the RGB breakdown of a color.
- *
- * @typedef {Object} RGB
- * @property {number} r The red component, from 0 to 255
- * @property {number} g The green component, from 0 to 255
- * @property {number} b The blue component, from 0 to 255
- */
+import { ColorSpec, RGB } from "types";
 
 /**
  * Gets the nearest color, from the given list of {@link ColorSpec} objects
@@ -206,32 +182,6 @@ function parseColor(source: RGB | string): RGB {
 
   throw Error(`"${source}" is not a valid color`);
 }
-
-type RGB = {
-  r: number;
-  g: number;
-  b: number;
-};
-
-// type ColorMatch = {
-//   name: string;
-//   value: string;
-//   rgb: RGB;
-//   distance: number;
-// };
-
-type ColorSpec = {
-  source: string;
-  rgb: RGB;
-};
-
-//   export function createColorSpec(input: string | RGB, name: string): ColorSpec;
-
-//   // it can actually return a ColorMatch, but let's ignore that for simplicity
-//   // in this app, it is never going to return ColorMatch because the input is hex instead of red
-//   export function from(
-//     availableColors: Array<String> | Object
-//   ): (attr: string) => string;
 
 /**
  * Creates a {@link ColorSpec} from either a string or an {@link RGB}.

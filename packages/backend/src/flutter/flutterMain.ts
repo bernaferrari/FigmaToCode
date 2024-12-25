@@ -6,12 +6,13 @@ import { retrieveTopFill } from "../common/retrieveFill";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { FlutterTextBuilder } from "./flutterTextBuilder";
 import { indentString } from "../common/indentString";
-import { PluginSettings } from "../code";
+
 import {
   getCrossAxisAlignment,
   getMainAxisAlignment,
 } from "./builderImpl/flutterAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { PluginSettings } from "types";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];

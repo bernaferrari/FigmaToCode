@@ -1,5 +1,6 @@
-import { FrameworkTypes, PluginUI } from "plugin-ui";
+import { FrameworkTypes } from "types";
 import * as React from "react";
+import { PluginUI } from "plugin-ui";
 
 export default function Web() {
   const [selectedFramework, setSelectedFramework] =

@@ -5,8 +5,7 @@ import {
   nearestOpacity,
   nearestValue,
 } from "../conversionTables";
-
-type Kind = "text" | "bg" | "border" | "solid";
+import { TailwindColorType } from "../../../../types/types";
 
 /**
  * Get a tailwind color value object
@@ -32,7 +31,7 @@ export function tailwindColor(fill: SolidPaint) {
  */
 export const tailwindSolidColor = (
   fill: SolidPaint | ColorStop,
-  kind?: Kind,
+  kind?: TailwindColorType,
 ): string => {
   // example: stone-500 or custom-color-700
   const { colorName } = getColorInfo(fill);
@@ -55,7 +54,7 @@ export const tailwindSolidColor = (
 // retrieve the SOLID color for tailwind
 export const tailwindColorFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
-  kind: Kind,
+  kind: TailwindColorType,
 ): string => {
   // [when testing] fills can be undefined
 

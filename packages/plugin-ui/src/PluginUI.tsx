@@ -2,23 +2,7 @@ import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 import copy from "copy-to-clipboard";
-
-export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
-
-// This must be kept in sync with the backend.
-export type PluginSettings = {
-  framework: FrameworkTypes;
-  jsx: boolean;
-  inlineStyle: boolean;
-  optimizeLayout: boolean;
-  showLayerNames: boolean;
-  responsiveRoot: boolean;
-  flutterGenerationMode: string;
-  swiftUIGenerationMode: string;
-  roundTailwindValues: boolean;
-  roundTailwindColors: boolean;
-  customTailwindColors: boolean;
-};
+import { FrameworkTypes, PluginSettings } from "types";
 
 type PluginUIProps = {
   code: string;

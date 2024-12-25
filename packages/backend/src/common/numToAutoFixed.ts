@@ -36,11 +36,9 @@ export const propertyIfNotDefault = (
   return propertyValue;
 };
 
-type PropertyValueType = number | string | string[];
-
 export const generateWidgetCode = (
   className: string,
-  properties: Record<string, PropertyValueType>,
+  properties: Record<string, number | string | string[]>,
   positionedValues?: string[],
 ): string => {
   console.log("properties", properties);
