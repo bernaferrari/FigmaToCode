@@ -1,7 +1,12 @@
 import { convertNodesOnRectangle } from "./convertNodesOnRectangle";
 import type { ParentNode } from "types";
 
-export let globalTextStyleSegments: Record<string, StyledTextSegment[]> = {};
+type StyledTextSegmentSubset = Omit<
+  StyledTextSegment,
+  "listSpacing" | "paragraphIndent" | "paragraphSpacing" | "textStyleOverrides"
+>;
+export let globalTextStyleSegments: Record<string, StyledTextSegmentSubset[]> =
+  {};
 
 export const cloneNode = <T extends BaseNode>(node: T): T => {
   // Create the cloned object with the correct prototype
