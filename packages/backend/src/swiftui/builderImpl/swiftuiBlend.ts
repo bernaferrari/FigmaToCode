@@ -1,5 +1,5 @@
+import { SwiftUIModifier } from "types";
 import { sliceNum } from "../../common/numToAutoFixed";
-import { SwiftUIModifier } from "./swiftuiParser";
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/opacity(_:)

@@ -25,6 +25,7 @@ import {
   getClassLabel,
   formatStyleAttribute,
 } from "../common/commonFormatAttributes";
+import { TailwindColorType } from "types";
 
 const isNotEmpty = (s: string) => s !== "";
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
@@ -150,7 +151,7 @@ export class TailwindDefaultBuilder {
    */
   customColor(
     paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
-    kind: string,
+    kind: TailwindColorType,
   ): this {
     // visible is true or undefinied (tests)
     if (this.visible) {
@@ -217,7 +218,7 @@ export class TailwindDefaultBuilder {
         const blurValue = pxToBlur(blur.radius);
         if (blurValue) {
           this.addAttributes(
-            blurValue === "blur" ? "blur" : `blur-${blurValue}`
+            blurValue === "blur" ? "blur" : `blur-${blurValue}`,
           ); // If blur value is 8, it will be "blur". Otherwise, it will be "blur-sm", "blur-md", etc. or "blur-[Xpx]"
         }
       }

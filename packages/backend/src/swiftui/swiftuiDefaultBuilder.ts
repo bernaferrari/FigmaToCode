@@ -18,7 +18,8 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { SwiftUIModifier, SwiftUIElement } from "./builderImpl/swiftuiParser";
+import { SwiftUIElement } from "./builderImpl/swiftuiParser";
+import { SwiftUIModifier } from "types";
 
 export class SwiftuiDefaultBuilder {
   element: SwiftUIElement;

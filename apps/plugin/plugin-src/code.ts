@@ -6,12 +6,12 @@ import {
   swiftuiMain,
   convertIntoNodes,
   htmlMain,
-  PluginSettings,
 } from "backend";
 import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retrieveColors";
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
 import { htmlCodeGenTextStyles } from "backend/src/html/htmlMain";
 import { swiftUICodeGenTextStyles } from "backend/src/swiftui/swiftuiMain";
+import { PluginSettings } from "types";
 
 let userPluginSettings: PluginSettings;
 

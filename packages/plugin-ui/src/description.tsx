@@ -1,4 +1,4 @@
-import { FrameworkTypes } from "./PluginUI";
+import { FrameworkTypes } from "types";
 
 export const Description = (props: { selected: FrameworkTypes }) => {
   switch (props.selected) {

@@ -3,7 +3,7 @@ import { rgbTo6hex } from "../../common/color";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { convertFontWeight } from "../../common/convertFontWeight";
 import { nearestColor } from "../conversionTables";
-import { TailwindTextConversion } from "../../../../types/types";
+import { TailwindTextConversion } from "types";
 
 export const retrieveTailwindText = (
   sceneNode: Array<SceneNode>,
@@ -96,7 +96,7 @@ const style = (node: TextNode): string => {
       .replace(" ", "")
       .toLowerCase();
 
-    const weight = convertFontWeight(Number(value));
+    const weight = convertFontWeight(value);
     if (weight) {
       comp += `font-weight: ${weight};`;
     }

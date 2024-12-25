@@ -5,7 +5,7 @@ import {
   nearestOpacity,
   nearestValue,
 } from "../conversionTables";
-import { TailwindColorType } from "../../../../types/types";
+import { TailwindColorType } from "types";
 
 /**
  * Get a tailwind color value object

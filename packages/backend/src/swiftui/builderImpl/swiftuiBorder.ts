@@ -2,7 +2,8 @@ import { commonStroke } from "./../../common/commonStroke";
 import { getCommonRadius } from "../../common/commonRadius";
 import { sliceNum } from "../../common/numToAutoFixed";
 import { swiftUISolidColor } from "./swiftuiColor";
-import { SwiftUIModifier, SwiftUIElement } from "./swiftuiParser";
+import { SwiftUIElement } from "./swiftuiParser";
+import { SwiftUIModifier } from "types";
 
 const swiftUIStroke = (node: SceneNode): number => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {

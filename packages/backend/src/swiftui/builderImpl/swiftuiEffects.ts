@@ -1,5 +1,5 @@
 import { sliceNum } from "../../common/numToAutoFixed";
-import { SwiftUIModifier } from "./swiftuiParser";
+import { SwiftUIModifier } from "types";
 
 export const swiftuiShadow = (node: SceneNode): SwiftUIModifier | null => {
   if (!("effects" in node) || node.effects.length === 0) {

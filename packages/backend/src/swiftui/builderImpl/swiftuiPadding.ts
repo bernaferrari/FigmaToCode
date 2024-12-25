@@ -1,6 +1,6 @@
 import { sliceNum } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
-import { SwiftUIModifier } from "./swiftuiParser";
+import { SwiftUIModifier } from "types";
 
 export const swiftuiPadding = (
   node: InferredAutoLayoutResult,

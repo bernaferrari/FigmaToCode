@@ -2,8 +2,8 @@ import { indentString } from "../common/indentString";
 import { stringToClassName, sliceNum } from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
-import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { PluginSettings } from "types";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
