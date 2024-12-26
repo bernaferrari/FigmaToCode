@@ -6,13 +6,19 @@ import {
   SettingsChangedMessage,
 } from "types";
 
-export const postMessage = figma.ui.postMessage;
+export const postBackendMessage = figma.ui.postMessage;
 
 export const postEmptyMessage = () =>
-  postMessage({ type: "empty" } as EmptyMessage);
+  postBackendMessage({ type: "empty" } as EmptyMessage);
 
 export const postConversionComplete = (conversionData: ConversionMessage) =>
-  postMessage(conversionData);
+  postBackendMessage(conversionData);
 
 export const postError = (error: string) =>
-  postMessage({ type: "error", error } as ErrorMessage);
+  postBackendMessage({ type: "error", error } as ErrorMessage);
+
+export const postSettingsChanged = (settings: PluginSettings) =>
+  postBackendMessage({
+    type: "pluginSettingsChanged",
+    data: settings,
+  } as SettingsChangedMessage);

@@ -8,10 +8,10 @@ import {
   HTMLPreview,
   LinearGradientConversion,
   SolidColorConversion,
-  SettingsChangedMessage,
   ErrorMessage,
-  SettingsChangingMessage,
+  SettingsChangedMessage,
 } from "types";
+import { postUISettingsChangingMessage } from "./messaging";
 
 interface AppState {
   code: string;
@@ -56,7 +56,7 @@ export default function App() {
           break;
 
         case "pluginSettingChanged":
-          const settingsMessage = untypedMessage as any;
+          const settingsMessage = untypedMessage as SettingsChangedMessage;
           setState((prevState) => ({
             ...prevState,
             preferences: settingsMessage.data,
@@ -65,6 +65,7 @@ export default function App() {
           break;
 
         case "empty":
+          // const emptyMessage = untypedMessage as EmptyMessage;
           setState((prevState) => ({
             ...prevState,
             code: "// No layer is selected.",
@@ -120,17 +121,9 @@ export default function App() {
       // code: "// Loading...",
       selectedFramework: updatedFramework,
     }));
-
-    parent.postMessage(
-      {
-        pluginMessage: {
-          type: "pluginSettingChanged",
-          key: "framework",
-          value: updatedFramework,
-        },
-      },
-      "*",
-    );
+    postUISettingsChangingMessage("framework", updatedFramework, {
+      targetOrigin: "*",
+    });
   };
   console.log("state.code", state.code.slice(0, 25));
 
@@ -143,18 +136,9 @@ export default function App() {
         setSelectedFramework={handleFrameworkChange}
         htmlPreview={state.htmlPreview}
         preferences={state.preferences}
-        onPreferenceChange={(key: string, value: boolean | string) => {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: "pluginSettingChanged",
-                key: key,
-                value: value,
-              },
-            },
-            "*",
-          );
-        }}
+        onPreferenceChange={(key: string, value: boolean | string) =>
+          postUISettingsChangingMessage(key, value, { targetOrigin: "*" })
+        }
         colors={state.colors}
         gradients={state.gradients}
       />

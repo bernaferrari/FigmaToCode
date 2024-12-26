@@ -16,7 +16,12 @@ export interface PluginSettings {
 }
 
 // Messaging
-export type Message = { type: string };
+export interface Message {
+  type: string;
+}
+export interface UIMessage {
+  pluginMessage: Message;
+}
 export type EmptyMessage = Message & { type: "empty" };
 export type ConversionMessage = Message & {
   type: "code";
@@ -26,13 +31,14 @@ export type ConversionMessage = Message & {
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
 };
-export type SettingsChangingMessage<T> = Message & {
-  type: "pluginSettingsChanged";
+export type SettingWillChangeMessage<T> = Message & {
+  type: "pluginSettingWillChange";
   key: string;
   value: T;
 };
 export type SettingsChangedMessage = Message & {
   type: "pluginSettingsChanged";
+  data: PluginSettings;
 };
 export type ErrorMessage = Message & {
   type: "error";
