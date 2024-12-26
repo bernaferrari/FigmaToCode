@@ -4,3 +4,4 @@ export { tailwindMain } from "./tailwind/tailwindMain";
 export { swiftuiMain } from "./swiftui/swiftuiMain";
 export { run } from "./code";
 export { convertIntoNodes } from "./altNodes/altConversion";
+export * from "./messaging";

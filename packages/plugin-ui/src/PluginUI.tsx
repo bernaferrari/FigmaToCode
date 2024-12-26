@@ -2,27 +2,24 @@ import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 import copy from "copy-to-clipboard";
-import { FrameworkTypes, PluginSettings } from "types";
+import {
+  FrameworkTypes,
+  HTMLPreview,
+  LinearGradientConversion,
+  PluginSettings,
+  SolidColorConversion,
+} from "types";
 
 type PluginUIProps = {
   code: string;
-  htmlPreview: {
-    size: { width: number; height: number };
-    content: string;
-  } | null;
+  htmlPreview: HTMLPreview;
   emptySelection: boolean;
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
   preferences: PluginSettings | null;
   onPreferenceChange: (key: string, value: boolean | string) => void;
-  colors: {
-    hex: string;
-    colorName: string;
-    exportValue: string;
-    contrastWhite: number;
-    contrastBlack: number;
-  }[];
-  gradients: { cssPreview: string; exportValue: string }[];
+  colors: SolidColorConversion[];
+  gradients: LinearGradientConversion[];
 };
 
 export const PluginUI = (props: PluginUIProps) => {
@@ -258,8 +255,6 @@ export const CodePanel = (props: {
 
         <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
           <div className="flex gap-2 items-center flex-wrap">
-            {/* <span className="min-w-[60px] font-medium">Settings</span> */}
-
             {preferenceOptions
               .filter((preference) =>
                 preference.includedLanguages?.includes(props.selectedFramework),
@@ -345,13 +340,7 @@ export const CodePanel = (props: {
 };
 
 export const ColorsPanel = (props: {
-  colors: {
-    hex: string;
-    colorName: string;
-    exportValue: string;
-    contrastWhite: number;
-    contrastBlack: number;
-  }[];
+  colors: SolidColorConversion[];
   onColorClick: (color: string) => void;
 }) => {
   const [isPressed, setIsPressed] = useState(-1);
@@ -488,10 +477,7 @@ const SelectableToggle = ({
 };
 
 export const Preview: React.FC<{
-  htmlPreview: {
-    size: { width: number; height: number };
-    content: string;
-  };
+  htmlPreview: HTMLPreview;
   isResponsiveExpanded: boolean;
   setIsResponsiveExpanded: (value: boolean) => void;
 }> = (props) => {

@@ -15,6 +15,30 @@ export interface PluginSettings {
   customTailwindColors: boolean;
 }
 
+// Messaging
+export type Message = { type: string };
+export type EmptyMessage = Message & { type: "empty" };
+export type ConversionMessage = Message & {
+  type: "code";
+  code: string;
+  preferences: PluginSettings;
+  htmlPreview: HTMLPreview;
+  colors: SolidColorConversion[];
+  gradients: LinearGradientConversion[];
+};
+export type SettingsChangingMessage<T> = Message & {
+  type: "pluginSettingsChanged";
+  key: string;
+  value: T;
+};
+export type SettingsChangedMessage = Message & {
+  type: "pluginSettingsChanged";
+};
+export type ErrorMessage = Message & {
+  type: "error";
+  error: string;
+};
+
 // Styles & Conversions
 
 export type LayoutMode =
@@ -97,13 +121,18 @@ export type LinearGradientConversion = {
 
 // Framework Specific
 
-export type TailwindTextConversion = {
+export interface HTMLPreview {
+  size: { width: number; height: number };
+  content: string;
+}
+
+export interface TailwindTextConversion {
   name: string;
   attr: string;
   full: string;
   style: string;
   contrastBlack: number;
-};
+}
 
 export type TailwindColorType = "text" | "bg" | "border" | "solid";
 

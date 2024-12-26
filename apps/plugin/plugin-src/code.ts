@@ -11,7 +11,12 @@ import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retr
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
 import { htmlCodeGenTextStyles } from "backend/src/html/htmlMain";
 import { swiftUICodeGenTextStyles } from "backend/src/swiftui/swiftuiMain";
-import { PluginSettings } from "types";
+import {
+  Message,
+  PluginSettings,
+  SettingsChangedMessage,
+  SettingsChangingMessage,
+} from "types";
 
 let userPluginSettings: PluginSettings;
 
@@ -71,11 +76,9 @@ const safeRun = (settings: PluginSettings) => {
     run(settings);
   } catch (e) {
     if (e && typeof e === "object" && "message" in e) {
-      console.log("error: ", (e as any).stack);
-      figma.ui.postMessage({
-        type: "error",
-        data: e.message,
-      });
+      const error = e as Error;
+      console.log("error: ", error.stack);
+      figma.ui.postMessage({ type: "error", error: error.message });
     }
   }
 };
@@ -100,10 +103,6 @@ const standardMode = async () => {
     if (msg.type === "pluginSettingChanged") {
       (userPluginSettings as any)[msg.key] = msg.value;
       figma.clientStorage.setAsync("userPluginSettings", userPluginSettings);
-      // figma.ui.postMessage({
-      //   type: "pluginSettingChanged",
-      //   data: userPluginSettings,
-      // });
       safeRun(userPluginSettings);
     }
   };

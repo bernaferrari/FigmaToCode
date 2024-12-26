@@ -1,32 +1,35 @@
 import { useEffect, useState } from "react";
 import { PluginUI } from "plugin-ui";
-import { FrameworkTypes, PluginSettings } from "types";
+import {
+  FrameworkTypes,
+  PluginSettings,
+  ConversionMessage,
+  Message,
+  HTMLPreview,
+  LinearGradientConversion,
+  SolidColorConversion,
+  SettingsChangedMessage,
+  ErrorMessage,
+  SettingsChangingMessage,
+} from "types";
 
 interface AppState {
   code: string;
-  selectedFramework: FrameworkTypes | null;
+  selectedFramework: FrameworkTypes;
   isLoading: boolean;
-  htmlPreview: {
-    size: { width: number; height: number };
-    content: string;
-  } | null;
+  htmlPreview: HTMLPreview;
   preferences: PluginSettings | null;
-  colors: {
-    hex: string;
-    colorName: string;
-    exportValue: string;
-    contrastWhite: number;
-    contrastBlack: number;
-  }[];
-  gradients: { cssPreview: string; exportedValue: string }[];
+  colors: SolidColorConversion[];
+  gradients: LinearGradientConversion[];
 }
 
+const emptyPreview = { size: { width: 0, height: 0 }, content: "" };
 export default function App() {
   const [state, setState] = useState<AppState>({
     code: "",
-    selectedFramework: null,
+    selectedFramework: "HTML",
     isLoading: false,
-    htmlPreview: null,
+    htmlPreview: emptyPreview,
     preferences: null,
     colors: [],
     gradients: [],
@@ -39,42 +42,46 @@ export default function App() {
 
   useEffect(() => {
     window.onmessage = (event: MessageEvent) => {
-      const message = event.data.pluginMessage;
-      console.log("[ui] message received:", message);
-      switch (message.type) {
+      const untypedMessage = event.data.pluginMessage as Message;
+      console.log("[ui] message received:", untypedMessage);
+
+      switch (untypedMessage.type) {
         case "code":
+          const conversionMessage = untypedMessage as ConversionMessage;
           setState((prevState) => ({
             ...prevState,
-            code: message.data,
-            htmlPreview: message.htmlPreview,
-            colors: message.colors,
-            gradients: message.gradients,
-            preferences: message.preferences,
-            selectedFramework: message.preferences.framework,
+            ...conversionMessage,
+            selectedFramework: conversionMessage.preferences.framework,
           }));
           break;
+
         case "pluginSettingChanged":
+          const settingsMessage = untypedMessage as any;
           setState((prevState) => ({
             ...prevState,
-            preferences: message.data,
-            selectedFramework: message.data.framework,
+            preferences: settingsMessage.data,
+            selectedFramework: settingsMessage.data.framework,
           }));
           break;
+
         case "empty":
           setState((prevState) => ({
             ...prevState,
             code: "// No layer is selected.",
-            htmlPreview: null,
+            htmlPreview: emptyPreview,
             colors: [],
             gradients: [],
           }));
           break;
+
         case "error":
+          const errorMessage = untypedMessage as ErrorMessage;
+
           setState((prevState) => ({
             ...prevState,
             colors: [],
             gradients: [],
-            code: `Error :(\n// ${message.data}`,
+            code: `Error :(\n// ${errorMessage.error}`,
           }));
           break;
         default:
@@ -149,10 +156,7 @@ export default function App() {
           );
         }}
         colors={state.colors}
-        gradients={state.gradients.map((gradient) => ({
-          ...gradient,
-          exportValue: gradient.exportedValue,
-        }))}
+        gradients={state.gradients}
       />
     </div>
   );
