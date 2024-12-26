@@ -16,6 +16,14 @@ export interface PluginSettings {
 }
 
 // Messaging
+export interface ConversionData {
+  code: string;
+  settings: PluginSettings;
+  htmlPreview: HTMLPreview;
+  colors: SolidColorConversion[];
+  gradients: LinearGradientConversion[];
+}
+
 export interface Message {
   type: string;
 }
@@ -25,12 +33,7 @@ export interface UIMessage {
 export type EmptyMessage = Message & { type: "empty" };
 export type ConversionMessage = Message & {
   type: "code";
-  code: string;
-  settings: PluginSettings;
-  htmlPreview: HTMLPreview;
-  colors: SolidColorConversion[];
-  gradients: LinearGradientConversion[];
-};
+} & ConversionData;
 export type SettingWillChangeMessage<T> = Message & {
   type: "pluginSettingWillChange";
   key: string;
