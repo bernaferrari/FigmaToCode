@@ -16,8 +16,8 @@ type PluginUIProps = {
   emptySelection: boolean;
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
-  preferences: PluginSettings | null;
-  onPreferenceChange: (key: string, value: boolean | string) => void;
+  settings: PluginSettings | null;
+  onPreferenceChanged: (key: string, value: boolean | string) => void;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
 };
@@ -63,8 +63,8 @@ export const PluginUI = (props: PluginUIProps) => {
           <CodePanel
             code={props.code}
             selectedFramework={props.selectedFramework}
-            preferences={props.preferences}
-            onPreferenceChange={props.onPreferenceChange}
+            settings={props.settings}
+            onPreferenceChanged={props.onPreferenceChanged}
           />
 
           {props.colors.length > 0 && (
@@ -203,8 +203,8 @@ const selectPreferenceOptions: {
 export const CodePanel = (props: {
   code: string;
   selectedFramework: FrameworkTypes;
-  preferences: PluginSettings | null;
-  onPreferenceChange: (key: string, value: boolean | string) => void;
+  settings: PluginSettings | null;
+  onPreferenceChanged: (key: string, value: boolean | string) => void;
 }) => {
   const emptySelection = false;
   const [isPressed, setIsPressed] = useState(false);
@@ -228,7 +228,7 @@ export const CodePanel = (props: {
       </div>
     );
   } else {
-    const selectablePreferencesFiltered = selectPreferenceOptions.filter(
+    const selectableSettingsFiltered = selectPreferenceOptions.filter(
       (preference) =>
         preference.includedLanguages?.includes(props.selectedFramework),
     );
@@ -265,23 +265,23 @@ export const CodePanel = (props: {
                   title={preference.label}
                   description={preference.description}
                   isSelected={
-                    props.preferences?.[preference.propertyName] ??
+                    props.settings?.[preference.propertyName] ??
                     preference.isDefault
                   }
                   onSelect={(value) => {
-                    props.onPreferenceChange(preference.propertyName, value);
+                    props.onPreferenceChanged(preference.propertyName, value);
                   }}
                   buttonClass="bg-green-100 dark:bg-black dark:ring-green-800 ring-green-500"
                   checkClass="bg-green-400 dark:bg-black dark:bg-green-500 dark:border-green-500 ring-green-300 border-green-400"
                 />
               ))}
           </div>
-          {selectablePreferencesFiltered.length > 0 && (
+          {selectableSettingsFiltered.length > 0 && (
             <>
               <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700" />
 
               <div className="flex gap-2 items-center flex-wrap">
-                {selectablePreferencesFiltered.map((preference) => (
+                {selectableSettingsFiltered.map((preference) => (
                   <>
                     {/* <span className="min-w-[60px] font-medium">
                       {preference.label}
@@ -292,11 +292,11 @@ export const CodePanel = (props: {
                         title={option.label}
                         isSelected={
                           option.value ===
-                          (props.preferences?.[preference.propertyName] ??
+                          (props.settings?.[preference.propertyName] ??
                             option.isDefault)
                         }
                         onSelect={() => {
-                          props.onPreferenceChange(
+                          props.onPreferenceChanged(
                             preference.propertyName,
                             option.value,
                           );

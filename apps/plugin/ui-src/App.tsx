@@ -18,7 +18,7 @@ interface AppState {
   selectedFramework: FrameworkTypes;
   isLoading: boolean;
   htmlPreview: HTMLPreview;
-  preferences: PluginSettings | null;
+  settings: PluginSettings | null;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
 }
@@ -30,7 +30,7 @@ export default function App() {
     selectedFramework: "HTML",
     isLoading: false,
     htmlPreview: emptyPreview,
-    preferences: null,
+    settings: null,
     colors: [],
     gradients: [],
   });
@@ -51,7 +51,7 @@ export default function App() {
           setState((prevState) => ({
             ...prevState,
             ...conversionMessage,
-            selectedFramework: conversionMessage.preferences.framework,
+            selectedFramework: conversionMessage.settings.framework,
           }));
           break;
 
@@ -59,8 +59,8 @@ export default function App() {
           const settingsMessage = untypedMessage as SettingsChangedMessage;
           setState((prevState) => ({
             ...prevState,
-            preferences: settingsMessage.data,
-            selectedFramework: settingsMessage.data.framework,
+            settings: settingsMessage.settings,
+            selectedFramework: settingsMessage.settings.framework,
           }));
           break;
 
@@ -135,8 +135,8 @@ export default function App() {
         selectedFramework={state.selectedFramework}
         setSelectedFramework={handleFrameworkChange}
         htmlPreview={state.htmlPreview}
-        preferences={state.preferences}
-        onPreferenceChange={(key: string, value: boolean | string) =>
+        settings={state.settings}
+        onPreferenceChanged={(key: string, value: boolean | string) =>
           postUISettingsChangingMessage(key, value, { targetOrigin: "*" })
         }
         colors={state.colors}

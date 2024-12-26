@@ -20,5 +20,5 @@ export const postError = (error: string) =>
 export const postSettingsChanged = (settings: PluginSettings) =>
   postBackendMessage({
     type: "pluginSettingsChanged",
-    data: settings,
+    settings,
   } as SettingsChangedMessage);

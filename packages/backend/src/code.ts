@@ -46,7 +46,7 @@ export const run = (settings: PluginSettings) => {
     htmlPreview,
     colors,
     gradients,
-    preferences: settings,
+    settings,
   });
 };
 

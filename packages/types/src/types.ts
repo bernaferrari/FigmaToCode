@@ -26,7 +26,7 @@ export type EmptyMessage = Message & { type: "empty" };
 export type ConversionMessage = Message & {
   type: "code";
   code: string;
-  preferences: PluginSettings;
+  settings: PluginSettings;
   htmlPreview: HTMLPreview;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
@@ -38,7 +38,7 @@ export type SettingWillChangeMessage<T> = Message & {
 };
 export type SettingsChangedMessage = Message & {
   type: "pluginSettingsChanged";
-  data: PluginSettings;
+  settings: PluginSettings;
 };
 export type ErrorMessage = Message & {
   type: "error";

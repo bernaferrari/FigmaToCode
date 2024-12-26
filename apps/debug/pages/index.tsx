@@ -23,8 +23,8 @@ export default function Web() {
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
               htmlPreview={null}
-              preferences={undefined}
-              onPreferenceChange={() => {}}
+              settings={undefined}
+              onPreferenceChanged={() => {}}
               colors={[]}
               gradients={[]}
             />
@@ -40,8 +40,8 @@ export default function Web() {
               setSelectedFramework={setSelectedFramework}
               emptySelection={false}
               htmlPreview={null}
-              preferences={undefined}
-              onPreferenceChange={() => {}}
+              settings={undefined}
+              onPreferenceChanged={() => {}}
               colors={[]}
               gradients={[]}
             />
