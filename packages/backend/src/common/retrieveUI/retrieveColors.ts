@@ -19,11 +19,11 @@ import { calculateContrastRatio } from "./commonUI";
 import {
   LinearGradientConversion,
   SolidColorConversion,
-  FrameworkTypes,
+  Framework,
 } from "types";
 
 export const retrieveGenericSolidUIColors = (
-  framework: FrameworkTypes,
+  framework: Framework,
 ): Array<SolidColorConversion> => {
   const selectionColors = figma.getSelectionColors();
   if (!selectionColors || selectionColors.paints.length === 0) return [];
@@ -44,7 +44,7 @@ export const retrieveGenericSolidUIColors = (
 
 const convertSolidColor = (
   fill: Paint,
-  framework: FrameworkTypes,
+  framework: Framework,
 ): SolidColorConversion | null => {
   const black = { r: 0, g: 0, b: 0 };
   const white = { r: 1, g: 1, b: 1 };
@@ -74,7 +74,7 @@ const convertSolidColor = (
 };
 
 export const retrieveGenericLinearGradients = (
-  framework: FrameworkTypes,
+  framework: Framework,
 ): Array<LinearGradientConversion> => {
   const selectionColors = figma.getSelectionColors();
   const colorStr: Array<LinearGradientConversion> = [];

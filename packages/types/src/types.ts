@@ -1,8 +1,8 @@
 // Settings
-export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
+export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 
 export interface PluginSettings {
-  framework: FrameworkTypes;
+  framework: Framework;
   jsx: boolean;
   inlineStyle: boolean;
   optimizeLayout: boolean;

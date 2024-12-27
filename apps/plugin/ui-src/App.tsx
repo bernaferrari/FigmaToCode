@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { PluginUI } from "plugin-ui";
 import {
-  FrameworkTypes,
+  Framework,
   PluginSettings,
   ConversionMessage,
   Message,
@@ -16,7 +16,7 @@ import { postUISettingsChangingMessage } from "./messaging";
 
 interface AppState {
   code: string;
-  selectedFramework: FrameworkTypes;
+  selectedFramework: Framework;
   isLoading: boolean;
   htmlPreview: HTMLPreview;
   settings: PluginSettings | null;
@@ -119,7 +119,7 @@ export default function App() {
     ) : null;
   }
 
-  const handleFrameworkChange = (updatedFramework: FrameworkTypes) => {
+  const handleFrameworkChange = (updatedFramework: Framework) => {
     setState((prevState) => ({
       ...prevState,
       // code: "// Loading...",
