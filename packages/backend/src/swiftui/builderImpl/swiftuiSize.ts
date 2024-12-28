@@ -3,7 +3,7 @@ import { sliceNum } from "../../common/numToAutoFixed";
 
 export const swiftuiSize = (
   node: SceneNode,
-  optimizeLayout: boolean,
+  optimizeLayout: boolean = false,
 ): { width: string; height: string } => {
   const size = nodeSize(node, optimizeLayout);
 

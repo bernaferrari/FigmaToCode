@@ -1,34 +1,38 @@
 import { indentString } from "../../common/indentString";
-
-export type Modifier = [string, string | Modifier | Modifier[]];
+import { SwiftUIModifier } from "types";
 
 export class SwiftUIElement {
   private readonly element: string;
-  private readonly modifiers: Modifier[];
+  private readonly modifiers: SwiftUIModifier[];
 
-  constructor(element: string = "", modifiers: Modifier[] = []) {
+  constructor(element: string = "", modifiers: SwiftUIModifier[] = []) {
     this.element = element;
     this.modifiers = modifiers;
   }
 
   addModifierMixed(
     property: string,
-    value: string | Modifier | Modifier[],
+    value: string | SwiftUIModifier | SwiftUIModifier[],
   ): this {
     this.modifiers.push([property, value]);
     return this;
   }
 
-  addModifier(modifier: Modifier | [string | null, string | null]): this {
+  addModifier(
+    modifier: SwiftUIModifier | [string | null, string | null],
+  ): this {
     if (modifier && modifier[0] !== null && modifier[1] !== null) {
       this.modifiers.push([modifier[0], modifier[1]]);
     }
     return this;
   }
 
-  addChildElement(element: string, ...modifiers: Modifier[]): SwiftUIElement {
+  addChildElement(
+    element: string,
+    ...modifiers: SwiftUIModifier[]
+  ): SwiftUIElement {
     const childModifiers = modifiers.length === 1 ? modifiers[0] : modifiers;
-    return this.addModifierMixed(element, childModifiers as Modifier);
+    return this.addModifierMixed(element, childModifiers as SwiftUIModifier);
   }
 
   private buildModifierLines(indentLevel: number): string {
@@ -38,7 +42,7 @@ export class SwiftUIElement {
         Array.isArray(value)
           ? `${indent}.${property}(${new SwiftUIElement(
               property,
-              value as Modifier[],
+              value as SwiftUIModifier[],
             )
               .toString()
               .trim()})`

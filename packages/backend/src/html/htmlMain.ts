@@ -2,10 +2,10 @@ import { indentString } from "../common/indentString";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { HtmlTextBuilder } from "./htmlTextBuilder";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
-import { PluginSettings } from "../code";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { PluginSettings } from "types";
 
 let showLayerNames = false;
 
@@ -35,6 +35,19 @@ export const htmlMain = (
 
   return result;
 };
+
+export const generateHTMLPreview = (
+  nodes: SceneNode[],
+  settings: PluginSettings,
+) =>
+  htmlMain(
+    nodes,
+    {
+      ...settings,
+      jsx: false,
+    },
+    true,
+  );
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const htmlWidgetGenerator = (

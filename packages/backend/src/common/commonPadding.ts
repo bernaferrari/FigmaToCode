@@ -1,15 +1,4 @@
-type PaddingType =
-  | { all: number }
-  | {
-      horizontal: number;
-      vertical: number;
-    }
-  | {
-      left: number;
-      right: number;
-      top: number;
-      bottom: number;
-    };
+import { PaddingType } from "types";
 
 export const commonPadding = (
   node: InferredAutoLayoutResult,

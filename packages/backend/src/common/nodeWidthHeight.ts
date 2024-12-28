@@ -1,12 +1,6 @@
-type SizeResult = {
-  readonly width: "fill" | number | null;
-  readonly height: "fill" | number | null;
-};
+import { Size } from "types";
 
-export const nodeSize = (
-  node: SceneNode,
-  optimizeLayout: boolean,
-): SizeResult => {
+export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
   const hasLayout =
     "layoutAlign" in node && node.parent && "layoutMode" in node.parent;
 

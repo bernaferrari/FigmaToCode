@@ -4,79 +4,62 @@ import {
   retrieveGenericLinearGradients as retrieveGenericGradients,
 } from "./common/retrieveUI/retrieveColors";
 import { flutterMain } from "./flutter/flutterMain";
-import { htmlMain } from "./html/htmlMain";
+import { generateHTMLPreview, htmlMain } from "./html/htmlMain";
+import { postConversionComplete, postEmptyMessage } from "./messaging";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
-
-export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
-
-export type PluginSettings = {
-  framework: FrameworkTypes;
-  jsx: boolean;
-  inlineStyle: boolean;
-  optimizeLayout: boolean;
-  showLayerNames: boolean;
-  responsiveRoot: boolean;
-  flutterGenerationMode: string;
-  swiftUIGenerationMode: string;
-  roundTailwindValues: boolean;
-  roundTailwindColors: boolean;
-  customTailwindColors: boolean;
-};
+import { PluginSettings } from "types";
 
 export const run = (settings: PluginSettings) => {
+  const selection = figma.currentPage.selection;
+
+  const convertedSelection = convertIntoNodes(selection, null);
+
   // ignore when nothing was selected
-  if (figma.currentPage.selection.length === 0) {
-    figma.ui.postMessage({
-      type: "empty",
-    });
+  // If the selection was empty, the converted selection will also be empty.
+  if (convertedSelection.length === 0) {
+    postEmptyMessage();
     return;
   }
 
-  const convertedSelection = convertIntoNodes(
-    figma.currentPage.selection,
-    null,
-  );
-  let result = "";
-  switch (settings.framework) {
-    case "HTML":
-      result = htmlMain(convertedSelection, settings);
-      break;
-    case "Tailwind":
-      result = tailwindMain(convertedSelection, settings);
-      break;
-    case "Flutter":
-      result = flutterMain(convertedSelection, settings);
-      break;
-    case "SwiftUI":
-      result = swiftuiMain(convertedSelection, settings);
-      break;
-  }
+  const { framework } = settings;
+  const code = convertToCode(convertedSelection, settings);
+  // Only generate HTML code if necessary
+  const htmlCode =
+    framework === "HTML" && settings.jsx === false
+      ? code
+      : generateHTMLPreview(convertedSelection, settings);
+  const colors = retrieveGenericSolidUIColors(framework);
+  const gradients = retrieveGenericGradients(framework);
 
-  figma.ui.postMessage({
+  const htmlPreview = {
+    size: {
+      width: convertedSelection[0].width,
+      height: convertedSelection[0].height,
+    },
+    content: htmlCode,
+  };
+
+  postConversionComplete({
     type: "code",
-    data: result,
-    settings: settings,
-    htmlPreview:
-      convertedSelection.length > 0
-        ? {
-            size: convertedSelection.map((node) => ({
-              width: node.width,
-              height: node.height,
-            }))[0],
-            content: htmlMain(
-              convertedSelection,
-              {
-                ...settings,
-                jsx: false,
-              },
-              true,
-            ),
-          }
-        : null,
-    colors: retrieveGenericSolidUIColors(settings.framework),
-    gradients: retrieveGenericGradients(settings.framework),
-    preferences: settings,
-    // text: retrieveTailwindText(convertedSelection),
+    code,
+    htmlPreview,
+    colors,
+    gradients,
+    settings,
   });
+};
+
+export const convertToCode = (nodes: SceneNode[], settings: PluginSettings) => {
+  switch (settings.framework) {
+    case "Tailwind":
+      return tailwindMain(nodes, settings);
+    case "Flutter":
+      return flutterMain(nodes, settings);
+    case "SwiftUI":
+      return swiftuiMain(nodes, settings);
+    case "HTML":
+    default:
+      return htmlMain(nodes, settings);
+  }
 };

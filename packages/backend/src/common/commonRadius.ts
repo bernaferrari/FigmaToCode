@@ -1,13 +1,6 @@
-type RadiusType =
-  | { all: number }
-  | {
-      topLeft: number;
-      topRight: number;
-      bottomRight: number;
-      bottomLeft: number;
-    };
+import { CornerRadius } from "types";
 
-export const getCommonRadius = (node: SceneNode): RadiusType => {
+export const getCommonRadius = (node: SceneNode): CornerRadius => {
   if (
     "cornerRadius" in node &&
     node.cornerRadius !== figma.mixed &&

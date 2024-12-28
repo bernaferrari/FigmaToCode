@@ -13,6 +13,7 @@
     "eslint": "^9.17.0",
     "eslint-config-custom": "workspace:*",
     "prettier": "^3.4.2",
-    "turbo": "^2.3.3"
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
   }
 }

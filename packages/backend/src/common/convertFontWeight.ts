@@ -1,17 +1,7 @@
+import { FontWeightNumber } from "types";
+
 // Convert generic named weights to numbers, which is the way tailwind understands
-export const convertFontWeight = (
-  weight: number,
-):
-  | "100"
-  | "200"
-  | "300"
-  | "400"
-  | "500"
-  | "600"
-  | "700"
-  | "800"
-  | "900"
-  | null => {
+export const convertFontWeight = (weight: string): FontWeightNumber | null => {
   // change extra-light to extralight
   weight = weight.replace(" ", "").replace("-", "").toLowerCase();
   switch (weight) {
@@ -36,6 +26,6 @@ export const convertFontWeight = (
     case "black":
       return "900";
     default:
-      return null;
+      return "400";
   }
 };

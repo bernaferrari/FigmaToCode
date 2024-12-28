@@ -1,10 +1,12 @@
+import { SwiftUIModifier } from "types";
 import { sliceNum } from "../../common/numToAutoFixed";
-import { Modifier } from "./swiftuiParser";
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/opacity(_:)
  */
-export const swiftuiOpacity = (node: MinimalBlendMixin): Modifier | null => {
+export const swiftuiOpacity = (
+  node: MinimalBlendMixin,
+): SwiftUIModifier | null => {
   if (node.opacity !== undefined && node.opacity !== 1) {
     return ["opacity", sliceNum(node.opacity)];
   }
@@ -14,7 +16,9 @@ export const swiftuiOpacity = (node: MinimalBlendMixin): Modifier | null => {
 /**
  * https://developer.apple.com/documentation/swiftui/view/hidden()
  */
-export const swiftuiVisibility = (node: SceneNodeMixin): Modifier | null => {
+export const swiftuiVisibility = (
+  node: SceneNodeMixin,
+): SwiftUIModifier | null => {
   // [when testing] node.visible can be undefined
   if (node.visible !== undefined && !node.visible) {
     return ["hidden", ""];
@@ -25,7 +29,7 @@ export const swiftuiVisibility = (node: SceneNodeMixin): Modifier | null => {
 /**
  * https://developer.apple.com/documentation/swiftui/modifiedcontent/rotationeffect(_:anchor:)
  */
-export const swiftuiRotation = (node: LayoutMixin): Modifier | null => {
+export const swiftuiRotation = (node: LayoutMixin): SwiftUIModifier | null => {
   if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
     return ["rotationEffect", `.degrees(${sliceNum(node.rotation)})`];
   }
@@ -35,7 +39,9 @@ export const swiftuiRotation = (node: LayoutMixin): Modifier | null => {
 /**
  * https://developer.apple.com/documentation/swiftui/blendmode
  */
-export const swiftuiBlendMode = (node: MinimalBlendMixin): Modifier | null => {
+export const swiftuiBlendMode = (
+  node: MinimalBlendMixin,
+): SwiftUIModifier | null => {
   const fromBlendEnum = blendModeEnum(node);
   if (fromBlendEnum) {
     return ["blendMode", fromBlendEnum];

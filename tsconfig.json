@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/backend" },
+    { "path": "./packages/plugin-ui" },
+    { "path": "./apps/plugin" },
+    { "path": "./apps/debug" }
+  ],
+  "exclude": ["node_modules"]
+}

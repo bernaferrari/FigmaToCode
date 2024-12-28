@@ -1,7 +1,7 @@
 import { sliceNum } from "../../common/numToAutoFixed";
-import { Modifier } from "./swiftuiParser";
+import { SwiftUIModifier } from "types";
 
-export const swiftuiShadow = (node: SceneNode): Modifier | null => {
+export const swiftuiShadow = (node: SceneNode): SwiftUIModifier | null => {
   if (!("effects" in node) || node.effects.length === 0) {
     return null;
   }
@@ -44,7 +44,7 @@ export const swiftuiShadow = (node: SceneNode): Modifier | null => {
   return ["shadow", comp.join(", ")];
 };
 
-export const swiftuiBlur = (node: SceneNode): Modifier | null => {
+export const swiftuiBlur = (node: SceneNode): SwiftUIModifier | null => {
   if (!("effects" in node) || node.effects.length === 0) {
     return null;
   }

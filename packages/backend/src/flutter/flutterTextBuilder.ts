@@ -96,9 +96,13 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         letterSpacing: letterSpacing,
       };
 
-      if (segment.openTypeFeatures.SUBS === true) {
+      if (
+        (segment.openTypeFeatures as unknown as { SUBS: boolean }).SUBS === true
+      ) {
         styleProperties.fontFeatures = `[FontFeature.enable("subs")]`;
-      } else if (segment.openTypeFeatures.SUPS === true) {
+      } else if (
+        (segment.openTypeFeatures as unknown as { SUPS: boolean }).SUPS === true
+      ) {
         styleProperties.fontFeatures = `[FontFeature.enable("sups")]`;
       }
 

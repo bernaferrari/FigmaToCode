@@ -1,10 +1,10 @@
 import { sliceNum } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
-import { Modifier } from "./swiftuiParser";
+import { SwiftUIModifier } from "types";
 
 export const swiftuiPadding = (
   node: InferredAutoLayoutResult,
-): Modifier | null => {
+): SwiftUIModifier | null => {
   if (!("layoutMode" in node)) {
     return null;
   }

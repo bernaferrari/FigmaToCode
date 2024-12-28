@@ -2,43 +2,24 @@ import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 import copy from "copy-to-clipboard";
-
-export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
-
-// This must be kept in sync with the backend.
-export type PluginSettings = {
-  framework: FrameworkTypes;
-  jsx: boolean;
-  inlineStyle: boolean;
-  optimizeLayout: boolean;
-  showLayerNames: boolean;
-  responsiveRoot: boolean;
-  flutterGenerationMode: string;
-  swiftUIGenerationMode: string;
-  roundTailwindValues: boolean;
-  roundTailwindColors: boolean;
-  customTailwindColors: boolean;
-};
+import {
+  FrameworkTypes,
+  HTMLPreview,
+  LinearGradientConversion,
+  PluginSettings,
+  SolidColorConversion,
+} from "types";
 
 type PluginUIProps = {
   code: string;
-  htmlPreview: {
-    size: { width: number; height: number };
-    content: string;
-  } | null;
+  htmlPreview: HTMLPreview;
   emptySelection: boolean;
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
-  preferences: PluginSettings | null;
-  onPreferenceChange: (key: string, value: boolean | string) => void;
-  colors: {
-    hex: string;
-    colorName: string;
-    exportValue: string;
-    contrastWhite: number;
-    contrastBlack: number;
-  }[];
-  gradients: { cssPreview: string; exportValue: string }[];
+  settings: PluginSettings | null;
+  onPreferenceChanged: (key: string, value: boolean | string) => void;
+  colors: SolidColorConversion[];
+  gradients: LinearGradientConversion[];
 };
 
 export const PluginUI = (props: PluginUIProps) => {
@@ -72,10 +53,6 @@ export const PluginUI = (props: PluginUIProps) => {
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
         <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
-          {/* <div className="flex flex-col items-center p-4 bg-neutral-50 dark:bg-neutral-800 rounded">
-            <Description selected={props.selectedFramework} />
-          </div> */}
-
           {props.htmlPreview && (
             <Preview
               htmlPreview={props.htmlPreview}
@@ -83,18 +60,11 @@ export const PluginUI = (props: PluginUIProps) => {
               setIsResponsiveExpanded={setIsResponsiveExpanded}
             />
           )}
-          {/* <ResponsiveGrade /> */}
-          {/* <div className="h-2"></div>
-        <div className="flex justify-end w-full mb-1">
-          <button className="px-4 py-2 text-sm font-semibold text-white bg-neutral-900 rounded-lg ring-1 ring-neutral-700 hover:bg-neutral-700 focus:outline-none">
-            Copy
-          </button>
-        </div> */}
           <CodePanel
             code={props.code}
             selectedFramework={props.selectedFramework}
-            preferences={props.preferences}
-            onPreferenceChange={props.onPreferenceChange}
+            settings={props.settings}
+            onPreferenceChanged={props.onPreferenceChanged}
           />
 
           {props.colors.length > 0 && (
@@ -134,40 +104,18 @@ export const ResponsiveGrade = () => {
   );
 };
 
-type LocalCodegenPreference =
-  // | {
-  //     itemType: "alternative-unit";
-  //     defaultScaleFactor: number;
-  //     scaledUnit: string;
-  //     default?: boolean;
-  //     includedLanguages?: FrameworkTypes[];
-  //   }
-  // | {
-  //     itemType: "select";
-  //     propertyName: Exclude<keyof PluginSettings, "framework">;
-  //     label: string;
-  //     options: { label: string; value: string; isDefault?: boolean }[];
-  //     includedLanguages?: FrameworkTypes[];
-  //   }
-  // | {
-  //     itemType: "action";
-  //     propertyName: string;
-  //     label: string;
-  //     includedLanguages?: FrameworkTypes[];
-  //   }
-  // |
-  {
-    itemType: "individual_select";
-    propertyName: Exclude<
-      keyof PluginSettings,
-      "framework" | "flutterGenerationMode" | "swiftUIGenerationMode"
-    >;
-    label: string;
-    description: string;
-    value?: boolean;
-    isDefault?: boolean;
-    includedLanguages?: FrameworkTypes[];
-  };
+type LocalCodegenPreference = {
+  itemType: "individual_select";
+  propertyName: Exclude<
+    keyof PluginSettings,
+    "framework" | "flutterGenerationMode" | "swiftUIGenerationMode"
+  >;
+  label: string;
+  description: string;
+  value?: boolean;
+  isDefault?: boolean;
+  includedLanguages?: FrameworkTypes[];
+};
 
 export const preferenceOptions: LocalCodegenPreference[] = [
   {
@@ -178,20 +126,6 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
-  // {
-  //   itemType: "individual_select",
-  //   propertyName: "inlineStyle",
-  //   label: "Inline Style",
-  //   isDefault: true,
-  //   includedLanguages: ["HTML"],
-  // },
-  // {
-  //   itemType: "individual_select",
-  //   propertyName: "responsiveRoot",
-  //   label: "Responsive Root",
-  //   isDefault: false,
-  //   includedLanguages: ["Tailwind"],
-  // },
   {
     itemType: "individual_select",
     propertyName: "optimizeLayout",
@@ -264,23 +198,13 @@ const selectPreferenceOptions: {
     ],
     includedLanguages: ["SwiftUI"],
   },
-  // {
-  //   itemType: "select",
-  //   propertyName: "htmlGenerationMode",
-  //   label: "Mode",
-  //   options: [
-  //     { label: "Component", value: "component" },
-  //     { label: "Snippet", value: "snippet" },
-  //   ],
-  //   includedLanguages: ["HTML"],
-  // },
 ];
 
 export const CodePanel = (props: {
   code: string;
   selectedFramework: FrameworkTypes;
-  preferences: PluginSettings | null;
-  onPreferenceChange: (key: string, value: boolean | string) => void;
+  settings: PluginSettings | null;
+  onPreferenceChanged: (key: string, value: boolean | string) => void;
 }) => {
   const emptySelection = false;
   const [isPressed, setIsPressed] = useState(false);
@@ -304,7 +228,7 @@ export const CodePanel = (props: {
       </div>
     );
   } else {
-    const selectablePreferencesFiltered = selectPreferenceOptions.filter(
+    const selectableSettingsFiltered = selectPreferenceOptions.filter(
       (preference) =>
         preference.includedLanguages?.includes(props.selectedFramework),
     );
@@ -331,8 +255,6 @@ export const CodePanel = (props: {
 
         <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
           <div className="flex gap-2 items-center flex-wrap">
-            {/* <span className="min-w-[60px] font-medium">Settings</span> */}
-
             {preferenceOptions
               .filter((preference) =>
                 preference.includedLanguages?.includes(props.selectedFramework),
@@ -343,23 +265,23 @@ export const CodePanel = (props: {
                   title={preference.label}
                   description={preference.description}
                   isSelected={
-                    props.preferences?.[preference.propertyName] ??
+                    props.settings?.[preference.propertyName] ??
                     preference.isDefault
                   }
                   onSelect={(value) => {
-                    props.onPreferenceChange(preference.propertyName, value);
+                    props.onPreferenceChanged(preference.propertyName, value);
                   }}
                   buttonClass="bg-green-100 dark:bg-black dark:ring-green-800 ring-green-500"
                   checkClass="bg-green-400 dark:bg-black dark:bg-green-500 dark:border-green-500 ring-green-300 border-green-400"
                 />
               ))}
           </div>
-          {selectablePreferencesFiltered.length > 0 && (
+          {selectableSettingsFiltered.length > 0 && (
             <>
               <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700" />
 
               <div className="flex gap-2 items-center flex-wrap">
-                {selectablePreferencesFiltered.map((preference) => (
+                {selectableSettingsFiltered.map((preference) => (
                   <>
                     {/* <span className="min-w-[60px] font-medium">
                       {preference.label}
@@ -370,11 +292,11 @@ export const CodePanel = (props: {
                         title={option.label}
                         isSelected={
                           option.value ===
-                          (props.preferences?.[preference.propertyName] ??
+                          (props.settings?.[preference.propertyName] ??
                             option.isDefault)
                         }
                         onSelect={() => {
-                          props.onPreferenceChange(
+                          props.onPreferenceChanged(
                             preference.propertyName,
                             option.value,
                           );
@@ -418,13 +340,7 @@ export const CodePanel = (props: {
 };
 
 export const ColorsPanel = (props: {
-  colors: {
-    hex: string;
-    colorName: string;
-    exportValue: string;
-    contrastWhite: number;
-    contrastBlack: number;
-  }[];
+  colors: SolidColorConversion[];
   onColorClick: (color: string) => void;
 }) => {
   const [isPressed, setIsPressed] = useState(-1);
@@ -512,61 +428,6 @@ export const GradientsPanel = (props: {
   );
 };
 
-// export const PrevColorsPanel = (props: {
-//   colors: {
-//     hex: string;
-//     colorName: string;
-//     exportValue: string;
-//     contrastWhite: number;
-//     contrastBlack: number;
-//   }[];
-//   // onColorClick: (color: string) => void;
-// }) => {
-//   return (
-//     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-//       <div className="container mx-auto p-4">
-//         <div className="flex flex-wrap items-start space-x-2 lg:space-x-0">
-//           <div className="flex-1 min-w-0">
-//             <h2 className="text-gray-800 dark:text-gray-200 mb-2">Text</h2>
-//             {["Button1", "Button2", "Button3"].map((button, idx) => (
-//               <button
-//                 key={idx}
-//                 className="bg-white dark:bg-gray-800 p-2 mb-1 rounded-lg focus:outline-none focus:ring-0 hover:bg-gray-200 dark:hover:bg-gray-700 w-full transition"
-//               >
-//                 <div className="flex flex-col">
-//                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-//                     Tt
-//                   </span>
-//                   <span className="text-xs text-gray-500 dark:text-gray-400">
-//                     {button}
-//                   </span>
-//                 </div>
-//               </button>
-//             ))}
-//           </div>
-//           <div className="flex-1 lg:max-w-[200px]">
-//             <h2 className="text-gray-800 dark:text-gray-200 mb-2">Colors</h2>
-//             <div className="flex flex-wrap">
-//               {["red-500", "yellow-500", "blue-500"].map((color, idx) => (
-//                 <button
-//                   key={idx}
-//                   className={`bg-${color} w-full sm:w-1/2 lg:w-full h-16 mb-1 rounded-lg focus:outline-none focus:ring-0 transition`}
-//                 >
-//                   <div className="flex flex-col h-full justify-center items-center">
-//                     <span className="text-xs font-semibold text-white">
-//                       Color{idx + 1}
-//                     </span>
-//                   </div>
-//                 </button>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
 type SelectableToggleProps = {
   onSelect: (isSelected: boolean) => void;
   isSelected?: boolean;
@@ -616,10 +477,7 @@ const SelectableToggle = ({
 };
 
 export const Preview: React.FC<{
-  htmlPreview: {
-    size: { width: number; height: number };
-    content: string;
-  };
+  htmlPreview: HTMLPreview;
   isResponsiveExpanded: boolean;
   setIsResponsiveExpanded: (value: boolean) => void;
 }> = (props) => {

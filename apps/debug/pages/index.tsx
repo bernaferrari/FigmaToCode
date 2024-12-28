@@ -1,5 +1,6 @@
-import { FrameworkTypes, PluginUI } from "plugin-ui";
+import { FrameworkTypes } from "types";
 import * as React from "react";
+import { PluginUI } from "plugin-ui";
 
 export default function Web() {
   const [selectedFramework, setSelectedFramework] =
@@ -22,8 +23,8 @@ export default function Web() {
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
               htmlPreview={null}
-              preferences={undefined}
-              onPreferenceChange={() => {}}
+              settings={undefined}
+              onPreferenceChanged={() => {}}
               colors={[]}
               gradients={[]}
             />
@@ -39,8 +40,8 @@ export default function Web() {
               setSelectedFramework={setSelectedFramework}
               emptySelection={false}
               htmlPreview={null}
-              preferences={undefined}
-              onPreferenceChange={() => {}}
+              settings={undefined}
+              onPreferenceChanged={() => {}}
               colors={[]}
               gradients={[]}
             />

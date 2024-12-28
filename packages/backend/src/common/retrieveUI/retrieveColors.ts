@@ -16,24 +16,19 @@ import {
   htmlGradientFromFills,
 } from "../../html/builderImpl/htmlColor";
 import { calculateContrastRatio } from "./commonUI";
-import { FrameworkTypes } from "../../code";
-
-export type ExportSolidColor = {
-  hex: string;
-  colorName: string;
-  exportValue: string;
-  contrastWhite: number;
-  contrastBlack: number;
-  meta?: string;
-};
+import {
+  LinearGradientConversion,
+  SolidColorConversion,
+  FrameworkTypes,
+} from "types";
 
 export const retrieveGenericSolidUIColors = (
   framework: FrameworkTypes,
-): Array<ExportSolidColor> => {
+): Array<SolidColorConversion> => {
   const selectionColors = figma.getSelectionColors();
   if (!selectionColors || selectionColors.paints.length === 0) return [];
 
-  const colors: Array<ExportSolidColor> = [];
+  const colors: Array<SolidColorConversion> = [];
   selectionColors.paints.forEach((paint) => {
     const fill = convertSolidColor(paint, framework);
     if (fill) {
@@ -50,7 +45,7 @@ export const retrieveGenericSolidUIColors = (
 const convertSolidColor = (
   fill: Paint,
   framework: FrameworkTypes,
-): ExportSolidColor | null => {
+): SolidColorConversion | null => {
   const black = { r: 0, g: 0, b: 0 };
   const white = { r: 1, g: 1, b: 1 };
 
@@ -78,13 +73,11 @@ const convertSolidColor = (
   return output;
 };
 
-type ExportLinearGradient = { cssPreview: string; exportValue: string };
-
 export const retrieveGenericLinearGradients = (
   framework: FrameworkTypes,
-): Array<ExportLinearGradient> => {
+): Array<LinearGradientConversion> => {
   const selectionColors = figma.getSelectionColors();
-  const colorStr: Array<ExportLinearGradient> = [];
+  const colorStr: Array<LinearGradientConversion> = [];
 
   selectionColors?.paints.forEach((paint) => {
     if (paint.type === "GRADIENT_LINEAR") {

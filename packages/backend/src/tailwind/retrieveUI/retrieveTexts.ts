@@ -3,14 +3,15 @@ import { rgbTo6hex } from "../../common/color";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { convertFontWeight } from "../../common/convertFontWeight";
 import { nearestColor } from "../conversionTables";
+import { TailwindTextConversion } from "types";
 
 export const retrieveTailwindText = (
   sceneNode: Array<SceneNode>,
-): Array<namedText> => {
+): Array<TailwindTextConversion> => {
   // convert to Node and then flatten it. Conversion is necessary because of [tailwindText]
   const selectedText = deepFlatten(sceneNode);
 
-  const textStr: Array<namedText> = [];
+  const textStr: Array<TailwindTextConversion> = [];
 
   selectedText.forEach((node) => {
     if (node.type === "TEXT") {
@@ -42,7 +43,7 @@ export const retrieveTailwindText = (
           ? node.characters.split("\n").join("<br/>")
           : node.characters;
 
-      const black = {
+      const black: RGB = {
         r: 0,
         g: 0,
         b: 0,
@@ -69,7 +70,7 @@ export const retrieveTailwindText = (
   // retrieve only unique texts (attr + name)
   // from https://stackoverflow.com/a/18923480/4418073
   const unique: Record<string, boolean> = {};
-  const distinct: Array<namedText> = [];
+  const distinct: Array<TailwindTextConversion> = [];
   textStr.forEach((x) => {
     if (!unique[x.attr + x.name]) {
       distinct.push(x);
@@ -78,14 +79,6 @@ export const retrieveTailwindText = (
   });
 
   return distinct;
-};
-
-type namedText = {
-  name: string;
-  attr: string;
-  full: string;
-  style: string;
-  contrastBlack: number;
 };
 
 const style = (node: TextNode): string => {
@@ -103,7 +96,7 @@ const style = (node: TextNode): string => {
       .replace(" ", "")
       .toLowerCase();
 
-    const weight = convertFontWeight(Number(value));
+    const weight = convertFontWeight(value);
     if (weight) {
       comp += `font-weight: ${weight};`;
     }

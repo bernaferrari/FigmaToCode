@@ -6,12 +6,13 @@ import {
   swiftuiMain,
   convertIntoNodes,
   htmlMain,
-  PluginSettings,
+  postSettingsChanged,
 } from "backend";
 import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retrieveColors";
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
 import { htmlCodeGenTextStyles } from "backend/src/html/htmlMain";
 import { swiftUICodeGenTextStyles } from "backend/src/swiftui/swiftuiMain";
+import { PluginSettings, SettingWillChangeMessage } from "types";
 
 let userPluginSettings: PluginSettings;
 
@@ -58,11 +59,7 @@ const getUserSettings = async () => {
 
 const initSettings = async () => {
   await getUserSettings();
-  figma.ui.postMessage({
-    type: "pluginSettingChanged",
-    data: userPluginSettings,
-  });
-
+  postSettingsChanged(userPluginSettings);
   safeRun(userPluginSettings);
 };
 
@@ -71,11 +68,9 @@ const safeRun = (settings: PluginSettings) => {
     run(settings);
   } catch (e) {
     if (e && typeof e === "object" && "message" in e) {
-      console.log("error: ", (e as any).stack);
-      figma.ui.postMessage({
-        type: "error",
-        data: e.message,
-      });
+      const error = e as Error;
+      console.log("error: ", error.stack);
+      figma.ui.postMessage({ type: "error", error: error.message });
     }
   }
 };
@@ -83,7 +78,7 @@ const safeRun = (settings: PluginSettings) => {
 const standardMode = async () => {
   figma.showUI(__html__, { width: 450, height: 550, themeColors: true });
   await initSettings();
-  
+
   // Listen for selection changes
   figma.on("selectionchange", () => {
     safeRun(userPluginSettings);
@@ -97,13 +92,10 @@ const standardMode = async () => {
   figma.ui.onmessage = (msg) => {
     console.log("[node] figma.ui.onmessage", msg);
 
-    if (msg.type === "pluginSettingChanged") {
-      (userPluginSettings as any)[msg.key] = msg.value;
+    if (msg.type === "pluginSettingWillChange") {
+      const { key, value } = msg as SettingWillChangeMessage<unknown>;
+      (userPluginSettings as any)[key] = value;
       figma.clientStorage.setAsync("userPluginSettings", userPluginSettings);
-      // figma.ui.postMessage({
-      //   type: "pluginSettingChanged",
-      //   data: userPluginSettings,
-      // });
       safeRun(userPluginSettings);
     }
   };

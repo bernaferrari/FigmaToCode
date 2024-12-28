@@ -1,8 +1,9 @@
-import { convertNodesOnRectangle } from "./convertNodesOnRectangle";
-
-type ParentType = (BaseNode & ChildrenMixin) | null;
-
-export let globalTextStyleSegments: Record<string, StyledTextSegment[]> = {};
+type StyledTextSegmentSubset = Omit<
+  StyledTextSegment,
+  "listSpacing" | "paragraphIndent" | "paragraphSpacing" | "textStyleOverrides"
+>;
+export let globalTextStyleSegments: Record<string, StyledTextSegmentSubset[]> =
+  {};
 
 export const cloneNode = <T extends BaseNode>(node: T): T => {
   // Create the cloned object with the correct prototype
@@ -30,9 +31,27 @@ export const cloneNode = <T extends BaseNode>(node: T): T => {
   return cloned;
 };
 
+/**
+ * Identify all nodes that are inside Rectangles and transform those Rectangles into Frames containing those nodes.
+ */
+export const convertNodesOnRectangle = (
+  node: FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode,
+): FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode => {
+  if (node.children.length < 2) {
+    return node;
+  }
+  if (!node.id) {
+    throw new Error(
+      "Node is missing an id! This error should only happen in tests.",
+    );
+  }
+
+  return node;
+};
+
 export const frameNodeTo = (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
-  parent: ParentType,
+  parent: ParentNode,
 ):
   | RectangleNode
   | FrameNode
@@ -57,7 +76,7 @@ export const frameNodeTo = (
 // auto convert Frame to Rectangle when Frame has no Children
 const frameToRectangleNode = (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
-  parent: ParentType,
+  parent: ParentNode,
 ): RectangleNode => {
   const clonedNode = cloneNode(node);
   if (parent) {
@@ -80,13 +99,13 @@ export const overrideReadonlyProperty = <T, K extends keyof T>(
   });
 };
 
-const assignParent = (node: SceneNode, parent: ParentType) => {
+const assignParent = (node: SceneNode, parent: ParentNode) => {
   if (parent) {
     overrideReadonlyProperty(node, "parent", parent);
   }
 };
 
-const standardClone = <T extends SceneNode>(node: T, parent: ParentType): T => {
+const standardClone = <T extends SceneNode>(node: T, parent: ParentNode): T => {
   const clonedNode = cloneNode(node);
   if (parent !== null) {
     assignParent(clonedNode, parent);
@@ -94,9 +113,11 @@ const standardClone = <T extends SceneNode>(node: T, parent: ParentType): T => {
   return clonedNode;
 };
 
+type ParentNode = (BaseNode & ChildrenMixin) | null;
+
 export const convertIntoNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
-  parent: ParentType = null,
+  parent: ParentNode = null,
 ): Array<SceneNode> => {
   const mapped: Array<SceneNode | null> = sceneNode.map((node: SceneNode) => {
     switch (node.type) {
@@ -198,7 +219,7 @@ export const convertIntoNodes = (
 
 const iconToRectangle = (
   node: FrameNode | InstanceNode | ComponentNode | GroupNode,
-  parent: ParentType,
+  parent: ParentNode,
 ): RectangleNode | null => {
   // TODO Fix this.
   if (false && node.children.every((d) => d.type === "VECTOR")) {
