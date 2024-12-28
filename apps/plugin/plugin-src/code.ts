@@ -16,7 +16,7 @@ import { PluginSettings, SettingWillChangeMessage } from "types";
 
 let userPluginSettings: PluginSettings;
 
-const defaultPluginSettings: PluginSettings = {
+export const defaultPluginSettings: PluginSettings = {
   framework: "HTML",
   jsx: false,
   optimizeLayout: true,
