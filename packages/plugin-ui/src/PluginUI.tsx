@@ -8,12 +8,13 @@ import {
   LinearGradientConversion,
   PluginSettings,
   SolidColorConversion,
+  Warning,
 } from "types";
 
 type PluginUIProps = {
   code: string;
   htmlPreview: HTMLPreview;
-  warnings: string[];
+  warnings: Warning[];
   emptySelection: boolean;
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
