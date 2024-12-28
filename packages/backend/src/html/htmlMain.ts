@@ -5,11 +5,8 @@ import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-<<<<<<< HEAD
 import { PluginSettings } from "types";
-=======
 import { addWarning } from "../common/commonConversionWarnings";
->>>>>>> 4f01feb (Added a method for recording and displaying warnings when doing conversions.)
 
 let showLayerNames = false;
 

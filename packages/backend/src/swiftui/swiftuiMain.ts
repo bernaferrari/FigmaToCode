@@ -3,11 +3,8 @@ import { stringToClassName, sliceNum } from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-<<<<<<< HEAD
 import { PluginSettings } from "types";
-=======
 import { addWarning } from "../common/commonConversionWarnings";
->>>>>>> 4f01feb (Added a method for recording and displaying warnings when doing conversions.)
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];

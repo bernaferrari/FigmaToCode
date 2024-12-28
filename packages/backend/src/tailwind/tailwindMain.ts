@@ -5,11 +5,8 @@ import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-<<<<<<< HEAD
 import { PluginSettings } from "types";
-=======
 import { addWarning } from "../common/commonConversionWarnings";
->>>>>>> 4f01feb (Added a method for recording and displaying warnings when doing conversions.)
 
 export let localTailwindSettings: PluginSettings;
 
