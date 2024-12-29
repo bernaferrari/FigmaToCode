@@ -67,17 +67,17 @@ export const PluginUI = (props: PluginUIProps) => {
             />
           )}
           {warnings.length > 0 && (
-            <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-4 w-full">
+            <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-3 w-full">
               <div className="flex flex-row gap-1">
-                <div style={{ transform: "translate(2px, 2px) scale(80%)" }}>
+                <div style={{ transform: "translate(2px, 0px) scale(80%)" }}>
                   <WarningIcon />
                 </div>
-                <h3 className="text-lg font-bold">Warnings:</h3>
+                <h3 className="text-base font-bold">Warnings:</h3>
               </div>
               <ul className="list-disc pl-6">
                 {warnings.map((message: string) => (
                   <li className="list-item">
-                    <em className="italic">{message}</em>
+                    <em className="italic text-sm">{message}</em>
                   </li>
                 ))}
               </ul>
