@@ -153,3 +153,28 @@ export type SwiftUIModifier = [
   string,
   string | SwiftUIModifier | SwiftUIModifier[],
 ];
+
+// UI
+
+export interface PreferenceOptions {
+  itemType: string;
+  label: string;
+  propertyName: string;
+  includedLanguages?: Framework[];
+}
+export interface SelectPreferenceOptions extends PreferenceOptions {
+  itemType: "select";
+  propertyName: Exclude<keyof PluginSettings, "framework">;
+  options: { label: string; value: string; isDefault?: boolean }[];
+}
+
+export interface LocalCodegenPreferenceOptions extends PreferenceOptions {
+  itemType: "individual_select";
+  propertyName: Exclude<
+    keyof PluginSettings,
+    "framework" | "flutterGenerationMode" | "swiftUIGenerationMode"
+  >;
+  description: string;
+  value?: boolean;
+  isDefault?: boolean;
+}
