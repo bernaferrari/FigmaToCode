@@ -42,7 +42,6 @@ export const run = (settings: PluginSettings) => {
   };
 
   postConversionComplete({
-    type: "code",
     code,
     htmlPreview,
     colors,
