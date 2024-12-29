@@ -66,7 +66,6 @@ const tailwindWidgetGenerator = (
       case "VECTOR":
         addWarning("VectorNodes are not supported in Tailwind");
         break;
-      //   comp += htmlAsset(node, isJsx);
     }
   });
 

@@ -68,7 +68,7 @@ export const frameNodeTo = (
   overrideReadonlyProperty(
     clone,
     "children",
-    convertIntoNodes(node.children, clone),
+    convertToAltNodes(node.children, clone),
   );
   return convertNodesOnRectangle(clone);
 };
@@ -115,7 +115,7 @@ const standardClone = <T extends SceneNode>(node: T, parent: ParentNode): T => {
 
 type ParentNode = (BaseNode & ChildrenMixin) | null;
 
-export const convertIntoNodes = (
+export const convertToAltNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
   parent: ParentNode = null,
 ): Array<SceneNode> => {
@@ -140,7 +140,7 @@ export const convertIntoNodes = (
         if (node.children.length === 1 && node.visible) {
           // if Group is visible and has only one child, Group should disappear.
           // there will be a single value anyway.
-          return convertIntoNodes(node.children, parent)[0];
+          return convertToAltNodes(node.children, parent)[0];
         }
 
         // TODO see if necessary.
@@ -154,7 +154,7 @@ export const convertIntoNodes = (
         overrideReadonlyProperty(
           clone,
           "children",
-          convertIntoNodes(node.children, clone),
+          convertToAltNodes(node.children, clone),
         );
 
         // try to find big rect and regardless of that result, also try to convert to autolayout.
@@ -188,7 +188,7 @@ export const convertIntoNodes = (
         overrideReadonlyProperty(
           sectionClone,
           "children",
-          convertIntoNodes(node.children, sectionClone),
+          convertToAltNodes(node.children, sectionClone),
         );
         return sectionClone;
       case "BOOLEAN_OPERATION":
