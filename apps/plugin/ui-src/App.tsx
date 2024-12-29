@@ -71,7 +71,7 @@ export default function App() {
           // const emptyMessage = untypedMessage as EmptyMessage;
           setState((prevState) => ({
             ...prevState,
-            code: "// No layer is selected.",
+            code: "",
             htmlPreview: emptyPreview,
             warnings: [],
             colors: [],
@@ -136,7 +136,6 @@ export default function App() {
       <PluginUI
         code={state.code}
         warnings={state.warnings}
-        emptySelection={false}
         selectedFramework={state.selectedFramework}
         setSelectedFramework={handleFrameworkChange}
         htmlPreview={state.htmlPreview}

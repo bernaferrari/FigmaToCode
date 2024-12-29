@@ -21,7 +21,6 @@ export default function Web() {
               code={
                 "backend:dev: CJS dist/index.js 105.74 KB backend:dev: CJS ⚡️ Build        success in 419ms plugin:dev: warn - Port 3000 is in use, trying 3001        instead. plugin:dev: warn - Port 3001 is in use, trying 3002 instead."
               }
-              emptySelection={false}
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
               htmlPreview={null}
@@ -41,7 +40,6 @@ export default function Web() {
               code={"code goes hereeeee"}
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
-              emptySelection={false}
               htmlPreview={null}
               settings={undefined}
               onPreferenceChanged={() => {}}

@@ -15,7 +15,6 @@ type PluginUIProps = {
   code: string;
   htmlPreview: HTMLPreview;
   warnings: Warning[];
-  emptySelection: boolean;
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
   settings: PluginSettings | null;
@@ -28,6 +27,7 @@ const frameworks: FrameworkTypes[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
 
 export const PluginUI = (props: PluginUIProps) => {
   const [isResponsiveExpanded, setIsResponsiveExpanded] = useState(false);
+  const isEmpty = props.code === "";
 
   const warnings = props.warnings ?? [];
 
@@ -59,7 +59,7 @@ export const PluginUI = (props: PluginUIProps) => {
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
         <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
-          {props.htmlPreview && (
+          {isEmpty === false && props.htmlPreview && (
             <Preview
               htmlPreview={props.htmlPreview}
               isResponsiveExpanded={isResponsiveExpanded}
@@ -229,7 +229,6 @@ export const CodePanel = (props: {
   settings: PluginSettings | null;
   onPreferenceChanged: (key: string, value: boolean | string) => void;
 }) => {
-  const emptyCodeMessage = "// No layer is selected.";
   const isEmpty = props.code === "";
   const [isPressed, setIsPressed] = useState(false);
   const [syntaxHovered, setSyntaxHovered] = useState(false);
@@ -336,22 +335,26 @@ export const CodePanel = (props: {
           syntaxHovered ? "ring-2" : "ring-0"
         }`}
       >
-        <SyntaxHighlighter
-          language="dart"
-          style={theme}
-          customStyle={{
-            fontSize: 12,
-            borderRadius: 8,
-            marginTop: 0,
-            marginBottom: 0,
-            backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
-            transitionProperty: "all",
-            transitionTimingFunction: "ease",
-            transitionDuration: "0.2s",
-          }}
-        >
-          {props.code || emptyCodeMessage}
-        </SyntaxHighlighter>
+        {isEmpty ? (
+          <h3>No layer is selected. Please select a layer.</h3>
+        ) : (
+          <SyntaxHighlighter
+            language="dart"
+            style={theme}
+            customStyle={{
+              fontSize: 12,
+              borderRadius: 8,
+              marginTop: 0,
+              marginBottom: 0,
+              backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
+              transitionProperty: "all",
+              transitionTimingFunction: "ease",
+              transitionDuration: "0.2s",
+            }}
+          >
+            {props.code}
+          </SyntaxHighlighter>
+        )}
       </div>
     </div>
   );
