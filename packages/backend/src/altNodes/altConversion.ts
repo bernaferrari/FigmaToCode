@@ -123,7 +123,6 @@ export const convertToAltNodes = (
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
-        return standardClone(node, parent);
       case "LINE":
         return standardClone(node, parent);
       case "FRAME":
@@ -131,22 +130,12 @@ export const convertToAltNodes = (
       case "COMPONENT":
       case "COMPONENT_SET":
         // TODO Fix asset export. Use the new API.
-        // const iconToRect = iconToRectangle(node, parent);
-        // if (iconToRect != null) {
-        //   return iconToRect;
-        // }
         return frameNodeTo(node, parent);
       case "GROUP":
         if (node.children.length === 1 && node.visible) {
           // if Group is visible and has only one child, Group should disappear.
           // there will be a single value anyway.
           return convertToAltNodes(node.children, parent)[0];
-        }
-
-        // TODO see if necessary.
-        const iconToRect = iconToRectangle(node, parent);
-        if (iconToRect != null) {
-          return iconToRect;
         }
 
         const clone = standardClone(node, parent);
@@ -215,47 +204,6 @@ export const convertToAltNodes = (
   });
 
   return mapped.filter(notEmpty);
-};
-
-const iconToRectangle = (
-  node: FrameNode | InstanceNode | ComponentNode | GroupNode,
-  parent: ParentNode,
-): RectangleNode | null => {
-  // TODO Fix this.
-  if (false && node.children.every((d) => d.type === "VECTOR")) {
-    // const node = new RectangleNode();
-    // node.id = node.id;
-    // node.name = node.name;
-    // if (Parent) {
-    //   node.parent = Parent;
-    // }
-    // convertBlend(Node, node);
-    // // width, x, y
-    // convertLayout(Node, node);
-    // // Vector support is still missing. Meanwhile, add placeholder.
-    // node.cornerRadius = 8;
-    // node.strokes = [];
-    // node.strokeWeight = 0;
-    // node.strokeMiterLimit = 0;
-    // node.strokeAlign = "CENTER";
-    // node.strokeCap = "NONE";
-    // node.strokeJoin = "BEVEL";
-    // node.dashPattern = [];
-    // node.fillStyleId = "";
-    // node.strokeStyleId = "";
-    // node.fills = [
-    //   {
-    //     type: "IMAGE",
-    //     imageHash: "",
-    //     scaleMode: "FIT",
-    //     visible: true,
-    //     opacity: 0.5,
-    //     blendMode: "NORMAL",
-    //   },
-    // ];
-    // return node;
-  }
-  return null;
 };
 
 export function notEmpty<TValue>(
