@@ -5,7 +5,7 @@ import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { PluginSettings } from "types";
+import { PluginSettings, HTMLPreview } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 
 let showLayerNames = false;
@@ -40,15 +40,29 @@ export const htmlMain = (
 export const generateHTMLPreview = (
   nodes: SceneNode[],
   settings: PluginSettings,
-) =>
-  htmlMain(
-    nodes,
-    {
-      ...settings,
-      jsx: false,
+  code?: string,
+): HTMLPreview => {
+  const htmlCodeAlreadyGenerated =
+    settings.framework === "HTML" && settings.jsx === false && code;
+  const htmlCode = htmlCodeAlreadyGenerated
+    ? code
+    : htmlMain(
+        nodes,
+        {
+          ...settings,
+          jsx: false,
+        },
+        true,
+      );
+
+  return {
+    size: {
+      width: nodes[0].width,
+      height: nodes[0].height,
     },
-    true,
-  );
+    content: htmlCode,
+  };
+};
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const htmlWidgetGenerator = (
