@@ -10,6 +10,7 @@ import {
   SolidColorConversion,
   ErrorMessage,
   SettingsChangedMessage,
+  Warning,
 } from "types";
 import { postUISettingsChangingMessage } from "./messaging";
 
@@ -21,6 +22,7 @@ interface AppState {
   settings: PluginSettings | null;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
+  warnings: Warning[];
 }
 
 const emptyPreview = { size: { width: 0, height: 0 }, content: "" };
@@ -33,6 +35,7 @@ export default function App() {
     settings: null,
     colors: [],
     gradients: [],
+    warnings: [],
   });
 
   const rootStyles = getComputedStyle(document.documentElement);
@@ -68,8 +71,9 @@ export default function App() {
           // const emptyMessage = untypedMessage as EmptyMessage;
           setState((prevState) => ({
             ...prevState,
-            code: "// No layer is selected.",
+            code: "",
             htmlPreview: emptyPreview,
+            warnings: [],
             colors: [],
             gradients: [],
           }));
@@ -131,7 +135,7 @@ export default function App() {
     <div className={`${figmaColorBgValue === "#ffffff" ? "" : "dark"}`}>
       <PluginUI
         code={state.code}
-        emptySelection={false}
+        warnings={state.warnings}
         selectedFramework={state.selectedFramework}
         setSelectedFramework={handleFrameworkChange}
         htmlPreview={state.htmlPreview}

@@ -6,6 +6,7 @@ import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { PluginSettings } from "types";
+import { addWarning } from "../common/commonConversionWarnings";
 
 export let localTailwindSettings: PluginSettings;
 
@@ -63,7 +64,9 @@ const tailwindWidgetGenerator = (
       case "SECTION":
         comp += tailwindSection(node, isJsx);
         break;
-      // case "VECTOR":
+      case "VECTOR":
+        addWarning("VectorNodes are not supported in Tailwind");
+        break;
       //   comp += htmlAsset(node, isJsx);
     }
   });
@@ -232,6 +235,7 @@ export const tailwindContainer = (
     let tag = "div";
     let src = "";
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
+      addWarning("Image fills are replaced with placeholders");
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
         src = ` src="https://via.placeholder.com/${node.width.toFixed(

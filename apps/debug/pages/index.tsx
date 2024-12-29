@@ -6,6 +6,8 @@ export default function Web() {
   const [selectedFramework, setSelectedFramework] =
     React.useState<FrameworkTypes>("HTML");
 
+  const testWarnings = ["This is an example of a conversion warning message."];
+
   return (
     <div className="flex flex-col p-8 space-y-2">
       <p className="text-3xl font-bold">Debug Mode</p>
@@ -19,7 +21,6 @@ export default function Web() {
               code={
                 "backend:dev: CJS dist/index.js 105.74 KB backend:dev: CJS ⚡️ Build        success in 419ms plugin:dev: warn - Port 3000 is in use, trying 3001        instead. plugin:dev: warn - Port 3001 is in use, trying 3002 instead."
               }
-              emptySelection={false}
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
               htmlPreview={null}
@@ -27,6 +28,7 @@ export default function Web() {
               onPreferenceChanged={() => {}}
               colors={[]}
               gradients={[]}
+              warnings={testWarnings}
             />
           </div>
         </div>
@@ -38,12 +40,12 @@ export default function Web() {
               code={"code goes hereeeee"}
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
-              emptySelection={false}
               htmlPreview={null}
               settings={undefined}
               onPreferenceChanged={() => {}}
               colors={[]}
               gradients={[]}
+              warnings={testWarnings}
             />
           </div>
         </div>

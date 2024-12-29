@@ -22,7 +22,11 @@ export interface ConversionData {
   htmlPreview: HTMLPreview;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
+  warnings: Warning[];
 }
+
+export type Warning = string;
+export type Warnings = Set<Warning>;
 
 export interface Message {
   type: string;

@@ -8,11 +8,12 @@ import { generateHTMLPreview, htmlMain } from "./html/htmlMain";
 import { postConversionComplete, postEmptyMessage } from "./messaging";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
+import { clearWarnings, warnings } from "./common/commonConversionWarnings";
 import { PluginSettings } from "types";
 
 export const run = (settings: PluginSettings) => {
+  clearWarnings();
   const selection = figma.currentPage.selection;
-
   const convertedSelection = convertIntoNodes(selection, null);
 
   // ignore when nothing was selected
@@ -47,6 +48,7 @@ export const run = (settings: PluginSettings) => {
     colors,
     gradients,
     settings,
+    warnings: [...warnings],
   });
 };
 

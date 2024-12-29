@@ -6,6 +6,7 @@ import {
   nearestValue,
 } from "../conversionTables";
 import { TailwindColorType } from "types";
+import { addWarning } from "../../common/commonConversionWarnings";
 
 /**
  * Get a tailwind color value object
@@ -89,6 +90,10 @@ export const tailwindGradientFromFills = (
   if (fill?.type === "GRADIENT_LINEAR") {
     return tailwindGradient(fill);
   }
+
+  addWarning(
+    "Gradients are not fully supported in Tailwind except for Linear Gradients.",
+  );
 
   return "";
 };

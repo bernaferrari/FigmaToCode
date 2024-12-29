@@ -6,6 +6,7 @@ import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { PluginSettings } from "types";
+import { addWarning } from "../common/commonConversionWarnings";
 
 let showLayerNames = false;
 
@@ -87,6 +88,8 @@ const htmlWidgetGenerator = (
         break;
       case "VECTOR":
         comp += htmlAsset(node, isJsx);
+        addWarning("VectorNodes are not fully supported in HTML");
+        break;
     }
   });
 
@@ -208,6 +211,7 @@ export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
   let tag = "div";
   let src = "";
   if (retrieveTopFill(node.fills)?.type === "IMAGE") {
+    addWarning("Image fills are replaced with placeholders");
     tag = "img";
     src = ` src="https://via.placeholder.com/${node.width.toFixed(
       0,
@@ -249,6 +253,7 @@ export const htmlContainer = (
     let tag = "div";
     let src = "";
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
+      addWarning("Image fills are replaced with placeholders");
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
         src = ` src="https://via.placeholder.com/${node.width.toFixed(

@@ -8,12 +8,13 @@ import {
   LinearGradientConversion,
   PluginSettings,
   SolidColorConversion,
+  Warning,
 } from "types";
 
 type PluginUIProps = {
   code: string;
   htmlPreview: HTMLPreview;
-  emptySelection: boolean;
+  warnings: Warning[];
   selectedFramework: FrameworkTypes;
   setSelectedFramework: (framework: FrameworkTypes) => void;
   settings: PluginSettings | null;
@@ -22,13 +23,18 @@ type PluginUIProps = {
   gradients: LinearGradientConversion[];
 };
 
+const frameworks: FrameworkTypes[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
+
 export const PluginUI = (props: PluginUIProps) => {
   const [isResponsiveExpanded, setIsResponsiveExpanded] = useState(false);
+  const isEmpty = props.code === "";
+
+  const warnings = props.warnings ?? [];
 
   return (
     <div className="flex flex-col h-full dark:text-white">
       <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
-        {["HTML", "Tailwind", "Flutter", "SwiftUI"].map((tab) => (
+        {frameworks.map((tab) => (
           <button
             key={`tab ${tab}`}
             className={`w-full p-1 text-sm ${
@@ -53,12 +59,29 @@ export const PluginUI = (props: PluginUIProps) => {
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
         <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
-          {props.htmlPreview && (
+          {isEmpty === false && props.htmlPreview && (
             <Preview
               htmlPreview={props.htmlPreview}
               isResponsiveExpanded={isResponsiveExpanded}
               setIsResponsiveExpanded={setIsResponsiveExpanded}
             />
+          )}
+          {warnings.length > 0 && (
+            <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-4 w-full">
+              <div className="flex flex-row gap-1">
+                <div style={{ transform: "translate(2px, 2px) scale(80%)" }}>
+                  <WarningIcon />
+                </div>
+                <h3 className="text-lg font-bold">Warnings:</h3>
+              </div>
+              <ul className="list-disc pl-6">
+                {warnings.map((message: string) => (
+                  <li className="list-item">
+                    <em className="italic">{message}</em>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
           <CodePanel
             code={props.code}
@@ -206,7 +229,7 @@ export const CodePanel = (props: {
   settings: PluginSettings | null;
   onPreferenceChanged: (key: string, value: boolean | string) => void;
 }) => {
-  const emptySelection = false;
+  const isEmpty = props.code === "";
   const [isPressed, setIsPressed] = useState(false);
   const [syntaxHovered, setSyntaxHovered] = useState(false);
 
@@ -220,25 +243,18 @@ export const CodePanel = (props: {
   const handleButtonHover = () => setSyntaxHovered(true);
   const handleButtonLeave = () => setSyntaxHovered(false);
 
-  if (emptySelection) {
-    return (
-      <div className="flex flex-col space-y-2 m-auto items-center justify-center p-4 {sectionStyle}">
-        <p className="text-lg font-bold">Nothing is selected</p>
-        <p className="text-xs">Try selecting a layer, any layer</p>
-      </div>
-    );
-  } else {
-    const selectableSettingsFiltered = selectPreferenceOptions.filter(
-      (preference) =>
-        preference.includedLanguages?.includes(props.selectedFramework),
-    );
+  const selectableSettingsFiltered = selectPreferenceOptions.filter(
+    (preference) =>
+      preference.includedLanguages?.includes(props.selectedFramework),
+  );
 
-    return (
-      <div className="w-full flex flex-col gap-2 mt-2">
-        <div className="flex items-center justify-between w-full">
-          <p className="text-lg font-medium text-center dark:text-white rounded-lg">
-            Code
-          </p>
+  return (
+    <div className="w-full flex flex-col gap-2 mt-2">
+      <div className="flex items-center justify-between w-full">
+        <p className="text-lg font-medium text-center dark:text-white rounded-lg">
+          Code
+        </p>
+        {isEmpty === false && (
           <button
             className={`px-4 py-1 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${
               isPressed
@@ -251,8 +267,9 @@ export const CodePanel = (props: {
           >
             Copy
           </button>
-        </div>
-
+        )}
+      </div>
+      {isEmpty === false && (
         <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
           <div className="flex gap-2 items-center flex-wrap">
             {preferenceOptions
@@ -285,7 +302,7 @@ export const CodePanel = (props: {
                   <>
                     {/* <span className="min-w-[60px] font-medium">
                       {preference.label}
-                    </span> */}
+                      </span> */}
                     {preference.options.map((option) => (
                       <SelectableToggle
                         key={option.label}
@@ -311,12 +328,16 @@ export const CodePanel = (props: {
             </>
           )}
         </div>
+      )}
 
-        <div
-          className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
-            syntaxHovered ? "ring-2" : "ring-0"
-          }`}
-        >
+      <div
+        className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
+          syntaxHovered ? "ring-2" : "ring-0"
+        }`}
+      >
+        {isEmpty ? (
+          <h3>No layer is selected. Please select a layer.</h3>
+        ) : (
           <SyntaxHighlighter
             language="dart"
             style={theme}
@@ -333,10 +354,10 @@ export const CodePanel = (props: {
           >
             {props.code}
           </SyntaxHighlighter>
-        </div>
+        )}
       </div>
-    );
-  }
+    </div>
+  );
 };
 
 export const ColorsPanel = (props: {
@@ -572,5 +593,24 @@ const ExpandIcon = (props: { size: number }) => (
     viewBox="0 0 256 256"
   >
     <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM101.66,53.66,120,35.31V96a8,8,0,0,0,16,0V35.31l18.34,18.35a8,8,0,0,0,11.32-11.32l-32-32a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32Zm52.68,148.68L136,220.69V160a8,8,0,0,0-16,0v60.69l-18.34-18.35a8,8,0,0,0-11.32,11.32l32,32a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Z"></path>
+  </svg>
+);
+
+const WarningIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    className="lucide lucide-triangle-alert"
+  >
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+    <path d="M12 9v4" />
+    <path d="M12 17h.01" />
   </svg>
 );
