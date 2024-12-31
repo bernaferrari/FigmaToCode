@@ -1,4 +1,4 @@
-import { convertToAltNodes } from "./altNodes/altConversion";
+import { convertNodesToAltNodes } from "./altNodes/altConversion";
 import {
   retrieveGenericSolidUIColors,
   retrieveGenericLinearGradients as retrieveGenericGradients,
@@ -14,7 +14,7 @@ export const run = (settings: PluginSettings) => {
   const { framework } = settings;
   const selection = figma.currentPage.selection;
 
-  const convertedSelection = convertToAltNodes(selection, null);
+  const convertedSelection = convertNodesToAltNodes(selection, null);
 
   // ignore when nothing was selected
   // If the selection was empty, the converted selection will also be empty.

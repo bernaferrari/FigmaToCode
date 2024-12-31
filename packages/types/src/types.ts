@@ -52,6 +52,25 @@ export type ErrorMessage = Message & {
   error: string;
 };
 
+// Nodes
+export type ParentNode = (BaseNode & ChildrenMixin) | null;
+
+export type AltNode<K extends BaseNode> = Omit<
+  K,
+  | "parent"
+  | "children"
+  | "horizontalPadding"
+  | "verticalPadding"
+  | "mainComponent"
+  | "masterComponent"
+  | "variantProperties"
+  | "get_annotations"
+  | "componentPropertyDefinitions"
+  | "exposedInstances"
+  | "componentProperties"
+  | "componenPropertyReferences"
+>;
+
 // Styles & Conversions
 
 export type LayoutMode =
@@ -66,6 +85,11 @@ export type LayoutMode =
   | "BottomStart"
   | "BottomCenter"
   | "BottomEnd";
+
+export interface BoundingRect {
+  x: number;
+  y: number;
+}
 
 interface AllSides {
   all: number;
@@ -96,6 +120,11 @@ export interface Size {
   readonly width: SizeValue;
   readonly height: SizeValue;
 }
+
+export type StyledTextSegmentSubset = Omit<
+  StyledTextSegment,
+  "listSpacing" | "paragraphIndent" | "paragraphSpacing" | "textStyleOverrides"
+>;
 
 export type FontWeightNumber =
   | "100"
