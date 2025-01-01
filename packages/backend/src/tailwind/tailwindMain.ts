@@ -4,10 +4,10 @@ import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { AltNode, PluginSettings } from "types";
+import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 import { renderAndAttachSVG, renderNodeAsSVG } from "../altNodes/altNodeUtils";
-import { isVisible } from "../common/isVisible";
+import { getVisibleNodes } from "../common/nodeVisibility";
 
 export let localTailwindSettings: PluginSettings;
 
@@ -41,9 +41,9 @@ const tailwindWidgetGenerator = async (
   isJsx: boolean,
 ): Promise<string> => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const promiseOfConvertedCode = sceneNode
-    .filter(isVisible)
-    .map(convertNode(isJsx));
+  const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
+    convertNode(isJsx),
+  );
   const code = (await Promise.all(promiseOfConvertedCode)).join("");
   return code;
 };
