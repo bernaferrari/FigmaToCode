@@ -12,14 +12,18 @@ export let globalTextStyleSegments: Record<string, StyledTextSegmentSubset[]> =
   {};
 
 export const convertNodeToAltNode =
-  (parent: ParentNode | null) => (node: SceneNode) => {
-    switch (node.type) {
+  (parent: ParentNode | null) =>
+  (node: SceneNode): SceneNode => {
+    const type = node.type;
+    switch (type) {
       // Standard nodes
       case "RECTANGLE":
       case "ELLIPSE":
       case "LINE":
       case "STAR":
       case "POLYGON":
+      case "VECTOR":
+      case "BOOLEAN_OPERATION":
         return cloneNode(node, parent);
 
       // Group nodes
@@ -27,44 +31,28 @@ export const convertNodeToAltNode =
       case "INSTANCE":
       case "COMPONENT":
       case "COMPONENT_SET":
-        //TODO: I think this is almost identical to the group thing below
-
-        // TODO: Fix asset export. Use the new API.
-        return frameNodeTo(node, parent);
-
-      case "SECTION":
-        const sectionClone = cloneNode(node, parent);
-        const sectionChildren = convertNodesToAltNodes(
-          node.children,
-          sectionClone,
-        );
-        return assignChildren(sectionChildren, sectionClone);
+        // if the frame, instance etc. has no children, convert the frame to rectangle
+        if (node.children.length === 0)
+          return cloneAsRectangleNode(node, parent);
+      // goto SECTION
 
       case "GROUP":
-        if (node.children.length === 1 && node.visible) {
-          // if Group is visible and has only one child, Group should disappear.
-          // there will be a single value anyway.
-          return convertNodesToAltNodes(node.children, parent)[0];
-        }
+        // if a Group is visible and has only one child, the Group should be ungrouped.
+        if (type === "GROUP" && node.children.length === 1 && node.visible)
+          return convertNodeToAltNode(parent)(node.children[0]);
+      // goto SECTION
 
-        const groupClone = cloneNode(node, parent);
-        const groupChildren = convertNodesToAltNodes(node.children, groupClone);
-        const groupWithChildren = assignChildren(groupChildren, groupClone);
-
-        return groupWithChildren;
+      case "SECTION":
+        const group = cloneNode(node, parent);
+        const groupChildren = convertNodesToAltNodes(node.children, group);
+        return assignChildren(groupChildren, group);
 
       // Text Nodes
       case "TEXT":
         globalTextStyleSegments[node.id] = extractStyledTextSegments(node);
         return cloneNode(node, parent);
 
-      // Unsupported
-      case "BOOLEAN_OPERATION":
-        addWarning(
-          "Boolean Groups are not supported and will be converted to rectangles.",
-        );
-        return cloneAsRectangleNode(node, parent);
-
+      // Unsupported Nodes
       case "SLICE":
         throw new Error(
           `Sorry, Slices are not supported. Type:${node.type} id:${node.id}`,
@@ -111,30 +99,6 @@ export const cloneNode = <T extends BaseNode>(
   assignParent(parent, cloned);
 
   return cloned;
-};
-
-export const frameNodeTo = (
-  node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
-  parent: ParentNode | null,
-):
-  | RectangleNode
-  | FrameNode
-  | InstanceNode
-  | ComponentNode
-  | GroupNode
-  | ComponentSetNode => {
-  if (node.children.length === 0) {
-    // if it has no children, convert frame to rectangle
-    return cloneAsRectangleNode(node, parent);
-  }
-  const clone = cloneNode(node, parent);
-
-  overrideReadonlyProperty(
-    "children",
-    convertNodesToAltNodes(node.children, clone),
-    clone,
-  );
-  return clone;
 };
 
 // auto convert Frame to Rectangle when Frame has no Children

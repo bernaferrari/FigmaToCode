@@ -1,13 +1,12 @@
 import { curry } from "../common/curry";
 
 export const overrideReadonlyProperty = curry(
-  <T, K extends keyof T>(prop: K, value: any, obj: T): void => {
+  <T, K extends keyof T>(prop: K, value: any, obj: T): T =>
     Object.defineProperty(obj, prop, {
       value: value,
       writable: true,
       configurable: true,
-    });
-  },
+    }),
 );
 
 export const assignParent = overrideReadonlyProperty("parent");
