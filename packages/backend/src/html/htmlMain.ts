@@ -6,7 +6,9 @@ import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { addWarning } from "../common/commonConversionWarnings";
-import { PluginSettings, HTMLPreview } from "types";
+import { PluginSettings, HTMLPreview, AltNode } from "types";
+import { isVisible } from "../common/isVisible";
+import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 
 let showLayerNames = false;
 
@@ -17,17 +19,17 @@ export let isPreviewGlobal = false;
 let localSettings: PluginSettings;
 let previousExecutionCache: { style: string; text: string }[];
 
-export const htmlMain = (
+export const htmlMain = async (
   sceneNode: Array<SceneNode>,
   settings: PluginSettings,
   isPreview: boolean = false,
-): string => {
+): Promise<string> => {
   showLayerNames = settings.showLayerNames;
   isPreviewGlobal = isPreview;
   previousExecutionCache = [];
   localSettings = settings;
 
-  let result = htmlWidgetGenerator(sceneNode, settings.jsx);
+  let result = await htmlWidgetGenerator(sceneNode, settings.jsx);
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -37,16 +39,16 @@ export const htmlMain = (
   return result;
 };
 
-export const generateHTMLPreview = (
+export const generateHTMLPreview = async (
   nodes: SceneNode[],
   settings: PluginSettings,
   code?: string,
-): HTMLPreview => {
+): Promise<HTMLPreview> => {
   const htmlCodeAlreadyGenerated =
     settings.framework === "HTML" && settings.jsx === false && code;
   const htmlCode = htmlCodeAlreadyGenerated
     ? code
-    : htmlMain(
+    : await htmlMain(
         nodes,
         {
           ...settings,
@@ -65,52 +67,59 @@ export const generateHTMLPreview = (
 };
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
-const htmlWidgetGenerator = (
+const htmlWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
   isJsx: boolean,
-): string => {
-  let comp = "";
+): Promise<string> => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible);
-  visibleSceneNode.forEach((node, index) => {
-    // if (node.isAsset || ("isMask" in node && node.isMask === true)) {
-    //   comp += htmlAsset(node, isJsx);
-    // }
-
-    switch (node.type) {
-      case "RECTANGLE":
-      case "ELLIPSE":
-        comp += htmlContainer(node, "", [], isJsx);
-        break;
-      case "GROUP":
-        comp += htmlGroup(node, isJsx);
-        break;
-      case "FRAME":
-      case "COMPONENT":
-      case "INSTANCE":
-      case "COMPONENT_SET":
-        comp += htmlFrame(node, isJsx);
-        break;
-      case "SECTION":
-        comp += htmlSection(node, isJsx);
-        break;
-      case "TEXT":
-        comp += htmlText(node, isJsx);
-        break;
-      case "LINE":
-        comp += htmlLine(node, isJsx);
-        break;
-      case "VECTOR":
-        comp += htmlAsset(node, isJsx);
-        addWarning("VectorNodes are not fully supported in HTML");
-        break;
-    }
-  });
-
-  return comp;
+  const promiseOfConvertedCode = sceneNode
+    .filter(isVisible)
+    .map(convertNode(isJsx));
+  const code = (await Promise.all(promiseOfConvertedCode)).join("");
+  return code;
 };
 
-const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
+const convertNode = (isJsx: boolean) => async (node: SceneNode) => {
+  const altNode = await renderAndAttachSVG(node);
+  if (altNode.svg) return htmlWrapSVG(altNode, isJsx);
+
+  switch (node.type) {
+    case "RECTANGLE":
+    case "ELLIPSE":
+      return htmlContainer(node, "", [], isJsx);
+    case "GROUP":
+      return htmlGroup(node, isJsx);
+    case "FRAME":
+    case "COMPONENT":
+    case "INSTANCE":
+    case "COMPONENT_SET":
+      return htmlFrame(node, isJsx);
+    case "SECTION":
+      return htmlSection(node, isJsx);
+    case "TEXT":
+      return htmlText(node, isJsx);
+    case "LINE":
+      return htmlLine(node, isJsx);
+    case "VECTOR":
+      addWarning("VectorNodes are not fully supported in HTML");
+      return htmlAsset(node, isJsx);
+    default:
+  }
+  return "";
+};
+
+const htmlWrapSVG = (node: AltNode<SceneNode>, isJsx: boolean): string => {
+  if (node.svg === "") return "";
+  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx).addData(
+    "svg-wrapper",
+  );
+  return `\n<div${builder.build()}>\n${node.svg ?? ""}</div>`;
+};
+
+const htmlGroup = async (
+  node: GroupNode,
+  isJsx: boolean = false,
+): Promise<string> => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -132,12 +141,12 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
   if (builder.styles) {
     const attr = builder.build();
 
-    const generator = htmlWidgetGenerator(node.children, isJsx);
+    const generator = await htmlWidgetGenerator(node.children, isJsx);
 
     return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }
 
-  return htmlWidgetGenerator(node.children, isJsx);
+  return await htmlWidgetGenerator(node.children, isJsx);
 };
 
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
@@ -182,11 +191,11 @@ const htmlText = (node: TextNode, isJsx: boolean): string => {
   return `\n<div${layoutBuilder.build()}>${content}</div>`;
 };
 
-const htmlFrame = (
+const htmlFrame = async (
   node: SceneNode & BaseFrameMixin,
   isJsx: boolean = false,
-): string => {
-  const childrenStr = htmlWidgetGenerator(
+): Promise<string> => {
+  const childrenStr = await htmlWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(
       node,
       localSettings.optimizeLayout,
@@ -300,8 +309,11 @@ const htmlContainer = (
   return children;
 };
 
-const htmlSection = (node: SectionNode, isJsx: boolean = false): string => {
-  const childrenStr = htmlWidgetGenerator(node.children, isJsx);
+const htmlSection = async (
+  node: SectionNode,
+  isJsx: boolean = false,
+): Promise<string> => {
+  const childrenStr = await htmlWidgetGenerator(node.children, isJsx);
   const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .size(node, localSettings.optimizeLayout)
     .position(node, localSettings.optimizeLayout)

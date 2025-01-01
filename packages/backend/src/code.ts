@@ -9,7 +9,7 @@ import { clearWarnings, warnings } from "./common/commonConversionWarnings";
 import { PluginSettings } from "types";
 import { convertToCode } from "./common/retrieveUI/convertToCode";
 
-export const run = (settings: PluginSettings) => {
+export const run = async (settings: PluginSettings) => {
   clearWarnings();
   const { framework } = settings;
   const selection = figma.currentPage.selection;
@@ -23,8 +23,12 @@ export const run = (settings: PluginSettings) => {
     return;
   }
 
-  const code = convertToCode(convertedSelection, settings);
-  const htmlPreview = generateHTMLPreview(convertedSelection, settings, code);
+  const code = await convertToCode(convertedSelection, settings);
+  const htmlPreview = await generateHTMLPreview(
+    convertedSelection,
+    settings,
+    code,
+  );
   const colors = retrieveGenericSolidUIColors(framework);
   const gradients = retrieveGenericGradients(framework);
 

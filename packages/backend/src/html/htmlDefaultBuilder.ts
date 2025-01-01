@@ -21,12 +21,13 @@ import { sliceNum, stringToClassName } from "../common/numToAutoFixed";
 import { commonStroke } from "../common/commonStroke";
 import {
   formatClassAttribute,
-  formatLayerNameAttribute,
+  formatDataAttribute,
   formatStyleAttribute,
 } from "../common/commonFormatAttributes";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
+  data: Array<string>;
   isJSX: boolean;
   visible: boolean;
   name: string;
@@ -34,6 +35,7 @@ export class HtmlDefaultBuilder {
   constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
     this.isJSX = optIsJSX;
     this.styles = [];
+    this.data = [];
     this.visible = node.visible;
     this.name = showLayerNames ? node.name : "";
   }
@@ -286,17 +288,28 @@ export class HtmlDefaultBuilder {
     }
   }
 
+  addData(label: string, value?: string): this {
+    const attribute = formatDataAttribute(label, value);
+    this.data.push(attribute);
+    return this;
+  }
+
   build(additionalStyle: Array<string> = []): string {
     this.addStyles(...additionalStyle);
 
-    const layerNameAttribute = formatLayerNameAttribute(this.name);
-    const layerNameClass = stringToClassName(this.name);
-    const classAttribute = formatClassAttribute(
-      layerNameClass === "" ? [] : [layerNameClass],
-      this.isJSX,
-    );
+    let classAttribute = "";
+    if (this.name) {
+      this.addData("layer", this.name);
+      const layerNameClass = stringToClassName(this.name);
+      classAttribute = formatClassAttribute(
+        layerNameClass === "" ? [] : [layerNameClass],
+        this.isJSX,
+      );
+    }
+
+    const dataAttributes = this.data.join("");
     const styleAttribute = formatStyleAttribute(this.styles, this.isJSX);
 
-    return `${layerNameAttribute}${classAttribute}${styleAttribute}`;
+    return `${dataAttributes}${classAttribute}${styleAttribute}`;
   }
 }
