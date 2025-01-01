@@ -4,16 +4,19 @@ import { htmlMain } from "../../html/htmlMain";
 import { swiftuiMain } from "../../swiftui/swiftuiMain";
 import { tailwindMain } from "../../tailwind/tailwindMain";
 
-export const convertToCode = (nodes: SceneNode[], settings: PluginSettings) => {
+export const convertToCode = async (
+  nodes: SceneNode[],
+  settings: PluginSettings,
+) => {
   switch (settings.framework) {
     case "Tailwind":
-      return tailwindMain(nodes, settings);
+      return await tailwindMain(nodes, settings);
     case "Flutter":
-      return flutterMain(nodes, settings);
+      return await flutterMain(nodes, settings);
     case "SwiftUI":
-      return swiftuiMain(nodes, settings);
+      return await swiftuiMain(nodes, settings);
     case "HTML":
     default:
-      return htmlMain(nodes, settings);
+      return await htmlMain(nodes, settings);
   }
 };

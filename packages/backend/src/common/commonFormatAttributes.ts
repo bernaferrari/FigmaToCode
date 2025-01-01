@@ -17,8 +17,8 @@ export const formatStyleAttribute = (
   return ` style=${isJSX ? `{{${trimmedStyles}}}` : `"${trimmedStyles}"`}`;
 };
 
-export const formatLayerNameAttribute = (name: string) =>
-  name === "" ? "" : ` data-layer="${name}"`;
+export const formatDataAttribute = (label: string, value?: string) =>
+  ` data-${label}${value === undefined ? `` : `="${value}"`}`;
 
 export const formatClassAttribute = (
   classes: string[],
