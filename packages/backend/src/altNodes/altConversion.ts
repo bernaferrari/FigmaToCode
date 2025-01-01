@@ -1,4 +1,4 @@
-import { StyledTextSegmentSubset, ParentNode } from "types";
+import { StyledTextSegmentSubset, ParentNode, AltNode } from "types";
 import {
   overrideReadonlyProperty,
   assignParent,
@@ -98,7 +98,8 @@ export const cloneNode = <T extends BaseNode>(
   }
   assignParent(parent, cloned);
 
-  return cloned;
+  const altNode = { ...cloned, originalNode: node } as AltNode<T>;
+  return altNode;
 };
 
 // auto convert Frame to Rectangle when Frame has no Children

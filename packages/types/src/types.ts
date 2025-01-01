@@ -55,6 +55,8 @@ export type ErrorMessage = Message & {
 // Nodes
 export type ParentNode = BaseNode & ChildrenMixin;
 
+export type AltNode<T extends BaseNode> = T & { originalNode: T };
+
 // Styles & Conversions
 
 export type LayoutMode =
