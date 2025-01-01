@@ -1,6 +1,5 @@
 import { retrieveTopFill } from "../common/retrieveFill";
 import { indentString } from "../common/indentString";
-import { tailwindVector } from "./vector";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
@@ -67,7 +66,6 @@ const tailwindWidgetGenerator = (
       case "VECTOR":
         addWarning("VectorNodes are not supported in Tailwind");
         break;
-      //   comp += htmlAsset(node, isJsx);
     }
   });
 
@@ -82,14 +80,6 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
   if (node.width < 0 || node.height <= 0 || node.children.length === 0) {
     return "";
   }
-
-  const vectorIfExists = tailwindVector(
-    node,
-    localTailwindSettings.showLayerNames,
-    "",
-    isJsx,
-  );
-  if (vectorIfExists) return vectorIfExists;
 
   // this needs to be called after CustomNode because widthHeight depends on it
   const builder = new TailwindDefaultBuilder(

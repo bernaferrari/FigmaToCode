@@ -5,8 +5,8 @@ import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
+import { PluginSettings, HTMLPreview } from "types";
 
 let showLayerNames = false;
 
@@ -40,15 +40,29 @@ export const htmlMain = (
 export const generateHTMLPreview = (
   nodes: SceneNode[],
   settings: PluginSettings,
-) =>
-  htmlMain(
-    nodes,
-    {
-      ...settings,
-      jsx: false,
+  code?: string,
+): HTMLPreview => {
+  const htmlCodeAlreadyGenerated =
+    settings.framework === "HTML" && settings.jsx === false && code;
+  const htmlCode = htmlCodeAlreadyGenerated
+    ? code
+    : htmlMain(
+        nodes,
+        {
+          ...settings,
+          jsx: false,
+        },
+        true,
+      );
+
+  return {
+    size: {
+      width: nodes[0].width,
+      height: nodes[0].height,
     },
-    true,
-  );
+    content: htmlCode,
+  };
+};
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const htmlWidgetGenerator = (
@@ -127,7 +141,7 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
 };
 
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
-export const htmlText = (node: TextNode, isJsx: boolean): string => {
+const htmlText = (node: TextNode, isJsx: boolean): string => {
   let layoutBuilder = new HtmlTextBuilder(node, showLayerNames, isJsx)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .textAlign(node);
@@ -199,7 +213,7 @@ const htmlFrame = (
   }
 };
 
-export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
+const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
   if (!("opacity" in node) || !("layoutAlign" in node) || !("fills" in node)) {
     return "";
   }
@@ -227,7 +241,7 @@ export const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
-export const htmlContainer = (
+const htmlContainer = (
   node: SceneNode &
     SceneNodeMixin &
     BlendMixin &
@@ -286,10 +300,7 @@ export const htmlContainer = (
   return children;
 };
 
-export const htmlSection = (
-  node: SectionNode,
-  isJsx: boolean = false,
-): string => {
+const htmlSection = (node: SectionNode, isJsx: boolean = false): string => {
   const childrenStr = htmlWidgetGenerator(node.children, isJsx);
   const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .size(node, localSettings.optimizeLayout)
@@ -303,7 +314,7 @@ export const htmlSection = (
   }
 };
 
-export const htmlLine = (node: LineNode, isJsx: boolean): string => {
+const htmlLine = (node: LineNode, isJsx: boolean): string => {
   const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .commonPositionStyles(node, localSettings.optimizeLayout)
     .commonShapeStyles(node);

@@ -1,8 +1,8 @@
 // Settings
-export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
+export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 
 export interface PluginSettings {
-  framework: FrameworkTypes;
+  framework: Framework;
   jsx: boolean;
   inlineStyle: boolean;
   optimizeLayout: boolean;
@@ -52,6 +52,9 @@ export type ErrorMessage = Message & {
   error: string;
 };
 
+// Nodes
+export type ParentNode = BaseNode & ChildrenMixin;
+
 // Styles & Conversions
 
 export type LayoutMode =
@@ -66,6 +69,11 @@ export type LayoutMode =
   | "BottomStart"
   | "BottomCenter"
   | "BottomEnd";
+
+export interface BoundingRect {
+  x: number;
+  y: number;
+}
 
 interface AllSides {
   all: number;
@@ -96,6 +104,11 @@ export interface Size {
   readonly width: SizeValue;
   readonly height: SizeValue;
 }
+
+export type StyledTextSegmentSubset = Omit<
+  StyledTextSegment,
+  "listSpacing" | "paragraphIndent" | "paragraphSpacing" | "textStyleOverrides"
+>;
 
 export type FontWeightNumber =
   | "100"
@@ -153,3 +166,28 @@ export type SwiftUIModifier = [
   string,
   string | SwiftUIModifier | SwiftUIModifier[],
 ];
+
+// UI
+
+export interface PreferenceOptions {
+  itemType: string;
+  label: string;
+  propertyName: string;
+  includedLanguages?: Framework[];
+}
+export interface SelectPreferenceOptions extends PreferenceOptions {
+  itemType: "select";
+  propertyName: Exclude<keyof PluginSettings, "framework">;
+  options: { label: string; value: string; isDefault?: boolean }[];
+}
+
+export interface LocalCodegenPreferenceOptions extends PreferenceOptions {
+  itemType: "individual_select";
+  propertyName: Exclude<
+    keyof PluginSettings,
+    "framework" | "flutterGenerationMode" | "swiftUIGenerationMode"
+  >;
+  description: string;
+  value?: boolean;
+  isDefault?: boolean;
+}

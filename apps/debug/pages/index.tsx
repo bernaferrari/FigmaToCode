@@ -1,10 +1,10 @@
-import { FrameworkTypes } from "types";
+import { Framework } from "types";
 import * as React from "react";
 import { PluginUI } from "plugin-ui";
 
 export default function Web() {
   const [selectedFramework, setSelectedFramework] =
-    React.useState<FrameworkTypes>("HTML");
+    React.useState<Framework>("HTML");
 
   const testWarnings = ["This is an example of a conversion warning message."];
 
@@ -18,9 +18,7 @@ export default function Web() {
           <div className="bg-white w-96 shadow-md rounded-md">
             <PluginFigmaToolbar variant="(Light)" />
             <PluginUI
-              code={
-                "backend:dev: CJS dist/index.js 105.74 KB backend:dev: CJS ⚡️ Build        success in 419ms plugin:dev: warn - Port 3000 is in use, trying 3001        instead. plugin:dev: warn - Port 3001 is in use, trying 3002 instead."
-              }
+              code={"code goes hereeeee"}
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
               htmlPreview={null}
@@ -50,26 +48,6 @@ export default function Web() {
           </div>
         </div>
       </div>
-      {/* <div>Templates for debugging</div>
-      <div className="flex space-x-4">
-        {[1, 2, 3, 4, 5].map((d) => (
-          <div
-            key={`row ${d}`}
-            className={`bg-gray-400 w-28 h-28 rounded ${
-              d == 1 ? "ring-2 ring-green-500" : ""
-            }`}
-          >
-            <Image
-              src="https://images.unsplash.com/photo-1678653300204-75de70535454?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=120&q=0"
-              alt="A random image"
-              width={112}
-              height={112}
-              style={{ objectFit: "cover" }}
-              className="rounded"
-            />
-          </div>
-        ))}
-      </div> */}
 
       <div>Plugin dropdown selection (each frame a different breakpoint)</div>
       <div className="flex space-x-4">
@@ -97,7 +75,6 @@ export default function Web() {
 
 const PluginFigmaToolbar = (props: { variant: string }) => (
   <div className="bg-gray-800 w-full h-8 flex items-center text-white space-x-4 px-4">
-    {/* <div className="bg-white w-4 h-4 rounded" /> */}
     <span>Figma to Code {props.variant}</span>
   </div>
 );
