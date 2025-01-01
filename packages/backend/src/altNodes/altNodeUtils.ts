@@ -11,6 +11,9 @@ export const overrideReadonlyProperty = curry(
 );
 
 export const assignParent = overrideReadonlyProperty("parent");
+export const assignChildren = overrideReadonlyProperty("children");
+export const assignType = overrideReadonlyProperty("type");
+export const assignRectangleType = assignType("RECTANGLE");
 
 export function isNotEmpty<TValue>(
   value: TValue | null | undefined,

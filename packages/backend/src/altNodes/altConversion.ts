@@ -3,25 +3,43 @@ import {
   overrideReadonlyProperty,
   assignParent,
   isNotEmpty,
+  assignRectangleType,
+  assignChildren,
 } from "./altNodeUtils";
+import { addWarning } from "../common/commonConversionWarnings";
 
 export let globalTextStyleSegments: Record<string, StyledTextSegmentSubset[]> =
   {};
 
 export const convertNodeToAltNode =
-  (parent: ParentNode | null = null) =>
-  (node: SceneNode) => {
+  (parent: ParentNode | null) => (node: SceneNode) => {
     switch (node.type) {
+      // Standard nodes
       case "RECTANGLE":
       case "ELLIPSE":
       case "LINE":
-        return standardClone(node, parent);
+      case "STAR":
+      case "POLYGON":
+        return cloneNode(node, parent);
+
+      // Group nodes
       case "FRAME":
       case "INSTANCE":
       case "COMPONENT":
       case "COMPONENT_SET":
-        // TODO Fix asset export. Use the new API.
+        //TODO: I think this is almost identical to the group thing below
+
+        // TODO: Fix asset export. Use the new API.
         return frameNodeTo(node, parent);
+
+      case "SECTION":
+        const sectionClone = cloneNode(node, parent);
+        const sectionChildren = convertNodesToAltNodes(
+          node.children,
+          sectionClone,
+        );
+        return assignChildren(sectionChildren, sectionClone);
+
       case "GROUP":
         if (node.children.length === 1 && node.visible) {
           // if Group is visible and has only one child, Group should disappear.
@@ -29,119 +47,70 @@ export const convertNodeToAltNode =
           return convertNodesToAltNodes(node.children, parent)[0];
         }
 
-        const clone = standardClone(node, parent);
+        const groupClone = cloneNode(node, parent);
+        const groupChildren = convertNodesToAltNodes(node.children, groupClone);
+        const groupWithChildren = assignChildren(groupChildren, groupClone);
 
-        overrideReadonlyProperty(
-          "children",
-          convertNodesToAltNodes(node.children, clone),
-          clone,
-        );
+        return groupWithChildren;
 
-        // try to find big rect and regardless of that result, also try to convert to autolayout.
-        // There is a big chance this will be returned as a Frame
-        // also, Group will always have at least 2 children.
-        return convertNodesOnRectangle(clone);
+      // Text Nodes
       case "TEXT":
-        globalTextStyleSegments[node.id] = node.getStyledTextSegments([
-          "fontName",
-          "fills",
-          "fontSize",
-          "fontWeight",
-          "hyperlink",
-          "indentation",
-          "letterSpacing",
-          "lineHeight",
-          "listOptions",
-          "textCase",
-          "textDecoration",
-          "textStyleId",
-          "fillStyleId",
-          "openTypeFeatures",
-        ]);
-        return standardClone(node, parent);
-      case "STAR":
-      case "POLYGON":
-      case "VECTOR":
-        return standardClone(node, parent);
-      case "SECTION":
-        const sectionClone = standardClone(node, parent);
-        overrideReadonlyProperty(
-          "children",
-          convertNodesToAltNodes(node.children, sectionClone),
-          sectionClone,
-        );
-        return sectionClone;
+        globalTextStyleSegments[node.id] = extractStyledTextSegments(node);
+        return cloneNode(node, parent);
+
+      // Unsupported
       case "BOOLEAN_OPERATION":
-        const clonedOperation = standardClone(node, parent);
-        overrideReadonlyProperty("type", "RECTANGLE", clonedOperation);
-        clonedOperation.fills = [
-          {
-            type: "IMAGE",
-            scaleMode: "FILL",
-            imageHash: "0",
-            opacity: 1,
-            visible: true,
-            blendMode: "NORMAL",
-            imageTransform: [
-              [1, 0, 0],
-              [0, 1, 0],
-            ],
-          },
-        ];
-        return clonedOperation;
+        addWarning(
+          "Boolean Groups are not supported and will be converted to rectangles.",
+        );
+        return cloneAsRectangleNode(node, parent);
+
+      case "SLICE":
+        throw new Error(
+          `Sorry, Slices are not supported. Type:${node.type} id:${node.id}`,
+        );
       default:
-        return null;
+        throw new Error(
+          `Sorry, an unsupported node type was selected. Type:${node.type} id:${node.id}`,
+        );
     }
   };
 
 export const convertNodesToAltNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
-  parent: ParentNode | null = null,
+  parent: ParentNode | null,
 ): Array<SceneNode> =>
   sceneNode.map(convertNodeToAltNode(parent)).filter(isNotEmpty);
 
-export const cloneNode = <T extends BaseNode>(node: T): T => {
+export const cloneNode = <T extends BaseNode>(
+  node: T,
+  parent: ParentNode | null,
+): T => {
   // Create the cloned object with the correct prototype
   const cloned = {} as T;
   // Create a new object with only the desired descriptors (excluding 'parent' and 'children')
+  const droppedProps = [
+    "parent",
+    "children",
+    "horizontalPadding",
+    "verticalPadding",
+    "mainComponent",
+    "masterComponent",
+    "variantProperties",
+    "get_annotations",
+    "componentPropertyDefinitions",
+    "exposedInstances",
+    "componentProperties",
+    "componenPropertyReferences",
+  ];
   for (const prop in node) {
-    if (
-      prop !== "parent" &&
-      prop !== "children" &&
-      prop !== "horizontalPadding" &&
-      prop !== "verticalPadding" &&
-      prop !== "mainComponent" &&
-      prop !== "masterComponent" &&
-      prop !== "variantProperties" &&
-      prop !== "get_annotations" &&
-      prop !== "componentPropertyDefinitions" &&
-      prop !== "exposedInstances" &&
-      prop !== "componentProperties" &&
-      prop !== "componenPropertyReferences"
-    ) {
+    if (prop in droppedProps === false) {
       cloned[prop as keyof T] = node[prop as keyof T];
     }
   }
+  assignParent(parent, cloned);
 
   return cloned;
-};
-
-/**
- * Identify all nodes that are inside Rectangles and transform those Rectangles into Frames containing those nodes.
- */
-export const convertNodesOnRectangle = (
-  node: FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode,
-): FrameNode | GroupNode | InstanceNode | ComponentNode | ComponentSetNode => {
-  if (node.children.length < 2) {
-    return node;
-  }
-  if (!node.id) {
-    throw new Error(
-      "Node is missing an id! This error should only happen in tests.",
-    );
-  }
-
-  return node;
 };
 
 export const frameNodeTo = (
@@ -156,39 +125,44 @@ export const frameNodeTo = (
   | ComponentSetNode => {
   if (node.children.length === 0) {
     // if it has no children, convert frame to rectangle
-    return frameToRectangleNode(node, parent);
+    return cloneAsRectangleNode(node, parent);
   }
-  const clone = standardClone(node, parent);
+  const clone = cloneNode(node, parent);
 
   overrideReadonlyProperty(
     "children",
     convertNodesToAltNodes(node.children, clone),
     clone,
   );
-  return convertNodesOnRectangle(clone);
+  return clone;
 };
 
 // auto convert Frame to Rectangle when Frame has no Children
-const frameToRectangleNode = (
-  node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
+const cloneAsRectangleNode = <T extends BaseNode>(
+  node: T,
   parent: ParentNode | null,
 ): RectangleNode => {
-  const clonedNode = cloneNode(node);
-  if (parent) {
-    assignParent(parent, clonedNode);
-  }
-  overrideReadonlyProperty("type", "RECTANGLE", clonedNode);
+  const clonedNode = cloneNode(node, parent);
+
+  assignRectangleType(clonedNode);
 
   return clonedNode as unknown as RectangleNode;
 };
 
-const standardClone = <T extends SceneNode>(
-  node: T,
-  parent: ParentNode | null,
-): T => {
-  const clonedNode = cloneNode(node);
-  if (parent !== null) {
-    assignParent(parent, clonedNode);
-  }
-  return clonedNode;
-};
+const extractStyledTextSegments = (node: TextNode) =>
+  node.getStyledTextSegments([
+    "fontName",
+    "fills",
+    "fontSize",
+    "fontWeight",
+    "hyperlink",
+    "indentation",
+    "letterSpacing",
+    "lineHeight",
+    "listOptions",
+    "textCase",
+    "textDecoration",
+    "textStyleId",
+    "fillStyleId",
+    "openTypeFeatures",
+  ]);

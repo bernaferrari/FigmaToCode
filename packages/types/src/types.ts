@@ -53,7 +53,7 @@ export type ErrorMessage = Message & {
 };
 
 // Nodes
-export type ParentNode = (BaseNode & ChildrenMixin) | null;
+export type ParentNode = BaseNode & ChildrenMixin;
 
 export type AltNode<K extends BaseNode> = Omit<
   K,
@@ -69,7 +69,11 @@ export type AltNode<K extends BaseNode> = Omit<
   | "exposedInstances"
   | "componentProperties"
   | "componenPropertyReferences"
->;
+> & { parent: ParentNode | null };
+export type AltNodeGroup<
+  K extends BaseNode & ChildrenMixin,
+  T extends AltNode<SceneNode>,
+> = AltNode<K> & { children: Array<T> };
 
 // Styles & Conversions
 
