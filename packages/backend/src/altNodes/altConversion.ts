@@ -1,15 +1,22 @@
 import { StyledTextSegmentSubset, ParentNode, AltNode } from "types";
 import {
-  overrideReadonlyProperty,
   assignParent,
   isNotEmpty,
   assignRectangleType,
   assignChildren,
+  isTypeOrGroupOfTypes,
 } from "./altNodeUtils";
-import { addWarning } from "../common/commonConversionWarnings";
 
 export let globalTextStyleSegments: Record<string, StyledTextSegmentSubset[]> =
   {};
+
+// List of types that can be flattened into SVG
+const canBeFlattened = isTypeOrGroupOfTypes([
+  "VECTOR",
+  "STAR",
+  "POLYGON",
+  "BOOLEAN_OPERATION",
+]);
 
 export const convertNodeToAltNode =
   (parent: ParentNode | null) =>
@@ -98,7 +105,11 @@ export const cloneNode = <T extends BaseNode>(
   }
   assignParent(parent, cloned);
 
-  const altNode = { ...cloned, originalNode: node } as AltNode<T>;
+  const altNode = {
+    ...cloned,
+    originalNode: node,
+    canBeFlattened: canBeFlattened(node),
+  } as AltNode<T>;
   return altNode;
 };
 

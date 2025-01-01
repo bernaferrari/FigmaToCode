@@ -4,8 +4,10 @@ import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { PluginSettings } from "types";
+import { AltNode, PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
+import { renderAndAttachSVG, renderNodeAsSVG } from "../altNodes/altNodeUtils";
+import { isVisible } from "../common/isVisible";
 
 export let localTailwindSettings: PluginSettings;
 
@@ -13,14 +15,17 @@ let previousExecutionCache: { style: string; text: string }[];
 
 const selfClosingTags = ["img"];
 
-export const tailwindMain = (
+export const tailwindMain = async (
   sceneNode: Array<SceneNode>,
   settings: PluginSettings,
-): string => {
+) => {
   localTailwindSettings = settings;
   previousExecutionCache = [];
 
-  let result = tailwindWidgetGenerator(sceneNode, localTailwindSettings.jsx);
+  let result = await tailwindWidgetGenerator(
+    sceneNode,
+    localTailwindSettings.jsx,
+  );
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -31,48 +36,49 @@ export const tailwindMain = (
 };
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
-const tailwindWidgetGenerator = (
+const tailwindWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
   isJsx: boolean,
-): string => {
-  let comp = "";
-
+): Promise<string> => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible);
-  visibleSceneNode.forEach((node) => {
-    switch (node.type) {
-      case "RECTANGLE":
-      case "ELLIPSE":
-        comp += tailwindContainer(node, "", "", isJsx);
-        break;
-      case "GROUP":
-        comp += tailwindGroup(node, isJsx);
-        break;
-      case "FRAME":
-      case "COMPONENT":
-      case "INSTANCE":
-      case "COMPONENT_SET":
-        comp += tailwindFrame(node, isJsx);
-        break;
-      case "TEXT":
-        comp += tailwindText(node, isJsx);
-        break;
-      case "LINE":
-        comp += tailwindLine(node, isJsx);
-        break;
-      case "SECTION":
-        comp += tailwindSection(node, isJsx);
-        break;
-      case "VECTOR":
-        addWarning("VectorNodes are not supported in Tailwind");
-        break;
-    }
-  });
-
-  return comp;
+  const promiseOfConvertedCode = sceneNode
+    .filter(isVisible)
+    .map(convertNode(isJsx));
+  const code = (await Promise.all(promiseOfConvertedCode)).join("");
+  return code;
 };
 
-const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
+const convertNode = (isJsx: boolean) => async (node: SceneNode) => {
+  const altNode = await renderAndAttachSVG(node);
+  if (altNode.svg) return altNode.svg;
+
+  switch (node.type) {
+    case "RECTANGLE":
+    case "ELLIPSE":
+      return tailwindContainer(node, "", "", isJsx);
+    case "GROUP":
+      return tailwindGroup(node, isJsx);
+    case "FRAME":
+    case "COMPONENT":
+    case "INSTANCE":
+    case "COMPONENT_SET":
+      return tailwindFrame(node, isJsx);
+    case "TEXT":
+      return tailwindText(node, isJsx);
+    case "LINE":
+      return tailwindLine(node, isJsx);
+    case "SECTION":
+      return tailwindSection(node, isJsx);
+    case "VECTOR":
+      addWarning("VectorNodes are not supported in Tailwind");
+      break;
+    default:
+      addWarning(`${node.type} nodes are not supported in Tailwind`);
+  }
+  return "";
+};
+
+const tailwindGroup = async (node: GroupNode, isJsx: boolean = false) => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -94,12 +100,12 @@ const tailwindGroup = (node: GroupNode, isJsx: boolean = false): string => {
   if (builder.attributes || builder.style) {
     const attr = builder.build("");
 
-    const generator = tailwindWidgetGenerator(node.children, isJsx);
+    const generator = await tailwindWidgetGenerator(node.children, isJsx);
 
     return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }
 
-  return tailwindWidgetGenerator(node.children, isJsx);
+  return await tailwindWidgetGenerator(node.children, isJsx);
 };
 
 export const tailwindText = (node: TextNode, isJsx: boolean): string => {
@@ -147,11 +153,11 @@ export const tailwindText = (node: TextNode, isJsx: boolean): string => {
   return `\n<div${layoutBuilder.build()}>${content}</div>`;
 };
 
-const tailwindFrame = (
+const tailwindFrame = async (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   isJsx: boolean,
-): string => {
-  const childrenStr = tailwindWidgetGenerator(
+): Promise<string> => {
+  const childrenStr = await tailwindWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(
       node,
       localTailwindSettings.optimizeLayout,
@@ -264,8 +270,11 @@ export const tailwindLine = (node: LineNode, isJsx: boolean): string => {
   return `\n<div${builder.build()}></div>`;
 };
 
-export const tailwindSection = (node: SectionNode, isJsx: boolean): string => {
-  const childrenStr = tailwindWidgetGenerator(node.children, isJsx);
+export const tailwindSection = async (
+  node: SectionNode,
+  isJsx: boolean,
+): Promise<string> => {
+  const childrenStr = await tailwindWidgetGenerator(node.children, isJsx);
   const builder = new TailwindDefaultBuilder(
     node,
     localTailwindSettings.showLayerNames,

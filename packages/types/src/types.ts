@@ -57,6 +57,8 @@ export type ParentNode = BaseNode & ChildrenMixin;
 
 export type AltNodeMetadata<T extends BaseNode> = {
   originalNode: T;
+  canBeFlattened: boolean;
+  svg?: string;
 };
 export type AltNode<T extends BaseNode> = T & AltNodeMetadata<T>;
 
