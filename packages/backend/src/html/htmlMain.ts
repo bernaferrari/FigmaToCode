@@ -7,8 +7,8 @@ import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { addWarning } from "../common/commonConversionWarnings";
 import { PluginSettings, HTMLPreview, AltNode } from "types";
-import { isVisible } from "../common/isVisible";
 import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
+import { getVisibleNodes } from "../common/nodeVisibility";
 
 let showLayerNames = false;
 
@@ -72,9 +72,9 @@ const htmlWidgetGenerator = async (
   isJsx: boolean,
 ): Promise<string> => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const promiseOfConvertedCode = sceneNode
-    .filter(isVisible)
-    .map(convertNode(isJsx));
+  const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
+    convertNode(isJsx),
+  );
   const code = (await Promise.all(promiseOfConvertedCode)).join("");
   return code;
 };
