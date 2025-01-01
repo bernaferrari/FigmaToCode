@@ -55,7 +55,10 @@ export type ErrorMessage = Message & {
 // Nodes
 export type ParentNode = BaseNode & ChildrenMixin;
 
-export type AltNode<T extends BaseNode> = T & { originalNode: T };
+export type AltNodeMetadata<T extends BaseNode> = {
+  originalNode: T;
+};
+export type AltNode<T extends BaseNode> = T & AltNodeMetadata<T>;
 
 // Styles & Conversions
 
