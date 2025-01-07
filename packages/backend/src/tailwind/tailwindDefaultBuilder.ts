@@ -25,7 +25,7 @@ import {
   formatDataAttribute,
   getClassLabel,
 } from "../common/commonFormatAttributes";
-import { TailwindColorType } from "types";
+import { TailwindColorType, TailwindSettings } from "types";
 
 const isNotEmpty = (s: string) => s !== "";
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
@@ -35,23 +35,28 @@ export class TailwindDefaultBuilder {
   style: string;
   data: string[];
   styleSeparator: string = "";
-  isJSX: boolean;
-  visible: boolean;
-  name: string;
+  node: SceneNode;
+  settings: TailwindSettings;
 
-  constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
-    this.isJSX = optIsJSX;
+  get name() {
+    return this.settings.showLayerNames ? this.node.name : "";
+  }
+  get visible() {
+    return this.node.visible;
+  }
+  get isJSX() {
+    return this.settings.jsx;
+  }
+  get optimizeLayout() {
+    return this.settings.optimizeLayout;
+  }
+
+  constructor(node: SceneNode, settings: TailwindSettings) {
+    this.node = node;
+    this.settings = settings;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = "";
     this.data = [];
-    this.visible = node.visible;
-    this.name = showLayerNames ? node.name : "";
-
-    /*
-    if (showLayerNames) {
-      this.attributes.push(className(node.name));
-    }
-    */
   }
 
   addAttributes = (...newStyles: string[]) => {
@@ -61,62 +66,55 @@ export class TailwindDefaultBuilder {
     this.attributes.unshift(...dropEmptyStrings(newStyles));
   };
 
-  blend(
-    node: SceneNode & SceneNodeMixin & MinimalBlendMixin & LayoutMixin,
-  ): this {
+  blend(): this {
     this.addAttributes(
-      tailwindVisibility(node),
-      tailwindRotation(node),
-      tailwindOpacity(node),
-      tailwindBlendMode(node),
+      tailwindVisibility(this.node),
+      tailwindRotation(this.node as LayoutMixin),
+      tailwindOpacity(this.node as MinimalBlendMixin),
+      tailwindBlendMode(this.node as MinimalBlendMixin),
     );
 
     return this;
   }
 
-  commonPositionStyles(
-    node: SceneNode &
-      SceneNodeMixin &
-      BlendMixin &
-      LayoutMixin &
-      MinimalBlendMixin,
-    optimizeLayout: boolean,
-  ): this {
-    this.size(node, optimizeLayout);
-    this.autoLayoutPadding(node, optimizeLayout);
-    this.position(node, optimizeLayout);
-    this.blend(node);
+  commonPositionStyles(): this {
+    this.size();
+    this.autoLayoutPadding();
+    this.position();
+    this.blend();
     return this;
   }
 
-  commonShapeStyles(node: GeometryMixin & BlendMixin & SceneNode): this {
-    this.customColor(node.fills, "bg");
-    this.radius(node);
-    this.shadow(node);
-    this.border(node);
-    this.blur(node);
+  commonShapeStyles(): this {
+    this.customColor((this.node as MinimalFillsMixin).fills, "bg");
+    this.radius();
+    this.shadow();
+    this.border();
+    this.blur();
     return this;
   }
 
-  radius(node: SceneNode): this {
-    if (node.type === "ELLIPSE") {
+  radius(): this {
+    if (this.node.type === "ELLIPSE") {
       this.addAttributes("rounded-full");
     } else {
-      this.addAttributes(tailwindBorderRadius(node));
+      this.addAttributes(tailwindBorderRadius(this.node));
     }
     return this;
   }
 
-  border(node: SceneNode): this {
-    if ("strokes" in node) {
-      this.addAttributes(tailwindBorderWidth(node));
-      this.customColor(node.strokes, "border");
+  border(): this {
+    if ("strokes" in this.node) {
+      this.addAttributes(tailwindBorderWidth(this.node));
+      this.customColor(this.node.strokes, "border");
     }
 
     return this;
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
+  position(): this {
+    const { node, optimizeLayout } = this;
+
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
 
@@ -174,13 +172,14 @@ export class TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/box-shadow/
    * example: shadow
    */
-  shadow(node: BlendMixin): this {
-    this.addAttributes(...tailwindShadow(node));
+  shadow(): this {
+    this.addAttributes(...tailwindShadow(this.node as BlendMixin));
     return this;
   }
 
   // must be called before Position, because of the hasFixedSize attribute.
-  size(node: SceneNode, optimizeLayout: boolean): this {
+  size(): this {
+    const { node, optimizeLayout } = this;
     const { width, height } = tailwindSizePartial(node, optimizeLayout);
 
     if (node.type === "TEXT") {
@@ -202,18 +201,20 @@ export class TailwindDefaultBuilder {
     return this;
   }
 
-  autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
-    if ("paddingLeft" in node) {
+  autoLayoutPadding(): this {
+    if ("paddingLeft" in this.node) {
       this.addAttributes(
         ...tailwindPadding(
-          (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
+          (this.optimizeLayout ? this.node.inferredAutoLayout : null) ??
+            this.node,
         ),
       );
     }
     return this;
   }
 
-  blur(node: SceneNode) {
+  blur() {
+    const { node } = this;
     if ("effects" in node && node.effects.length > 0) {
       const blur = node.effects.find((e) => e.type === "LAYER_BLUR");
       if (blur) {

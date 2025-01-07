@@ -80,13 +80,9 @@ const tailwindWrapSVG = (
   settings: TailwindSettings,
 ): string => {
   if (node.svg === "") return "";
-  const builder = new TailwindDefaultBuilder(
-    node,
-    settings.showLayerNames,
-    settings.jsx,
-  )
+  const builder = new TailwindDefaultBuilder(node, settings)
     .addData("svg-wrapper")
-    .position(node, settings.optimizeLayout);
+    .position();
 
   return `\n<div${builder.build()}>\n${node.svg ?? ""}</div>`;
 };
@@ -101,14 +97,10 @@ const tailwindGroup = async (node: GroupNode, settings: TailwindSettings) => {
   }
 
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new TailwindDefaultBuilder(
-    node,
-    localTailwindSettings.showLayerNames,
-    settings.jsx,
-  )
-    .blend(node)
-    .size(node, localTailwindSettings.optimizeLayout)
-    .position(node, localTailwindSettings.optimizeLayout);
+  const builder = new TailwindDefaultBuilder(node, settings)
+    .blend()
+    .size()
+    .position();
 
   if (builder.attributes || builder.style) {
     const attr = builder.build("");
@@ -125,13 +117,9 @@ export const tailwindText = (
   node: TextNode,
   settings: TailwindSettings,
 ): string => {
-  let layoutBuilder = new TailwindTextBuilder(
-    node,
-    localTailwindSettings.showLayerNames,
-    settings.jsx,
-  )
-    .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
-    .textAlign(node);
+  let layoutBuilder = new TailwindTextBuilder(node, settings)
+    .commonPositionStyles()
+    .textAlign();
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
   previousExecutionCache.push(...styledHtml);
@@ -232,13 +220,9 @@ export const tailwindContainer = (
     return children;
   }
 
-  let builder = new TailwindDefaultBuilder(
-    node,
-    localTailwindSettings.showLayerNames,
-    settings.jsx,
-  )
-    .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
-    .commonShapeStyles(node);
+  let builder = new TailwindDefaultBuilder(node, settings)
+    .commonPositionStyles()
+    .commonShapeStyles();
 
   if (builder.attributes || additionalAttr) {
     const build = builder.build(additionalAttr);
@@ -278,13 +262,9 @@ export const tailwindLine = (
   node: LineNode,
   settings: TailwindSettings,
 ): string => {
-  const builder = new TailwindDefaultBuilder(
-    node,
-    localTailwindSettings.showLayerNames,
-    settings.jsx,
-  )
-    .commonPositionStyles(node, localTailwindSettings.optimizeLayout)
-    .commonShapeStyles(node);
+  const builder = new TailwindDefaultBuilder(node, settings)
+    .commonPositionStyles()
+    .commonShapeStyles();
 
   return `\n<div${builder.build()}></div>`;
 };
@@ -294,13 +274,9 @@ export const tailwindSection = async (
   settings: TailwindSettings,
 ): Promise<string> => {
   const childrenStr = await tailwindWidgetGenerator(node.children, settings);
-  const builder = new TailwindDefaultBuilder(
-    node,
-    localTailwindSettings.showLayerNames,
-    settings.jsx,
-  )
-    .size(node, localTailwindSettings.optimizeLayout)
-    .position(node, localTailwindSettings.optimizeLayout)
+  const builder = new TailwindDefaultBuilder(node, settings)
+    .size()
+    .position()
     .customColor(node.fills, "bg");
 
   if (childrenStr) {
