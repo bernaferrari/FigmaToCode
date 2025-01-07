@@ -1,22 +1,30 @@
 // Settings
 export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
-
 export interface HTMLSettings {
   jsx: boolean;
   optimizeLayout: boolean;
   showLayerNames: boolean;
 }
-export interface PluginSettings extends HTMLSettings {
-  framework: Framework;
-  inlineStyle: boolean;
-  responsiveRoot: boolean;
-  flutterGenerationMode: string;
-  swiftUIGenerationMode: string;
+export interface TailwindSettings extends HTMLSettings {
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
   customTailwindColors: boolean;
 }
-
+export interface FlutterSettings {
+  flutterGenerationMode: string;
+}
+export interface SwiftUISettings {
+  swiftUIGenerationMode: string;
+}
+export interface PluginSettings
+  extends HTMLSettings,
+    TailwindSettings,
+    FlutterSettings,
+    SwiftUISettings {
+  framework: Framework;
+  inlineStyle: boolean;
+  responsiveRoot: boolean;
+}
 // Messaging
 export interface ConversionData {
   code: string;
