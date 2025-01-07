@@ -116,7 +116,8 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     return "";
   }
 
-  textAlign(node: TextNode): this {
+  textAlign(): this {
+    const node = this.node as TextNode;
     // if alignHorizontal is LEFT, don't do anything because that is native
 
     // only undefined in testing

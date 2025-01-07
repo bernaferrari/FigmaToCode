@@ -3,7 +3,7 @@ import { retrieveTopFill } from "../../common/retrieveFill";
 
 // retrieve the SOLID color on HTML
 export const htmlColorFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"] | undefined,
 ): string => {
   // kind can be text, bg, border...
   // [when testing] fills can be undefined

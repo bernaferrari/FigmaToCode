@@ -29,37 +29,47 @@ import { HTMLSettings } from "types";
 export class HtmlDefaultBuilder {
   styles: Array<string>;
   data: Array<string>;
-  isJSX: boolean;
-  visible: boolean;
-  name: string;
+  node: SceneNode;
+  settings: HTMLSettings;
 
-  constructor(node: SceneNode, settings: HTMLSettings) {
-    this.isJSX = settings.jsx;
-    this.styles = [];
-    this.data = [];
-    this.visible = node.visible;
-    this.name = settings.showLayerNames ? node.name : "";
+  get name() {
+    return this.settings.showLayerNames ? this.node.name : "";
+  }
+  get visible() {
+    return this.node.visible;
+  }
+  get isJSX() {
+    return this.settings.jsx;
+  }
+  get optimizeLayout() {
+    return this.settings.optimizeLayout;
   }
 
-  commonPositionStyles(
-    node: SceneNode & LayoutMixin & MinimalBlendMixin,
-    optimizeLayout: boolean,
-  ): this {
-    this.size(node, optimizeLayout);
-    this.autoLayoutPadding(node, optimizeLayout);
-    this.position(node, optimizeLayout);
-    this.blend(node);
+  constructor(node: SceneNode, settings: HTMLSettings) {
+    this.node = node;
+    this.settings = settings;
+    this.styles = [];
+    this.data = [];
+  }
+
+  commonPositionStyles(): this {
+    this.size();
+    this.autoLayoutPadding();
+    this.position();
+    this.blend();
     return this;
   }
 
-  commonShapeStyles(node: GeometryMixin & SceneNode): this {
-    this.applyFillsToStyle(
-      node.fills,
-      node.type === "TEXT" ? "text" : "background",
-    );
-    this.shadow(node);
-    this.border(node);
-    this.blur(node);
+  commonShapeStyles(): this {
+    if ("fills" in this.node) {
+      this.applyFillsToStyle(
+        this.node.fills,
+        this.node.type === "TEXT" ? "text" : "background",
+      );
+    }
+    this.shadow();
+    this.border();
+    this.blur();
     return this;
   }
 
@@ -67,17 +77,19 @@ export class HtmlDefaultBuilder {
     this.styles.push(...newStyles.filter((style) => style));
   };
 
-  blend(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
+  blend(): this {
+    const { node, isJSX } = this;
     this.addStyles(
-      htmlVisibility(node, this.isJSX),
-      ...htmlRotation(node, this.isJSX),
-      htmlOpacity(node, this.isJSX),
-      htmlBlendMode(node, this.isJSX),
+      htmlVisibility(node, isJSX),
+      ...htmlRotation(node as LayoutMixin, isJSX),
+      htmlOpacity(node as MinimalBlendMixin, isJSX),
+      htmlBlendMode(node as MinimalBlendMixin, isJSX),
     );
     return this;
   }
 
-  border(node: GeometryMixin & SceneNode): this {
+  border(): this {
+    const { node } = this;
     this.addStyles(...htmlBorderRadius(node, this.isJSX));
 
     const commonBorder = commonStroke(node);
@@ -85,8 +97,10 @@ export class HtmlDefaultBuilder {
       return this;
     }
 
-    const color = htmlColorFromFills(node.strokes);
-    const borderStyle = node.dashPattern.length > 0 ? "dotted" : "solid";
+    const strokes = ("strokes" in node && node.strokes) || undefined;
+    const color = htmlColorFromFills(strokes);
+    const borderStyle =
+      "dashPattern" in node && node.dashPattern.length > 0 ? "dotted" : "solid";
 
     const consolidateBorders = (border: number): string =>
       [`${sliceNum(border)}px`, color, borderStyle].filter((d) => d).join(" ");
@@ -140,14 +154,15 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
+  position(): this {
+    const { node, optimizeLayout, isJSX } = this;
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
 
       this.addStyles(
-        formatWithJSX("left", this.isJSX, x),
-        formatWithJSX("top", this.isJSX, y),
-        formatWithJSX("position", this.isJSX, "absolute"),
+        formatWithJSX("left", isJSX, x),
+        formatWithJSX("top", isJSX, y),
+        formatWithJSX("position", isJSX, "absolute"),
       );
     } else {
       if (
@@ -156,7 +171,7 @@ export class HtmlDefaultBuilder {
           ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
             ?.layoutMode === "NONE")
       ) {
-        this.addStyles(formatWithJSX("position", this.isJSX, "relative"));
+        this.addStyles(formatWithJSX("position", isJSX, "relative"));
       }
     }
 
@@ -213,20 +228,24 @@ export class HtmlDefaultBuilder {
     return styles.filter((value) => value !== "").join(", ");
   }
 
-  shadow(node: SceneNode): this {
+  shadow(): this {
+    const { node, isJSX } = this;
     if ("effects" in node) {
       const shadow = htmlShadow(node);
       if (shadow) {
-        this.addStyles(
-          formatWithJSX("box-shadow", this.isJSX, htmlShadow(node)),
-        );
+        this.addStyles(formatWithJSX("box-shadow", isJSX, htmlShadow(node)));
       }
     }
     return this;
   }
 
-  size(node: SceneNode, optimize: boolean): this {
-    const { width, height } = htmlSizePartial(node, this.isJSX, optimize);
+  size(): this {
+    const { node, settings } = this;
+    const { width, height } = htmlSizePartial(
+      node,
+      settings.jsx,
+      settings.optimizeLayout,
+    );
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {
@@ -247,19 +266,21 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
+  autoLayoutPadding(): this {
+    const { node, isJSX, optimizeLayout } = this;
     if ("paddingLeft" in node) {
       this.addStyles(
         ...htmlPadding(
           (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
-          this.isJSX,
+          isJSX,
         ),
       );
     }
     return this;
   }
 
-  blur(node: SceneNode) {
+  blur() {
+    const { node } = this;
     if ("effects" in node && node.effects.length > 0) {
       const blur = node.effects.find(
         (e) => e.type === "LAYER_BLUR" && e.visible,

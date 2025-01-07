@@ -110,7 +110,7 @@ const htmlWrapSVG = (
   if (node.svg === "") return "";
   const builder = new HtmlDefaultBuilder(node, settings)
     .addData("svg-wrapper")
-    .position(node, settings.optimizeLayout);
+    .position();
 
   return `\n<div${builder.build()}>\n${node.svg ?? ""}</div>`;
 };
@@ -128,10 +128,7 @@ const htmlGroup = async (
   }
 
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new HtmlDefaultBuilder(node, settings).commonPositionStyles(
-    node,
-    settings.optimizeLayout,
-  );
+  const builder = new HtmlDefaultBuilder(node, settings).commonPositionStyles();
 
   if (builder.styles) {
     const attr = builder.build();
@@ -147,8 +144,8 @@ const htmlGroup = async (
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
 const htmlText = (node: TextNode, settings: HTMLSettings): string => {
   let layoutBuilder = new HtmlTextBuilder(node, settings)
-    .commonPositionStyles(node, settings.optimizeLayout)
-    .textAlign(node);
+    .commonPositionStyles()
+    .textAlign();
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
   previousExecutionCache.push(...styledHtml);
@@ -220,8 +217,8 @@ const htmlAsset = (node: SceneNode, settings: HTMLSettings): string => {
   }
 
   const builder = new HtmlDefaultBuilder(node, settings)
-    .commonPositionStyles(node, settings.optimizeLayout)
-    .commonShapeStyles(node);
+    .commonPositionStyles()
+    .commonShapeStyles();
 
   let tag = "div";
   let src = "";
@@ -261,8 +258,8 @@ const htmlContainer = (
   }
 
   const builder = new HtmlDefaultBuilder(node, settings)
-    .commonPositionStyles(node, settings.optimizeLayout)
-    .commonShapeStyles(node);
+    .commonPositionStyles()
+    .commonShapeStyles();
 
   if (builder.styles || additionalStyles) {
     let tag = "div";
@@ -307,8 +304,8 @@ const htmlSection = async (
 ): Promise<string> => {
   const childrenStr = await htmlWidgetGenerator(node.children, settings);
   const builder = new HtmlDefaultBuilder(node, settings)
-    .size(node, settings.optimizeLayout)
-    .position(node, settings.optimizeLayout)
+    .size()
+    .position()
     .applyFillsToStyle(node.fills, "background");
 
   if (childrenStr) {
@@ -320,8 +317,8 @@ const htmlSection = async (
 
 const htmlLine = (node: LineNode, settings: HTMLSettings): string => {
   const builder = new HtmlDefaultBuilder(node, settings)
-    .commonPositionStyles(node, settings.optimizeLayout)
-    .commonShapeStyles(node);
+    .commonPositionStyles()
+    .commonShapeStyles();
 
   return `\n<div${builder.build()}></div>`;
 };
