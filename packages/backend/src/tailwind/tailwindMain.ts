@@ -4,9 +4,9 @@ import { TailwindTextBuilder } from "./tailwindTextBuilder";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { tailwindAutoLayoutProps } from "./builderImpl/tailwindAutoLayout";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { PluginSettings } from "types";
+import { AltNode, PluginSettings, TailwindSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
-import { renderAndAttachSVG, renderNodeAsSVG } from "../altNodes/altNodeUtils";
+import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { getVisibleNodes } from "../common/nodeVisibility";
 
 export let localTailwindSettings: PluginSettings;
@@ -35,7 +35,7 @@ export const tailwindMain = async (
   return result;
 };
 
-// todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
+// TODO: lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const tailwindWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
   isJsx: boolean,
@@ -50,7 +50,7 @@ const tailwindWidgetGenerator = async (
 
 const convertNode = (isJsx: boolean) => async (node: SceneNode) => {
   const altNode = await renderAndAttachSVG(node);
-  if (altNode.svg) return altNode.svg;
+  if (altNode.svg) return tailwindWrapSVG(altNode, localTailwindSettings);
 
   switch (node.type) {
     case "RECTANGLE":
@@ -76,6 +76,22 @@ const convertNode = (isJsx: boolean) => async (node: SceneNode) => {
       addWarning(`${node.type} nodes are not supported in Tailwind`);
   }
   return "";
+};
+
+const tailwindWrapSVG = (
+  node: AltNode<SceneNode>,
+  settings: TailwindSettings,
+): string => {
+  if (node.svg === "") return "";
+  const builder = new TailwindDefaultBuilder(
+    node,
+    settings.showLayerNames,
+    settings.jsx,
+  )
+    .addData("svg-wrapper")
+    .position(node, settings.optimizeLayout);
+
+  return `\n<div${builder.build()}>\n${node.svg ?? ""}</div>`;
 };
 
 const tailwindGroup = async (node: GroupNode, isJsx: boolean = false) => {

@@ -24,7 +24,7 @@ import {
   formatDataAttribute,
   formatStyleAttribute,
 } from "../common/commonFormatAttributes";
-import { HTMLSettings, PluginSettings } from "types";
+import { HTMLSettings } from "types";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;

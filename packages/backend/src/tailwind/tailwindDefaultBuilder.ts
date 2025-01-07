@@ -22,8 +22,8 @@ import {
 } from "../common/commonPosition";
 import { pxToBlur } from "./conversionTables";
 import {
+  formatDataAttribute,
   getClassLabel,
-  formatStyleAttribute,
 } from "../common/commonFormatAttributes";
 import { TailwindColorType } from "types";
 
@@ -33,6 +33,7 @@ const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
 export class TailwindDefaultBuilder {
   attributes: string[] = [];
   style: string;
+  data: string[];
   styleSeparator: string = "";
   isJSX: boolean;
   visible: boolean;
@@ -42,6 +43,7 @@ export class TailwindDefaultBuilder {
     this.isJSX = optIsJSX;
     this.styleSeparator = this.isJSX ? "," : ";";
     this.style = "";
+    this.data = [];
     this.visible = node.visible;
     this.name = showLayerNames ? node.name : "";
 
@@ -239,13 +241,21 @@ export class TailwindDefaultBuilder {
     }
   }
 
+  addData(label: string, value?: string): this {
+    const attribute = formatDataAttribute(label, value);
+    this.data.push(attribute);
+    return this;
+  }
+
   build(additionalAttr = ""): string {
     this.addAttributes(additionalAttr);
 
     if (this.name !== "") {
       this.prependAttributes(stringToClassName(this.name));
     }
-    const layerName = this.name ? ` data-layer="${this.name}"` : "";
+    if (this.name) {
+      this.addData("layer", this.name);
+    }
 
     const classLabel = getClassLabel(this.isJSX);
     const classNames =
@@ -253,12 +263,14 @@ export class TailwindDefaultBuilder {
         ? ` ${classLabel}="${this.attributes.join(" ")}"`
         : "";
     const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
+    const dataAttributes = this.data.join("");
 
-    return `${layerName}${classNames}${styles}`;
+    return `${dataAttributes}${classNames}${styles}`;
   }
 
   reset(): void {
     this.attributes = [];
+    this.data = [];
     this.style = "";
   }
 }
