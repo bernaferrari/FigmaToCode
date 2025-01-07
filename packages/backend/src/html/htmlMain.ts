@@ -29,7 +29,11 @@ export const htmlMain = async (
   previousExecutionCache = [];
   localSettings = settings;
 
-  let result = await htmlWidgetGenerator(sceneNode, settings.jsx);
+  let result = await htmlWidgetGenerator(
+    sceneNode,
+    settings.jsx,
+    settings.optimizeLayout,
+  );
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -70,55 +74,63 @@ export const generateHTMLPreview = async (
 const htmlWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
   isJsx: boolean,
+  optimizeLayout: boolean,
 ): Promise<string> => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
-    convertNode(isJsx),
+    convertNode(isJsx, optimizeLayout),
   );
   const code = (await Promise.all(promiseOfConvertedCode)).join("");
   return code;
 };
 
-const convertNode = (isJsx: boolean) => async (node: SceneNode) => {
-  const altNode = await renderAndAttachSVG(node);
-  if (altNode.svg) return htmlWrapSVG(altNode, isJsx);
+const convertNode =
+  (isJsx: boolean, optimizeLayout: boolean) => async (node: SceneNode) => {
+    const altNode = await renderAndAttachSVG(node);
+    if (altNode.svg) return htmlWrapSVG(altNode, isJsx, optimizeLayout);
 
-  switch (node.type) {
-    case "RECTANGLE":
-    case "ELLIPSE":
-      return htmlContainer(node, "", [], isJsx);
-    case "GROUP":
-      return htmlGroup(node, isJsx);
-    case "FRAME":
-    case "COMPONENT":
-    case "INSTANCE":
-    case "COMPONENT_SET":
-      return htmlFrame(node, isJsx);
-    case "SECTION":
-      return htmlSection(node, isJsx);
-    case "TEXT":
-      return htmlText(node, isJsx);
-    case "LINE":
-      return htmlLine(node, isJsx);
-    case "VECTOR":
-      addWarning("VectorNodes are not fully supported in HTML");
-      return htmlAsset(node, isJsx);
-    default:
-  }
-  return "";
-};
+    switch (node.type) {
+      case "RECTANGLE":
+      case "ELLIPSE":
+        return htmlContainer(node, "", [], isJsx);
+      case "GROUP":
+        return htmlGroup(node, isJsx, optimizeLayout);
+      case "FRAME":
+      case "COMPONENT":
+      case "INSTANCE":
+      case "COMPONENT_SET":
+        return htmlFrame(node, isJsx, optimizeLayout);
+      case "SECTION":
+        return htmlSection(node, isJsx, optimizeLayout);
+      case "TEXT":
+        return htmlText(node, isJsx);
+      case "LINE":
+        return htmlLine(node, isJsx);
+      case "VECTOR":
+        addWarning("VectorNodes are not fully supported in HTML");
+        return htmlAsset(node, isJsx);
+      default:
+    }
+    return "";
+  };
 
-const htmlWrapSVG = (node: AltNode<SceneNode>, isJsx: boolean): string => {
+const htmlWrapSVG = (
+  node: AltNode<SceneNode>,
+  isJsx: boolean,
+  optimizeLayout: boolean,
+): string => {
   if (node.svg === "") return "";
-  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx).addData(
-    "svg-wrapper",
-  );
+  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
+    .addData("svg-wrapper")
+    .position(node, optimizeLayout);
+
   return `\n<div${builder.build()}>\n${node.svg ?? ""}</div>`;
 };
 
 const htmlGroup = async (
   node: GroupNode,
-  isJsx: boolean = false,
+  isJsx: boolean,
+  optimizeLayout: boolean,
 ): Promise<string> => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -141,12 +153,16 @@ const htmlGroup = async (
   if (builder.styles) {
     const attr = builder.build();
 
-    const generator = await htmlWidgetGenerator(node.children, isJsx);
+    const generator = await htmlWidgetGenerator(
+      node.children,
+      isJsx,
+      optimizeLayout,
+    );
 
     return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }
 
-  return await htmlWidgetGenerator(node.children, isJsx);
+  return await htmlWidgetGenerator(node.children, isJsx, optimizeLayout);
 };
 
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
@@ -193,7 +209,8 @@ const htmlText = (node: TextNode, isJsx: boolean): string => {
 
 const htmlFrame = async (
   node: SceneNode & BaseFrameMixin,
-  isJsx: boolean = false,
+  isJsx: boolean,
+  optimizeLayout: boolean,
 ): Promise<string> => {
   const childrenStr = await htmlWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(
@@ -201,6 +218,7 @@ const htmlFrame = async (
       localSettings.optimizeLayout,
     ),
     isJsx,
+    optimizeLayout,
   );
 
   if (node.layoutMode !== "NONE") {
@@ -311,9 +329,14 @@ const htmlContainer = (
 
 const htmlSection = async (
   node: SectionNode,
-  isJsx: boolean = false,
+  isJsx: boolean,
+  optimizeLayout: boolean,
 ): Promise<string> => {
-  const childrenStr = await htmlWidgetGenerator(node.children, isJsx);
+  const childrenStr = await htmlWidgetGenerator(
+    node.children,
+    isJsx,
+    optimizeLayout,
+  );
   const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
     .size(node, localSettings.optimizeLayout)
     .position(node, localSettings.optimizeLayout)
