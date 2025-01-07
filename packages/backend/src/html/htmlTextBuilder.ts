@@ -6,15 +6,14 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
+import { PluginSettings } from "types";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
-  constructor(node: TextNode, showLayerNames: boolean, optIsJSX: boolean) {
-    super(node, showLayerNames, optIsJSX);
+  constructor(node: TextNode, settings: PluginSettings) {
+    super(node, settings);
   }
 
-  getTextSegments(
-    id: string,
-  ): {
+  getTextSegments(id: string): {
     style: string;
     text: string;
     openTypeFeatures: { [key: string]: boolean };

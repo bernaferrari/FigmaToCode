@@ -24,6 +24,7 @@ import {
   formatDataAttribute,
   formatStyleAttribute,
 } from "../common/commonFormatAttributes";
+import { PluginSettings } from "types";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
@@ -32,12 +33,12 @@ export class HtmlDefaultBuilder {
   visible: boolean;
   name: string;
 
-  constructor(node: SceneNode, showLayerNames: boolean, optIsJSX: boolean) {
-    this.isJSX = optIsJSX;
+  constructor(node: SceneNode, settings: PluginSettings) {
+    this.isJSX = settings.jsx;
     this.styles = [];
     this.data = [];
     this.visible = node.visible;
-    this.name = showLayerNames ? node.name : "";
+    this.name = settings.showLayerNames ? node.name : "";
   }
 
   commonPositionStyles(
