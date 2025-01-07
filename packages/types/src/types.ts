@@ -1,12 +1,14 @@
 // Settings
 export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 
-export interface PluginSettings {
-  framework: Framework;
+export interface HTMLSettings {
   jsx: boolean;
-  inlineStyle: boolean;
   optimizeLayout: boolean;
   showLayerNames: boolean;
+}
+export interface PluginSettings extends HTMLSettings {
+  framework: Framework;
+  inlineStyle: boolean;
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;

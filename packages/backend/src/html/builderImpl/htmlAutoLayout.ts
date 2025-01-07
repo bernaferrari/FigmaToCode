@@ -1,4 +1,4 @@
-import { PluginSettings } from "types";
+import { HTMLSettings, PluginSettings } from "types";
 import { formatMultipleJSXArray } from "../../common/parseJSX";
 
 const getFlexDirection = (node: InferredAutoLayoutResult): string =>
@@ -48,7 +48,7 @@ const getFlex = (
 export const htmlAutoLayoutProps = (
   node: SceneNode,
   autoLayout: InferredAutoLayoutResult,
-  settings: PluginSettings,
+  settings: HTMLSettings,
 ): string[] =>
   formatMultipleJSXArray(
     {

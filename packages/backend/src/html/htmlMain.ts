@@ -6,7 +6,7 @@ import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { addWarning } from "../common/commonConversionWarnings";
-import { PluginSettings, HTMLPreview, AltNode } from "types";
+import { PluginSettings, HTMLPreview, AltNode, HTMLSettings } from "types";
 import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { getVisibleNodes } from "../common/nodeVisibility";
 
@@ -64,7 +64,7 @@ export const generateHTMLPreview = async (
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const htmlWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
-  settings: PluginSettings,
+  settings: HTMLSettings,
 ): Promise<string> => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
@@ -74,7 +74,7 @@ const htmlWidgetGenerator = async (
   return code;
 };
 
-const convertNode = (settings: PluginSettings) => async (node: SceneNode) => {
+const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
   const altNode = await renderAndAttachSVG(node);
   if (altNode.svg) return htmlWrapSVG(altNode, settings);
 
@@ -105,7 +105,7 @@ const convertNode = (settings: PluginSettings) => async (node: SceneNode) => {
 
 const htmlWrapSVG = (
   node: AltNode<SceneNode>,
-  settings: PluginSettings,
+  settings: HTMLSettings,
 ): string => {
   if (node.svg === "") return "";
   const builder = new HtmlDefaultBuilder(node, settings)
@@ -117,7 +117,7 @@ const htmlWrapSVG = (
 
 const htmlGroup = async (
   node: GroupNode,
-  settings: PluginSettings,
+  settings: HTMLSettings,
 ): Promise<string> => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -145,7 +145,7 @@ const htmlGroup = async (
 };
 
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
-const htmlText = (node: TextNode, settings: PluginSettings): string => {
+const htmlText = (node: TextNode, settings: HTMLSettings): string => {
   let layoutBuilder = new HtmlTextBuilder(node, settings)
     .commonPositionStyles(node, settings.optimizeLayout)
     .textAlign(node);
@@ -188,7 +188,7 @@ const htmlText = (node: TextNode, settings: PluginSettings): string => {
 
 const htmlFrame = async (
   node: SceneNode & BaseFrameMixin,
-  settings: PluginSettings,
+  settings: HTMLSettings,
 ): Promise<string> => {
   const childrenStr = await htmlWidgetGenerator(
     commonSortChildrenWhenInferredAutoLayout(node, settings.optimizeLayout),
@@ -214,7 +214,7 @@ const htmlFrame = async (
   }
 };
 
-const htmlAsset = (node: SceneNode, settings: PluginSettings): string => {
+const htmlAsset = (node: SceneNode, settings: HTMLSettings): string => {
   if (!("opacity" in node) || !("layoutAlign" in node) || !("fills" in node)) {
     return "";
   }
@@ -251,7 +251,7 @@ const htmlContainer = (
     MinimalBlendMixin,
   children: string,
   additionalStyles: string[] = [],
-  settings: PluginSettings,
+  settings: HTMLSettings,
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -303,7 +303,7 @@ const htmlContainer = (
 
 const htmlSection = async (
   node: SectionNode,
-  settings: PluginSettings,
+  settings: HTMLSettings,
 ): Promise<string> => {
   const childrenStr = await htmlWidgetGenerator(node.children, settings);
   const builder = new HtmlDefaultBuilder(node, settings)
@@ -318,7 +318,7 @@ const htmlSection = async (
   }
 };
 
-const htmlLine = (node: LineNode, settings: PluginSettings): string => {
+const htmlLine = (node: LineNode, settings: HTMLSettings): string => {
   const builder = new HtmlDefaultBuilder(node, settings)
     .commonPositionStyles(node, settings.optimizeLayout)
     .commonShapeStyles(node);
@@ -326,7 +326,7 @@ const htmlLine = (node: LineNode, settings: PluginSettings): string => {
   return `\n<div${builder.build()}></div>`;
 };
 
-export const htmlCodeGenTextStyles = (settings: PluginSettings) => {
+export const htmlCodeGenTextStyles = (settings: HTMLSettings) => {
   const result = previousExecutionCache
     .map(
       (style) =>

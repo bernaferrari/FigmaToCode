@@ -6,10 +6,10 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
-import { PluginSettings } from "types";
+import { HTMLSettings } from "types";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
-  constructor(node: TextNode, settings: PluginSettings) {
+  constructor(node: TextNode, settings: HTMLSettings) {
     super(node, settings);
   }
 

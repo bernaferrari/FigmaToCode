@@ -24,7 +24,7 @@ import {
   formatDataAttribute,
   formatStyleAttribute,
 } from "../common/commonFormatAttributes";
-import { PluginSettings } from "types";
+import { HTMLSettings, PluginSettings } from "types";
 
 export class HtmlDefaultBuilder {
   styles: Array<string>;
@@ -33,7 +33,7 @@ export class HtmlDefaultBuilder {
   visible: boolean;
   name: string;
 
-  constructor(node: SceneNode, settings: PluginSettings) {
+  constructor(node: SceneNode, settings: HTMLSettings) {
     this.isJSX = settings.jsx;
     this.styles = [];
     this.data = [];
