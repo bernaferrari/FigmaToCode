@@ -49,25 +49,55 @@ export default function Web() {
         </div>
       </div>
 
-      <div>Plugin dropdown selection (each frame a different breakpoint)</div>
-      <div className="flex space-x-4">
-        <div className="w-24 h-12 bg-red-400"></div>
-        <div className="w-12 h-12 bg-green-500"></div>
-        <div className="w-4 h-12 bg-blue-600"></div>
+      <div className="flex-col space-y-4 py-4">
+        <div>
+          <div>
+            Plugin dropdown selection (each frame a different breakpoint)
+          </div>
+          <div className="flex space-x-4">
+            <div className="w-24 h-12 bg-red-400"></div>
+            <div className="w-12 h-12 bg-green-500"></div>
+            <div className="w-4 h-12 bg-blue-600"></div>
+          </div>
+        </div>
+
+        <div>
+          <div>Outputs from plugin (different screen sizes)</div>
+          <div className="flex space-x-4">
+            <div className="w-24 h-12 bg-gray-400"></div>
+            <div className="w-12 h-12 bg-gray-500"></div>
+            <div className="w-4 h-12 bg-gray-600"></div>
+          </div>
+        </div>
+
+        <div>
+          <div> - Experiment on dark mode (invert colors on output) </div>
+          <div className="flex space-x-4">
+            <div className="w-24 h-12 bg-gray-900"></div>
+            <div className="w-12 h-12 bg-gray-800"></div>
+            <div className="w-4 h-12 bg-gray-700"></div>
+          </div>
+        </div>
       </div>
 
-      <div>Outputs from plugin (different screen sizes)</div>
-      <div className="flex space-x-4">
-        <div className="w-24 h-12 bg-gray-400"></div>
-        <div className="w-12 h-12 bg-gray-500"></div>
-        <div className="w-4 h-12 bg-gray-600"></div>
-      </div>
-
-      <div> - Experiment on dark mode (invert colors on output) </div>
-      <div className="flex space-x-4">
-        <div className="w-24 h-12 bg-gray-900"></div>
-        <div className="w-12 h-12 bg-gray-800"></div>
-        <div className="w-4 h-12 bg-gray-700"></div>
+      <div className="min-w-1/2">
+        <h3 className="text-lg">HTML Output Tester (No JSX)</h3>
+        <textarea
+          placeholder="Paste generated HTML snippet here"
+          className="border-black border-2 p-2 w-1/2 min-h-10"
+          onChange={(e) => {
+            const preview = document.getElementById("preview");
+            if (preview) {
+              preview.innerHTML = e.target.value;
+            }
+          }}
+        ></textarea>
+        <div
+          id="preview"
+          className="border-black border-2 p-2 min-w-24 w-full min-h-10"
+        >
+          Empty
+        </div>
       </div>
     </div>
   );
