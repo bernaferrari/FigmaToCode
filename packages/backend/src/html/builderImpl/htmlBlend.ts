@@ -109,15 +109,24 @@ export const htmlVisibility = (
  * if rotation was changed, let it be perceived. Therefore, 1 => 45
  */
 export const htmlRotation = (node: LayoutMixin, isJsx: boolean): string[] => {
-  // that's how you convert angles to clockwise radians: angle * -pi/180
-  // using 3.14159 as Pi for enough precision and to avoid importing math lib.
-  if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
+  // For some reason, a group with rotation also has rotated nodes.
+  // - group 1 - rotation 45°
+  //   - child 1 - rotation 45°
+  //
+  // if the child is also rotated 45° the effect is doubled
+  // - group 1 - rotation 45°
+  //   - child 1 - rotation 90°
+  //
+  // because of this, we subtract the rotation of the parent from the children.
+  const parent =
+    "parent" in node && node.parent ? (node.parent as LayoutMixin) : null;
+  const parentRotation: number =
+    parent && "rotation" in parent ? parent.rotation : 0;
+  const rotation: number = Math.round(parentRotation - node.rotation) ?? 0;
+
+  if (rotation !== 0) {
     return [
-      formatWithJSX(
-        "transform",
-        isJsx,
-        `rotate(${sliceNum(-node.rotation)}deg)`,
-      ),
+      formatWithJSX("transform", isJsx, `rotate(${sliceNum(rotation)}deg)`),
       formatWithJSX("transform-origin", isJsx, "0 0"),
     ];
   }
