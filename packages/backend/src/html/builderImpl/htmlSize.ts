@@ -15,8 +15,7 @@ const getStyleForSize = (
   }
 
   if (value === "fill") {
-    if (parent === null || optimizeLayout === false)
-      return formatWithJSX(property, isJsx, "100%");
+    if (parent === null) return formatWithJSX(property, isJsx, "100%");
     if (
       "layoutMode" in parent &&
       ((property === "width" && parent.layoutMode === "HORIZONTAL") ||
