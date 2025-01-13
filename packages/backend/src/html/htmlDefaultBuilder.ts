@@ -246,13 +246,14 @@ export class HtmlDefaultBuilder {
 
   size(): this {
     const { node, settings } = this;
-    const { width, height } = htmlSizePartial(
+    const { width, height, maxWidth, maxHeight } = htmlSizePartial(
       node,
       settings.jsx,
       settings.optimizeLayout,
     );
 
     if (node.type === "TEXT") {
+      // TODO: add max width and height for text nodes if possible
       switch (node.textAutoResize) {
         case "WIDTH_AND_HEIGHT":
           break;
@@ -265,7 +266,7 @@ export class HtmlDefaultBuilder {
           break;
       }
     } else {
-      this.addStyles(width, height);
+      this.addStyles(width, height, maxWidth, maxHeight);
     }
 
     return this;
