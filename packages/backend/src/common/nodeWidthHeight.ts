@@ -20,13 +20,16 @@ export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
     height = hMode;
   }
 
-  return { width, height };
+  // TODO: it might be possible to just return the values here. I'm not sure the stuff below adds anything.
+  // return { width, height };
 
   const hasLayout =
-    "layoutAlign" in node && node.parent && "layoutMode" in node.parent;
+    "layoutAlign" in node &&
+    node.parent !== null &&
+    "layoutMode" in node.parent;
 
   if (!hasLayout) {
-    return { width: node.width, height: node.height };
+    return { width, height };
   }
 
   const nodeAuto =
@@ -35,7 +38,7 @@ export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
       : null) ?? node;
 
   if ("layoutMode" in nodeAuto && nodeAuto.layoutMode === "NONE") {
-    return { width: node.width, height: node.height };
+    return { width, height };
   }
 
   // const parentLayoutMode = node.parent.layoutMode;
@@ -62,11 +65,11 @@ export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
       ? "fill"
       : "layoutMode" in nodeAuto && nodeAuto[primaryAxisMode] === "AUTO"
         ? null
-        : node.width,
+        : width,
     height: isHeightFill
       ? "fill"
       : "layoutMode" in nodeAuto && nodeAuto[counterAxisMode] === "AUTO"
         ? null
-        : node.height,
+        : height,
   };
 };
