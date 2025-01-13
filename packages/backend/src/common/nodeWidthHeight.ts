@@ -21,7 +21,7 @@ export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
   }
 
   // TODO: it might be possible to just return the values here. I'm not sure the stuff below adds anything.
-  return { width, height };
+  // return { width, height };
 
   const hasLayout =
     "layoutAlign" in node &&
