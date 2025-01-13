@@ -36,7 +36,14 @@ export const htmlSizePartial = (
   node: SceneNode,
   isJsx: boolean,
   optimizeLayout: boolean,
-): { width: string; height: string; maxWidth: string; maxHeight: string } => {
+): {
+  width: string;
+  height: string;
+  maxWidth: string;
+  maxHeight: string;
+  overflow: string;
+  shrink: string;
+} => {
   const size = nodeSize(node, optimizeLayout);
 
   let parent: InferredAutoLayoutResult | ParentNode | null =
@@ -61,6 +68,15 @@ export const htmlSizePartial = (
     parent,
   );
 
+  let overflow = "";
+  if ("clipsContent" in node) {
+    overflow = formatWithJSX(
+      "overflow",
+      isJsx,
+      node.clipsContent ? "hidden" : "visible",
+    );
+  }
+
   const maxWidth =
     node.maxWidth === null
       ? ""
@@ -70,5 +86,8 @@ export const htmlSizePartial = (
       ? ""
       : formatWithJSX("max-height", isJsx, Number(node.maxHeight + "px"));
 
-  return { width, height, maxWidth, maxHeight };
+  const shrink =
+    parent === null ? "" : formatWithJSX("flex-shrink", isJsx, "0");
+
+  return { width, height, maxWidth, maxHeight, overflow, shrink };
 };
