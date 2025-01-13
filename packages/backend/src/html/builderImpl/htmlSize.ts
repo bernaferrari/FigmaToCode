@@ -1,54 +1,74 @@
+import { ParentNode, SizeValue } from "types";
 import { nodeSize } from "../../common/nodeWidthHeight";
 import { formatWithJSX } from "../../common/parseJSX";
 import { isPreviewGlobal } from "../htmlMain";
+
+const getStyleForSize = (
+  isJsx: boolean,
+  property: string,
+  value: SizeValue,
+  optimizeLayout: boolean,
+  parent: ParentNode | InferredAutoLayoutResult | null,
+): string => {
+  if (typeof value === "number") {
+    return formatWithJSX(property, isJsx, Number(value) + "px");
+  }
+
+  if (value === "fill") {
+    if (parent === null || optimizeLayout === false)
+      return formatWithJSX(property, isJsx, "100%");
+    if (
+      "layoutMode" in parent &&
+      ((property === "width" && parent.layoutMode === "HORIZONTAL") ||
+        (property === "height" && parent.layoutMode === "VERTICAL"))
+    ) {
+      return formatWithJSX("flex", isJsx, "1 1 0");
+    } else {
+      return formatWithJSX("align-self", isJsx, "stretch");
+    }
+  }
+
+  // Else, presume it's null which is like width:"auto"
+  return "";
+};
 
 export const htmlSizePartial = (
   node: SceneNode,
   isJsx: boolean,
   optimizeLayout: boolean,
-): { width: string; height: string } => {
-  if (isPreviewGlobal && node.parent === undefined) {
-    return {
-      width: formatWithJSX("width", isJsx, "100%"),
-      height: formatWithJSX("height", isJsx, "100%"),
-    };
-  }
-
+): { width: string; height: string; maxWidth: string; maxHeight: string } => {
   const size = nodeSize(node, optimizeLayout);
-  const nodeParent =
-    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
+
+  let parent: InferredAutoLayoutResult | ParentNode | null =
+    node.parent !== null &&
+    "inferredAutoLayout" in node.parent &&
+    node.parent.inferredAutoLayout !== null
       ? node.parent.inferredAutoLayout
-      : null) ?? node.parent;
+      : node.parent;
 
-  let w = "";
-  if (typeof size.width === "number") {
-    w = formatWithJSX("width", isJsx, size.width);
-  } else if (size.width === "fill") {
-    if (
-      nodeParent &&
-      "layoutMode" in nodeParent &&
-      nodeParent.layoutMode === "HORIZONTAL"
-    ) {
-      w = formatWithJSX("flex", isJsx, "1 1 0");
-    } else {
-      w = formatWithJSX("align-self", isJsx, "stretch");
-    }
-  }
+  let width = getStyleForSize(
+    isJsx,
+    "width",
+    size.width,
+    optimizeLayout,
+    parent,
+  );
+  let height = getStyleForSize(
+    isJsx,
+    "height",
+    size.height,
+    optimizeLayout,
+    parent,
+  );
 
-  let h = "";
-  if (typeof size.height === "number") {
-    h = formatWithJSX("height", isJsx, size.height);
-  } else if (typeof size.height === "string") {
-    if (
-      nodeParent &&
-      "layoutMode" in nodeParent &&
-      nodeParent.layoutMode === "VERTICAL"
-    ) {
-      h = formatWithJSX("flex", isJsx, "1 1 0");
-    } else {
-      h = formatWithJSX("align-self", isJsx, "stretch");
-    }
-  }
+  const maxWidth =
+    node.maxWidth === null
+      ? ""
+      : formatWithJSX("max-width", isJsx, Number(node.maxWidth) + "px");
+  const maxHeight =
+    node.maxHeight === null
+      ? ""
+      : formatWithJSX("max-height", isJsx, Number(node.maxHeight + "px"));
 
-  return { width: w, height: h };
+  return { width, height, maxWidth, maxHeight };
 };

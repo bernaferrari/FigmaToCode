@@ -1,6 +1,27 @@
-import { Size } from "types";
+import { Size, SizeValue } from "types";
 
 export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
+  const n = node as LayoutMixin;
+  const mapMode: Record<typeof n.layoutSizingHorizontal, SizeValue> = {
+    FILL: "fill",
+    HUG: null,
+    FIXED: 0,
+  };
+  const wMode = mapMode[n.layoutSizingHorizontal ?? "FIXED"];
+  const hMode = mapMode[n.layoutSizingVertical ?? "FIXED"];
+
+  let width: SizeValue = n.width;
+  let height: SizeValue = n.height;
+
+  if (wMode === null || wMode === "fill") {
+    width = wMode;
+  }
+  if (hMode === null || hMode === "fill") {
+    height = hMode;
+  }
+
+  return { width, height };
+
   const hasLayout =
     "layoutAlign" in node && node.parent && "layoutMode" in node.parent;
 
