@@ -41,7 +41,6 @@ export const generateWidgetCode = (
   properties: Record<string, number | string | string[]>,
   positionedValues?: string[],
 ): string => {
-  console.log("properties", properties);
   const propertiesArray = Object.entries(properties)
     .filter(([, value]) => {
       if (Array.isArray(value)) {
