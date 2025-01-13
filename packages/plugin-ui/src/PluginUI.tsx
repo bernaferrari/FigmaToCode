@@ -33,7 +33,6 @@ type PluginUIProps = {
 const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
 
 export const PluginUI = (props: PluginUIProps) => {
-  const [isResponsiveExpanded, setIsResponsiveExpanded] = useState(false);
   const isEmpty = props.code === "";
 
   const warnings = props.warnings ?? [];
@@ -67,11 +66,7 @@ export const PluginUI = (props: PluginUIProps) => {
       <div className="flex flex-col h-full overflow-y-auto">
         <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
           {isEmpty === false && props.htmlPreview && (
-            <Preview
-              htmlPreview={props.htmlPreview}
-              isResponsiveExpanded={isResponsiveExpanded}
-              setIsResponsiveExpanded={setIsResponsiveExpanded}
-            />
+            <Preview htmlPreview={props.htmlPreview} />
           )}
           {warnings.length > 0 && (
             <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-3 w-full">
