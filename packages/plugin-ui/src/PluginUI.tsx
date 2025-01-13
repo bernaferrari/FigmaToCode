@@ -30,7 +30,7 @@ type PluginUIProps = {
   gradients: LinearGradientConversion[];
 };
 
-const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
+const frameworks: Framework[] = ["HTML", "Tailwind"];
 
 export const PluginUI = (props: PluginUIProps) => {
   const [isResponsiveExpanded, setIsResponsiveExpanded] = useState(false);
@@ -39,16 +39,15 @@ export const PluginUI = (props: PluginUIProps) => {
   const warnings = props.warnings ?? [];
 
   return (
-    <div className="flex flex-col h-full dark:text-white">
+    <div className="flex flex-col h-full dark:text-white bg-white dark:bg-gray-950">
       <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
         {frameworks.map((tab) => (
           <button
             key={`tab ${tab}`}
-            className={`w-full p-1 text-sm ${
-              props.selectedFramework === tab
-                ? "bg-green-500 dark:bg-green-600 text-white rounded-md font-semibold shadow-sm"
-                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-600 dark:hover:bg-green-800 dark:hover:border-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
-            }`}
+            className={`w-full p-1 text-sm ${props.selectedFramework === tab
+              ? "bg-blue-500 dark:bg-blue-500 text-white rounded-md font-semibold shadow-sm"
+              : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-600 dark:hover:bg-green-800 dark:hover:border-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
+              }`}
             onClick={() => {
               props.setSelectedFramework(tab as Framework);
             }}
@@ -74,7 +73,7 @@ export const PluginUI = (props: PluginUIProps) => {
             />
           )}
           {warnings.length > 0 && (
-            <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-3 w-full">
+            <div className="flex flex-col bg-amber-300 text-gray-950 dark:bg-amber-300 dark:text-black p-3 w-full rounded-sm">
               <div className="flex flex-row gap-1">
                 <div style={{ transform: "translate(2px, 0px) scale(80%)" }}>
                   <WarningIcon />

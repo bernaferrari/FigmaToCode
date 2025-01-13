@@ -7,8 +7,8 @@ import {
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
-import copy from "copy-to-clipboard";
 import SelectableToggle from "./SelectableToggle";
+import { IconWand } from "@tabler/icons-react";
 
 interface CodePanelProps {
   code: string;
@@ -36,7 +36,7 @@ const CodePanel = (props: CodePanelProps) => {
   const handleButtonClick = () => {
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 250);
-    copy(code);
+
   };
 
   const handleButtonHover = () => setSyntaxHovered(true);
@@ -55,16 +55,16 @@ const CodePanel = (props: CodePanelProps) => {
         </p>
         {isEmpty === false && (
           <button
-            className={`px-4 py-1 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${
-              isPressed
-                ? "bg-green-500 dark:text-white hover:bg-green-500 ring-4 ring-green-300 ring-opacity-50 animate-pulse"
-                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600"
-            }`}
+            className={`flex items-center justify-center gap-2 px-4 py-1 text-sm font-semibold border border-blue-500 rounded-md shadow-sm hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white hover:border-transparent transition-all duration-300 ${isPressed
+              ? "bg-blue-500 dark:text-white hover:bg-blue-500 ring-4 ring-blue-300 ring-opacity-50 animate-pulse"
+              : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600 dark:hover:border-blue-600"
+              }`}
             onClick={handleButtonClick}
             onMouseEnter={handleButtonHover}
             onMouseLeave={handleButtonLeave}
           >
-            Copy
+            <IconWand className="" size={16} />
+            Open with Polymet
           </button>
         )}
       </div>
@@ -87,8 +87,8 @@ const CodePanel = (props: CodePanelProps) => {
                   onSelect={(value) => {
                     onPreferenceChanged(preference.propertyName, value);
                   }}
-                  buttonClass="bg-green-100 dark:bg-black dark:ring-green-800 ring-green-500"
-                  checkClass="bg-green-400 dark:bg-black dark:bg-green-500 dark:border-green-500 ring-green-300 border-green-400"
+                  buttonClass="bg-blue-100 dark:bg-black dark:ring-blue-800 ring-blue-500"
+                  checkClass="bg-blue-400 dark:bg-black dark:bg-blue-500 dark:border-blue-500 ring-blue-300 border-blue-400"
                 />
               ))}
           </div>
@@ -127,9 +127,8 @@ const CodePanel = (props: CodePanelProps) => {
       )}
 
       <div
-        className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
-          syntaxHovered ? "ring-2" : "ring-0"
-        }`}
+        className={`rounded-lg ring-blue-600 transition-all duratio overflow-clip ${syntaxHovered ? "ring-2" : "ring-0"
+          }`}
       >
         {isEmpty ? (
           <h3>No layer is selected. Please select a layer.</h3>
@@ -142,7 +141,7 @@ const CodePanel = (props: CodePanelProps) => {
               borderRadius: 8,
               marginTop: 0,
               marginBottom: 0,
-              backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
+              backgroundColor: syntaxHovered ? "#1A1E2B" : "#1B1B1B",
               transitionProperty: "all",
               transitionTimingFunction: "ease",
               transitionDuration: "0.2s",

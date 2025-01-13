@@ -10,6 +10,7 @@
     "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.28.1",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "@types/react-syntax-highlighter": "15.5.13",

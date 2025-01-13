@@ -206,6 +206,9 @@ importers:
 
   packages/plugin-ui:
     dependencies:
+      '@tabler/icons-react':
+        specifier: ^3.28.1
+        version: 3.28.1(react@18.3.1)
       '@types/react':
         specifier: ^18.3.17
         version: 18.3.17
@@ -1130,6 +1133,14 @@ packages:
 
   '@swc/types@0.1.17':
     resolution: {integrity: sha512-V5gRru+aD8YVyCOMAjMpWR1Ui577DD5KSJsHP8RAxopAH22jFz6GZd/qxqjO6MJHQhcsjvjOFXyDhyLQUnMveQ==}
+
+  '@tabler/icons-react@3.28.1':
+    resolution: {integrity: sha512-KNBpA2kbxr3/2YK5swt7b/kd/xpDP1FHYZCxDFIw54tX8slELRFEf95VMxsccQHZeIcUbdoojmUUuYSbt/sM5Q==}
+    peerDependencies:
+      react: '>= 16'
+
+  '@tabler/icons@3.28.1':
+    resolution: {integrity: sha512-h7nqKEvFooLtFxhMOC1/2eiV+KRXhBUuDUUJrJlt6Ft6tuMw2eU/9GLQgrTk41DNmIEzp/LI83K9J9UUU8YBYQ==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -3590,6 +3601,13 @@ snapshots:
   '@swc/types@0.1.17':
     dependencies:
       '@swc/counter': 0.1.3
+
+  '@tabler/icons-react@3.28.1(react@18.3.1)':
+    dependencies:
+      '@tabler/icons': 3.28.1
+      react: 18.3.1
+
+  '@tabler/icons@3.28.1': {}
 
   '@types/babel__core@7.20.5':
     dependencies:

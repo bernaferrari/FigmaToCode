@@ -46,7 +46,7 @@ const getUserSettings = async () => {
         isKeyOfPluginSettings(key) &&
         key in possiblePluginSrcSettings &&
         typeof possiblePluginSrcSettings[key] ===
-          typeof defaultPluginSettings[key]
+        typeof defaultPluginSettings[key]
       ) {
         validSettings[key] = possiblePluginSrcSettings[key] as any;
       }
@@ -181,38 +181,7 @@ const codegenMode = async () => {
             language: "HTML",
           },
         ];
-      case "flutter":
-        return [
-          {
-            title: `Code`,
-            code: flutterMain(convertedSelection, {
-              ...userPluginSettings,
-              flutterGenerationMode: "snippet",
-            }),
-            language: "SWIFT",
-          },
-          {
-            title: `Text Styles`,
-            code: flutterCodeGenTextStyles(),
-            language: "SWIFT",
-          },
-        ];
-      case "swiftUI":
-        return [
-          {
-            title: `SwiftUI`,
-            code: swiftuiMain(convertedSelection, {
-              ...userPluginSettings,
-              swiftUIGenerationMode: "snippet",
-            }),
-            language: "SWIFT",
-          },
-          {
-            title: `Text Styles`,
-            code: swiftUICodeGenTextStyles(),
-            language: "SWIFT",
-          },
-        ];
+
       default:
         break;
     }
