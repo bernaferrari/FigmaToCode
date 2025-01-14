@@ -2,6 +2,9 @@
 
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
+import { useCodeContext } from "@/hooks/use-code";
+
+
 
 type ChatHistory = {
     user: 'user' | 'claude';
@@ -9,40 +12,43 @@ type ChatHistory = {
 }
 
 export default function Chat() {
+
+    const { code, setCode } = useCodeContext();
+
     const [message, setMessage] = useState("");
     const [chatHistory, setChatHistory] = useState<ChatHistory[]>([]);
 
     const sendMessage = async () => {
 
 
-        const response = await fetch("api/query-anthropic", {
-            method: "POST",
-            body: JSON.stringify({ prompt: message }),
-        });
+        try {
+            const data = await fetch('/api/tweak-design', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message, code }),
+            });
 
-        if (!response.ok) {
-            const { error, details } = await response.json();
-            throw new Error(`${error}: ${details}`);
+            const response = await data.json();
+            if (response.error) {
+                throw new Error(response.error);
+            }
+
+            setCode(response.completion);
+
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error(`Anthropic API Error: ${error.message}`);
+            }
+            throw error;
         }
-
-        const { completion } = await response.json();
-
-        setChatHistory([...chatHistory, { user: 'claude', message }]);
-        return completion;
 
     }
 
     return (
         <div className="h-screen flex flex-col justify-end p-16">
-            <div>
-                {chatHistory.map((chat, index) => (
-                    <div key={index} className={`flex ${chat.user === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`bg-neutral-800 p-4 rounded-xl ${chat.user === 'user' ? 'ml-auto' : 'mr-auto'}`}>
-                            {chat.message}
-                        </div>
-                    </div>
-                ))}
-            </div>
+
             <div className="bg-neutral-800 h-48 rounded-xl p-6">
                 <textarea className="bg-neutral-800 w-full rounded-xl resize-none placeholder-neutral-300 focus:ring-0 focus:outline-none" placeholder="Tweak the design with Polymet " rows={4} onChange={(e) => setMessage(e.target.value)}>
                 </textarea>
