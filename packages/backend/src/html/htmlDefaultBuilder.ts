@@ -147,12 +147,7 @@ export class HtmlDefaultBuilder {
         formatWithJSX("position", this.isJSX, "absolute"),
       );
     } else {
-      if (
-        node.type === "GROUP" ||
-        ("layoutMode" in node &&
-          ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
-            ?.layoutMode === "NONE")
-      ) {
+      if ("children" in node) {
         this.addStyles(formatWithJSX("position", this.isJSX, "relative"));
       }
     }
@@ -223,9 +218,11 @@ export class HtmlDefaultBuilder {
   }
 
   size(node: SceneNode, optimize: boolean): this {
-    const { width, height } = htmlSizePartial(node, this.isJSX, optimize);
+    const sizeStyles = htmlSizePartial(node, this.isJSX, optimize);
+    const { width, height } = sizeStyles;
 
     if (node.type === "TEXT") {
+      // TODO: add max width and height for text nodes if possible
       switch (node.textAutoResize) {
         case "WIDTH_AND_HEIGHT":
           break;
@@ -238,7 +235,7 @@ export class HtmlDefaultBuilder {
           break;
       }
     } else {
-      this.addStyles(width, height);
+      this.addStyles(...Object.values(sizeStyles));
     }
 
     return this;
