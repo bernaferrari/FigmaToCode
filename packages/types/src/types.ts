@@ -1,20 +1,30 @@
 // Settings
 export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
-
-export interface PluginSettings {
-  framework: Framework;
+export interface HTMLSettings {
   jsx: boolean;
-  inlineStyle: boolean;
   optimizeLayout: boolean;
   showLayerNames: boolean;
-  responsiveRoot: boolean;
-  flutterGenerationMode: string;
-  swiftUIGenerationMode: string;
+}
+export interface TailwindSettings extends HTMLSettings {
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
   customTailwindColors: boolean;
 }
-
+export interface FlutterSettings {
+  flutterGenerationMode: string;
+}
+export interface SwiftUISettings {
+  swiftUIGenerationMode: string;
+}
+export interface PluginSettings
+  extends HTMLSettings,
+    TailwindSettings,
+    FlutterSettings,
+    SwiftUISettings {
+  framework: Framework;
+  inlineStyle: boolean;
+  responsiveRoot: boolean;
+}
 // Messaging
 export interface ConversionData {
   code: string;
@@ -54,6 +64,13 @@ export type ErrorMessage = Message & {
 
 // Nodes
 export type ParentNode = BaseNode & ChildrenMixin;
+
+export type AltNodeMetadata<T extends BaseNode> = {
+  originalNode: T;
+  canBeFlattened: boolean;
+  svg?: string;
+};
+export type AltNode<T extends BaseNode> = T & AltNodeMetadata<T>;
 
 // Styles & Conversions
 

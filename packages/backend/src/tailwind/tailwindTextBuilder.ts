@@ -170,9 +170,9 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/text-align/
    * example: text-justify
    */
-  textAlign(node: TextNode): this {
+  textAlign(): this {
     // if alignHorizontal is LEFT, don't do anything because that is native
-
+    const node = this.node as TextNode;
     // only undefined in testing
     if (node.textAlignHorizontal && node.textAlignHorizontal !== "LEFT") {
       // todo when node.textAutoResize === "WIDTH_AND_HEIGHT" and there is no \n in the text, this can be ignored.

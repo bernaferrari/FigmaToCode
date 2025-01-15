@@ -122,7 +122,7 @@ const codegenMode = async () => {
           },
           {
             title: `Text Styles`,
-            code: htmlCodeGenTextStyles(false),
+            code: htmlCodeGenTextStyles(userPluginSettings),
             language: "HTML",
           },
         ];
@@ -139,7 +139,7 @@ const codegenMode = async () => {
           },
           {
             title: `Text Styles`,
-            code: htmlCodeGenTextStyles(true),
+            code: htmlCodeGenTextStyles(userPluginSettings),
             language: "HTML",
           },
         ];

@@ -6,15 +6,14 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
+import { HTMLSettings } from "types";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
-  constructor(node: TextNode, showLayerNames: boolean, optIsJSX: boolean) {
-    super(node, showLayerNames, optIsJSX);
+  constructor(node: TextNode, settings: HTMLSettings) {
+    super(node, settings);
   }
 
-  getTextSegments(
-    id: string,
-  ): {
+  getTextSegments(id: string): {
     style: string;
     text: string;
     openTypeFeatures: { [key: string]: boolean };
@@ -117,7 +116,8 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     return "";
   }
 
-  textAlign(node: TextNode): this {
+  textAlign(): this {
+    const node = this.node as TextNode;
     // if alignHorizontal is LEFT, don't do anything because that is native
 
     // only undefined in testing

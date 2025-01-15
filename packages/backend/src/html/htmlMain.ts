@@ -6,28 +6,25 @@ import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { addWarning } from "../common/commonConversionWarnings";
-import { PluginSettings, HTMLPreview } from "types";
-
-let showLayerNames = false;
+import { PluginSettings, HTMLPreview, AltNode, HTMLSettings } from "types";
+import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
+import { getVisibleNodes } from "../common/nodeVisibility";
 
 const selfClosingTags = ["img"];
 
 export let isPreviewGlobal = false;
 
-let localSettings: PluginSettings;
 let previousExecutionCache: { style: string; text: string }[];
 
-export const htmlMain = (
+export const htmlMain = async (
   sceneNode: Array<SceneNode>,
   settings: PluginSettings,
   isPreview: boolean = false,
-): string => {
-  showLayerNames = settings.showLayerNames;
+): Promise<string> => {
   isPreviewGlobal = isPreview;
   previousExecutionCache = [];
-  localSettings = settings;
 
-  let result = htmlWidgetGenerator(sceneNode, settings.jsx);
+  let result = await htmlWidgetGenerator(sceneNode, settings);
 
   // remove the initial \n that is made in Container.
   if (result.length > 0 && result.startsWith("\n")) {
@@ -37,16 +34,16 @@ export const htmlMain = (
   return result;
 };
 
-export const generateHTMLPreview = (
+export const generateHTMLPreview = async (
   nodes: SceneNode[],
   settings: PluginSettings,
   code?: string,
-): HTMLPreview => {
+): Promise<HTMLPreview> => {
   const htmlCodeAlreadyGenerated =
     settings.framework === "HTML" && settings.jsx === false && code;
   const htmlCode = htmlCodeAlreadyGenerated
     ? code
-    : htmlMain(
+    : await htmlMain(
         nodes,
         {
           ...settings,
@@ -65,52 +62,63 @@ export const generateHTMLPreview = (
 };
 
 // todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
-const htmlWidgetGenerator = (
+const htmlWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
-  isJsx: boolean,
-): string => {
-  let comp = "";
+  settings: HTMLSettings,
+): Promise<string> => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible);
-  visibleSceneNode.forEach((node, index) => {
-    // if (node.isAsset || ("isMask" in node && node.isMask === true)) {
-    //   comp += htmlAsset(node, isJsx);
-    // }
-
-    switch (node.type) {
-      case "RECTANGLE":
-      case "ELLIPSE":
-        comp += htmlContainer(node, "", [], isJsx);
-        break;
-      case "GROUP":
-        comp += htmlGroup(node, isJsx);
-        break;
-      case "FRAME":
-      case "COMPONENT":
-      case "INSTANCE":
-      case "COMPONENT_SET":
-        comp += htmlFrame(node, isJsx);
-        break;
-      case "SECTION":
-        comp += htmlSection(node, isJsx);
-        break;
-      case "TEXT":
-        comp += htmlText(node, isJsx);
-        break;
-      case "LINE":
-        comp += htmlLine(node, isJsx);
-        break;
-      case "VECTOR":
-        comp += htmlAsset(node, isJsx);
-        addWarning("VectorNodes are not fully supported in HTML");
-        break;
-    }
-  });
-
-  return comp;
+  const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
+    convertNode(settings),
+  );
+  const code = (await Promise.all(promiseOfConvertedCode)).join("");
+  return code;
 };
 
-const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
+const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
+  const altNode = await renderAndAttachSVG(node);
+  if (altNode.svg) return htmlWrapSVG(altNode, settings);
+
+  switch (node.type) {
+    case "RECTANGLE":
+    case "ELLIPSE":
+      return htmlContainer(node, "", [], settings);
+    case "GROUP":
+      return htmlGroup(node, settings);
+    case "FRAME":
+    case "COMPONENT":
+    case "INSTANCE":
+    case "COMPONENT_SET":
+      return htmlFrame(node, settings);
+    case "SECTION":
+      return htmlSection(node, settings);
+    case "TEXT":
+      return htmlText(node, settings);
+    case "LINE":
+      return htmlLine(node, settings);
+    case "VECTOR":
+      addWarning("VectorNodes are not fully supported in HTML");
+      return htmlAsset(node, settings);
+    default:
+  }
+  return "";
+};
+
+const htmlWrapSVG = (
+  node: AltNode<SceneNode>,
+  settings: HTMLSettings,
+): string => {
+  if (node.svg === "") return "";
+  const builder = new HtmlDefaultBuilder(node, settings)
+    .addData("svg-wrapper")
+    .position();
+
+  return `\n<div${builder.build()}>\n${node.svg ?? ""}</div>`;
+};
+
+const htmlGroup = async (
+  node: GroupNode,
+  settings: HTMLSettings,
+): Promise<string> => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -119,32 +127,25 @@ const htmlGroup = (node: GroupNode, isJsx: boolean = false): string => {
     return "";
   }
 
-  // const vectorIfExists = tailwindVector(node, isJsx);
-  // if (vectorIfExists) return vectorIfExists;
-
   // this needs to be called after CustomNode because widthHeight depends on it
-  const builder = new HtmlDefaultBuilder(
-    node,
-    showLayerNames,
-    isJsx,
-  ).commonPositionStyles(node, localSettings.optimizeLayout);
+  const builder = new HtmlDefaultBuilder(node, settings).commonPositionStyles();
 
   if (builder.styles) {
     const attr = builder.build();
 
-    const generator = htmlWidgetGenerator(node.children, isJsx);
+    const generator = await htmlWidgetGenerator(node.children, settings);
 
     return `\n<div${attr}>${indentString(generator)}\n</div>`;
   }
 
-  return htmlWidgetGenerator(node.children, isJsx);
+  return await htmlWidgetGenerator(node.children, settings);
 };
 
 // this was split from htmlText to help the UI part, where the style is needed (without <p></p>).
-const htmlText = (node: TextNode, isJsx: boolean): string => {
-  let layoutBuilder = new HtmlTextBuilder(node, showLayerNames, isJsx)
-    .commonPositionStyles(node, localSettings.optimizeLayout)
-    .textAlign(node);
+const htmlText = (node: TextNode, settings: HTMLSettings): string => {
+  let layoutBuilder = new HtmlTextBuilder(node, settings)
+    .commonPositionStyles()
+    .textAlign();
 
   const styledHtml = layoutBuilder.getTextSegments(node.id);
   previousExecutionCache.push(...styledHtml);
@@ -182,45 +183,42 @@ const htmlText = (node: TextNode, isJsx: boolean): string => {
   return `\n<div${layoutBuilder.build()}>${content}</div>`;
 };
 
-const htmlFrame = (
+const htmlFrame = async (
   node: SceneNode & BaseFrameMixin,
-  isJsx: boolean = false,
-): string => {
-  const childrenStr = htmlWidgetGenerator(
-    commonSortChildrenWhenInferredAutoLayout(
-      node,
-      localSettings.optimizeLayout,
-    ),
-    isJsx,
+  settings: HTMLSettings,
+): Promise<string> => {
+  const childrenStr = await htmlWidgetGenerator(
+    commonSortChildrenWhenInferredAutoLayout(node, settings.optimizeLayout),
+    settings,
   );
 
   if (node.layoutMode !== "NONE") {
-    const rowColumn = htmlAutoLayoutProps(node, node, isJsx);
-    return htmlContainer(node, childrenStr, rowColumn, isJsx);
+    const rowColumn = htmlAutoLayoutProps(node, node, settings);
+    return htmlContainer(node, childrenStr, rowColumn, settings);
   } else {
-    if (localSettings.optimizeLayout && node.inferredAutoLayout !== null) {
+    if (settings.optimizeLayout && node.inferredAutoLayout !== null) {
       const rowColumn = htmlAutoLayoutProps(
         node,
         node.inferredAutoLayout,
-        isJsx,
+        settings,
       );
-      return htmlContainer(node, childrenStr, rowColumn, isJsx);
+      return htmlContainer(node, childrenStr, rowColumn, settings);
     }
 
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return htmlContainer(node, childrenStr, [], isJsx);
+    return htmlContainer(node, childrenStr, [], settings);
   }
 };
 
-const htmlAsset = (node: SceneNode, isJsx: boolean = false): string => {
+const htmlAsset = (node: SceneNode, settings: HTMLSettings): string => {
   if (!("opacity" in node) || !("layoutAlign" in node) || !("fills" in node)) {
     return "";
   }
 
-  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
-    .commonPositionStyles(node, localSettings.optimizeLayout)
-    .commonShapeStyles(node);
+  const builder = new HtmlDefaultBuilder(node, settings)
+    .commonPositionStyles()
+    .commonShapeStyles();
 
   let tag = "div";
   let src = "";
@@ -250,7 +248,7 @@ const htmlContainer = (
     MinimalBlendMixin,
   children: string,
   additionalStyles: string[] = [],
-  isJsx: boolean,
+  settings: HTMLSettings,
 ): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -259,9 +257,9 @@ const htmlContainer = (
     return children;
   }
 
-  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
-    .commonPositionStyles(node, localSettings.optimizeLayout)
-    .commonShapeStyles(node);
+  const builder = new HtmlDefaultBuilder(node, settings)
+    .commonPositionStyles()
+    .commonShapeStyles();
 
   if (builder.styles || additionalStyles) {
     let tag = "div";
@@ -277,7 +275,7 @@ const htmlContainer = (
         builder.addStyles(
           formatWithJSX(
             "background-image",
-            isJsx,
+            settings.jsx,
             `url(https://via.placeholder.com/${node.width.toFixed(
               0,
             )}x${node.height.toFixed(0)})`,
@@ -290,7 +288,7 @@ const htmlContainer = (
 
     if (children) {
       return `\n<${tag}${build}${src}>${indentString(children)}\n</${tag}>`;
-    } else if (selfClosingTags.includes(tag) || isJsx) {
+    } else if (selfClosingTags.includes(tag) || settings.jsx) {
       return `\n<${tag}${build}${src} />`;
     } else {
       return `\n<${tag}${build}${src}></${tag}>`;
@@ -300,11 +298,14 @@ const htmlContainer = (
   return children;
 };
 
-const htmlSection = (node: SectionNode, isJsx: boolean = false): string => {
-  const childrenStr = htmlWidgetGenerator(node.children, isJsx);
-  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
-    .size(node, localSettings.optimizeLayout)
-    .position(node, localSettings.optimizeLayout)
+const htmlSection = async (
+  node: SectionNode,
+  settings: HTMLSettings,
+): Promise<string> => {
+  const childrenStr = await htmlWidgetGenerator(node.children, settings);
+  const builder = new HtmlDefaultBuilder(node, settings)
+    .size()
+    .position()
     .applyFillsToStyle(node.fills, "background");
 
   if (childrenStr) {
@@ -314,19 +315,19 @@ const htmlSection = (node: SectionNode, isJsx: boolean = false): string => {
   }
 };
 
-const htmlLine = (node: LineNode, isJsx: boolean): string => {
-  const builder = new HtmlDefaultBuilder(node, showLayerNames, isJsx)
-    .commonPositionStyles(node, localSettings.optimizeLayout)
-    .commonShapeStyles(node);
+const htmlLine = (node: LineNode, settings: HTMLSettings): string => {
+  const builder = new HtmlDefaultBuilder(node, settings)
+    .commonPositionStyles()
+    .commonShapeStyles();
 
   return `\n<div${builder.build()}></div>`;
 };
 
-export const htmlCodeGenTextStyles = (isJsx: boolean) => {
+export const htmlCodeGenTextStyles = (settings: HTMLSettings) => {
   const result = previousExecutionCache
     .map(
       (style) =>
-        `// ${style.text}\n${style.style.split(isJsx ? "," : ";").join(";\n")}`,
+        `// ${style.text}\n${style.style.split(settings.jsx ? "," : ";").join(";\n")}`,
     )
     .join("\n---\n");
 
