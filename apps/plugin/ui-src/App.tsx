@@ -11,6 +11,7 @@ import {
   ErrorMessage,
   SettingsChangedMessage,
   Warning,
+  ConversionStartMessage,
 } from "types";
 import { postUISettingsChangingMessage } from "./messaging";
 
@@ -30,7 +31,7 @@ export default function App() {
   const [state, setState] = useState<AppState>({
     code: "",
     selectedFramework: "HTML",
-    isLoading: false,
+    isLoading: true,
     htmlPreview: emptyPreview,
     settings: null,
     colors: [],
@@ -49,12 +50,21 @@ export default function App() {
       console.log("[ui] message received:", untypedMessage);
 
       switch (untypedMessage.type) {
+        case "conversionStart":
+          setState((prevState) => ({
+            ...prevState,
+            code: "",
+            isLoading: true,
+          }));
+          break;
+
         case "code":
           const conversionMessage = untypedMessage as ConversionMessage;
           setState((prevState) => ({
             ...prevState,
             ...conversionMessage,
             selectedFramework: conversionMessage.settings.framework,
+            isLoading: false,
           }));
           break;
 
@@ -76,6 +86,7 @@ export default function App() {
             warnings: [],
             colors: [],
             gradients: [],
+            isLoading: false,
           }));
           break;
 
@@ -87,6 +98,7 @@ export default function App() {
             colors: [],
             gradients: [],
             code: `Error :(\n// ${errorMessage.error}`,
+            isLoading: false,
           }));
           break;
         default:
@@ -99,26 +111,6 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (state.selectedFramework === null) {
-      const timer = setTimeout(
-        () => setState((prevState) => ({ ...prevState, isLoading: true })),
-        300,
-      );
-      return () => clearTimeout(timer);
-    } else {
-      setState((prevState) => ({ ...prevState, isLoading: false }));
-    }
-  }, [state.selectedFramework]);
-
-  if (state.selectedFramework === null) {
-    return state.isLoading ? (
-      <div className="w-full h-96 justify-center text-center items-center dark:text-white text-lg">
-        Loading Plugin...
-      </div>
-    ) : null;
-  }
-
   const handleFrameworkChange = (updatedFramework: Framework) => {
     setState((prevState) => ({
       ...prevState,
@@ -129,10 +121,14 @@ export default function App() {
       targetOrigin: "*",
     });
   };
-  console.log("state.code", state.code.slice(0, 25));
 
+  const darkMode = figmaColorBgValue !== "#ffffff";
+
+  if (state.isLoading) {
+    return <LoadingMessage darkMode={darkMode} />;
+  }
   return (
-    <div className={`${figmaColorBgValue === "#ffffff" ? "" : "dark"}`}>
+    <div className={`${darkMode ? "dark" : ""}`}>
       <PluginUI
         code={state.code}
         warnings={state.warnings}
@@ -149,3 +145,22 @@ export default function App() {
     </div>
   );
 }
+
+interface LoadingProps {
+  darkMode: boolean;
+}
+const LoadingMessage = ({ darkMode }: LoadingProps) => (
+  <div
+    style={{ padding: "1rem" }}
+    className={`flex w-full h-full dark:text-white text-lg ${darkMode ? "dark" : ""}`}
+  >
+    <div style={{ width: "60%" }} className="dark:text-white">
+      <p className="text-lg font-medium dark:text-white rounded-lg">
+        Loading...
+      </p>
+      <p className="text-xs">
+        (This can take a while if the selection has lots of images or paths)
+      </p>
+    </div>
+  </div>
+);
