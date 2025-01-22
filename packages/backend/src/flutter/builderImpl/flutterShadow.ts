@@ -1,5 +1,8 @@
 import { rgbTo8hex } from "../../common/color";
-import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
+import {
+  generateWidgetCode,
+  numberToFixedString,
+} from "../../common/numToAutoFixed";
 import { indentStringFlutter } from "../../common/indentString";
 
 // TODO Document it can't do flutter shadows.
@@ -19,11 +22,13 @@ export const flutterShadow = (node: SceneNode): string => {
               effect.color,
               effect.color.a,
             ).toUpperCase()})`,
-            blurRadius: sliceNum(effect.radius),
-            offset: `Offset(${sliceNum(effect.offset.x)}, ${sliceNum(
+            blurRadius: numberToFixedString(effect.radius),
+            offset: `Offset(${numberToFixedString(effect.offset.x)}, ${numberToFixedString(
               effect.offset.y,
             )})`,
-            spreadRadius: effect.spread ? sliceNum(effect.spread) : "0",
+            spreadRadius: effect.spread
+              ? numberToFixedString(effect.spread)
+              : "0",
           });
         }
       });

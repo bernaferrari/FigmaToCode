@@ -1,4 +1,4 @@
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 import { exactValue, nearestOpacity, nearestValue } from "../conversionTables";
 
 /**
@@ -93,7 +93,7 @@ export const tailwindRotation = (node: LayoutMixin): string => {
 
       return `origin-top-left ${minusIfNegative}rotate-${nearest}`;
     } else {
-      return `origin-top-left rotate-[${sliceNum(-node.rotation)}deg]`;
+      return `origin-top-left rotate-[${numberToFixedString(-node.rotation)}deg]`;
     }
   }
   return "";

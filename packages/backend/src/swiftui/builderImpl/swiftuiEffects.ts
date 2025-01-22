@@ -1,4 +1,4 @@
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 import { SwiftUIModifier } from "types";
 
 export const swiftuiShadow = (node: SceneNode): SwiftUIModifier | null => {
@@ -20,15 +20,17 @@ export const swiftuiShadow = (node: SceneNode): SwiftUIModifier | null => {
 
   const color = shadow.color;
   // set color when not black with 0.25 of opacity, which is the Figma default. Round the alpha now to avoid rounding issues.
-  const a = sliceNum(color.a);
-  const r = sliceNum(color.r);
-  const g = sliceNum(color.g);
-  const b = sliceNum(color.b);
+  const a = numberToFixedString(color.a);
+  const r = numberToFixedString(color.r);
+  const g = numberToFixedString(color.g);
+  const b = numberToFixedString(color.b);
   comp.push(`color: Color(red: ${r}, green: ${g}, blue: ${b}, opacity: ${a})`);
-  comp.push(`radius: ${sliceNum(shadow.radius)}`);
+  comp.push(`radius: ${numberToFixedString(shadow.radius)}`);
 
-  const x = shadow.offset.x > 0 ? `x: ${sliceNum(shadow.offset.x)}` : "";
-  const y = shadow.offset.y > 0 ? `y: ${sliceNum(shadow.offset.y)}` : "";
+  const x =
+    shadow.offset.x > 0 ? `x: ${numberToFixedString(shadow.offset.x)}` : "";
+  const y =
+    shadow.offset.y > 0 ? `y: ${numberToFixedString(shadow.offset.y)}` : "";
 
   // add initial comma since this is an optional paramater and radius must come first.
   if (x && y) {
@@ -59,5 +61,5 @@ export const swiftuiBlur = (node: SceneNode): SwiftUIModifier | null => {
 
   // retrieve first blur.
   const blur = layerBlur[0].radius;
-  return ["blur", `radius: ${sliceNum(blur)})`];
+  return ["blur", `radius: ${numberToFixedString(blur)})`];
 };

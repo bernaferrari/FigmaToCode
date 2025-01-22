@@ -1,4 +1,6 @@
-import { sliceNum } from "../../common/numToAutoFixed";
+import { roundToNearestHundreth } from "./../../common/numToAutoFixed";
+import { addWarning } from "../../common/commonConversionWarnings";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 import { formatWithJSX } from "../../common/parseJSX";
 
 /**
@@ -15,9 +17,9 @@ export const htmlOpacity = (
   if (node.opacity !== undefined && node.opacity !== 1) {
     // formatWithJSX is not called here because opacity unit doesn't end in px.
     if (isJsx) {
-      return `opacity: ${sliceNum(node.opacity)}`;
+      return `opacity: ${numberToFixedString(node.opacity)}`;
     } else {
-      return `opacity: ${sliceNum(node.opacity)}`;
+      return `opacity: ${numberToFixedString(node.opacity)}`;
     }
   }
   return "";
@@ -124,10 +126,23 @@ export const htmlRotation = (node: LayoutMixin, isJsx: boolean): string[] => {
     parent && "rotation" in parent ? parent.rotation : 0;
   const rotation: number = Math.round(parentRotation - node.rotation) ?? 0;
 
+  if (
+    roundToNearestHundreth(parentRotation) !== 0 &&
+    roundToNearestHundreth(rotation) !== 0
+  ) {
+    addWarning(
+      "Rotated elements within rotated containers are not currently supported.",
+    );
+  }
+
   if (rotation !== 0) {
     return [
-      formatWithJSX("transform", isJsx, `rotate(${sliceNum(rotation)}deg)`),
-      formatWithJSX("transform-origin", isJsx, "0 0"),
+      formatWithJSX(
+        "transform",
+        isJsx,
+        `rotate(${numberToFixedString(rotation)}deg)`,
+      ),
+      formatWithJSX("transform-origin", isJsx, "top left"),
     ];
   }
   return [];

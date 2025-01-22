@@ -1,9 +1,13 @@
 import { indentStringFlutter } from "./indentString";
 
 // this is necessary to avoid a height of 4.999999523162842.
-export const sliceNum = (num: number): string => {
+export const numberToFixedString = (num: number): string => {
   return num.toFixed(2).replace(/\.00$/, "");
 };
+
+export const roundToNearestDecimal = (decimal: number) => (n: number) =>
+  Math.round(n * 10 ** decimal) / 10 ** decimal;
+export const roundToNearestHundreth = roundToNearestDecimal(2);
 
 export const printPropertyIfNotDefault = (
   propertyName: string,
@@ -54,14 +58,14 @@ export const generateWidgetCode = (
         return `${key}: [\n${indentStringFlutter(value.join(",\n"))},\n],`;
       } else {
         return `${key}: ${
-          typeof value === "number" ? sliceNum(value) : value
+          typeof value === "number" ? numberToFixedString(value) : value
         },`;
       }
     });
 
   const positionedValuesString = (positionedValues || [])
     .map((value) => {
-      return typeof value === "number" ? sliceNum(value) : value;
+      return typeof value === "number" ? numberToFixedString(value) : value;
     })
     .join(", ");
 

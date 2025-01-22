@@ -1,4 +1,7 @@
-import { stringToClassName, sliceNum } from "./../common/numToAutoFixed";
+import {
+  stringToClassName,
+  numberToFixedString,
+} from "./../common/numToAutoFixed";
 import { tailwindShadow } from "./builderImpl/tailwindShadow";
 import {
   tailwindVisibility,
@@ -118,8 +121,8 @@ export class TailwindDefaultBuilder {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
 
-      const parsedX = sliceNum(x);
-      const parsedY = sliceNum(y);
+      const parsedX = numberToFixedString(x);
+      const parsedY = numberToFixedString(y);
       if (parsedX === "0") {
         this.addAttributes(`left-0`);
       } else {

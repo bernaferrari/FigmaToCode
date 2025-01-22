@@ -1,7 +1,7 @@
 import {
   generateWidgetCode,
   skipDefaultProperty,
-  sliceNum,
+  numberToFixedString,
 } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
 
@@ -18,22 +18,25 @@ export const flutterPadding = (node: InferredAutoLayoutResult): string => {
 
   if ("all" in padding) {
     return skipDefaultProperty(
-      `const EdgeInsets.all(${sliceNum(padding.all)})`,
+      `const EdgeInsets.all(${numberToFixedString(padding.all)})`,
       "const EdgeInsets.all(0)",
     );
   }
 
   if ("horizontal" in padding) {
     return generateWidgetCode("const EdgeInsets.symmetric", {
-      horizontal: skipDefaultProperty(sliceNum(padding.horizontal), "0"),
-      vertical: skipDefaultProperty(sliceNum(padding.vertical), "0"),
+      horizontal: skipDefaultProperty(
+        numberToFixedString(padding.horizontal),
+        "0",
+      ),
+      vertical: skipDefaultProperty(numberToFixedString(padding.vertical), "0"),
     });
   }
 
   return generateWidgetCode("const EdgeInsets.only", {
-    top: skipDefaultProperty(sliceNum(padding.top), "0"),
-    left: skipDefaultProperty(sliceNum(padding.left), "0"),
-    right: skipDefaultProperty(sliceNum(padding.right), "0"),
-    bottom: skipDefaultProperty(sliceNum(padding.bottom), "0"),
+    top: skipDefaultProperty(numberToFixedString(padding.top), "0"),
+    left: skipDefaultProperty(numberToFixedString(padding.left), "0"),
+    right: skipDefaultProperty(numberToFixedString(padding.right), "0"),
+    bottom: skipDefaultProperty(numberToFixedString(padding.bottom), "0"),
   });
 };

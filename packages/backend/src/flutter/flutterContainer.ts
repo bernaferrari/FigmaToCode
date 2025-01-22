@@ -10,7 +10,7 @@ import {
   generateWidgetCode,
   skipDefaultProperty,
 } from "../common/numToAutoFixed";
-import { sliceNum } from "../common/numToAutoFixed";
+import { numberToFixedString } from "../common/numToAutoFixed";
 import { getCommonRadius } from "../common/commonRadius";
 import { commonStroke } from "../common/commonStroke";
 
@@ -180,12 +180,12 @@ const generateStarBorder = (node: StarNode): string => {
 
   return generateWidgetCode("StarBorder", {
     side: generateBorderSideCode(node),
-    points: sliceNum(points),
-    innerRadiusRatio: sliceNum(innerRadiusRatio),
-    pointRounding: sliceNum(pointRounding),
-    valleyRounding: sliceNum(valleyRounding),
-    rotation: sliceNum(rotation),
-    squash: sliceNum(squash),
+    points: numberToFixedString(points),
+    innerRadiusRatio: numberToFixedString(innerRadiusRatio),
+    pointRounding: numberToFixedString(pointRounding),
+    valleyRounding: numberToFixedString(valleyRounding),
+    rotation: numberToFixedString(rotation),
+    squash: numberToFixedString(squash),
   });
 };
 
@@ -219,7 +219,7 @@ const generatePolygonBorder = (node: PolygonNode): string => {
 
   return generateWidgetCode("StarBorder.polygon", {
     side: generateBorderSideCode(node),
-    sides: sliceNum(points),
+    sides: numberToFixedString(points),
     borderRadius: generateBorderRadius(node),
   });
 };
@@ -230,24 +230,24 @@ const generateBorderRadius = (node: SceneNode): string => {
     if (radius.all === 0) {
       return "";
     }
-    return `BorderRadius.circular(${sliceNum(radius.all)})`;
+    return `BorderRadius.circular(${numberToFixedString(radius.all)})`;
   }
 
   return generateWidgetCode("BorderRadius.only", {
     topLeft: skipDefaultProperty(
-      `Radius.circular(${sliceNum(radius.topLeft)})`,
+      `Radius.circular(${numberToFixedString(radius.topLeft)})`,
       "Radius.circular(0)",
     ),
     topRight: skipDefaultProperty(
-      `Radius.circular(${sliceNum(radius.topRight)})`,
+      `Radius.circular(${numberToFixedString(radius.topRight)})`,
       "Radius.circular(0)",
     ),
     bottomLeft: skipDefaultProperty(
-      `Radius.circular(${sliceNum(radius.bottomLeft)})`,
+      `Radius.circular(${numberToFixedString(radius.bottomLeft)})`,
       "Radius.circular(0)",
     ),
     bottomRight: skipDefaultProperty(
-      `Radius.circular(${sliceNum(radius.bottomRight)})`,
+      `Radius.circular(${numberToFixedString(radius.bottomRight)})`,
       "Radius.circular(0)",
     ),
   });

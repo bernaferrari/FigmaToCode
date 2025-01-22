@@ -1,5 +1,5 @@
 import { nodeSize } from "../../common/nodeWidthHeight";
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 
 // Used in tests.
 export const flutterSizeWH = (node: SceneNode): string => {
@@ -23,7 +23,7 @@ export const flutterSize = (
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
   if (typeof size.width === "number") {
-    propWidth = sliceNum(size.width);
+    propWidth = numberToFixedString(size.width);
   } else if (size.width === "fill") {
     // When parent is a Row, child must be Expanded.
     if (
@@ -39,7 +39,7 @@ export const flutterSize = (
 
   let propHeight = "";
   if (typeof size.height === "number") {
-    propHeight = sliceNum(size.height);
+    propHeight = numberToFixedString(size.height);
   } else if (size.height === "fill") {
     // When parent is a Column, child must be Expanded.
     if (

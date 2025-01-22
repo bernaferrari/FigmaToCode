@@ -1,4 +1,4 @@
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
 import { SwiftUIModifier } from "types";
 
@@ -18,22 +18,22 @@ export const swiftuiPadding = (
     if (padding.all === 0) {
       return null;
     }
-    return ["padding", sliceNum(padding.all)];
+    return ["padding", numberToFixedString(padding.all)];
   }
 
   if ("horizontal" in padding) {
-    const vertical = sliceNum(padding.vertical);
-    const horizontal = sliceNum(padding.horizontal);
+    const vertical = numberToFixedString(padding.vertical);
+    const horizontal = numberToFixedString(padding.horizontal);
     return [
       "padding",
       `EdgeInsets(top: ${vertical}, leading: ${horizontal}, bottom: ${vertical}, trailing: ${horizontal})`,
     ];
   }
 
-  const top = sliceNum(padding.top);
-  const left = sliceNum(padding.left);
-  const bottom = sliceNum(padding.bottom);
-  const right = sliceNum(padding.right);
+  const top = numberToFixedString(padding.top);
+  const left = numberToFixedString(padding.left);
+  const bottom = numberToFixedString(padding.bottom);
+  const right = numberToFixedString(padding.right);
   return [
     "padding",
     `EdgeInsets(top: ${top}, leading: ${left}, bottom: ${bottom}, trailing: ${right})`,

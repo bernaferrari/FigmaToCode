@@ -1,4 +1,4 @@
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 
 // retrieve the SOLID color on HTML
@@ -47,10 +47,10 @@ export const htmlColor = (color: RGB, alpha: number = 1): string => {
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
   }
 
-  const r = sliceNum(color.r * 255);
-  const g = sliceNum(color.g * 255);
-  const b = sliceNum(color.b * 255);
-  const a = sliceNum(alpha);
+  const r = numberToFixedString(color.r * 255);
+  const g = numberToFixedString(color.g * 255);
+  const b = numberToFixedString(color.b * 255);
+  const a = numberToFixedString(alpha);
 
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };

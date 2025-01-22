@@ -1,4 +1,7 @@
-import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
+import {
+  generateWidgetCode,
+  numberToFixedString,
+} from "../../common/numToAutoFixed";
 
 /**
  * https://api.flutter.dev/flutter/widgets/Opacity-class.html
@@ -9,7 +12,7 @@ export const flutterOpacity = (
 ): string => {
   if (node.opacity !== undefined && node.opacity !== 1 && child !== "") {
     return generateWidgetCode("Opacity", {
-      opacity: sliceNum(node.opacity),
+      opacity: numberToFixedString(node.opacity),
       child: child,
     });
   }
@@ -43,7 +46,7 @@ export const flutterRotation = (node: LayoutMixin, child: string): string => {
     Math.round(node.rotation) !== 0
   ) {
     return generateWidgetCode("Transform", {
-      transform: `Matrix4.identity()..translate(0.0, 0.0)..rotateZ(${sliceNum(
+      transform: `Matrix4.identity()..translate(0.0, 0.0)..rotateZ(${numberToFixedString(
         node.rotation * (-3.14159 / 180),
       )})`,
       child: child,

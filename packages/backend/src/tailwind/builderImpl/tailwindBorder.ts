@@ -1,6 +1,6 @@
 import { getCommonRadius } from "../../common/commonRadius";
 import { commonStroke } from "../../common/commonStroke";
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 import { nearestValue, pxToBorderRadius } from "../conversionTables";
 
 /**

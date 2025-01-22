@@ -1,6 +1,9 @@
 import { rgbTo8hex, gradientAngle } from "../../common/color";
 import { addWarning } from "../../common/commonConversionWarnings";
-import { generateWidgetCode, sliceNum } from "../../common/numToAutoFixed";
+import {
+  generateWidgetCode,
+  numberToFixedString,
+} from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { nearestValue } from "../../tailwind/conversionTables";
 
@@ -101,11 +104,11 @@ const flutterRadialGradient = (fill: GradientPaint): string => {
     .map((d) => flutterColor(d.color, d.color.a))
     .join(", ");
 
-  const x = sliceNum(fill.gradientTransform[0][2]);
-  const y = sliceNum(fill.gradientTransform[1][2]);
+  const x = numberToFixedString(fill.gradientTransform[0][2]);
+  const y = numberToFixedString(fill.gradientTransform[1][2]);
   const scaleX = fill.gradientTransform[0][0];
   const scaleY = fill.gradientTransform[1][1];
-  const r = sliceNum(Math.sqrt(scaleX * scaleX + scaleY * scaleY));
+  const r = numberToFixedString(Math.sqrt(scaleX * scaleX + scaleY * scaleY));
 
   return generateWidgetCode("RadialGradient", {
     center: `Alignment(${x}, ${y})`,
@@ -119,10 +122,10 @@ const flutterAngularGradient = (fill: GradientPaint): string => {
     .map((d) => flutterColor(d.color, d.color.a))
     .join(", ");
 
-  const x = sliceNum(fill.gradientTransform[0][2]);
-  const y = sliceNum(fill.gradientTransform[1][2]);
-  const startAngle = sliceNum(-fill.gradientTransform[0][0]);
-  const endAngle = sliceNum(-fill.gradientTransform[0][1]);
+  const x = numberToFixedString(fill.gradientTransform[0][2]);
+  const y = numberToFixedString(fill.gradientTransform[1][2]);
+  const startAngle = numberToFixedString(-fill.gradientTransform[0][0]);
+  const endAngle = numberToFixedString(-fill.gradientTransform[0][1]);
 
   return generateWidgetCode("SweepGradient", {
     center: `Alignment(${x}, ${y})`,
