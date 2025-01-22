@@ -1,7 +1,7 @@
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 import { nearestValue } from "../../tailwind/conversionTables";
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 import { addWarning } from "../../common/commonConversionWarnings";
 
 export const swiftUISolidColor = (fill: Paint): string => {
@@ -116,11 +116,12 @@ export const swiftuiColor = (color: RGB, opacity: number): string => {
     return ".white";
   }
 
-  const r = `red: ${sliceNum(color.r)}`;
-  const g = `green: ${sliceNum(color.g)}`;
-  const b = `blue: ${sliceNum(color.b)}`;
+  const r = `red: ${numberToFixedString(color.r)}`;
+  const g = `green: ${numberToFixedString(color.g)}`;
+  const b = `blue: ${numberToFixedString(color.b)}`;
 
-  const opacityAttr = opacity !== 1.0 ? `.opacity(${sliceNum(opacity)})` : "";
+  const opacityAttr =
+    opacity !== 1.0 ? `.opacity(${numberToFixedString(opacity)})` : "";
 
   return `Color(${r}, ${g}, ${b})${opacityAttr}`;
 };

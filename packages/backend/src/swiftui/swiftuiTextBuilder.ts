@@ -1,4 +1,4 @@
-import { sliceNum } from "../common/numToAutoFixed";
+import { numberToFixedString } from "../common/numToAutoFixed";
 import {
   commonLetterSpacing,
   commonLineHeight,
@@ -109,7 +109,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     const segment = segments[0];
 
     // return segments.map((segment) => {
-    const fontSize = sliceNum(segment.fontSize);
+    const fontSize = numberToFixedString(segment.fontSize);
     const fontFamily = segment.fontName.family;
     const fontWeight = this.fontWeight(segment.fontWeight);
     const lineHeight = this.lineHeight(segment.lineHeight, segment.fontSize);
@@ -150,7 +150,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   ): string | null => {
     const value = commonLetterSpacing(letterSpacing, fontSize);
     if (value > 0) {
-      return sliceNum(value);
+      return numberToFixedString(value);
     }
     return null;
   };
@@ -160,7 +160,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   lineHeight = (lineHeight: LineHeight, fontSize: number): string | null => {
     const value = commonLineHeight(lineHeight, fontSize);
     if (value > 0) {
-      return sliceNum(value);
+      return numberToFixedString(value);
     }
     return null;
   };

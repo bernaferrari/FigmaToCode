@@ -1,5 +1,5 @@
 import { nearestColorFrom } from "../nearest-color/nearestColor";
-import { sliceNum } from "../common/numToAutoFixed";
+import { numberToFixedString } from "../common/numToAutoFixed";
 import { localTailwindSettings } from "./tailwindMain";
 import { config } from "./tailwindConfig";
 import { rgbTo6hex } from "../common/color";
@@ -44,7 +44,7 @@ const pxToRemToTailwind = (
     return conversionMap[nearestValue(value / 16, keys)];
   }
 
-  return `[${sliceNum(value)}px]`;
+  return `[${numberToFixedString(value)}px]`;
 };
 
 const pxToTailwind = (
@@ -60,7 +60,7 @@ const pxToTailwind = (
     return conversionMap[nearestValue(value, keys)];
   }
 
-  return `[${sliceNum(value)}px]`;
+  return `[${numberToFixedString(value)}px]`;
 };
 
 export const pxToLetterSpacing = (value: number): string => {
@@ -89,7 +89,7 @@ export const pxToLayoutSize = (value: number): string => {
     return tailwindValue;
   }
 
-  return `[${sliceNum(value)}px]`;
+  return `[${numberToFixedString(value)}px]`;
 };
 
 export const nearestOpacity = (nodeOpacity: number): number => {
@@ -115,8 +115,10 @@ export const nearestColorFromRgb = (color: RGB) => {
 
 export const variableToColorName = (alias: VariableAlias) => {
   return (
-    figma.variables.getVariableById(alias.id)?.name.replaceAll("/", "-").replaceAll(" ", "-") || 
-    alias.id.toLowerCase().replaceAll(":", "-")
+    figma.variables
+      .getVariableById(alias.id)
+      ?.name.replaceAll("/", "-")
+      .replaceAll(" ", "-") || alias.id.toLowerCase().replaceAll(":", "-")
   );
 };
 
@@ -138,16 +140,16 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
       colorType: "tailwind",
       colorName: "black",
       hex: "#000000",
-      meta: ''
+      meta: "",
     };
   }
 
   if (fill.color.r === 1 && fill.color.g === 1 && fill.color.b === 1) {
     return {
-      colorType: "tailwind", 
+      colorType: "tailwind",
       colorName: "white",
       hex: "#ffffff",
-      meta: ''
+      meta: "",
     };
   }
 

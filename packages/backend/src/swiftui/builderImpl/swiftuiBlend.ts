@@ -1,5 +1,5 @@
 import { SwiftUIModifier } from "types";
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/opacity(_:)
@@ -8,7 +8,7 @@ export const swiftuiOpacity = (
   node: MinimalBlendMixin,
 ): SwiftUIModifier | null => {
   if (node.opacity !== undefined && node.opacity !== 1) {
-    return ["opacity", sliceNum(node.opacity)];
+    return ["opacity", numberToFixedString(node.opacity)];
   }
   return null;
 };
@@ -31,7 +31,10 @@ export const swiftuiVisibility = (
  */
 export const swiftuiRotation = (node: LayoutMixin): SwiftUIModifier | null => {
   if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
-    return ["rotationEffect", `.degrees(${sliceNum(node.rotation)})`];
+    return [
+      "rotationEffect",
+      `.degrees(${numberToFixedString(node.rotation)})`,
+    ];
   }
   return null;
 };

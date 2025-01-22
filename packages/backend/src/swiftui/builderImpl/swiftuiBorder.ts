@@ -1,6 +1,6 @@
 import { commonStroke } from "./../../common/commonStroke";
 import { getCommonRadius } from "../../common/commonRadius";
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 import { swiftUISolidColor } from "./swiftuiColor";
 import { SwiftUIElement } from "./swiftuiParser";
 import { SwiftUIModifier } from "types";
@@ -50,7 +50,7 @@ export const swiftuiBorder = (node: SceneNode): string[] | null => {
 
       const strokeModifier: SwiftUIModifier = [
         "stroke",
-        `${strokeColor}, lineWidth: ${sliceNum(width)}`,
+        `${strokeColor}, lineWidth: ${numberToFixedString(width)}`,
       ];
 
       if (strokeColor) {
@@ -84,9 +84,9 @@ const strokeInset = (
 ): [string, string | null] => {
   switch (node.strokeAlign) {
     case "INSIDE":
-      return ["inset", `by: ${sliceNum(width)}`];
+      return ["inset", `by: ${numberToFixedString(width)}`];
     case "OUTSIDE":
-      return ["inset", `by: -${sliceNum(width)}`];
+      return ["inset", `by: -${numberToFixedString(width)}`];
     case "CENTER":
       return ["inset", null];
   }
@@ -104,7 +104,7 @@ export const swiftuiCornerRadius = (node: SceneNode): string => {
   const radius = getCommonRadius(node);
   if ("all" in radius) {
     if (radius.all > 0) {
-      return sliceNum(radius.all);
+      return numberToFixedString(radius.all);
     } else {
       return "";
     }
@@ -119,7 +119,7 @@ export const swiftuiCornerRadius = (node: SceneNode): string => {
   );
 
   if (maxBorder > 0) {
-    return sliceNum(maxBorder);
+    return numberToFixedString(maxBorder);
   }
 
   return "";

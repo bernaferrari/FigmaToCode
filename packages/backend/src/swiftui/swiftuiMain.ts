@@ -1,5 +1,8 @@
 import { indentString } from "../common/indentString";
-import { stringToClassName, sliceNum } from "../common/numToAutoFixed";
+import {
+  stringToClassName,
+  numberToFixedString,
+} from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
@@ -222,7 +225,7 @@ export const generateSwiftViewCode = (
     .filter(([, value]) => value !== "")
     .map(
       ([key, value]) =>
-        `${key}: ${typeof value === "number" ? sliceNum(value) : value}`,
+        `${key}: ${typeof value === "number" ? numberToFixedString(value) : value}`,
     );
 
   const compactPropertiesArray = propertiesArray.join(", ");

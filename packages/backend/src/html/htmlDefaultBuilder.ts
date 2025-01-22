@@ -17,7 +17,10 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { sliceNum, stringToClassName } from "../common/numToAutoFixed";
+import {
+  numberToFixedString,
+  stringToClassName,
+} from "../common/numToAutoFixed";
 import { commonStroke } from "../common/commonStroke";
 import {
   formatClassAttribute,
@@ -103,7 +106,9 @@ export class HtmlDefaultBuilder {
       "dashPattern" in node && node.dashPattern.length > 0 ? "dotted" : "solid";
 
     const consolidateBorders = (border: number): string =>
-      [`${sliceNum(border)}px`, color, borderStyle].filter((d) => d).join(" ");
+      [`${numberToFixedString(border)}px`, color, borderStyle]
+        .filter((d) => d)
+        .join(" ");
 
     if ("all" in commonBorder) {
       if (commonBorder.all === 0) {
@@ -290,7 +295,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "filter",
             this.isJSX,
-            `blur(${sliceNum(blur.radius)}px)`,
+            `blur(${numberToFixedString(blur.radius)}px)`,
           ),
         );
       }
@@ -303,7 +308,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "backdrop-filter",
             this.isJSX,
-            `blur(${sliceNum(backgroundBlur.radius)}px)`,
+            `blur(${numberToFixedString(backgroundBlur.radius)}px)`,
           ),
         );
       }

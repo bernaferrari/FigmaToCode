@@ -1,7 +1,7 @@
 import {
   generateWidgetCode,
   skipDefaultProperty,
-  sliceNum,
+  numberToFixedString,
 } from "./../common/numToAutoFixed";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
 import { flutterColorFromFills } from "./builderImpl/flutterColor";
@@ -71,7 +71,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     return segments.map((segment) => {
       const color = flutterColorFromFills(segment.fills);
 
-      const fontSize = `${sliceNum(segment.fontSize)}`;
+      const fontSize = `${numberToFixedString(segment.fontSize)}`;
       const fontStyle = this.fontStyle(segment.fontName);
       const fontFamily = `'${segment.fontName.family}'`;
       const fontWeight = `FontWeight.w${segment.fontWeight}`;
@@ -139,16 +139,16 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
       case "AUTO":
         return "";
       case "PIXELS":
-        return sliceNum(lineHeight.value / fontSize);
+        return numberToFixedString(lineHeight.value / fontSize);
       case "PERCENT":
-        return sliceNum(lineHeight.value / 100);
+        return numberToFixedString(lineHeight.value / 100);
     }
   }
 
   letterSpacing(letterSpacing: LetterSpacing, fontSize: number): string {
     const value = commonLetterSpacing(letterSpacing, fontSize);
     if (value) {
-      return sliceNum(value);
+      return numberToFixedString(value);
     }
     return "";
   }

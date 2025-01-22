@@ -1,4 +1,4 @@
-import { sliceNum } from "./numToAutoFixed";
+import { numberToFixedString } from "./numToAutoFixed";
 
 export const formatWithJSX = (
   property: string,
@@ -13,9 +13,9 @@ export const formatWithJSX = (
 
   if (typeof value === "number") {
     if (isJsx) {
-      return `${jsx_property}: ${sliceNum(value)}`;
+      return `${jsx_property}: ${numberToFixedString(value)}`;
     } else {
-      return `${property}: ${sliceNum(value)}px`;
+      return `${property}: ${numberToFixedString(value)}px`;
     }
   } else if (isJsx) {
     return `${jsx_property}: '${value}'`;

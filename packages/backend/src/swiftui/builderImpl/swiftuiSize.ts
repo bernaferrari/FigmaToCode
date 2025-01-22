@@ -1,5 +1,5 @@
 import { nodeSize } from "../../common/nodeWidthHeight";
-import { sliceNum } from "../../common/numToAutoFixed";
+import { numberToFixedString } from "../../common/numToAutoFixed";
 
 export const swiftuiSize = (
   node: SceneNode,
@@ -13,7 +13,7 @@ export const swiftuiSize = (
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
   if (typeof size.width === "number") {
-    const w = sliceNum(size.width);
+    const w = numberToFixedString(size.width);
 
     if (shouldExtend) {
       propWidth = `minWidth: ${w}, maxWidth: ${w}`;
@@ -26,7 +26,7 @@ export const swiftuiSize = (
 
   let propHeight = "";
   if (typeof size.height === "number") {
-    const h = sliceNum(size.height);
+    const h = numberToFixedString(size.height);
 
     if (shouldExtend) {
       propHeight = `minHeight: ${h}, maxHeight: ${h}`;

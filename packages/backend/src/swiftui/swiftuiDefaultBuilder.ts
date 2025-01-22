@@ -1,4 +1,4 @@
-import { sliceNum } from "./../common/numToAutoFixed";
+import { numberToFixedString } from "./../common/numToAutoFixed";
 import { swiftuiBlur, swiftuiShadow } from "./builderImpl/swiftuiEffects";
 import {
   swiftuiBorder,
@@ -87,7 +87,7 @@ export class SwiftuiDefaultBuilder {
 
       this.pushModifier([
         `offset`,
-        `x: ${sliceNum(centerX)}, y: ${sliceNum(centerY)}`,
+        `x: ${numberToFixedString(centerX)}, y: ${numberToFixedString(centerY)}`,
       ]);
     }
     return this;
