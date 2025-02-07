@@ -24,6 +24,18 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     }
 
     return segments.map((segment) => {
+      // Prepare additional CSS properties from layer blur and drop shadow effects.
+      const additionalStyles: { [key: string]: string } = {};
+
+      const layerBlurStyle = this.getLayerBlurStyle();
+      if (layerBlurStyle) {
+        additionalStyles.filter = layerBlurStyle;
+      }
+      const textShadowStyle = this.getTextShadowStyle();
+      if (textShadowStyle) {
+        additionalStyles["text-shadow"] = textShadowStyle;
+      }
+
       const styleAttributes = formatMultipleJSX(
         {
           color: htmlColorFromFills(segment.fills),
@@ -36,12 +48,13 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
           "line-height": this.lineHeight(segment.lineHeight, segment.fontSize),
           "letter-spacing": this.letterSpacing(
             segment.letterSpacing,
-            segment.fontSize,
+            segment.fontSize
           ),
           // "text-indent": segment.indentation,
           "word-wrap": "break-word",
+          ...additionalStyles,
         },
-        this.isJSX,
+        this.isJSX
       );
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
@@ -138,5 +151,50 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       this.addStyles(formatWithJSX("text-align", this.isJSX, textAlign));
     }
     return this;
+  }
+
+  /**
+   * Returns a CSS filter value for layer blur.
+   */
+  private getLayerBlurStyle(): string {
+    if (this.node && (this.node as TextNode).effects) {
+      const effects = (this.node as TextNode).effects;
+      const blurEffect = effects.find(
+        (effect) =>
+          effect.type === "LAYER_BLUR" &&
+          effect.visible !== false &&
+          effect.radius > 0
+      );
+      if (blurEffect && blurEffect.radius) {
+        return `blur(${blurEffect.radius}px)`;
+      }
+    }
+    return "";
+  }
+
+  /**
+   * Returns a CSS text-shadow value if a drop shadow effect is applied.
+   */
+  private getTextShadowStyle(): string {
+    if (this.node && (this.node as TextNode).effects) {
+      const effects = (this.node as TextNode).effects;
+      const dropShadow = effects.find(
+        (effect) => effect.type === "DROP_SHADOW" && effect.visible !== false
+      );
+      if (dropShadow) {
+        const ds = dropShadow as DropShadowEffect; // Type narrow the effect.
+        const offsetX = Math.round(ds.offset.x);
+        const offsetY = Math.round(ds.offset.y);
+        const blurRadius = Math.round(ds.radius);
+        const r = Math.round(ds.color.r * 255);
+        const g = Math.round(ds.color.g * 255);
+        const b = Math.round(ds.color.b * 255);
+        const a = ds.color.a;
+        return `${offsetX}px ${offsetY}px ${blurRadius}px rgba(${r}, ${g}, ${b}, ${a.toFixed(
+          2
+        )})`;
+      }
+    }
+    return "";
   }
 }

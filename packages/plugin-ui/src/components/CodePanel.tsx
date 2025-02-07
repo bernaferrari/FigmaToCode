@@ -32,11 +32,35 @@ const CodePanel = (props: CodePanelProps) => {
   } = props;
   const isEmpty = code === "";
 
-  // Add your clipboard function here or any other actions
+  // State for custom prefix for Tailwind classes.
+  // It is initially set from settings (if available) or an empty string.
+  const [customPrefix, setCustomPrefix] = useState(settings?.customTailwindPrefix || "");
+
+  // Helper function to add the prefix before every class (or className) in the code.
+  // It finds every occurrence of class="..." or className="..." and, for each class,
+  // prepends the custom prefix.
+  const applyPrefixToClasses = (codeString: string, prefix: string) => {
+    return codeString.replace(/(class(?:Name)?)="([^"]*)"/g, (match, attr, classes) => {
+      const prefixedClasses = classes
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((cls: string) => prefix + cls)
+        .join(" ");
+      return `${attr}="${prefixedClasses}"`;
+    });
+  };
+
+  // If the selected framework is Tailwind and a prefix is provided then transform the code.
+  const prefixedCode =
+    selectedFramework === "Tailwind" && customPrefix.trim() !== ""
+      ? applyPrefixToClasses(code, customPrefix)
+      : code;
+
+  // Clipboard and hover handlers.
   const handleButtonClick = () => {
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 250);
-    copy(code);
+    copy(prefixedCode);
   };
 
   const handleButtonHover = () => setSyntaxHovered(true);
@@ -82,7 +106,9 @@ const CodePanel = (props: CodePanelProps) => {
                   title={preference.label}
                   description={preference.description}
                   isSelected={
-                    settings?.[preference.propertyName] ?? preference.isDefault
+                    typeof settings?.[preference.propertyName] === "boolean"
+                      ? (settings?.[preference.propertyName] as boolean)
+                      : preference.isDefault
                   }
                   onSelect={(value) => {
                     onPreferenceChanged(preference.propertyName, value);
@@ -92,6 +118,27 @@ const CodePanel = (props: CodePanelProps) => {
                 />
               ))}
           </div>
+
+          {/* Input field for custom Tailwind prefix (only rendered when Tailwind is selected) */}
+          {selectedFramework === "Tailwind" && (
+            <div className="mt-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Custom Prefix
+              </label>
+              <input
+                type="text"
+                value={customPrefix}
+                onChange={(e) => {
+                  const newVal = e.target.value;
+                  setCustomPrefix(newVal);
+                  onPreferenceChanged("tailwindPrefix", newVal);
+                }}
+                placeholder="e.g., tw-"
+                className="mt-1 p-1 px-2 border border-gray-300 rounded bg-neutral-100 dark:bg-neutral-700 text-sm"
+              />
+            </div>
+          )}
+
           {selectableSettingsFiltered.length > 0 && (
             <>
               <div className="w-full h-px bg-neutral-200 dark:bg-neutral-700" />
@@ -148,7 +195,7 @@ const CodePanel = (props: CodePanelProps) => {
               transitionDuration: "0.2s",
             }}
           >
-            {code}
+            {prefixedCode}
           </SyntaxHighlighter>
         )}
       </div>

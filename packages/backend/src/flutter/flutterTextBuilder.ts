@@ -13,6 +13,8 @@ import {
 } from "../common/commonTextHeightSpacing";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {
+  node?: TextNode;
+
   constructor(optChild: string = "") {
     super(optChild);
   }
@@ -22,6 +24,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
   }
 
   createText(node: TextNode): this {
+    this.node = node;
     let alignHorizontal =
       node.textAlignHorizontal?.toString()?.toLowerCase() ?? "left";
     alignHorizontal =
@@ -106,6 +109,12 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         styleProperties.fontFeatures = `[FontFeature.enable("sups")]`;
       }
 
+      // Add text-shadow if a drop shadow is applied
+      const shadow = this.textShadow();
+      if (shadow) {
+        styleProperties.shadows = shadow;
+      }
+
       const style = generateWidgetCode("TextStyle", styleProperties);
 
       let text = segment.characters;
@@ -155,6 +164,10 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
 
   textAutoSize(node: TextNode): this {
     this.child = wrapTextAutoResize(node, this.child);
+    // First wrap with SizedBox/Expanded as before, then apply layer blur if any.
+    let wrapped = wrapTextAutoResize(node, this.child);
+    wrapped = wrapTextWithLayerBlur(node, wrapped);
+    this.child = wrapped;
     return this;
   }
 
@@ -165,6 +178,39 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     }
     return "";
   };
+
+  /**
+   * New method to handle text shadow.
+   * Checks if a drop shadow effect is applied to the node and
+   * returns Flutter code for the TextStyle "shadows" property.
+   */
+  textShadow(): string {
+    if (this.node && (this.node as TextNode).effects) {
+      const effects = (this.node as TextNode).effects;
+      const dropShadow = effects.find(
+        (effect) =>
+          effect.type === "DROP_SHADOW" && effect.visible !== false,
+      );
+      if (dropShadow) {
+        const ds = dropShadow as DropShadowEffect;
+        const offsetX = Math.round(ds.offset.x);
+        const offsetY = Math.round(ds.offset.y);
+        const blurRadius = Math.round(ds.radius);
+        const r = Math.round(ds.color.r * 255);
+        const g = Math.round(ds.color.g * 255);
+        const b = Math.round(ds.color.b * 255);
+        // Convert to hex for Flutter Color (e.g., Color(0xFF112233))
+        const hex = ((1 << 24) + (r << 16) + (g << 8) + b)
+          .toString(16)
+          .slice(1)
+          .toUpperCase();
+        return `[Shadow(offset: Offset(${offsetX}, ${offsetY}), blurRadius: ${blurRadius}, color: Color(0xFF${hex}).withOpacity(${ds.color.a.toFixed(
+          2,
+        )}))]`;
+      }
+    }
+    return "";
+  }
 }
 
 export const wrapTextAutoResize = (node: TextNode, child: string): string => {
@@ -198,6 +244,26 @@ export const wrapTextAutoResize = (node: TextNode, child: string): string => {
     return result;
   }
 
+  return child;
+};
+
+// New helper to wrap with layer blur using Flutter's ImageFiltered widget.
+export const wrapTextWithLayerBlur = (
+  node: TextNode,
+  child: string,
+): string => {
+  if (node.effects) {
+    const blurEffect = node.effects.find(
+      (effect) =>
+        effect.type === "LAYER_BLUR" && effect.visible !== false && effect.radius > 0,
+    );
+    if (blurEffect) {
+      return generateWidgetCode("ImageFiltered", {
+        imageFilter: `ImageFilter.blur(sigmaX: ${blurEffect.radius}, sigmaY: ${blurEffect.radius})`,
+        child: child,
+      });
+    }
+  }
   return child;
 };
 

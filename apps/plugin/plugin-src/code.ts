@@ -105,15 +105,15 @@ const codegenMode = async () => {
   // figma.showUI(__html__, { visible: false });
   await getUserSettings();
 
-  figma.codegen.on("generate", ({ language, node }) => {
+  figma.codegen.on("generate", async ({ language, node }: CodegenEvent): Promise<CodegenResult[]> => {
     const convertedSelection = convertIntoNodes([node], null);
 
     switch (language) {
       case "html":
         return [
           {
-            title: `Code`,
-            code: htmlMain(
+            title: "Code",
+            code: await htmlMain(
               convertedSelection,
               { ...userPluginSettings, jsx: false },
               true,
@@ -121,7 +121,7 @@ const codegenMode = async () => {
             language: "HTML",
           },
           {
-            title: `Text Styles`,
+            title: "Text Styles",
             code: htmlCodeGenTextStyles(userPluginSettings),
             language: "HTML",
           },
@@ -129,8 +129,8 @@ const codegenMode = async () => {
       case "html_jsx":
         return [
           {
-            title: `Code`,
-            code: htmlMain(
+            title: "Code",
+            code: await htmlMain(
               convertedSelection,
               { ...userPluginSettings, jsx: true },
               true,
@@ -138,7 +138,7 @@ const codegenMode = async () => {
             language: "HTML",
           },
           {
-            title: `Text Styles`,
+            title: "Text Styles",
             code: htmlCodeGenTextStyles(userPluginSettings),
             language: "HTML",
           },
@@ -147,20 +147,20 @@ const codegenMode = async () => {
       case "tailwind_jsx":
         return [
           {
-            title: `Code`,
-            code: tailwindMain(convertedSelection, {
+            title: "Code",
+            code: await tailwindMain(convertedSelection, {
               ...userPluginSettings,
               jsx: language === "tailwind_jsx",
             }),
             language: "HTML",
           },
           // {
-          //   title: `Style`,
+          //   title: "Style",
           //   code: tailwindMain(convertedSelection, defaultPluginSettings),
           //   language: "HTML",
           // },
           {
-            title: `Tailwind Colors`,
+            title: "Tailwind Colors",
             code: retrieveGenericSolidUIColors("Tailwind")
               .map((d) => {
                 let str = `${d.hex};`;
@@ -176,7 +176,7 @@ const codegenMode = async () => {
             language: "JAVASCRIPT",
           },
           {
-            title: `Text Styles`,
+            title: "Text Styles",
             code: tailwindCodeGenTextStyles(),
             language: "HTML",
           },
@@ -184,7 +184,7 @@ const codegenMode = async () => {
       case "flutter":
         return [
           {
-            title: `Code`,
+            title: "Code",
             code: flutterMain(convertedSelection, {
               ...userPluginSettings,
               flutterGenerationMode: "snippet",
@@ -192,7 +192,7 @@ const codegenMode = async () => {
             language: "SWIFT",
           },
           {
-            title: `Text Styles`,
+            title: "Text Styles",
             code: flutterCodeGenTextStyles(),
             language: "SWIFT",
           },
@@ -200,7 +200,7 @@ const codegenMode = async () => {
       case "swiftUI":
         return [
           {
-            title: `SwiftUI`,
+            title: "SwiftUI",
             code: swiftuiMain(convertedSelection, {
               ...userPluginSettings,
               swiftUIGenerationMode: "snippet",
@@ -208,7 +208,7 @@ const codegenMode = async () => {
             language: "SWIFT",
           },
           {
-            title: `Text Styles`,
+            title: "Text Styles",
             code: swiftUICodeGenTextStyles(),
             language: "SWIFT",
           },

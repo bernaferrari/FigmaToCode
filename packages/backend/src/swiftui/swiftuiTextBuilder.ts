@@ -12,6 +12,7 @@ import { parseTextAsCode } from "../flutter/flutterTextBuilder";
 import { swiftuiSolidColor } from "./builderImpl/swiftuiColor";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
+  node?: TextNode;
   modifiers: string[] = [];
 
   constructor(kind: string = "Text") {
@@ -80,6 +81,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   };
 
   createText(node: TextNode): this {
+    this.node = node;
     let alignHorizontal =
       node.textAlignHorizontal?.toString()?.toLowerCase() ?? "left";
     alignHorizontal =
@@ -139,6 +141,16 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
       .addModifier([this.textDecoration(segment.textDecoration), ""])
       .addModifier([this.textStyle(segment.fontName.style), ""])
       .addModifier(["foregroundColor", this.textColor(segment.fills)]);
+
+    const blurMod = this.textBlur();
+    if (blurMod !== "") {
+      element.addModifier([blurMod, ""]);
+    }
+
+    const shadowMod = this.textShadow();
+    if (shadowMod !== "") {
+      element.addModifier([shadowMod, ""]);
+    }
 
     return element;
     // });
@@ -219,6 +231,45 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     }
 
     // when they are centered
+    return "";
+  };
+
+  textBlur = (): string => {
+    if (this.node && this.node.effects) {
+      const blurEffect = this.node.effects.find(
+        (effect) =>
+          effect.type === "LAYER_BLUR" &&
+          effect.visible !== false &&
+          effect.radius > 0,
+      );
+      if (blurEffect) {
+        return `.blur(radius: ${blurEffect.radius})`;
+      }
+    }
+    return "";
+  };
+
+  textShadow = (): string => {
+    if (this.node && this.node.effects) {
+      const dropShadow = this.node.effects.find(
+        (effect) => effect.type === "DROP_SHADOW" && effect.visible !== false,
+      );
+      if (dropShadow) {
+        const ds = dropShadow as DropShadowEffect;
+        const offsetX = Math.round(ds.offset.x);
+        const offsetY = Math.round(ds.offset.y);
+        const blurRadius = Math.round(ds.radius);
+        return `.shadow(color: Color(red: ${ds.color.r.toFixed(
+          2,
+        )}, green: ${ds.color.g.toFixed(
+          2,
+        )}, blue: ${ds.color.b.toFixed(
+          2,
+        )}, opacity: ${ds.color.a.toFixed(
+          2,
+        )}), radius: ${blurRadius}, x: ${offsetX}, y: ${offsetY})`;
+      }
+    }
     return "";
   };
 }

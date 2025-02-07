@@ -60,7 +60,7 @@ export const swiftuiBackground = (
     return swiftuiGradient(fill);
   } else if (fill?.type === "IMAGE") {
     addWarning("Image fills are replaced with placeholders");
-    return `AsyncImage(url: URL(string: "https://via.placeholder.com/${node.width.toFixed(
+    return `AsyncImage(url: URL(string: "https://placehold.co/${node.width.toFixed(
       0,
     )}x${node.height.toFixed(0)}"))`;
   }
