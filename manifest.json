@@ -8,7 +8,7 @@
   "capabilities": ["inspect", "codegen", "vscode"],
   "permissions": [],
   "networkAccess": {
-    "allowedDomains": ["none"]
+    "allowedDomains": ["https://placehold.co"]
   },
   "codegenLanguages": [
     { "label": "HTML", "value": "html" },

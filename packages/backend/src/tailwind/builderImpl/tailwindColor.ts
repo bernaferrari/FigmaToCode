@@ -84,16 +84,27 @@ export const tailwindGradientFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   // [when testing] node.effects can be undefined
-
   const fill = retrieveTopFill(fills);
 
-  if (fill?.type === "GRADIENT_LINEAR") {
+  // Return early if no fill exists
+  if (!fill) {
+    return "";
+  }
+
+  if (fill.type === "GRADIENT_LINEAR") {
     return tailwindGradient(fill);
   }
 
-  addWarning(
-    "Gradients are not fully supported in Tailwind except for Linear Gradients.",
-  );
+  // Show warning if there's a non-linear gradient
+  if (
+    fill.type === "GRADIENT_ANGULAR" ||
+    fill.type === "GRADIENT_RADIAL" ||
+    fill.type === "GRADIENT_DIAMOND"
+  ) {
+    addWarning(
+      "Gradients are not fully supported in Tailwind except for Linear Gradients.",
+    );
+  }
 
   return "";
 };

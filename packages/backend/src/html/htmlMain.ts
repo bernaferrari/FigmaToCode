@@ -225,7 +225,7 @@ const htmlAsset = (node: SceneNode, settings: HTMLSettings): string => {
   if (retrieveTopFill(node.fills)?.type === "IMAGE") {
     addWarning("Image fills are replaced with placeholders");
     tag = "img";
-    src = ` src="https://via.placeholder.com/${node.width.toFixed(
+    src = ` src="https://placehold.co/$${node.width.toFixed(
       0,
     )}x${node.height.toFixed(0)}"`;
   }
@@ -268,7 +268,7 @@ const htmlContainer = (
       addWarning("Image fills are replaced with placeholders");
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
-        src = ` src="https://via.placeholder.com/${node.width.toFixed(
+        src = ` src="https://placehold.co/${node.width.toFixed(
           0,
         )}x${node.height.toFixed(0)}"`;
       } else {
@@ -276,7 +276,7 @@ const htmlContainer = (
           formatWithJSX(
             "background-image",
             settings.jsx,
-            `url(https://via.placeholder.com/${node.width.toFixed(
+            `url(https://placehold.co/${node.width.toFixed(
               0,
             )}x${node.height.toFixed(0)})`,
           ),
