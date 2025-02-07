@@ -9,6 +9,7 @@ export interface TailwindSettings extends HTMLSettings {
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
   customTailwindColors: boolean;
+  customTailwindPrefix?: string;
 }
 export interface FlutterSettings {
   flutterGenerationMode: string;
