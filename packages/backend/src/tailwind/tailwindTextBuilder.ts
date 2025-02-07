@@ -8,6 +8,7 @@ import {
   pxToFontSize,
   pxToLetterSpacing,
   pxToLineHeight,
+  pxToBlur,
 } from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { config } from "./tailwindConfig";
@@ -36,6 +37,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         segment.fontSize,
       );
       // const textIndentStyle = this.indentStyle(segment.indentation);
+      const blurStyle = this.layerBlur();
+      const shadowStyle = this.textShadow();
 
       const styleClasses = [
         color,
@@ -47,6 +50,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         lineHeightStyle,
         letterSpacingStyle,
         // textIndentStyle,
+        blurStyle,
+        shadowStyle,
       ]
         .filter((d) => d !== "")
         .join(" ");
@@ -228,6 +233,56 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         return "";
     }
   }
+
+  /**
+   * https://v3.tailwindcss.com/docs/blur
+   */
+  layerBlur = (): string => {
+    if (this.node && (this.node as TextNode).effects) {
+      const effects = (this.node as TextNode).effects;
+      const blurEffect = effects.find(
+        (effect) =>
+          effect.type === "LAYER_BLUR" && effect.visible !== false,
+      );
+      if (blurEffect && blurEffect.radius && blurEffect.radius > 0) {
+        const blurSuffix = pxToBlur(blurEffect.radius);
+        if (blurSuffix) {
+          return `blur-${blurSuffix}`;
+        }
+      }
+    }
+    return "";
+  };
+
+  /**
+   * New method to handle text shadow.
+   * When a drop shadow is applied to a text element,
+   * this method returns an arbitrary Tailwind utility class
+   * in the following format:
+   *
+   * [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.50)]
+   */
+  textShadow = (): string => {
+    if (this.node && (this.node as TextNode).effects) {
+      const effects = (this.node as TextNode).effects;
+      const dropShadow = effects.find(
+        (effect) =>
+          effect.type === "DROP_SHADOW" && effect.visible !== false,
+      );
+      if (dropShadow) {
+        const ds = dropShadow as DropShadowEffect;
+        const offsetX = Math.round(ds.offset.x);
+        const offsetY = Math.round(ds.offset.y);
+        const blurRadius = Math.round(ds.radius);
+        const r = Math.round(ds.color.r * 255);
+        const g = Math.round(ds.color.g * 255);
+        const b = Math.round(ds.color.b * 255);
+        const aFixed = ds.color.a.toFixed(2);
+        return `[text-shadow:_${offsetX}px_${offsetY}px_${blurRadius}px_rgb(${r}_${g}_${b}_/_${aFixed})]`;
+      }
+    }
+    return "";
+  };
 
   reset(): void {
     this.attributes = [];
