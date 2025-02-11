@@ -134,7 +134,7 @@ const CodePanel = (props: CodePanelProps) => {
                   onPreferenceChanged("tailwindPrefix", newVal);
                 }}
                 placeholder="e.g., tw-"
-                className="mt-1 p-1 px-2 border border-gray-300 rounded bg-neutral-100 dark:bg-neutral-700 text-sm"
+                className="mt-1 p-1 px-2 border border-gray-300 rounded bg-white dark:bg-black dark:border-gray-500 text-sm"
               />
             </div>
           )}
