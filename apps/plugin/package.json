@@ -26,7 +26,7 @@
     "@vitejs/plugin-react-swc": "^3.7.2",
     "autoprefixer": "^10.4.20",
     "concurrently": "^8.2.2",
-    "esbuild": "^0.23.1",
+    "esbuild": "^0.25.0",
     "eslint-config-custom": "workspace:*",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.16",
