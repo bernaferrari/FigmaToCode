@@ -84,22 +84,21 @@ export const cloneNode = <T extends BaseNode>(
   // Create the cloned object with the correct prototype
   const cloned = {} as T;
   // Create a new object with only the desired descriptors (excluding 'parent' and 'children')
-  const droppedProps = [
-    "parent",
-    "children",
-    "horizontalPadding",
-    "verticalPadding",
-    "mainComponent",
-    "masterComponent",
-    "variantProperties",
-    "get_annotations",
-    "componentPropertyDefinitions",
-    "exposedInstances",
-    "componentProperties",
-    "componenPropertyReferences",
-  ];
   for (const prop in node) {
-    if (prop in droppedProps === false) {
+    if (
+      prop !== "parent" &&
+      prop !== "children" &&
+      prop !== "horizontalPadding" &&
+      prop !== "verticalPadding" &&
+      prop !== "mainComponent" &&
+      prop !== "masterComponent" &&
+      prop !== "variantProperties" &&
+      prop !== "get_annotations" &&
+      prop !== "componentPropertyDefinitions" &&
+      prop !== "exposedInstances" &&
+      prop !== "componentProperties" &&
+      prop !== "componenPropertyReferences"
+    ) {
       cloned[prop as keyof T] = node[prop as keyof T];
     }
   }
