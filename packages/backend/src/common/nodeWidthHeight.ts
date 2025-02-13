@@ -20,7 +20,7 @@ export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
   // const parentLayoutMode = node.parent.layoutMode;
   const parentLayoutMode = optimizeLayout
     ? node.parent.inferredAutoLayout?.layoutMode
-    : (null ?? node.parent.layoutMode);
+    : node.parent.layoutMode;
 
   const isWidthFill =
     (parentLayoutMode === "HORIZONTAL" && nodeAuto.layoutGrow === 1) ||
