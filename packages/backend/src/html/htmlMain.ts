@@ -14,9 +14,11 @@ import {
 import { isSVGNode, renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { getVisibleNodes } from "../common/nodeVisibility";
 import {
+  exportFillAsBase64PNG,
   exportNodeAsBase64PNG,
   getPlaceholderImage,
   nodeHasImageFill,
+  nodeHasMultipleFills,
 } from "../common/images";
 import { addWarning } from "../common/commonConversionWarnings";
 
@@ -253,23 +255,64 @@ const htmlContainer = async (
     let src = "";
 
     if (nodeHasImageFill(node)) {
-      let imgUrl: String;
       const altNode = node as AltNode<ExportableNode>;
 
       // if node has NO children
       if (!("children" in node) || node.children.length === 0) {
-        imgUrl = await exportNodeAsBase64PNG(altNode.originalNode);
+        const imgUrl = await exportNodeAsBase64PNG(altNode.originalNode);
         tag = "img";
         src = ` src="${imgUrl}"`;
-      } else {
-        // imgUrl = await exportNodeAsBase64PNG(altNode.originalNode);
-        addWarning(
-          "Groups with background images are not currently supported. Some images were exported as placeholder URLs",
-        );
-        imgUrl = getPlaceholderImage(node.width, node.height);
-        builder.addStyles(
-          formatWithJSX("background-image", settings.jsx, `url(${imgUrl})`),
-        );
+      }
+      // If it DOES have children
+      else {
+        if (nodeHasMultipleFills(node)) {
+          addWarning(
+            "Groups with multiple fills including background images are not currently supported. Either flatten the fills into a single fill, or move the fills into a separate element in your group.",
+          );
+          addPlaceholderImageToBuilder(builder, node, settings);
+        } else {
+          const imageData = await exportFillAsBase64PNG(altNode.originalNode);
+          if (imageData === null) {
+            addWarning("There was an error in processing some images");
+            addPlaceholderImageToBuilder(builder, node, settings);
+          } else {
+            const imgUrl = imageData.base64;
+            const { scaleMode } = imageData.fill;
+            const scalingFactor = imageData.fill.scalingFactor ?? 1;
+
+            if (scaleMode === "CROP") {
+              addWarning(
+                "Cropped background images are not currently supported. They will use 'cover' mode instead.",
+              );
+            }
+            if (scaleMode === "TILE") {
+              addWarning(
+                "Tiled background images are not fully supported. They may not appear at the correct scale or offset.",
+              );
+            }
+
+            builder.addStyles(
+              formatWithJSX(
+                "background-size",
+                settings.jsx,
+                scaleMode === "FILL" || scaleMode === "CROP"
+                  ? "cover"
+                  : scaleMode === "FIT" || scaleMode === "TILE"
+                    ? "contain"
+                    : `${scalingFactor * 100}%`,
+              ),
+              formatWithJSX(
+                "background-repeat",
+                settings.jsx,
+                scaleMode === "TILE" ? "repeat" : "no-repeat",
+              ),
+              scaleMode !== "TILE"
+                ? formatWithJSX("background-position", settings.jsx, "center")
+                : "",
+              formatWithJSX("background-image", settings.jsx, `url(${imgUrl})`),
+            );
+          }
+        }
       }
     }
 
@@ -285,6 +328,18 @@ const htmlContainer = async (
   }
 
   return children;
+};
+
+const addPlaceholderImageToBuilder = (
+  builder: HtmlDefaultBuilder,
+  node: SceneNode,
+  settings: HTMLSettings,
+) => {
+  addWarning("Some images were exported as placeholder URLs");
+  const imgUrl = getPlaceholderImage(node.width, node.height);
+  builder.addStyles(
+    formatWithJSX("background-image", settings.jsx, `url(${imgUrl})`),
+  );
 };
 
 const htmlSection = async (

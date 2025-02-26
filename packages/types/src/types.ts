@@ -75,6 +75,8 @@ export type AltNodeMetadata<T extends BaseNode> = {
 };
 export type AltNode<T extends BaseNode> = T & AltNodeMetadata<T>;
 
+export type ExportableNode = SceneNode & ExportMixin & MinimalFillsMixin;
+
 // Styles & Conversions
 
 export type LayoutMode =
