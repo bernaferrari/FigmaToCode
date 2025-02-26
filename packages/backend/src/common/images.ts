@@ -40,6 +40,7 @@ const imageBytesToBase64 = (bytes: Uint8Array): string => {
 
 export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
   node: AltNode<T> | ExportableNode,
+  excludeChildren: boolean,
 ) => {
   let n: ExportableNode;
   if ("originalNode" in node) {
@@ -60,59 +61,30 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
   };
 
   let bytes: Uint8Array<ArrayBufferLike> = new Uint8Array();
-  try {
+
+  if ("children" in n && n.children.length > 0 && excludeChildren) {
+    // Store the original visible state of children
+    const originalVisibility = new Map<SceneNode, boolean>(
+      n.children.map((child) => [child, child.visible]),
+    );
+
+    // Temporarily hide all children
+    n.children.forEach((child) => {
+      child.visible = false;
+    });
+
     bytes = await node.exportAsync(exportSettings);
-  } catch (error) {
-    throw error as Error;
+
+    // After export, restore visibility
+    n.children.forEach((child) => {
+      child.visible = originalVisibility.get(child) ?? false;
+    });
+  } else {
+    bytes = await node.exportAsync(exportSettings);
   }
 
   addWarning("Some images exported as Base64 PNG");
 
   // Encode binary string to base64
   return imageBytesToBase64(bytes);
-};
-
-interface ImageBinaryData {
-  base64: string;
-  fill: ImagePaint;
-}
-
-export const exportFillAsBase64PNG = async <T extends ExportableNode>(
-  node: AltNode<T> | ExportableNode,
-): Promise<ImageBinaryData | null> => {
-  let n: ExportableNode;
-  if ("originalNode" in node) {
-    n = node.originalNode;
-  } else {
-    n = node;
-  }
-
-  const fills = getImageFills(n);
-  const topImageFill = fills[0];
-  const scale = topImageFill.scalingFactor ?? 1;
-
-  const imageHash = topImageFill.imageHash;
-  if (!imageHash) return null;
-  const image = figma.getImageByHash(imageHash);
-  if (image === null) return null;
-
-  console.log(topImageFill.imageTransform);
-  console.log(topImageFill.scaleMode);
-  console.log(topImageFill.scalingFactor);
-  console.log(topImageFill.rotation);
-
-  let bytes: Uint8Array<ArrayBufferLike> = new Uint8Array();
-  try {
-    bytes = await image.getBytesAsync();
-  } catch (error) {
-    throw error as Error;
-  }
-
-  addWarning("Some images exported as Base64 PNG");
-  const base64 = imageBytesToBase64(bytes);
-
-  return {
-    base64,
-    fill: topImageFill,
-  };
 };
