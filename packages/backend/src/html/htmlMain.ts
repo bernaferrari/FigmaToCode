@@ -212,7 +212,10 @@ const htmlFrame = async (
   }
 };
 
-const htmlAsset = (node: SceneNode, settings: HTMLSettings): string => {
+const htmlAsset = async (
+  node: SceneNode,
+  settings: HTMLSettings,
+): Promise<string> => {
   if (!("opacity" in node) || !("layoutAlign" in node) || !("fills" in node)) {
     return "";
   }
