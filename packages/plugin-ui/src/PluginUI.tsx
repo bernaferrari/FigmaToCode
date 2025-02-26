@@ -1,4 +1,3 @@
-import { useState } from "react";
 import copy from "copy-to-clipboard";
 import Preview from "./components/Preview";
 import GradientsPanel from "./components/GradientsPanel";
@@ -17,6 +16,7 @@ import {
   preferenceOptions,
   selectPreferenceOptions,
 } from "./codegenPreferenceOptions";
+import Loading from "./components/Loading";
 
 type PluginUIProps = {
   code: string;
@@ -28,11 +28,14 @@ type PluginUIProps = {
   onPreferenceChanged: (key: string, value: boolean | string) => void;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
+  isLoading: boolean;
 };
 
 const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
 
 export const PluginUI = (props: PluginUIProps) => {
+  if (props.isLoading) return <Loading />;
+
   const isEmpty = props.code === "";
 
   const warnings = props.warnings ?? [];

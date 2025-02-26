@@ -11,7 +11,6 @@ import {
   ErrorMessage,
   SettingsChangedMessage,
   Warning,
-  ConversionStartMessage,
 } from "types";
 import { postUISettingsChangingMessage } from "./messaging";
 
@@ -124,12 +123,10 @@ export default function App() {
 
   const darkMode = figmaColorBgValue !== "#ffffff";
 
-  if (state.isLoading) {
-    return <LoadingMessage darkMode={darkMode} />;
-  }
   return (
     <div className={`${darkMode ? "dark" : ""}`}>
       <PluginUI
+        isLoading={state.isLoading}
         code={state.code}
         warnings={state.warnings}
         selectedFramework={state.selectedFramework}
@@ -145,22 +142,3 @@ export default function App() {
     </div>
   );
 }
-
-interface LoadingProps {
-  darkMode: boolean;
-}
-const LoadingMessage = ({ darkMode }: LoadingProps) => (
-  <div
-    style={{ padding: "1rem" }}
-    className={`flex w-full h-full dark:text-white text-lg ${darkMode ? "dark" : ""}`}
-  >
-    <div style={{ width: "60%" }} className="dark:text-white">
-      <p className="text-lg font-medium dark:text-white rounded-lg">
-        Loading...
-      </p>
-      <p className="text-xs">
-        (This can take a while if the selection has lots of images or paths)
-      </p>
-    </div>
-  </div>
-);
