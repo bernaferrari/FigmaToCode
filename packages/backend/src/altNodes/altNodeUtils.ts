@@ -42,6 +42,11 @@ export const isTypeOrGroupOfTypes = curry(
   },
 );
 
+export const isSVGNode = (node: SceneNode) => {
+  const altNode = node as AltNode<typeof node>;
+  return altNode.canBeFlattened;
+};
+
 export const renderNodeAsSVG = async (node: SceneNode) =>
   await node.exportAsync({ format: "SVG_STRING" });
 
