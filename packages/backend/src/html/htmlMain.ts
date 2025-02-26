@@ -221,19 +221,13 @@ const htmlAsset = (node: SceneNode, settings: HTMLSettings): string => {
     .commonPositionStyles()
     .commonShapeStyles();
 
-  let tag = "div";
-  let src = "";
   if (retrieveTopFill(node.fills)?.type === "IMAGE") {
     addWarning("Image fills are replaced with placeholders");
-    tag = "img";
-    src = ` src="${getPlaceholderImage(node.width, node.height)}"`;
+    const imgUrl = getPlaceholderImage(node.width, node.height);
+    return `\n<img${builder.build()} src="${imgUrl}" />`;
   }
 
-  if (tag === "div") {
-    return `\n<div${builder.build()}${src}></div>`;
-  }
-
-  return `\n<${tag}${builder.build()}${src} />`;
+  return `\n<div${builder.build()}></div>`;
 };
 
 // properties named propSomething always take care of ","
