@@ -260,6 +260,7 @@ const htmlContainer = async (
         altNode.originalNode,
         hasChildren,
       );
+      altNode.base64 = imgUrl;
 
       if (hasChildren) {
         builder.addStyles(

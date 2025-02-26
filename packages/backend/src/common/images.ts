@@ -42,6 +42,11 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
   node: AltNode<T> | ExportableNode,
   excludeChildren: boolean,
 ) => {
+  // Shorcut export if the node has already been converted.
+  if ("base64" in node && node.base64 !== "") {
+    return node.base64;
+  }
+
   let n: ExportableNode;
   if ("originalNode" in node) {
     n = node.originalNode;
