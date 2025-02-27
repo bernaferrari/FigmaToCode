@@ -29,6 +29,7 @@ export const defaultPluginSettings: PluginSettings = {
   roundTailwindColors: false,
   customTailwindColors: false,
   customTailwindPrefix: "",
+  embedImages: false,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type

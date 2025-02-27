@@ -255,12 +255,14 @@ const htmlContainer = async (
     if (nodeHasImageFill(node)) {
       const altNode = node as AltNode<ExportableNode>;
       const hasChildren = "children" in node && node.children.length > 0;
+      let imgUrl = "";
 
-      const imgUrl = await exportNodeAsBase64PNG(
-        altNode.originalNode,
-        hasChildren,
-      );
-      altNode.base64 = imgUrl;
+      if (settings.embedImages) {
+        imgUrl = (await exportNodeAsBase64PNG(altNode, hasChildren)) ?? "";
+      } else {
+        addWarning("Some images were exported as placeholder URLs");
+        imgUrl = getPlaceholderImage(node.width, node.height);
+      }
 
       if (hasChildren) {
         builder.addStyles(
@@ -284,18 +286,6 @@ const htmlContainer = async (
     }
   }
   return children;
-};
-
-const addPlaceholderImageToBuilder = (
-  builder: HtmlDefaultBuilder,
-  node: SceneNode,
-  settings: HTMLSettings,
-) => {
-  addWarning("Some images were exported as placeholder URLs");
-  const imgUrl = getPlaceholderImage(node.width, node.height);
-  builder.addStyles(
-    formatWithJSX("background-image", settings.jsx, `url(${imgUrl})`),
-  );
 };
 
 const htmlSection = async (

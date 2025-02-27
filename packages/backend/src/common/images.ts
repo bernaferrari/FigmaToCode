@@ -39,20 +39,15 @@ const imageBytesToBase64 = (bytes: Uint8Array): string => {
 };
 
 export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
-  node: AltNode<T> | ExportableNode,
+  node: AltNode<T>,
   excludeChildren: boolean,
 ) => {
   // Shorcut export if the node has already been converted.
-  if ("base64" in node && node.base64 !== "") {
+  if (node.base64 !== undefined && node.base64 !== "") {
     return node.base64;
   }
 
-  let n: ExportableNode;
-  if ("originalNode" in node) {
-    n = node.originalNode;
-  } else {
-    n = node;
-  }
+  const n: ExportableNode = node.originalNode;
 
   if (n.exportAsync === undefined) {
     console.log(n);
@@ -60,32 +55,29 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
       "Something went wrong. This node doesn't have an exportAsync function. Maybe check the type before calling this function.",
     );
   }
+
+  const temporarilyHideChildren =
+    excludeChildren && "children" in n && n.children.length > 0;
+  const parent = n as ChildrenMixin;
+  const originalVisibility = new Map<SceneNode, boolean>();
+
+  if (temporarilyHideChildren) {
+    // Store the original visible state of children
+    parent.children.map((child: SceneNode) =>
+      originalVisibility.set(child, child.visible),
+    ),
+      // Temporarily hide all children
+      parent.children.forEach((child) => {
+        child.visible = false;
+      });
+  }
+
+  // export the image as bytes
   const exportSettings: ExportSettingsImage = {
     format: "PNG",
     constraint: { type: "SCALE", value: 1 },
   };
-
-  let bytes: Uint8Array<ArrayBufferLike> = new Uint8Array();
-
-  const temporarilyHideChildren =
-    "children" in n && n.children.length > 0 && excludeChildren;
-  const parent = n as ChildrenMixin;
-  let originalVisibility: Map<SceneNode, boolean>;
-
-  if (temporarilyHideChildren) {
-    // Store the original visible state of children
-    originalVisibility = new Map<SceneNode, boolean>(
-      parent.children.map((child: SceneNode) => [child, child.visible]),
-    );
-
-    // Temporarily hide all children
-    parent.children.forEach((child) => {
-      child.visible = false;
-    });
-  }
-
-  // export the image as bytes
-  bytes = await node.exportAsync(exportSettings);
+  const bytes = await n.exportAsync(exportSettings);
 
   if (temporarilyHideChildren) {
     // After export, restore visibility
@@ -97,5 +89,8 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
   addWarning("Some images exported as Base64 PNG");
 
   // Encode binary string to base64
-  return imageBytesToBase64(bytes);
+  const base64 = imageBytesToBase64(bytes);
+  // Save the value so it's only calculated once.
+  node.base64 = base64;
+  return base64;
 };

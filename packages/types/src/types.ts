@@ -5,6 +5,7 @@ export interface HTMLSettings {
   jsx: boolean;
   optimizeLayout: boolean;
   showLayerNames: boolean;
+  embedImages: boolean;
 }
 export interface TailwindSettings extends HTMLSettings {
   roundTailwindValues: boolean;
