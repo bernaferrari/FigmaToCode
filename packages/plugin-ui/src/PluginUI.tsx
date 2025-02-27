@@ -25,7 +25,10 @@ type PluginUIProps = {
   selectedFramework: Framework;
   setSelectedFramework: (framework: Framework) => void;
   settings: PluginSettings | null;
-  onPreferenceChanged: (key: string, value: boolean | string) => void;
+  onPreferenceChanged: (
+    key: keyof PluginSettings,
+    value: boolean | string,
+  ) => void;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
   isLoading: boolean;
