@@ -257,7 +257,16 @@ const htmlContainer = async (
       const hasChildren = "children" in node && node.children.length > 0;
       let imgUrl = "";
 
-      if (settings.embedImages) {
+      // TODO: This overrides the embedImages setting to only happen when HTML is selected but
+      // really this should be more of a global setting that isn't tied to a specific framework.
+      // It's being disabled in this way so the HTML preview will only embed images when it's HTML outuput.
+      // The reason this is so important is that it's a costly operation an it will slow down
+      // the generation of code for other languages and display different results in the preview
+      // than what the output will look like.
+      if (
+        settings.embedImages &&
+        (settings as PluginSettings).framework === "HTML"
+      ) {
         imgUrl = (await exportNodeAsBase64PNG(altNode, hasChildren)) ?? "";
       } else {
         addWarning("Some images were exported as placeholder URLs");
