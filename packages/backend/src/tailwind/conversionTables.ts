@@ -134,6 +134,16 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
   let hex: string = "#" + rgbTo6hex(fill.color);
   let meta: string = "";
 
+  // variable
+  if (
+    localTailwindSettings.customTailwindColors &&
+    fill.boundVariables?.color
+  ) {
+    colorName = variableToColorName(fill.boundVariables.color);
+    colorType = "variable";
+    meta = "custom";
+  }
+
   // Check for pure black/white first
   if (fill.color.r === 0 && fill.color.g === 0 && fill.color.b === 0) {
     return {
@@ -151,16 +161,6 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
       hex: "#ffffff",
       meta: "",
     };
-  }
-
-  // variable
-  if (
-    localTailwindSettings.customTailwindColors &&
-    fill.boundVariables?.color
-  ) {
-    colorName = variableToColorName(fill.boundVariables.color);
-    colorType = "variable";
-    meta = "custom";
   }
 
   // solid color
