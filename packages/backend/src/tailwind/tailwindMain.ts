@@ -8,6 +8,7 @@ import { AltNode, PluginSettings, TailwindSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { getVisibleNodes } from "../common/nodeVisibility";
+import { getPlaceholderImage } from "../common/images";
 
 export let localTailwindSettings: PluginSettings;
 
@@ -232,17 +233,12 @@ export const tailwindContainer = (
     let src = "";
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
       addWarning("Image fills are replaced with placeholders");
+      const imageURL = getPlaceholderImage(node.width, node.height);
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
-        src = ` src="https://placehold.co/${node.width.toFixed(
-          0,
-        )}x${node.height.toFixed(0)}"`;
+        src = ` src="${imageURL}"`;
       } else {
-        builder.addAttributes(
-          `bg-[url(https://placehold.co/${node.width.toFixed(
-            0,
-          )}x${node.height.toFixed(0)})]`,
-        );
+        builder.addAttributes(`bg-[url(${imageURL})]`);
       }
     }
 

@@ -6,6 +6,7 @@ import {
 } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { nearestValue } from "../../tailwind/conversionTables";
+import { getPlaceholderImage } from "../../common/images";
 
 /**
  * Retrieve the SOLID color for Flutter when existent, otherwise ""
@@ -56,9 +57,7 @@ export const flutterBoxDecorationColor = (
 export const flutterDecorationImage = (node: SceneNode, fill: ImagePaint) => {
   addWarning("Image fills are replaced with placeholders");
   return generateWidgetCode("DecorationImage", {
-    image: `NetworkImage("https://placehold.co/${node.width.toFixed(
-      0,
-    )}x${node.height.toFixed(0)}")`,
+    image: `NetworkImage("${getPlaceholderImage(node.width, node.height)}")`,
     fit: fitToBoxFit(fill),
   });
 };

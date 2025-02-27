@@ -9,6 +9,7 @@ import { addWarning } from "../common/commonConversionWarnings";
 import { PluginSettings, HTMLPreview, AltNode, HTMLSettings } from "types";
 import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { getVisibleNodes } from "../common/nodeVisibility";
+import { getPlaceholderImage } from "../common/images";
 
 const selfClosingTags = ["img"];
 
@@ -211,7 +212,10 @@ const htmlFrame = async (
   }
 };
 
-const htmlAsset = (node: SceneNode, settings: HTMLSettings): string => {
+const htmlAsset = async (
+  node: SceneNode,
+  settings: HTMLSettings,
+): Promise<string> => {
   if (!("opacity" in node) || !("layoutAlign" in node) || !("fills" in node)) {
     return "";
   }
@@ -220,21 +224,13 @@ const htmlAsset = (node: SceneNode, settings: HTMLSettings): string => {
     .commonPositionStyles()
     .commonShapeStyles();
 
-  let tag = "div";
-  let src = "";
   if (retrieveTopFill(node.fills)?.type === "IMAGE") {
     addWarning("Image fills are replaced with placeholders");
-    tag = "img";
-    src = ` src="https://placehold.co/$${node.width.toFixed(
-      0,
-    )}x${node.height.toFixed(0)}"`;
+    const imgUrl = getPlaceholderImage(node.width, node.height);
+    return `\n<img${builder.build()} src="${imgUrl}" />`;
   }
 
-  if (tag === "div") {
-    return `\n<div${builder.build()}${src}></div>`;
-  }
-
-  return `\n<${tag}${builder.build()}${src} />`;
+  return `\n<div${builder.build()}></div>`;
 };
 
 // properties named propSomething always take care of ","
@@ -266,20 +262,13 @@ const htmlContainer = (
     let src = "";
     if (retrieveTopFill(node.fills)?.type === "IMAGE") {
       addWarning("Image fills are replaced with placeholders");
+      const imageURL = getPlaceholderImage(node.width, node.height);
       if (!("children" in node) || node.children.length === 0) {
         tag = "img";
-        src = ` src="https://placehold.co/${node.width.toFixed(
-          0,
-        )}x${node.height.toFixed(0)}"`;
+        src = ` src="${imageURL}"`;
       } else {
         builder.addStyles(
-          formatWithJSX(
-            "background-image",
-            settings.jsx,
-            `url(https://placehold.co/${node.width.toFixed(
-              0,
-            )}x${node.height.toFixed(0)})`,
-          ),
+          formatWithJSX("background-image", settings.jsx, `url(${imageURL})`),
         );
       }
     }

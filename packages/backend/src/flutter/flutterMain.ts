@@ -14,6 +14,7 @@ import {
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
+import { getPlaceholderImage } from "../common/images";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -148,9 +149,7 @@ const flutterContainer = (node: SceneNode, child: string): string => {
   let image = "";
   if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
     addWarning("Image fills are replaced with placeholders");
-    image = `Image.network("https://placehold.co/${node.width.toFixed(
-      0,
-    )}x${node.height.toFixed(0)}")`;
+    image = `Image.network("${getPlaceholderImage(node.width, node.height)}")`;
   }
 
   if (child.length > 0) {
