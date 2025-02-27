@@ -64,14 +64,23 @@ const initSettings = async () => {
   safeRun(userPluginSettings);
 };
 
-const safeRun = (settings: PluginSettings) => {
-  try {
-    run(settings);
-  } catch (e) {
-    if (e && typeof e === "object" && "message" in e) {
-      const error = e as Error;
-      console.log("error: ", error.stack);
-      figma.ui.postMessage({ type: "error", error: error.message });
+// Used to prevent running from happening again.
+let isLoading = false;
+const safeRun = async (settings: PluginSettings) => {
+  if (isLoading === false) {
+    try {
+      isLoading = true;
+      await run(settings);
+      // hack to make it not immediately set to false when complete. (executes on next frame)
+      setTimeout(() => {
+        isLoading = false;
+      }, 1);
+    } catch (e) {
+      if (e && typeof e === "object" && "message" in e) {
+        const error = e as Error;
+        console.log("error: ", error.stack);
+        figma.ui.postMessage({ type: "error", error: error.message });
+      }
     }
   }
 };
@@ -87,10 +96,10 @@ const standardMode = async () => {
 
   // Listen for document changes
   figma.on("documentchange", () => {
-    // FIXME: This is causing an infinite load when you try to export a background image from a group that contains children.
+    // Node: This was causing an infinite load when you try to export a background image from a group that contains children.
     // The reason for this is that the code will temporarily hide the children of the group in order to export a clean image
     // then restores the visibility of the children. This constitutes a document change so it's restarting the whole conversion.
-    // In order to stop this, we may want to disable this listener when doing conversions (while isLoading === true).
+    // In order to stop this, we disable safeRun() when doing conversions (while isLoading === true).
     safeRun(userPluginSettings);
   });
 
