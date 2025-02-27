@@ -67,25 +67,31 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
 
   let bytes: Uint8Array<ArrayBufferLike> = new Uint8Array();
 
-  if ("children" in n && n.children.length > 0 && excludeChildren) {
+  const temporarilyHideChildren =
+    "children" in n && n.children.length > 0 && excludeChildren;
+  const parent = n as ChildrenMixin;
+  let originalVisibility: Map<SceneNode, boolean>;
+
+  if (temporarilyHideChildren) {
     // Store the original visible state of children
-    const originalVisibility = new Map<SceneNode, boolean>(
-      n.children.map((child) => [child, child.visible]),
+    originalVisibility = new Map<SceneNode, boolean>(
+      parent.children.map((child: SceneNode) => [child, child.visible]),
     );
 
     // Temporarily hide all children
-    n.children.forEach((child) => {
+    parent.children.forEach((child) => {
       child.visible = false;
     });
+  }
 
-    bytes = await node.exportAsync(exportSettings);
+  // export the image as bytes
+  bytes = await node.exportAsync(exportSettings);
 
+  if (temporarilyHideChildren) {
     // After export, restore visibility
-    n.children.forEach((child) => {
+    parent.children.forEach((child) => {
       child.visible = originalVisibility.get(child) ?? false;
     });
-  } else {
-    bytes = await node.exportAsync(exportSettings);
   }
 
   addWarning("Some images exported as Base64 PNG");
