@@ -30,7 +30,7 @@ export default function App() {
   const [state, setState] = useState<AppState>({
     code: "",
     selectedFramework: "HTML",
-    isLoading: false,
+    isLoading: true,
     htmlPreview: emptyPreview,
     settings: null,
     colors: [],
@@ -49,12 +49,21 @@ export default function App() {
       console.log("[ui] message received:", untypedMessage);
 
       switch (untypedMessage.type) {
+        case "conversionStart":
+          setState((prevState) => ({
+            ...prevState,
+            code: "",
+            isLoading: true,
+          }));
+          break;
+
         case "code":
           const conversionMessage = untypedMessage as ConversionMessage;
           setState((prevState) => ({
             ...prevState,
             ...conversionMessage,
             selectedFramework: conversionMessage.settings.framework,
+            isLoading: false,
           }));
           break;
 
@@ -76,6 +85,7 @@ export default function App() {
             warnings: [],
             colors: [],
             gradients: [],
+            isLoading: false,
           }));
           break;
 
@@ -87,6 +97,7 @@ export default function App() {
             colors: [],
             gradients: [],
             code: `Error :(\n// ${errorMessage.error}`,
+            isLoading: false,
           }));
           break;
         default:
@@ -99,26 +110,6 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (state.selectedFramework === null) {
-      const timer = setTimeout(
-        () => setState((prevState) => ({ ...prevState, isLoading: true })),
-        300,
-      );
-      return () => clearTimeout(timer);
-    } else {
-      setState((prevState) => ({ ...prevState, isLoading: false }));
-    }
-  }, [state.selectedFramework]);
-
-  if (state.selectedFramework === null) {
-    return state.isLoading ? (
-      <div className="w-full h-96 justify-center text-center items-center dark:text-white text-lg">
-        Loading Plugin...
-      </div>
-    ) : null;
-  }
-
   const handleFrameworkChange = (updatedFramework: Framework) => {
     setState((prevState) => ({
       ...prevState,
@@ -129,11 +120,13 @@ export default function App() {
       targetOrigin: "*",
     });
   };
-  console.log("state.code", state.code.slice(0, 25));
+
+  const darkMode = figmaColorBgValue !== "#ffffff";
 
   return (
-    <div className={`${figmaColorBgValue === "#ffffff" ? "" : "dark"}`}>
+    <div className={`${darkMode ? "dark" : ""}`}>
       <PluginUI
+        isLoading={state.isLoading}
         code={state.code}
         warnings={state.warnings}
         selectedFramework={state.selectedFramework}

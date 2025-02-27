@@ -47,6 +47,7 @@ export interface UIMessage {
   pluginMessage: Message;
 }
 export type EmptyMessage = Message & { type: "empty" };
+export type ConversionStartMessage = Message & { type: "conversionStarted" };
 export type ConversionMessage = Message & {
   type: "code";
 } & ConversionData;
