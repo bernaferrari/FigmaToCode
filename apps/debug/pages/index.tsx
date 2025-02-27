@@ -19,6 +19,7 @@ export default function Web() {
             <PluginFigmaToolbar variant="(Light)" />
             <PluginUI
               code={"code goes hereeeee"}
+              isLoading={false}
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
               htmlPreview={null}
@@ -36,6 +37,7 @@ export default function Web() {
             <PluginFigmaToolbar variant="(Dark)" />
             <PluginUI
               code={"code goes hereeeee"}
+              isLoading={false}
               selectedFramework={selectedFramework}
               setSelectedFramework={setSelectedFramework}
               htmlPreview={null}
