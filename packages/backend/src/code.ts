@@ -19,6 +19,7 @@ import { convertToCode } from "./common/retrieveUI/convertToCode";
 
 export const run = async (settings: PluginSettings) => {
   clearWarnings();
+
   const { framework } = settings;
   const selection = figma.currentPage.selection;
 

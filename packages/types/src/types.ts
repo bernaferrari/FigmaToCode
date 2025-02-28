@@ -5,6 +5,7 @@ export interface HTMLSettings {
   jsx: boolean;
   optimizeLayout: boolean;
   showLayerNames: boolean;
+  embedImages: boolean;
 }
 export interface TailwindSettings extends HTMLSettings {
   roundTailwindValues: boolean;
@@ -72,8 +73,11 @@ export type AltNodeMetadata<T extends BaseNode> = {
   originalNode: T;
   canBeFlattened: boolean;
   svg?: string;
+  base64?: string;
 };
 export type AltNode<T extends BaseNode> = T & AltNodeMetadata<T>;
+
+export type ExportableNode = SceneNode & ExportMixin & MinimalFillsMixin;
 
 // Styles & Conversions
 

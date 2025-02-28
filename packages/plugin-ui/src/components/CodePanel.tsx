@@ -16,7 +16,10 @@ interface CodePanelProps {
   settings: PluginSettings | null;
   preferenceOptions: LocalCodegenPreferenceOptions[];
   selectPreferenceOptions: SelectPreferenceOptions[];
-  onPreferenceChanged: (key: string, value: boolean | string) => void;
+  onPreferenceChanged: (
+    key: keyof PluginSettings,
+    value: boolean | string,
+  ) => void;
 }
 
 const CodePanel = (props: CodePanelProps) => {
@@ -34,20 +37,25 @@ const CodePanel = (props: CodePanelProps) => {
 
   // State for custom prefix for Tailwind classes.
   // It is initially set from settings (if available) or an empty string.
-  const [customPrefix, setCustomPrefix] = useState(settings?.customTailwindPrefix || "");
+  const [customPrefix, setCustomPrefix] = useState(
+    settings?.customTailwindPrefix || "",
+  );
 
   // Helper function to add the prefix before every class (or className) in the code.
   // It finds every occurrence of class="..." or className="..." and, for each class,
   // prepends the custom prefix.
   const applyPrefixToClasses = (codeString: string, prefix: string) => {
-    return codeString.replace(/(class(?:Name)?)="([^"]*)"/g, (match, attr, classes) => {
-      const prefixedClasses = classes
-        .split(/\s+/)
-        .filter(Boolean)
-        .map((cls: string) => prefix + cls)
-        .join(" ");
-      return `${attr}="${prefixedClasses}"`;
-    });
+    return codeString.replace(
+      /(class(?:Name)?)="([^"]*)"/g,
+      (match, attr, classes) => {
+        const prefixedClasses = classes
+          .split(/\s+/)
+          .filter(Boolean)
+          .map((cls: string) => prefix + cls)
+          .join(" ");
+        return `${attr}="${prefixedClasses}"`;
+      },
+    );
   };
 
   // If the selected framework is Tailwind and a prefix is provided then transform the code.
@@ -131,7 +139,7 @@ const CodePanel = (props: CodePanelProps) => {
                 onChange={(e) => {
                   const newVal = e.target.value;
                   setCustomPrefix(newVal);
-                  onPreferenceChanged("tailwindPrefix", newVal);
+                  onPreferenceChanged("customTailwindPrefix", newVal);
                 }}
                 placeholder="e.g., tw-"
                 className="mt-1 p-1 px-2 border border-gray-300 rounded bg-neutral-100 dark:bg-neutral-700 text-sm"

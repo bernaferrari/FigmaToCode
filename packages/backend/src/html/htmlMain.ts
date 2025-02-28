@@ -1,15 +1,24 @@
 import { indentString } from "../common/indentString";
-import { retrieveTopFill } from "../common/retrieveFill";
 import { HtmlTextBuilder } from "./htmlTextBuilder";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { addWarning } from "../common/commonConversionWarnings";
-import { PluginSettings, HTMLPreview, AltNode, HTMLSettings } from "types";
-import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
+import {
+  PluginSettings,
+  HTMLPreview,
+  AltNode,
+  HTMLSettings,
+  ExportableNode,
+} from "types";
+import { isSVGNode, renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { getVisibleNodes } from "../common/nodeVisibility";
-import { getPlaceholderImage } from "../common/images";
+import {
+  exportNodeAsBase64PNG,
+  getPlaceholderImage,
+  nodeHasImageFill,
+} from "../common/images";
+import { addWarning } from "../common/commonConversionWarnings";
 
 const selfClosingTags = ["img"];
 
@@ -76,32 +85,35 @@ const htmlWidgetGenerator = async (
 };
 
 const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
-  const altNode = await renderAndAttachSVG(node);
-  if (altNode.svg) return htmlWrapSVG(altNode, settings);
+  if (isSVGNode(node)) {
+    const altNode = await renderAndAttachSVG(node);
+    if (altNode.svg) return htmlWrapSVG(altNode, settings);
+  }
 
   switch (node.type) {
     case "RECTANGLE":
     case "ELLIPSE":
-      return htmlContainer(node, "", [], settings);
+      return await htmlContainer(node, "", [], settings);
     case "GROUP":
-      return htmlGroup(node, settings);
+      return await htmlGroup(node, settings);
     case "FRAME":
     case "COMPONENT":
     case "INSTANCE":
     case "COMPONENT_SET":
-      return htmlFrame(node, settings);
+      return await htmlFrame(node, settings);
     case "SECTION":
-      return htmlSection(node, settings);
+      return await htmlSection(node, settings);
     case "TEXT":
       return htmlText(node, settings);
     case "LINE":
       return htmlLine(node, settings);
     case "VECTOR":
-      addWarning("VectorNodes are not fully supported in HTML");
-      return htmlAsset(node, settings);
+      throw new Error(
+        "Normally vector type nodes are converted to SVG so this code point should be unreachable.",
+      );
     default:
+      return "";
   }
-  return "";
 };
 
 const htmlWrapSVG = (
@@ -195,7 +207,7 @@ const htmlFrame = async (
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = htmlAutoLayoutProps(node, node, settings);
-    return htmlContainer(node, childrenStr, rowColumn, settings);
+    return await htmlContainer(node, childrenStr, rowColumn, settings);
   } else {
     if (settings.optimizeLayout && node.inferredAutoLayout !== null) {
       const rowColumn = htmlAutoLayoutProps(
@@ -203,39 +215,18 @@ const htmlFrame = async (
         node.inferredAutoLayout,
         settings,
       );
-      return htmlContainer(node, childrenStr, rowColumn, settings);
+      return await htmlContainer(node, childrenStr, rowColumn, settings);
     }
 
     // node.layoutMode === "NONE" && node.children.length > 1
     // children needs to be absolute
-    return htmlContainer(node, childrenStr, [], settings);
+    return await htmlContainer(node, childrenStr, [], settings);
   }
-};
-
-const htmlAsset = async (
-  node: SceneNode,
-  settings: HTMLSettings,
-): Promise<string> => {
-  if (!("opacity" in node) || !("layoutAlign" in node) || !("fills" in node)) {
-    return "";
-  }
-
-  const builder = new HtmlDefaultBuilder(node, settings)
-    .commonPositionStyles()
-    .commonShapeStyles();
-
-  if (retrieveTopFill(node.fills)?.type === "IMAGE") {
-    addWarning("Image fills are replaced with placeholders");
-    const imgUrl = getPlaceholderImage(node.width, node.height);
-    return `\n<img${builder.build()} src="${imgUrl}" />`;
-  }
-
-  return `\n<div${builder.build()}></div>`;
 };
 
 // properties named propSomething always take care of ","
 // sometimes a property might not exist, so it doesn't add ","
-const htmlContainer = (
+const htmlContainer = async (
   node: SceneNode &
     SceneNodeMixin &
     BlendMixin &
@@ -245,11 +236,11 @@ const htmlContainer = (
   children: string,
   additionalStyles: string[] = [],
   settings: HTMLSettings,
-): string => {
+): Promise<string> => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
-  if (node.width < 0 || node.height <= 0) {
+  if (node.width <= 0 || node.height <= 0) {
     return children;
   }
 
@@ -260,16 +251,36 @@ const htmlContainer = (
   if (builder.styles || additionalStyles) {
     let tag = "div";
     let src = "";
-    if (retrieveTopFill(node.fills)?.type === "IMAGE") {
-      addWarning("Image fills are replaced with placeholders");
-      const imageURL = getPlaceholderImage(node.width, node.height);
-      if (!("children" in node) || node.children.length === 0) {
-        tag = "img";
-        src = ` src="${imageURL}"`;
+
+    if (nodeHasImageFill(node)) {
+      const altNode = node as AltNode<ExportableNode>;
+      const hasChildren = "children" in node && node.children.length > 0;
+      let imgUrl = "";
+
+      // TODO: This overrides the embedImages setting to only happen when HTML is selected but
+      // really this should be more of a global setting that isn't tied to a specific framework.
+      // It's being disabled in this way so the HTML preview will only embed images when it's HTML outuput.
+      // The reason this is so important is that it's a costly operation an it will slow down
+      // the generation of code for other languages and display different results in the preview
+      // than what the output will look like.
+      if (
+        settings.embedImages &&
+        (settings as PluginSettings).framework === "HTML"
+      ) {
+        imgUrl = (await exportNodeAsBase64PNG(altNode, hasChildren)) ?? "";
       } else {
+        addWarning("Some images were exported as placeholder URLs");
+        imgUrl = getPlaceholderImage(node.width, node.height);
+      }
+
+      if (hasChildren) {
         builder.addStyles(
-          formatWithJSX("background-image", settings.jsx, `url(${imageURL})`),
+          formatWithJSX("background-image", settings.jsx, `url(${imgUrl})`),
         );
+      } else {
+        // if node has NO children
+        tag = "img";
+        src = ` src="${imgUrl}"`;
       }
     }
 
@@ -283,7 +294,6 @@ const htmlContainer = (
       return `\n<${tag}${build}${src}></${tag}>`;
     }
   }
-
   return children;
 };
 
