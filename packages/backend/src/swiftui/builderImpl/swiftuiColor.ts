@@ -5,6 +5,10 @@ import { numberToFixedString } from "../../common/numToAutoFixed";
 import { addWarning } from "../../common/commonConversionWarnings";
 import { getPlaceholderImage } from "../../common/images";
 
+/**
+ * Retrieve the SwiftUI color for a Paint object
+ * @param fill The paint object to extract color from
+ */
 export const swiftUISolidColor = (fill: Paint): string => {
   if (fill && fill.type === "SOLID") {
     return swiftuiColor(fill.color, fill.opacity ?? 1.0);
@@ -22,9 +26,22 @@ export const swiftUISolidColor = (fill: Paint): string => {
   return "";
 };
 
+/**
+ * Retrieve the SwiftUI solid color when existent, otherwise ""
+ * @param node SceneNode containing the property to examine
+ * @param propertyPath Property path to extract fills from (e.g., 'fills', 'strokes') or direct fills array
+ */
 export const swiftuiSolidColor = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  node: SceneNode,
+  propertyPath: string | keyof SceneNode,
 ): string => {
+  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
+
+  // Property path string provided
+  fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
@@ -47,14 +64,22 @@ export const swiftuiSolidColor = (
   return "";
 };
 
+/**
+ * Get SwiftUI background for a node
+ * @param node SceneNode containing the property to examine
+ * @param propertyPath Property path to extract fills from (e.g., 'fills', 'strokes') or direct fills array
+ */
 export const swiftuiBackground = (
   node: SceneNode,
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  propertyPath: string,
 ): string => {
+  const fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
-    // opacity should only be null on set, not on get. But better be prevented.
     const opacity = fill.opacity ?? 1.0;
     return swiftuiColor(fill.color, opacity);
   } else if (fill?.type === "GRADIENT_LINEAR") {

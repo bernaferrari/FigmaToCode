@@ -45,7 +45,7 @@ export class TailwindDefaultBuilder {
     return this.settings.showLayerNames ? this.node.name : "";
   }
   get visible() {
-    return this.node.visible;
+    return this.node.visible ?? true;
   }
   get isJSX() {
     return this.settings.jsx;
@@ -156,7 +156,6 @@ export class TailwindDefaultBuilder {
     paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
     kind: TailwindColorType,
   ): this {
-    // visible is true or undefinied (tests)
     if (this.visible) {
       let gradient = "";
       if (kind === "bg") {

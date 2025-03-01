@@ -10,10 +10,18 @@ import { getPlaceholderImage } from "../../common/images";
 
 /**
  * Retrieve the SOLID color for Flutter when existent, otherwise ""
+ * @param node SceneNode containing the property to examine
+ * @param propertyPath Property path to extract fills from (e.g., 'fills', 'strokes') or direct fills array
  */
 export const flutterColorFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  node: SceneNode,
+  propertyPath: string,
 ): string => {
+  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
+  fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
@@ -32,10 +40,18 @@ export const flutterColorFromFills = (
   return "";
 };
 
+/**
+ * Get box decoration properties for a Flutter node
+ */
 export const flutterBoxDecorationColor = (
   node: SceneNode,
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  propertyPath: string,
 ): Record<string, string> => {
+  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
+  fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
@@ -178,13 +194,13 @@ export const flutterColor = (color: RGB, opacity: number): string => {
   if (sum === 0) {
     return opacity === 1
       ? "Colors.black"
-      : `Colors.black.withOpacity(${opacity})`;
+      : `Colors.black.withOpacity(${numberToFixedString(opacity)})`;
   }
 
   if (sum === 3) {
     return opacity === 1
       ? "Colors.white"
-      : `Colors.white.withOpacity(${opacity})`;
+      : `Colors.white.withOpacity(${numberToFixedString(opacity)})`;
   }
 
   return `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;

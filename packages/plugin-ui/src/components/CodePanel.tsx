@@ -33,7 +33,7 @@ const CodePanel = (props: CodePanelProps) => {
     settings,
     onPreferenceChanged,
   } = props;
-  const isEmpty = code === "";
+  const isCodeEmpty = code === "";
 
   // State for custom prefix for Tailwind classes.
   // It is initially set from settings (if available) or an empty string.
@@ -85,7 +85,7 @@ const CodePanel = (props: CodePanelProps) => {
         <p className="text-lg font-medium text-center dark:text-white rounded-lg">
           Code
         </p>
-        {isEmpty === false && (
+        {isCodeEmpty === false && (
           <button
             className={`px-4 py-1 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${
               isPressed
@@ -101,7 +101,7 @@ const CodePanel = (props: CodePanelProps) => {
         )}
       </div>
 
-      {isEmpty === false && (
+      {isCodeEmpty === false && (
         <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
           <div className="flex gap-2 items-center flex-wrap">
             {preferenceOptions
@@ -186,7 +186,7 @@ const CodePanel = (props: CodePanelProps) => {
           syntaxHovered ? "ring-2" : "ring-0"
         }`}
       >
-        {isEmpty ? (
+        {isCodeEmpty ? (
           <h3>No layer is selected. Please select a layer.</h3>
         ) : (
           <SyntaxHighlighter

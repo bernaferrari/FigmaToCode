@@ -47,13 +47,14 @@ const getFlex = (
 export const tailwindAutoLayoutProps = (
   node: SceneNode,
   autoLayout: InferredAutoLayoutResult,
-): string =>
-  Object.values({
-    flexDirection: getFlexDirection(autoLayout),
-    justifyContent: getJustifyContent(autoLayout),
-    alignItems: getAlignItems(autoLayout),
-    gap: getGap(autoLayout),
-    flex: getFlex(node, autoLayout),
-  })
-    .filter((value) => value !== "")
-    .join(" ");
+): string => {
+  const classes = [
+    getFlex(node, autoLayout),
+    getFlexDirection(autoLayout),
+    getJustifyContent(autoLayout),
+    getAlignItems(autoLayout),
+    getGap(autoLayout),
+  ].filter(Boolean);
+
+  return classes.join(" ");
+};

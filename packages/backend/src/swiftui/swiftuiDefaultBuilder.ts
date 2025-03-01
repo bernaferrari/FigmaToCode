@@ -105,7 +105,7 @@ export class SwiftuiDefaultBuilder {
 
   shapeBackground(node: SceneNode): this {
     if ("fills" in node) {
-      const background = swiftuiBackground(node, node.fills);
+      const background = swiftuiBackground(node, "fills");
       if (background) {
         this.pushModifier([`background`, background]);
       }
