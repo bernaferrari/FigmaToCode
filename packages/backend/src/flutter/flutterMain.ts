@@ -15,6 +15,7 @@ import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildr
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 import { getPlaceholderImage } from "../common/images";
+import { getVisibleNodes } from "../common/nodeVisibility";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -88,7 +89,7 @@ const flutterWidgetGenerator = (
   let comp: string[] = [];
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible);
+  const visibleSceneNode = getVisibleNodes(sceneNode);
   const sceneLen = visibleSceneNode.length;
 
   visibleSceneNode.forEach((node, index) => {

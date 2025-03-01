@@ -11,21 +11,21 @@
   },
   "dependencies": {
     "backend": "workspace:*",
-    "next": "^14.2.20",
+    "next": "^14.2.24",
     "plugin-ui": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20.17.10",
-    "@types/react": "^18.3.17",
+    "@types/node": "^20.17.21",
+    "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
     "eslint-config-custom": "workspace:*",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.3",
     "tailwindcss": "3.4.6",
     "tsconfig": "workspace:*",
     "types": "workspace:*",
-    "typescript": "^5.7.2"
+    "typescript": "^5.8.2"
   }
 }

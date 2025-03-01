@@ -11,7 +11,7 @@ import {
   HTMLSettings,
   ExportableNode,
 } from "types";
-import { isSVGNode, renderAndAttachSVG } from "../altNodes/altNodeUtils";
+import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { getVisibleNodes } from "../common/nodeVisibility";
 import {
   exportNodeAsBase64PNG,
@@ -71,11 +71,12 @@ export const generateHTMLPreview = async (
   };
 };
 
-// todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const htmlWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
   settings: HTMLSettings,
 ): Promise<string> => {
+  console.log("htmlWidgetGenerator", sceneNode);
+
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
     convertNode(settings),
@@ -85,7 +86,9 @@ const htmlWidgetGenerator = async (
 };
 
 const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
-  if (isSVGNode(node)) {
+  console.log("converting", node);
+
+  if ((node as any).canBeFlattened) {
     const altNode = await renderAndAttachSVG(node);
     if (altNode.svg) return htmlWrapSVG(altNode, settings);
   }

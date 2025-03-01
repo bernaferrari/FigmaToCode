@@ -17,10 +17,156 @@ import {
 import { PluginSettings } from "types";
 import { convertToCode } from "./common/retrieveUI/convertToCode";
 
+// Helper function to add parent references to all children in the node tree
+const addParentReferences = (node: any) => {
+  if (node.children && node.children.length > 0) {
+    for (const child of node.children) {
+      // Add parent reference to the child
+      child.parent = node;
+      // Recursively process this child's children
+      addParentReferences(child);
+    }
+  }
+};
+
+// Define all property paths that might contain gradients
+const GRADIENT_PROPERTIES = ["fills", "strokes", "effects"];
+
+/**
+ * Recursively process node and its children to update with data not available in JSON
+ * @param node The node to process
+ * @param optimizeLayout Whether to extract and include inferredAutoLayout data
+ */
+const processNodeData = (node: any, optimizeLayout: boolean) => {
+  if (node.id) {
+    // Check if we need to fetch the Figma node at all
+    const hasGradient = GRADIENT_PROPERTIES.some((propName) => {
+      const property = node[propName];
+      return (
+        property &&
+        Array.isArray(property) &&
+        property.length > 0 &&
+        property.some(
+          (item: any) => item.type && item.type.startsWith("GRADIENT_"),
+        )
+      );
+    });
+
+    // Only fetch the Figma node if we have gradients or optimizeLayout is enabled
+    if (hasGradient || optimizeLayout) {
+      try {
+        const figmaNode = figma.getNodeById(node.id);
+        if (figmaNode) {
+          // Handle gradients if needed
+          if (hasGradient) {
+            GRADIENT_PROPERTIES.forEach((propName) => {
+              const property = node[propName];
+              if (property && Array.isArray(property) && property.length > 0) {
+                // We already know there's a gradient in at least one property
+                if (
+                  property.some(
+                    (item: any) =>
+                      item.type && item.type.startsWith("GRADIENT_"),
+                  ) &&
+                  propName in figmaNode
+                ) {
+                  // Replace with the actual property that contains proper gradient transforms
+                  node[propName] = JSON.parse(
+                    JSON.stringify((figmaNode as any)[propName]),
+                  );
+                }
+              }
+            });
+          }
+
+          // Extract inferredAutoLayout if optimizeLayout is enabled
+          if (optimizeLayout && "inferredAutoLayout" in figmaNode) {
+            node.inferredAutoLayout = JSON.parse(
+              JSON.stringify((figmaNode as any).inferredAutoLayout),
+            );
+          }
+
+          node.width = (figmaNode as any).width;
+          node.height = (figmaNode as any).height;
+          node.x = (figmaNode as any).x;
+          node.y = (figmaNode as any).y;
+        }
+      } catch (e) {
+        // Silently fail if there's an error accessing the Figma node
+      }
+    } else {
+      // Avoid calling getNodeById if we don't need to
+      if (node.rotation && node.rotation !== 0) {
+        const figmaNode = figma.getNodeById(node.id);
+        node.width = (figmaNode as any).width;
+        node.height = (figmaNode as any).height;
+        node.x = (figmaNode as any).x;
+        node.y = (figmaNode as any).y;
+      } else {
+        // Use the absoluteRenderBounds if we don't need to fetch the Figma node.
+        node.width = node.absoluteRenderBounds.width;
+        node.height = node.absoluteRenderBounds.height;
+        node.x = node.absoluteRenderBounds.x;
+        node.y = node.absoluteRenderBounds.y;
+      }
+    }
+
+    if (!node.LayoutMode) {
+      node.LayoutMode = "NONE";
+    }
+    if (!node.layoutGrow) {
+      node.layoutGrow = 0;
+    }
+    if (!node.layoutSizingHorizontal) {
+      node.layoutSizingHorizontal = "FIXED";
+    }
+    if (!node.layoutSizingVertical) {
+      node.layoutSizingVertical = "FIXED";
+    }
+  }
+
+  // Process children recursively
+  if (node.children && Array.isArray(node.children)) {
+    node.children.forEach((child: any) =>
+      processNodeData(child, optimizeLayout),
+    );
+  }
+};
+
+/**
+ * Convert Figma nodes to JSON format with parent references added
+ * @param nodes The Figma nodes to convert to JSON
+ * @param optimizeLayout Whether to extract and include inferredAutoLayout data
+ * @returns JSON representation of the nodes with parent references
+ */
+export const nodesToJSON = async (
+  nodes: ReadonlyArray<SceneNode>,
+  optimizeLayout: boolean = false,
+): Promise<SceneNode[]> => {
+  const nodeJson = (await Promise.all(
+    nodes.map(
+      async (node) =>
+        (
+          (await node.exportAsync({
+            format: "JSON_REST_V1",
+          })) as any
+        ).document,
+    ),
+  )) as SceneNode[];
+
+  // Process gradients and inferredAutoLayout in the JSON tree before adding parent references
+  nodeJson.forEach((node) => processNodeData(node, optimizeLayout));
+
+  // Add parent references to all children in the node tree
+  nodeJson.forEach((node) => addParentReferences(node));
+
+  return nodeJson;
+};
+
 export const run = async (settings: PluginSettings) => {
   clearWarnings();
 
-  const { framework } = settings;
+  const { framework, optimizeLayout } = settings;
   const selection = figma.currentPage.selection;
 
   if (selection.length > 1) {
@@ -29,7 +175,15 @@ export const run = async (settings: PluginSettings) => {
     );
   }
 
-  const convertedSelection = convertNodesToAltNodes(selection, null);
+  const nodeJson = await nodesToJSON(selection, optimizeLayout);
+  console.log("nodeJson", nodeJson);
+
+  postConversionStart();
+  // force postMessage to run right now.
+  await new Promise((resolve) => setTimeout(resolve, 30));
+
+  // Now we work directly with the JSON nodes
+  const convertedSelection = await convertNodesToAltNodes(nodeJson, null);
 
   // ignore when nothing was selected
   // If the selection was empty, the converted selection will also be empty.

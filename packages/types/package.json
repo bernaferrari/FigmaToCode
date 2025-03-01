@@ -13,14 +13,14 @@
     "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
-    "@figma/plugin-typings": "^1.105.0",
-    "@types/react": "^18.3.17",
+    "@figma/plugin-typings": "^1.108.0",
+    "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "tsconfig": "workspace:*"
   },
   "devDependencies": {
-    "eslint": "^9.17.0",
+    "eslint": "^9.21.0",
     "eslint-config-custom": "workspace:*",
-    "typescript": "^5.7.2"
+    "typescript": "^5.8.2"
   }
 }

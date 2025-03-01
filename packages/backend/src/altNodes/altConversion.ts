@@ -20,7 +20,9 @@ const canBeFlattened = isTypeOrGroupOfTypes([
 
 export const convertNodeToAltNode =
   (parent: ParentNode | null) =>
-  (node: SceneNode): SceneNode => {
+  async (node: SceneNode): Promise<SceneNode | null> => {
+    console.log("node is", node);
+    (node as any).canBeFlattened = canBeFlattened(node);
     const type = node.type;
     switch (type) {
       // Standard nodes
@@ -31,7 +33,7 @@ export const convertNodeToAltNode =
       case "POLYGON":
       case "VECTOR":
       case "BOOLEAN_OPERATION":
-        return cloneNode(node, parent);
+        return node;
 
       // Group nodes
       case "FRAME":
@@ -39,31 +41,24 @@ export const convertNodeToAltNode =
       case "COMPONENT":
       case "COMPONENT_SET":
         // if the frame, instance etc. has no children, convert the frame to rectangle
-        if (node.children.length === 0)
-          return cloneAsRectangleNode(node, parent);
-      // goto SECTION
-
+        if (node.children.length === 0) return cloneAsRectangleNode(node);
       case "GROUP":
         // if a Group is visible and has only one child, the Group should be ungrouped.
         if (type === "GROUP" && node.children.length === 1 && node.visible)
           return convertNodeToAltNode(parent)(node.children[0]);
-      // goto SECTION
-
       case "SECTION":
-        const group = cloneNode(node, parent);
-        const groupChildren = convertNodesToAltNodes(node.children, group);
-        return assignChildren(groupChildren, group);
+        const groupChildren = await convertNodesToAltNodes(node.children, node);
+        return assignChildren(groupChildren, node);
 
       // Text Nodes
       case "TEXT":
-        globalTextStyleSegments[node.id] = extractStyledTextSegments(node);
-        return cloneNode(node, parent);
+        const textNode = (await figma.getNodeByIdAsync(node.id)) as TextNode;
+        globalTextStyleSegments[node.id] = extractStyledTextSegments(textNode);
+        return node;
 
       // Unsupported Nodes
       case "SLICE":
-        throw new Error(
-          `Sorry, Slices are not supported. Type:${node.type} id:${node.id}`,
-        );
+        return null;
       default:
         throw new Error(
           `Sorry, an unsupported node type was selected. Type:${node.type} id:${node.id}`,
@@ -71,58 +66,19 @@ export const convertNodeToAltNode =
     }
   };
 
-export const convertNodesToAltNodes = (
+export const convertNodesToAltNodes = async (
   sceneNode: ReadonlyArray<SceneNode>,
   parent: ParentNode | null,
-): Array<SceneNode> =>
-  sceneNode.map(convertNodeToAltNode(parent)).filter(isNotEmpty);
-
-export const cloneNode = <T extends BaseNode>(
-  node: T,
-  parent: ParentNode | null,
-): T => {
-  // Create the cloned object with the correct prototype
-  const cloned = {} as T;
-  // Create a new object with only the desired descriptors (excluding 'parent' and 'children')
-  for (const prop in node) {
-    if (
-      prop !== "parent" &&
-      prop !== "children" &&
-      prop !== "horizontalPadding" &&
-      prop !== "verticalPadding" &&
-      prop !== "mainComponent" &&
-      prop !== "masterComponent" &&
-      prop !== "variantProperties" &&
-      prop !== "get_annotations" &&
-      prop !== "componentPropertyDefinitions" &&
-      prop !== "exposedInstances" &&
-      prop !== "componentProperties" &&
-      prop !== "componenPropertyReferences" &&
-      prop !== "constrainProportions"
-    ) {
-      cloned[prop as keyof T] = node[prop as keyof T];
-    }
-  }
-  assignParent(parent, cloned);
-
-  const altNode = {
-    ...cloned,
-    originalNode: node,
-    canBeFlattened: canBeFlattened(node),
-  } as AltNode<T>;
-  return altNode;
-};
+): Promise<Array<SceneNode>> =>
+  (await Promise.all(sceneNode.map(convertNodeToAltNode(parent)))).filter(
+    isNotEmpty,
+  );
 
 // auto convert Frame to Rectangle when Frame has no Children
-const cloneAsRectangleNode = <T extends BaseNode>(
-  node: T,
-  parent: ParentNode | null,
-): RectangleNode => {
-  const clonedNode = cloneNode(node, parent);
+const cloneAsRectangleNode = <T extends BaseNode>(node: T): RectangleNode => {
+  assignRectangleType(node);
 
-  assignRectangleType(clonedNode);
-
-  return clonedNode as unknown as RectangleNode;
+  return node as unknown as RectangleNode;
 };
 
 const extractStyledTextSegments = (node: TextNode) =>
@@ -138,6 +94,11 @@ const extractStyledTextSegments = (node: TextNode) =>
     "listOptions",
     "textCase",
     "textDecoration",
+    "textDecorationStyle",
+    "textDecorationOffset",
+    "textDecorationThickness",
+    "textDecorationColor",
+    "textDecorationSkipInk",
     "textStyleId",
     "fillStyleId",
     "openTypeFeatures",
