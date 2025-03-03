@@ -170,7 +170,7 @@ const tailwindFrame = async (
   );
   const childrenStr = await tailwindWidgetGenerator(sortedChildren, settings);
 
-  const clipsContentClass = node.clipsContent ? " overflow-hidden" : "";
+  const clipsContentClass = node.clipsContent ? "overflow-hidden" : "";
   let layoutProps = "";
 
   if (node.layoutMode !== "NONE") {
@@ -182,16 +182,14 @@ const tailwindFrame = async (
     layoutProps = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
   }
 
-  return tailwindContainer(
-    node,
-    childrenStr,
-    layoutProps + clipsContentClass,
-    settings,
-  );
+  // Combine classes properly, ensuring no extra spaces
+  const combinedProps = [layoutProps, clipsContentClass]
+    .filter(Boolean)
+    .join(" ");
+
+  return tailwindContainer(node, childrenStr, combinedProps, settings);
 };
 
-// Properties named propSomething always take care of ","
-// Sometimes a property might not exist, so it doesn't add ","
 export const tailwindContainer = (
   node: SceneNode &
     SceneNodeMixin &
