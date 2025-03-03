@@ -96,23 +96,29 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
             }
           }
 
-          node.width = (figmaNode as any).width;
-          node.height = (figmaNode as any).height;
-          node.x = (figmaNode as any).x;
-          node.y = (figmaNode as any).y;
+          if ("width" in figmaNode) {
+            node.width = (figmaNode as any).width;
+            node.height = (figmaNode as any).height;
+            node.x = (figmaNode as any).x;
+            node.y = (figmaNode as any).y;
+          }
         }
       } catch (e) {
         // Silently fail if there's an error accessing the Figma node
       }
     } else {
       // Avoid calling getNodeById if we don't need to
-      if (node.rotation && node.rotation !== 0) {
+      if (
+        "rotation" in node &&
+        node.rotation !== undefined &&
+        node.rotation !== 0
+      ) {
         const figmaNode = figma.getNodeById(node.id);
         node.width = (figmaNode as any).width;
         node.height = (figmaNode as any).height;
         node.x = (figmaNode as any).x;
         node.y = (figmaNode as any).y;
-      } else {
+      } else if (node.absoluteRenderBounds) {
         // Use the absoluteRenderBounds if we don't need to fetch the Figma node.
         node.width = node.absoluteRenderBounds.width;
         node.height = node.absoluteRenderBounds.height;
