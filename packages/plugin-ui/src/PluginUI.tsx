@@ -4,6 +4,7 @@ import GradientsPanel from "./components/GradientsPanel";
 import ColorsPanel from "./components/ColorsPanel";
 import CodePanel from "./components/CodePanel";
 import About from "./components/About";
+import WarningsPanel from "./components/WarningsPanel";
 import {
   Framework,
   HTMLPreview,
@@ -18,7 +19,7 @@ import {
 } from "./codegenPreferenceOptions";
 import Loading from "./components/Loading";
 import { useState } from "react";
-import { InfoIcon, TriangleAlertIcon } from "lucide-react";
+import { InfoIcon } from "lucide-react";
 import React from "react";
 
 type PluginUIProps = {
@@ -96,23 +97,9 @@ export const PluginUI = (props: PluginUIProps) => {
             {isEmpty === false && props.htmlPreview && (
               <Preview htmlPreview={props.htmlPreview} />
             )}
-            {warnings.length > 0 && (
-              <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-3 w-full">
-                <div className="flex flex-row gap-1">
-                  <div style={{ transform: "translate(2px, 0px) scale(80%)" }}>
-                    <TriangleAlertIcon />
-                  </div>
-                  <h3 className="text-base font-bold">Warnings:</h3>
-                </div>
-                <ul className="list-disc pl-6">
-                  {warnings.map((message: string, index) => (
-                    <li key={index} className="list-item">
-                      <em className="italic text-sm">{message}</em>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            
+            {warnings.length > 0 && <WarningsPanel warnings={warnings} />}
+            
             <CodePanel
               code={props.code}
               selectedFramework={props.selectedFramework}

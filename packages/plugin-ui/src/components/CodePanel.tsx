@@ -10,6 +10,7 @@ import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/p
 import copy from "copy-to-clipboard";
 import SelectableToggle from "./SelectableToggle";
 import React from "react";
+import { CopyButton } from "./CopyButton";
 
 interface CodePanelProps {
   code: string;
@@ -87,18 +88,11 @@ const CodePanel = (props: CodePanelProps) => {
           Code
         </p>
         {isCodeEmpty === false && (
-          <button
-            className={`px-4 py-1 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${
-              isPressed
-                ? "bg-green-500 dark:text-white hover:bg-green-500 ring-4 ring-green-300 ring-opacity-50 animate-pulse"
-                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600"
-            }`}
-            onClick={handleButtonClick}
+          <CopyButton
+            value={prefixedCode}
             onMouseEnter={handleButtonHover}
             onMouseLeave={handleButtonLeave}
-          >
-            Copy
-          </button>
+          />
         )}
       </div>
 
