@@ -52,8 +52,11 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
       );
     });
 
-    // Only fetch the Figma node if we have gradients or optimizeLayout is enabled
-    if (hasGradient || optimizeLayout) {
+    // Check if node is an instance to extract component metadata
+    const isInstance = node.type === "INSTANCE";
+
+    // Only fetch the Figma node if we have gradients, optimizeLayout is enabled, or it's an instance
+    if (hasGradient || optimizeLayout || isInstance) {
       try {
         const figmaNode = figma.getNodeById(node.id);
         if (figmaNode) {
@@ -84,6 +87,13 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
             node.inferredAutoLayout = JSON.parse(
               JSON.stringify((figmaNode as any).inferredAutoLayout),
             );
+          }
+
+          // Extract component metadata from instances
+          if (isInstance && figmaNode.type === "INSTANCE") {
+            if (figmaNode.variantProperties) {
+              node.variantProperties = figmaNode.variantProperties;
+            }
           }
 
           node.width = (figmaNode as any).width;

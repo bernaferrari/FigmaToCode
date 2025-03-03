@@ -2,6 +2,7 @@ export const getMainAxisAlignment = (
   node: InferredAutoLayoutResult,
 ): string => {
   switch (node.primaryAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "MainAxisAlignment.start";
     case "CENTER":
@@ -17,6 +18,7 @@ export const getCrossAxisAlignment = (
   node: InferredAutoLayoutResult,
 ): string => {
   switch (node.counterAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "CrossAxisAlignment.start";
     case "CENTER":

@@ -334,6 +334,14 @@ export class HtmlDefaultBuilder {
       );
     }
 
+    if ("variantProperties" in this.node && this.node.variantProperties) {
+      Object.entries(this.node.variantProperties)
+        ?.map((prop) => {
+          this.addData(prop[0], prop[1]);
+        })
+        .sort();
+    }
+
     const dataAttributes = this.data.join("");
     const styleAttribute = formatStyleAttribute(this.styles, this.isJSX);
 

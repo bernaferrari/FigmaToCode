@@ -6,6 +6,7 @@ const getFlexDirection = (node: InferredAutoLayoutResult): string =>
 
 const getJustifyContent = (node: InferredAutoLayoutResult): string => {
   switch (node.primaryAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "flex-start";
     case "CENTER":
@@ -19,6 +20,7 @@ const getJustifyContent = (node: InferredAutoLayoutResult): string => {
 
 const getAlignItems = (node: InferredAutoLayoutResult): string => {
   switch (node.counterAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "flex-start";
     case "CENTER":
