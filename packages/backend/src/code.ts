@@ -127,8 +127,8 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
       }
     }
 
-    if (!node.LayoutMode) {
-      node.LayoutMode = "NONE";
+    if (!node.layoutMode) {
+      node.layoutMode = "NONE";
     }
     if (!node.layoutGrow) {
       node.layoutGrow = 0;

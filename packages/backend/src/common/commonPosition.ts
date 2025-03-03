@@ -122,22 +122,21 @@ export const commonIsAbsolutePosition = (
     return false;
   }
 
-  if ("layoutAlign" in node) {
-    if (!node.parent || node.parent === undefined) {
-      return false;
-    }
-
-    const parentLayoutIsNone =
-      "layoutMode" in node.parent && node.parent.layoutMode === "NONE";
-    const hasNoLayoutMode = !("layoutMode" in node.parent);
-
-    if (
-      node.layoutPositioning === "ABSOLUTE" ||
-      parentLayoutIsNone ||
-      hasNoLayoutMode
-    ) {
-      return true;
-    }
+  if (!node.parent || node.parent === undefined) {
+    return false;
   }
+
+  const parentLayoutIsNone =
+    "layoutMode" in node.parent && node.parent.layoutMode === "NONE";
+  const hasNoLayoutMode = !("layoutMode" in node.parent);
+
+  if (
+    ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") ||
+    parentLayoutIsNone ||
+    hasNoLayoutMode
+  ) {
+    return true;
+  }
+
   return false;
 };
