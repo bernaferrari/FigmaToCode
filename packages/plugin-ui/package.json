@@ -13,11 +13,14 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@types/react-syntax-highlighter": "15.5.13",
+    "clsx": "^2.1.1",
     "copy-to-clipboard": "^3.3.3",
     "lucide-react": "^0.477.0",
     "react": "^19.0.0",
     "react-syntax-highlighter": "^15.6.1",
-    "tailwindcss": "3.4.6"
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss": "3.4.6",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "eslint": "^9.21.0",
