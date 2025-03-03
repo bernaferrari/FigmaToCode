@@ -10,11 +10,12 @@
     "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
     "@types/react-syntax-highlighter": "15.5.13",
     "copy-to-clipboard": "^3.3.3",
-    "react": "^18.3.1",
+    "lucide-react": "^0.477.0",
+    "react": "^19.0.0",
     "react-syntax-highlighter": "^15.6.1",
     "tailwindcss": "3.4.6"
   },

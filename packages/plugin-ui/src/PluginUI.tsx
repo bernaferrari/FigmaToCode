@@ -3,7 +3,6 @@ import Preview from "./components/Preview";
 import GradientsPanel from "./components/GradientsPanel";
 import ColorsPanel from "./components/ColorsPanel";
 import CodePanel from "./components/CodePanel";
-import WarningIcon from "./components/WarningIcon";
 import About from "./components/About";
 import {
   Framework,
@@ -19,6 +18,8 @@ import {
 } from "./codegenPreferenceOptions";
 import Loading from "./components/Loading";
 import { useState } from "react";
+import { InfoIcon, TriangleAlertIcon } from "lucide-react";
+import React from "react";
 
 type PluginUIProps = {
   code: string;
@@ -69,7 +70,7 @@ export const PluginUI = (props: PluginUIProps) => {
           ))}
         </div>
         <button
-          className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium ${
+          className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
             showAbout
               ? "bg-green-500 dark:bg-green-600 text-white shadow-sm"
               : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600 hover:bg-green-600 dark:hover:bg-green-800 dark:hover:border-green-800 hover:text-white dark:hover:text-white shadow-sm"
@@ -77,7 +78,7 @@ export const PluginUI = (props: PluginUIProps) => {
           onClick={() => setShowAbout(!showAbout)}
           aria-label="About"
         >
-          i
+          <InfoIcon size={16} />
         </button>
       </div>
       <div
@@ -99,7 +100,7 @@ export const PluginUI = (props: PluginUIProps) => {
               <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-3 w-full">
                 <div className="flex flex-row gap-1">
                   <div style={{ transform: "translate(2px, 0px) scale(80%)" }}>
-                    <WarningIcon />
+                    <TriangleAlertIcon />
                   </div>
                   <h3 className="text-base font-bold">Warnings:</h3>
                 </div>

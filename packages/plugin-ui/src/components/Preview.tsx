@@ -1,3 +1,4 @@
+import React from "react";
 import { HTMLPreview } from "types";
 
 const Preview: React.FC<{
