@@ -7,10 +7,10 @@ import {
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
-import copy from "copy-to-clipboard";
 import SelectableToggle from "./SelectableToggle";
 import React from "react";
 import { CopyButton } from "./CopyButton";
+import EmptyState from "./EmptyState";
 
 interface CodePanelProps {
   code: string;
@@ -25,7 +25,6 @@ interface CodePanelProps {
 }
 
 const CodePanel = (props: CodePanelProps) => {
-  const [isPressed, setIsPressed] = useState(false);
   const [syntaxHovered, setSyntaxHovered] = useState(false);
   const {
     code,
@@ -65,13 +64,6 @@ const CodePanel = (props: CodePanelProps) => {
     selectedFramework === "Tailwind" && customPrefix.trim() !== ""
       ? applyPrefixToClasses(code, customPrefix)
       : code;
-
-  // Clipboard and hover handlers.
-  const handleButtonClick = () => {
-    setIsPressed(true);
-    setTimeout(() => setIsPressed(false), 250);
-    copy(prefixedCode);
-  };
 
   const handleButtonHover = () => setSyntaxHovered(true);
   const handleButtonLeave = () => setSyntaxHovered(false);
@@ -177,15 +169,21 @@ const CodePanel = (props: CodePanelProps) => {
       )}
 
       <div
-        className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
+        className={`rounded-lg ring-green-600 transition-all duration-200 overflow-clip ${
           syntaxHovered ? "ring-2" : "ring-0"
         }`}
       >
         {isCodeEmpty ? (
-          <h3>No layer is selected. Please select a layer.</h3>
+          <EmptyState />
         ) : (
           <SyntaxHighlighter
-            language="dart"
+            language={
+              selectedFramework === "Flutter"
+                ? "dart"
+                : selectedFramework === "SwiftUI"
+                  ? "swift"
+                  : "html"
+            }
             style={theme}
             customStyle={{
               fontSize: 12,
@@ -205,4 +203,5 @@ const CodePanel = (props: CodePanelProps) => {
     </div>
   );
 };
+
 export default CodePanel;
