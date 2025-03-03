@@ -336,10 +336,9 @@ export class HtmlDefaultBuilder {
 
     if ("variantProperties" in this.node && this.node.variantProperties) {
       Object.entries(this.node.variantProperties)
-        ?.map((prop) => {
-          this.addData(prop[0], prop[1]);
-        })
-        .sort();
+        ?.map((prop) => formatDataAttribute(prop[0], prop[1]))
+        .sort()
+        .forEach((d) => this.data.push(d));
     }
 
     const dataAttributes = this.data.join("");
