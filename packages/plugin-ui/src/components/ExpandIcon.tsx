@@ -1,3 +1,5 @@
+import React from "react";
+
 const ExpandIcon = (props: { size: number }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

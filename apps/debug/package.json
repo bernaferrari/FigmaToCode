@@ -13,13 +13,13 @@
     "backend": "workspace:*",
     "next": "^14.2.24",
     "plugin-ui": "workspace:*",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.21",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
     "autoprefixer": "^10.4.20",
     "eslint-config-custom": "workspace:*",
     "postcss": "^8.5.3",

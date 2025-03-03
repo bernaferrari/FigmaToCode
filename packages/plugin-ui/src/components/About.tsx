@@ -1,67 +1,189 @@
 import React from "react";
+import {
+  Code,
+  Github,
+  Heart,
+  Lock,
+  Mail,
+  MessageCircle,
+  Star,
+  Zap,
+} from "lucide-react";
 
 const About = () => {
   return (
-    <div className="flex flex-col p-5 gap-4 text-sm max-w-lg mx-auto">
-      <div>
-        <h2 className="text-xl font-bold mb-1">Figma to Code</h2>
-        <p className="text-neutral-600 dark:text-neutral-300">
-          Created by Bernardo Ferrari
-        </p>
+    <div className="flex flex-col p-5 gap-6 text-sm max-w-2xl mx-auto">
+      {/* Header Section with Logo and Title */}
+      <div className="flex flex-col items-center text-center mb-2">
+        <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg mb-3">
+          <Code size={32} className="text-white" />
+        </div>
+        <h2 className="text-2xl font-bold mb-1">Figma to Code</h2>
+        <div className="flex items-center gap-1 text-neutral-600 dark:text-neutral-300">
+          <span>Created with</span>
+          <Heart size={14} className="text-red-500 fill-red-500" />
+          <span>by Bernardo Ferrari</span>
+        </div>
+        <div className="mt-3 flex gap-3">
+          <a
+            href="https://github.com/bernaferrari"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-full bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
+            aria-label="GitHub Profile"
+          >
+            <Github size={18} />
+          </a>
+          <a
+            href="https://twitter.com/bernaferrari"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-full bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
+            aria-label="Twitter Profile"
+          >
+            <XLogo />
+          </a>
+          <a
+            href="mailto:bernaferrari2@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-full bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors"
+            aria-label="Email"
+          >
+            <Mail size={18} />
+          </a>
+        </div>
       </div>
 
-      <div>
-        <h3 className="font-semibold mb-1">Privacy Policy</h3>
-        <p className="text-neutral-600 dark:text-neutral-300">
-          This plugin is completely private. It processes your design locally and
-          does not collect or transmit any of your data.
-        </p>
-      </div>
+      {/* Cards Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Privacy Policy Card */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+              <Lock size={20} className="text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="font-semibold text-base">Privacy Policy</h3>
+          </div>
+          <p className="text-neutral-600 dark:text-neutral-300 leading-relaxed">
+            This plugin is completely private. All of your design data is
+            processed locally in your browser and never leaves your computer. No
+            analytics, no data collection, no tracking.
+          </p>
+        </div>
 
-      <div>
-        <h3 className="font-semibold mb-1">Open Source</h3>
-        <p className="text-neutral-600 dark:text-neutral-300">
-          Figma to Code is an open-source project. You can view the source code
-          and contribute on GitHub.
-        </p>
-        <a 
-          href="https://github.com/bernaferrari/figma-to-code"
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-green-600 dark:text-green-400 hover:underline mt-1 inline-block"
-        >
-          View on GitHub
-        </a>
-      </div>
+        {/* Open Source Card */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
+              <Github
+                size={20}
+                className="text-purple-600 dark:text-purple-400"
+              />
+            </div>
+            <h3 className="font-semibold text-base">Open Source</h3>
+          </div>
+          <p className="text-neutral-600 dark:text-neutral-300 leading-relaxed mb-3">
+            Figma to Code is completely open-source. Contributions, bug reports,
+            and feature requests are welcome!
+          </p>
+          <a
+            href="https://github.com/bernaferrari/figmatocode"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-700 rounded-md text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+          >
+            <Star size={14} className="text-yellow-500 fill-yellow-500" />
+            <span>View on GitHub</span>
+          </a>
+        </div>
 
-      <div>
-        <h3 className="font-semibold mb-1">Contact</h3>
-        <p className="text-neutral-600 dark:text-neutral-300">
-          If you have any issues, feedback, or questions, please contact me:
-        </p>
-        <ul className="mt-1 space-y-1">
-          <li>
-            <a 
-              href="mailto:be.ferrari@gmail.com" 
-              className="text-green-600 dark:text-green-400 hover:underline"
-            >
-              be.ferrari@gmail.com
-            </a>
-          </li>
-          <li>
-            <a 
-              href="https://github.com/bernaferrari"
-              target="_blank" 
+        {/* Features Card */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
+              <Zap size={20} className="text-amber-600 dark:text-amber-400" />
+            </div>
+            <h3 className="font-semibold text-base">Features</h3>
+          </div>
+          <ul className="text-neutral-600 dark:text-neutral-300 space-y-2 leading-relaxed">
+            <li className="flex items-start gap-2">
+              <div className="mt-1 min-w-[18px]">•</div>
+              <span>
+                Convert Figma designs to HTML, Tailwind, Flutter, and SwiftUI
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <div className="mt-1 min-w-[18px]">•</div>
+              <span>Extract colors and gradients from your designs</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <div className="mt-1 min-w-[18px]">•</div>
+              <span>Get responsive code that matches your design</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* Contact Card */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
+              <MessageCircle
+                size={20}
+                className="text-green-600 dark:text-green-400"
+              />
+            </div>
+            <h3 className="font-semibold text-base">Get in Touch</h3>
+          </div>
+          <p className="text-neutral-600 dark:text-neutral-300 leading-relaxed mb-3">
+            Have feedback, questions, or need help? I'd love to hear from you!
+            Feel free to reach out through any of these channels:
+          </p>
+          <div className="space-y-2">
+            <a
+              href="mailto:bernaferrari2@gmail.com"
+              target="_blank"
               rel="noopener noreferrer"
-              className="text-green-600 dark:text-green-400 hover:underline"
+              className="flex items-center gap-2 text-green-600 dark:text-green-400 hover:underline"
             >
-              GitHub: @bernaferrari
+              <Mail size={16} />
+              <span>bernaferrari2@gmail.com</span>
             </a>
-          </li>
-        </ul>
+            <a
+              href="https://github.com/bernaferrari/figmato-code/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-green-600 dark:text-green-400 hover:underline"
+            >
+              <Github size={16} />
+              <span>Report an issue on GitHub</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-2 text-center text-neutral-500 dark:text-neutral-400 text-xs">
+        <p>
+          © {new Date().getFullYear()} Bernardo Ferrari. All rights reserved.
+        </p>
       </div>
     </div>
   );
 };
+
+function XLogo() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      fill="currentColor"
+      viewBox="0 0 256 256"
+    >
+      <path d="M214.75,211.71l-62.6-98.38,61.77-67.95a8,8,0,0,0-11.84-10.76L143.24,99.34,102.75,35.71A8,8,0,0,0,96,32H48a8,8,0,0,0-6.75,12.3l62.6,98.37-61.77,68a8,8,0,1,0,11.84,10.76l58.84-64.72,40.49,63.63A8,8,0,0,0,160,224h48a8,8,0,0,0,6.75-12.29ZM164.39,208,62.57,48h29L193.43,208Z"></path>
+    </svg>
+  );
+}
 
 export default About;

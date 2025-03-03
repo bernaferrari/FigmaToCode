@@ -9,6 +9,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 import copy from "copy-to-clipboard";
 import SelectableToggle from "./SelectableToggle";
+import React from "react";
 
 interface CodePanelProps {
   code: string;

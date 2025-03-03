@@ -1,3 +1,5 @@
+import React from "react";
+
 interface LoadingProps {}
 const Loading = (_props: LoadingProps) => (
   <div
