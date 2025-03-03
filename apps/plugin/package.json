@@ -12,6 +12,7 @@
   "dependencies": {
     "@figma/plugin-typings": "^1.108.0",
     "backend": "workspace:*",
+    "lucide-react": "^0.477.0",
     "plugin-ui": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

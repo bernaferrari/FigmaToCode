@@ -1,5 +1,5 @@
 {
   "extends": "tsconfig/react-library.json",
-  "include": ["src"],
+  "include": [".turbo/src"],
   "exclude": ["dist", "build", "node_modules"]
 }
