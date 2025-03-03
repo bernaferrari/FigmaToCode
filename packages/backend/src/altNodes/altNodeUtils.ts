@@ -1,5 +1,6 @@
 import { AltNode } from "types";
 import { curry } from "../common/curry";
+import { exportAsyncProxy } from "../common/exportAsyncProxy";
 
 export const overrideReadonlyProperty = curry(
   <T, K extends keyof T>(prop: K, value: any, obj: T): T =>
@@ -48,7 +49,9 @@ export const isSVGNode = (node: SceneNode) => {
 };
 
 export const renderNodeAsSVG = async (node: SceneNode) =>
-  await node.exportAsync({ format: "SVG_STRING" });
+  await exportAsyncProxy<string>(node, {
+    format: "SVG_STRING",
+  });
 
 export const renderAndAttachSVG = async (node: SceneNode) => {
   const altNode = node as AltNode<typeof node>;
@@ -60,7 +63,7 @@ export const renderAndAttachSVG = async (node: SceneNode) => {
       return altNode;
     }
     // console.log(`${nodeName} can be flattened!`);
-    const svg = await renderNodeAsSVG(altNode.originalNode);
+    const svg = (await renderNodeAsSVG(altNode.originalNode)) as string;
     // console.log(`${svg}`);
     altNode.svg = svg;
   }
