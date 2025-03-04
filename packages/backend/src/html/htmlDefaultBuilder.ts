@@ -71,7 +71,7 @@ export class HtmlDefaultBuilder {
       );
     }
     this.shadow();
-    this.border();
+    this.border(this.settings);
     this.blur();
     return this;
   }
@@ -91,7 +91,7 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  border(): this {
+  border(settings: HTMLSettings): this {
     const { node } = this;
     this.addStyles(...htmlBorderRadius(node, this.isJSX));
 
@@ -101,7 +101,7 @@ export class HtmlDefaultBuilder {
     }
 
     const strokes = ("strokes" in node && node.strokes) || undefined;
-    const color = htmlColorFromFills(strokes);
+    const color = htmlColorFromFills(strokes, settings);
     const borderStyle =
       "dashPattern" in node && node.dashPattern.length > 0 ? "dotted" : "solid";
 
@@ -189,7 +189,11 @@ export class HtmlDefaultBuilder {
   ): this {
     if (property === "text") {
       this.addStyles(
-        formatWithJSX("text", this.isJSX, htmlColorFromFills(paintArray)),
+        formatWithJSX(
+          "text",
+          this.isJSX,
+          htmlColorFromFills(paintArray, this.settings),
+        ),
       );
       return this;
     }
@@ -211,20 +215,21 @@ export class HtmlDefaultBuilder {
 
     // If one fill and it's a solid, return the solid RGB color
     if (paintArray.length === 1 && paintArray[0].type === "SOLID") {
-      return htmlColorFromFills(paintArray);
+      return htmlColorFromFills(paintArray, this.settings);
     }
 
     // If multiple fills, deal with gradients and convert solid colors to a "dumb" linear-gradient
     const styles = paintArray.map((paint) => {
       if (paint.type === "SOLID") {
-        const color = htmlColorFromFills([paint]);
+        const color = htmlColorFromFills([paint], this.settings);
         return `linear-gradient(0deg, ${color} 0%, ${color} 100%)`;
       } else if (
         paint.type === "GRADIENT_LINEAR" ||
         paint.type === "GRADIENT_RADIAL" ||
-        paint.type === "GRADIENT_ANGULAR"
+        paint.type === "GRADIENT_ANGULAR" ||
+        paint.type === "GRADIENT_DIAMOND"
       ) {
-        return htmlGradientFromFills([paint]);
+        return htmlGradientFromFills([paint], this.settings);
       }
 
       return ""; // Handle other paint types safely

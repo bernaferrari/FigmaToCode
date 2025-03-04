@@ -70,7 +70,7 @@ const swiftuiWidgetGenerator = (
   const visibleSceneNode = getVisibleNodes(sceneNode);
   let comp: string[] = [];
 
-  visibleSceneNode.forEach((node, index) => {
+  visibleSceneNode.forEach((node) => {
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
@@ -93,6 +93,7 @@ const swiftuiWidgetGenerator = (
       case "VECTOR":
         addWarning("VectorNodes are not supported in SwiftUI");
         break;
+      case "SLICE":
       default:
         break;
     }

@@ -9,11 +9,7 @@ import {
   warnings,
 } from "./common/commonConversionWarnings";
 import { generateHTMLPreview } from "./html/htmlMain";
-import {
-  postConversionComplete,
-  postConversionStart,
-  postEmptyMessage,
-} from "./messaging";
+import { postConversionComplete, postEmptyMessage } from "./messaging";
 import { PluginSettings } from "types";
 import { convertToCode } from "./common/retrieveUI/convertToCode";
 
@@ -223,7 +219,7 @@ export const run = async (settings: PluginSettings) => {
     code,
   );
   const colors = retrieveGenericSolidUIColors(framework);
-  const gradients = retrieveGenericGradients(framework);
+  const gradients = retrieveGenericGradients(framework, settings);
 
   postConversionComplete({
     code,

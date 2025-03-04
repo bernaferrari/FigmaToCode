@@ -38,7 +38,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
 
       const styleAttributes = formatMultipleJSX(
         {
-          color: htmlColorFromFills(segment.fills),
+          color: htmlColorFromFills(segment.fills, this.settings),
           "font-size": segment.fontSize,
           "font-family": segment.fontName.family,
           "font-style": this.getFontStyle(segment.fontName.style),

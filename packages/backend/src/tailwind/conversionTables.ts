@@ -142,6 +142,13 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
     colorName = variableToColorName(fill.boundVariables.color);
     colorType = "variable";
     meta = "custom";
+
+    return {
+      colorType,
+      colorName,
+      hex,
+      meta,
+    };
   }
 
   // Check for pure black/white first
@@ -152,19 +159,14 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
       hex: "#000000",
       meta: "",
     };
-  }
-
-  if (fill.color.r === 1 && fill.color.g === 1 && fill.color.b === 1) {
+  } else if (fill.color.r === 1 && fill.color.g === 1 && fill.color.b === 1) {
     return {
       colorType: "tailwind",
       colorName: "white",
       hex: "#ffffff",
       meta: "",
     };
-  }
-
-  // solid color
-  else {
+  } else {
     // get tailwind color as comparison
     const { name, value } = nearestColorFromRgb(fill.color);
 
