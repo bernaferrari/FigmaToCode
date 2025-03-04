@@ -161,7 +161,8 @@ const htmlGroup = async (
 const htmlText = (node: TextNode, settings: HTMLSettings): string => {
   let layoutBuilder = new HtmlTextBuilder(node, settings)
     .commonPositionStyles()
-    .textAlign();
+    .textAlignHorizontal()
+    .textAlignVertical();
 
   const styledHtml = layoutBuilder.getTextSegments(node);
   previousExecutionCache.push(...styledHtml);

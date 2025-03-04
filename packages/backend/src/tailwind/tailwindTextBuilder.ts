@@ -180,7 +180,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/text-align/
    * example: text-justify
    */
-  textAlign(): this {
+  textAlignHorizontal(): this {
     // if alignHorizontal is LEFT, don't do anything because that is native
     const node = this.node as TextNode;
     // only undefined in testing
@@ -199,6 +199,29 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         default:
           break;
       }
+    }
+
+    return this;
+  }
+
+  /**
+   * https://tailwindcss.com/docs/vertical-align/
+   * example: align-top, align-middle, align-bottom
+   */
+  textAlignVertical(): this {
+    const node = this.node as TextNode;
+    switch (node.textAlignVertical) {
+      case "TOP":
+        this.addAttributes("justify-start");
+        break;
+      case "CENTER":
+        this.addAttributes("justify-center");
+        break;
+      case "BOTTOM":
+        this.addAttributes("justify-end");
+        break;
+      default:
+        break;
     }
 
     return this;
