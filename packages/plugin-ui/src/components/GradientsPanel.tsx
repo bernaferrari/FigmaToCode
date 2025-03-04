@@ -17,10 +17,20 @@ const GradientsPanel = (props: {
   };
 
   return (
-    <div className="bg-gray-100 dark:bg-neutral-900 w-full rounded-lg p-2 flex flex-col gap-2">
-      <h2 className="text-gray-800 dark:text-gray-200 text-lg font-medium">
-        Gradients
-      </h2>
+    <div className="bg-gray-100 dark:bg-neutral-900 w-full rounded-lg p-4 flex flex-col gap-2">
+      <div className="p-0 pb-2 border-neutral-200 dark:border-neutral-700">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
+            {/* <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div> */}
+            Gradients
+          </h2>
+          <span className="text-xs bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-full text-neutral-500 dark:text-neutral-400">
+            {props.gradients.length} gradient
+            {props.gradients.length > 1 ? "s" : ""}
+          </span>
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 gap-2">
         {props.gradients.map((gradient, idx) => (
           <button
