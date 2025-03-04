@@ -39,7 +39,7 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     label: "Round colors",
     description: "Round color values to nearest Tailwind colors",
     isDefault: false,
-    includedLanguages: ["Tailwind"],
+    includedLanguages: ["HTML", "Tailwind"],
   },
   {
     itemType: "individual_select",

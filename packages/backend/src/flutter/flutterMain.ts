@@ -92,7 +92,7 @@ const flutterWidgetGenerator = (
   const visibleSceneNode = getVisibleNodes(sceneNode);
   const sceneLen = visibleSceneNode.length;
 
-  visibleSceneNode.forEach((node, index) => {
+  visibleSceneNode.forEach((node) => {
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
@@ -119,15 +119,9 @@ const flutterWidgetGenerator = (
       case "VECTOR":
         addWarning("VectorNodes are not supported in Flutter");
         break;
+      case "SLICE":
       default:
       // do nothing
-    }
-
-    if (index !== sceneLen - 1) {
-      const spacing = addSpacingIfNeeded(node, localSettings.optimizeLayout);
-      if (spacing) {
-        comp.push(spacing);
-      }
     }
   });
 
@@ -213,7 +207,7 @@ const makeRowColumn = (
 ): string => {
   const rowOrColumn = autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
-  const widgetProps = {
+  const widgetProps: Record<string, any> = {
     mainAxisSize: "MainAxisSize.min",
     // mainAxisSize: getFlex(node, autoLayout),
     mainAxisAlignment: getMainAxisAlignment(autoLayout),
@@ -221,37 +215,14 @@ const makeRowColumn = (
     children: [children],
   };
 
-  return generateWidgetCode(rowOrColumn, widgetProps);
-};
-
-const addSpacingIfNeeded = (
-  node: SceneNode,
-  optimizeLayout: boolean,
-): string => {
-  const nodeParentLayout =
-    optimizeLayout && node.parent && "itemSpacing" in node.parent
-      ? node.parent.inferredAutoLayout
-      : node.parent;
-
-  if (
-    nodeParentLayout &&
-    node.parent?.type === "FRAME" &&
-    "itemSpacing" in nodeParentLayout &&
-    nodeParentLayout.layoutMode !== "NONE"
-  ) {
-    if (nodeParentLayout.itemSpacing > 0) {
-      if (nodeParentLayout.layoutMode === "HORIZONTAL") {
-        return generateWidgetCode("const SizedBox", {
-          width: nodeParentLayout.itemSpacing,
-        });
-      } else if (nodeParentLayout.layoutMode === "VERTICAL") {
-        return generateWidgetCode("const SizedBox", {
-          height: nodeParentLayout.itemSpacing,
-        });
-      }
-    }
+  // Add spacing parameter if itemSpacing is set
+  if (autoLayout.itemSpacing > 0) {
+    widgetProps.spacing = autoLayout.itemSpacing;
+  } else if (autoLayout.itemSpacing < 0) {
+    addWarning("Flutter doesn't support negative itemSpacing");
   }
-  return "";
+
+  return generateWidgetCode(rowOrColumn, widgetProps);
 };
 
 export const flutterCodeGenTextStyles = () => {

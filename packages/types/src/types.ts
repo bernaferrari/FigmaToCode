@@ -7,6 +7,7 @@ export interface HTMLSettings {
   showLayerNames: boolean;
   embedImages: boolean;
   embedVectors: boolean;
+  customTailwindColors: boolean;
 }
 export interface TailwindSettings extends HTMLSettings {
   roundTailwindValues: boolean;

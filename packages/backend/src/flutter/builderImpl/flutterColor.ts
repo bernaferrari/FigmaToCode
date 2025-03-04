@@ -198,20 +198,28 @@ const gradientDirectionReadable = (angle: number): string => {
   }
 };
 
+/**
+ * Convert opacity (0-1) to alpha (0-255)
+ */
+const opacityToAlpha = (opacity: number): number => {
+  return Math.round(opacity * 255);
+};
+
 export const flutterColor = (color: RGB, opacity: number): string => {
   const sum = color.r + color.g + color.b;
 
   if (sum === 0) {
     return opacity === 1
       ? "Colors.black"
-      : `Colors.black.withOpacity(${numberToFixedString(opacity)})`;
+      : `Colors.black.withValues(alpha: ${opacityToAlpha(opacity)})`;
   }
 
   if (sum === 3) {
     return opacity === 1
       ? "Colors.white"
-      : `Colors.white.withOpacity(${numberToFixedString(opacity)})`;
+      : `Colors.white.withValues(alpha: ${opacityToAlpha(opacity)})`;
   }
 
+  // Always use full 8-digit hex which includes alpha channel
   return `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
 };
