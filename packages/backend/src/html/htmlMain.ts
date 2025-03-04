@@ -163,7 +163,7 @@ const htmlText = (node: TextNode, settings: HTMLSettings): string => {
     .commonPositionStyles()
     .textAlign();
 
-  const styledHtml = layoutBuilder.getTextSegments(node.id);
+  const styledHtml = layoutBuilder.getTextSegments(node);
   previousExecutionCache.push(...styledHtml);
 
   let content = "";

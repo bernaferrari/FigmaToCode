@@ -52,11 +52,13 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
       );
     });
 
-    // Check if node is an instance to extract component metadata
-    const isInstance = node.type === "INSTANCE";
-
     // Only fetch the Figma node if we have gradients, optimizeLayout is enabled, or it's an instance
-    if (hasGradient || optimizeLayout || isInstance) {
+    if (
+      hasGradient ||
+      optimizeLayout ||
+      node.type === "INSTANCE" ||
+      node.type === "TEXT"
+    ) {
       try {
         const figmaNode = figma.getNodeById(node.id);
         if (figmaNode) {
@@ -82,6 +84,31 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
             });
           }
 
+          if (figmaNode.type === "TEXT") {
+            node.styledTextSegments = figmaNode.getStyledTextSegments([
+              "fontName",
+              "fills",
+              "fontSize",
+              "fontWeight",
+              "hyperlink",
+              "indentation",
+              "letterSpacing",
+              "lineHeight",
+              "listOptions",
+              "textCase",
+              "textDecoration",
+              "textDecorationStyle",
+              "textDecorationOffset",
+              "textDecorationThickness",
+              "textDecorationColor",
+              "textDecorationSkipInk",
+              "textStyleId",
+              "fillStyleId",
+              "openTypeFeatures",
+            ]);
+            Object.assign(node, node.style);
+          }
+
           // Extract inferredAutoLayout if optimizeLayout is enabled
           if (optimizeLayout && "inferredAutoLayout" in figmaNode) {
             node.inferredAutoLayout = JSON.parse(
@@ -90,7 +117,7 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
           }
 
           // Extract component metadata from instances
-          if (isInstance && figmaNode.type === "INSTANCE") {
+          if (figmaNode.type === "INSTANCE") {
             if (figmaNode.variantProperties) {
               node.variantProperties = figmaNode.variantProperties;
             }
@@ -107,24 +134,11 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
         // Silently fail if there's an error accessing the Figma node
       }
     } else {
-      // Avoid calling getNodeById if we don't need to
-      if (
-        "rotation" in node &&
-        node.rotation !== undefined &&
-        node.rotation !== 0
-      ) {
-        const figmaNode = figma.getNodeById(node.id);
-        node.width = (figmaNode as any).width;
-        node.height = (figmaNode as any).height;
-        node.x = (figmaNode as any).x;
-        node.y = (figmaNode as any).y;
-      } else if (node.absoluteRenderBounds) {
-        // Use the absoluteRenderBounds if we don't need to fetch the Figma node.
-        node.width = node.absoluteRenderBounds.width;
-        node.height = node.absoluteRenderBounds.height;
-        node.x = node.absoluteRenderBounds.x;
-        node.y = node.absoluteRenderBounds.y;
-      }
+      const figmaNode = figma.getNodeById(node.id);
+      node.width = (figmaNode as any).width;
+      node.height = (figmaNode as any).height;
+      node.x = (figmaNode as any).x;
+      node.y = (figmaNode as any).y;
     }
 
     if (!node.layoutMode) {

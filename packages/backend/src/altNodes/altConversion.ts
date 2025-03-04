@@ -1,14 +1,10 @@
-import { StyledTextSegmentSubset, ParentNode, AltNode } from "types";
+import { ParentNode } from "types";
 import {
-  assignParent,
   isNotEmpty,
   assignRectangleType,
   assignChildren,
   isTypeOrGroupOfTypes,
 } from "./altNodeUtils";
-
-export let globalTextStyleSegments: Record<string, StyledTextSegmentSubset[]> =
-  {};
 
 // List of types that can be flattened into SVG
 const canBeFlattened = isTypeOrGroupOfTypes([
@@ -49,13 +45,9 @@ export const convertNodeToAltNode =
       case "SECTION":
         const groupChildren = await convertNodesToAltNodes(node.children, node);
         return assignChildren(groupChildren, node);
-
       // Text Nodes
       case "TEXT":
-        const textNode = (await figma.getNodeByIdAsync(node.id)) as TextNode;
-        globalTextStyleSegments[node.id] = extractStyledTextSegments(textNode);
         return node;
-
       // Unsupported Nodes
       case "SLICE":
         return null;
@@ -80,26 +72,3 @@ const cloneAsRectangleNode = <T extends BaseNode>(node: T): RectangleNode => {
 
   return node as unknown as RectangleNode;
 };
-
-const extractStyledTextSegments = (node: TextNode) =>
-  node.getStyledTextSegments([
-    "fontName",
-    "fills",
-    "fontSize",
-    "fontWeight",
-    "hyperlink",
-    "indentation",
-    "letterSpacing",
-    "lineHeight",
-    "listOptions",
-    "textCase",
-    "textDecoration",
-    "textDecorationStyle",
-    "textDecorationOffset",
-    "textDecorationThickness",
-    "textDecorationColor",
-    "textDecorationSkipInk",
-    "textStyleId",
-    "fillStyleId",
-    "openTypeFeatures",
-  ]);
