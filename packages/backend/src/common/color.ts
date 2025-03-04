@@ -1,4 +1,3 @@
-import { retrieveTopFill } from "./retrieveFill";
 import { numberToFixedString } from "./numToAutoFixed";
 
 // ---- Color Format Conversion ----
