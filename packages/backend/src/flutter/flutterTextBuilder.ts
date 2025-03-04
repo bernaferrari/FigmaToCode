@@ -4,13 +4,16 @@ import {
   numberToFixedString,
 } from "./../common/numToAutoFixed";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
-import { flutterColorFromFills } from "./builderImpl/flutterColor";
+import {
+  flutterColorFromDirectFills,
+  flutterColorFromFills,
+} from "./builderImpl/flutterColor";
 import { flutterSize } from "./builderImpl/flutterSize";
-import { globalTextStyleSegments } from "../altNodes/altConversion";
 import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
+import { StyledTextSegmentSubset } from "types/src/types";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {
   node?: TextNode;
@@ -35,7 +38,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         alignHorizontal !== "left" ? `TextAlign.${alignHorizontal}` : "",
     };
 
-    const segments = this.getTextSegments(node.id);
+    const segments = this.getTextSegments(node);
     if (segments.length === 1) {
       this.child = generateWidgetCode(
         "Text",
@@ -61,18 +64,19 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     return this;
   }
 
-  getTextSegments(id: string): {
+  getTextSegments(node: TextNode): {
     style: string;
     text: string;
     openTypeFeatures: { [key: string]: boolean };
   }[] {
-    const segments = globalTextStyleSegments[id];
+    const segments = (node as any)
+      .styledTextSegments as StyledTextSegmentSubset[];
     if (!segments) {
       return [];
     }
 
     return segments.map((segment) => {
-      const color = flutterColorFromFills(segment.fills);
+      const color = flutterColorFromDirectFills(segment.fills);
 
       const fontSize = `${numberToFixedString(segment.fontSize)}`;
       const fontStyle = this.fontStyle(segment.fontName);
@@ -188,8 +192,7 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
     if (this.node && (this.node as TextNode).effects) {
       const effects = (this.node as TextNode).effects;
       const dropShadow = effects.find(
-        (effect) =>
-          effect.type === "DROP_SHADOW" && effect.visible !== false,
+        (effect) => effect.type === "DROP_SHADOW" && effect.visible !== false,
       );
       if (dropShadow) {
         const ds = dropShadow as DropShadowEffect;
@@ -255,7 +258,9 @@ export const wrapTextWithLayerBlur = (
   if (node.effects) {
     const blurEffect = node.effects.find(
       (effect) =>
-        effect.type === "LAYER_BLUR" && effect.visible !== false && effect.radius > 0,
+        effect.type === "LAYER_BLUR" &&
+        effect.visible !== false &&
+        effect.radius > 0,
     );
     if (blurEffect) {
       return generateWidgetCode("ImageFiltered", {

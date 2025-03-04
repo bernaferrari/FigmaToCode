@@ -1,4 +1,3 @@
-import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 import {
   getColorInfo,
@@ -7,6 +6,7 @@ import {
 } from "../conversionTables";
 import { TailwindColorType } from "types";
 import { addWarning } from "../../common/commonConversionWarnings";
+import { retrieveTopFill } from "../../common/retrieveFill";
 
 /**
  * Get a tailwind color value object
@@ -76,10 +76,6 @@ export const tailwindColorFromFills = (
   return "";
 };
 
-/**
- * https://tailwindcss.com/docs/box-shadow/
- * example: shadow
- */
 export const tailwindGradientFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
@@ -114,24 +110,19 @@ export const tailwindGradient = (fill: GradientPaint): string => {
 
   if (fill.gradientStops.length === 1) {
     const fromColor = tailwindSolidColor(fill.gradientStops[0]);
-
     return `${direction} from-${fromColor}`;
   } else if (fill.gradientStops.length === 2) {
     const fromColor = tailwindSolidColor(fill.gradientStops[0]);
     const toColor = tailwindSolidColor(fill.gradientStops[1]);
-
     return `${direction} from-${fromColor} to-${toColor}`;
   } else {
     const fromColor = tailwindSolidColor(fill.gradientStops[0]);
-
     // middle (second color)
     const viaColor = tailwindSolidColor(fill.gradientStops[1]);
-
     // last
     const toColor = tailwindSolidColor(
       fill.gradientStops[fill.gradientStops.length - 1],
     );
-
     return `${direction} from-${fromColor} via-${viaColor} to-${toColor}`;
   }
 };

@@ -30,7 +30,7 @@ import {
 } from "../common/commonFormatAttributes";
 import { TailwindColorType, TailwindSettings } from "types";
 
-const isNotEmpty = (s: string) => s !== "";
+const isNotEmpty = (s: string) => s !== "" && s !== null && s !== undefined;
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
 
 export class TailwindDefaultBuilder {
@@ -45,7 +45,7 @@ export class TailwindDefaultBuilder {
     return this.settings.showLayerNames ? this.node.name : "";
   }
   get visible() {
-    return this.node.visible;
+    return this.node.visible ?? true;
   }
   get isJSX() {
     return this.settings.jsx;
@@ -63,10 +63,15 @@ export class TailwindDefaultBuilder {
   }
 
   addAttributes = (...newStyles: string[]) => {
-    this.attributes.push(...dropEmptyStrings(newStyles));
+    // Filter out empty strings and trim any extra spaces
+    const cleanedStyles = dropEmptyStrings(newStyles).map((s) => s.trim());
+    this.attributes.push(...cleanedStyles);
   };
+
   prependAttributes = (...newStyles: string[]) => {
-    this.attributes.unshift(...dropEmptyStrings(newStyles));
+    // Filter out empty strings and trim any extra spaces
+    const cleanedStyles = dropEmptyStrings(newStyles).map((s) => s.trim());
+    this.attributes.unshift(...cleanedStyles);
   };
 
   blend(): this {
@@ -120,6 +125,7 @@ export class TailwindDefaultBuilder {
 
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
+      console.log("x", x, y);
 
       const parsedX = numberToFixedString(x);
       const parsedY = numberToFixedString(y);
@@ -156,7 +162,6 @@ export class TailwindDefaultBuilder {
     paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
     kind: TailwindColorType,
   ): this {
-    // visible is true or undefinied (tests)
     if (this.visible) {
       let gradient = "";
       if (kind === "bg") {
@@ -252,7 +257,9 @@ export class TailwindDefaultBuilder {
   }
 
   build(additionalAttr = ""): string {
-    this.addAttributes(additionalAttr);
+    if (additionalAttr) {
+      this.addAttributes(additionalAttr);
+    }
 
     if (this.name !== "") {
       this.prependAttributes(stringToClassName(this.name));
@@ -261,10 +268,17 @@ export class TailwindDefaultBuilder {
       this.addData("layer", this.name);
     }
 
+    if ("variantProperties" in this.node && this.node.variantProperties) {
+      Object.entries(this.node.variantProperties)
+        ?.map((prop) => formatDataAttribute(prop[0], prop[1]))
+        .sort()
+        .forEach((d) => this.data.push(d));
+    }
+
     const classLabel = getClassLabel(this.isJSX);
     const classNames =
       this.attributes.length > 0
-        ? ` ${classLabel}="${this.attributes.join(" ")}"`
+        ? ` ${classLabel}="${this.attributes.filter(Boolean).join(" ")}"`
         : "";
     const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
     const dataAttributes = this.data.join("");

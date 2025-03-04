@@ -7,8 +7,10 @@ import {
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
-import copy from "copy-to-clipboard";
 import SelectableToggle from "./SelectableToggle";
+import React from "react";
+import { CopyButton } from "./CopyButton";
+import EmptyState from "./EmptyState";
 
 interface CodePanelProps {
   code: string;
@@ -23,7 +25,6 @@ interface CodePanelProps {
 }
 
 const CodePanel = (props: CodePanelProps) => {
-  const [isPressed, setIsPressed] = useState(false);
   const [syntaxHovered, setSyntaxHovered] = useState(false);
   const {
     code,
@@ -33,7 +34,7 @@ const CodePanel = (props: CodePanelProps) => {
     settings,
     onPreferenceChanged,
   } = props;
-  const isEmpty = code === "";
+  const isCodeEmpty = code === "";
 
   // State for custom prefix for Tailwind classes.
   // It is initially set from settings (if available) or an empty string.
@@ -64,13 +65,6 @@ const CodePanel = (props: CodePanelProps) => {
       ? applyPrefixToClasses(code, customPrefix)
       : code;
 
-  // Clipboard and hover handlers.
-  const handleButtonClick = () => {
-    setIsPressed(true);
-    setTimeout(() => setIsPressed(false), 250);
-    copy(prefixedCode);
-  };
-
   const handleButtonHover = () => setSyntaxHovered(true);
   const handleButtonLeave = () => setSyntaxHovered(false);
 
@@ -85,23 +79,16 @@ const CodePanel = (props: CodePanelProps) => {
         <p className="text-lg font-medium text-center dark:text-white rounded-lg">
           Code
         </p>
-        {isEmpty === false && (
-          <button
-            className={`px-4 py-1 text-sm font-semibold border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${
-              isPressed
-                ? "bg-green-500 dark:text-white hover:bg-green-500 ring-4 ring-green-300 ring-opacity-50 animate-pulse"
-                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600"
-            }`}
-            onClick={handleButtonClick}
+        {isCodeEmpty === false && (
+          <CopyButton
+            value={prefixedCode}
             onMouseEnter={handleButtonHover}
             onMouseLeave={handleButtonLeave}
-          >
-            Copy
-          </button>
+          />
         )}
       </div>
 
-      {isEmpty === false && (
+      {isCodeEmpty === false && (
         <div className="flex gap-2 justify-center flex-col p-2 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
           <div className="flex gap-2 items-center flex-wrap">
             {preferenceOptions
@@ -182,15 +169,21 @@ const CodePanel = (props: CodePanelProps) => {
       )}
 
       <div
-        className={`rounded-lg ring-green-600 transition-all duratio overflow-clip ${
+        className={`rounded-lg ring-green-600 transition-all duration-200 overflow-clip ${
           syntaxHovered ? "ring-2" : "ring-0"
         }`}
       >
-        {isEmpty ? (
-          <h3>No layer is selected. Please select a layer.</h3>
+        {isCodeEmpty ? (
+          <EmptyState />
         ) : (
           <SyntaxHighlighter
-            language="dart"
+            language={
+              selectedFramework === "Flutter"
+                ? "dart"
+                : selectedFramework === "SwiftUI"
+                  ? "swift"
+                  : "html"
+            }
             style={theme}
             customStyle={{
               fontSize: 12,
@@ -210,4 +203,5 @@ const CodePanel = (props: CodePanelProps) => {
     </div>
   );
 };
+
 export default CodePanel;
