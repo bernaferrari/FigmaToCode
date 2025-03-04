@@ -129,7 +129,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     return "";
   }
 
-  textAlign(): this {
+  textAlignHorizontal(): this {
     const node = this.node as TextNode;
     // if alignHorizontal is LEFT, don't do anything because that is native
 
@@ -149,6 +149,29 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
           break;
       }
       this.addStyles(formatWithJSX("text-align", this.isJSX, textAlign));
+    }
+    return this;
+  }
+
+  textAlignVertical(): this {
+    const node = this.node as TextNode;
+    if (node.textAlignVertical && node.textAlignVertical !== "TOP") {
+      let alignItems = "";
+      switch (node.textAlignVertical) {
+        case "CENTER":
+          alignItems = "center";
+          break;
+        case "BOTTOM":
+          alignItems = "flex-end";
+          break;
+      }
+      if (alignItems) {
+        this.addStyles(
+          formatWithJSX("justify-content", this.isJSX, alignItems),
+        );
+        this.addStyles(formatWithJSX("display", this.isJSX, "flex"));
+        this.addStyles(formatWithJSX("flex-direction", this.isJSX, "column"));
+      }
     }
     return this;
   }

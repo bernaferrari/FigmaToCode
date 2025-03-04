@@ -122,7 +122,8 @@ export const tailwindText = (
 ): string => {
   const layoutBuilder = new TailwindTextBuilder(node, settings)
     .commonPositionStyles()
-    .textAlign();
+    .textAlignHorizontal()
+    .textAlignVertical();
 
   const styledHtml = layoutBuilder.getTextSegments(node);
   previousExecutionCache.push(...styledHtml);

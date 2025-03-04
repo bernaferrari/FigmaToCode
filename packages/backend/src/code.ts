@@ -102,6 +102,9 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
               "openTypeFeatures",
             ]);
             Object.assign(node, node.style);
+            if (!node.textAutoResize) {
+              node.textAutoResize = "NONE";
+            }
           }
 
           // Extract inferredAutoLayout if optimizeLayout is enabled
