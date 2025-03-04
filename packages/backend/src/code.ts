@@ -29,10 +29,6 @@ export const run = async (settings: PluginSettings) => {
     );
   }
 
-  postConversionStart();
-  // force postMessage to run right now.
-  await new Promise((resolve) => setTimeout(resolve, 30));
-
   const convertedSelection = convertNodesToAltNodes(selection, null);
 
   // ignore when nothing was selected

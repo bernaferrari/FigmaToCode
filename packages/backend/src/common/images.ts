@@ -1,6 +1,7 @@
 import { AltNode, ExportableNode } from "types";
 import { btoa } from "js-base64";
 import { addWarning } from "./commonConversionWarnings";
+import { exportAsyncProxy } from "./exportAsyncProxy";
 
 export const PLACEHOLDER_IMAGE_DOMAIN = "https://placehold.co";
 
@@ -49,13 +50,6 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
 
   const n: ExportableNode = node.originalNode;
 
-  if (n.exportAsync === undefined) {
-    console.log(n);
-    throw new TypeError(
-      "Something went wrong. This node doesn't have an exportAsync function. Maybe check the type before calling this function.",
-    );
-  }
-
   const temporarilyHideChildren =
     excludeChildren && "children" in n && n.children.length > 0;
   const parent = n as ChildrenMixin;
@@ -77,7 +71,7 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
     format: "PNG",
     constraint: { type: "SCALE", value: 1 },
   };
-  const bytes = await n.exportAsync(exportSettings);
+  const bytes = await exportAsyncProxy(n, exportSettings);
 
   if (temporarilyHideChildren) {
     // After export, restore visibility
