@@ -125,6 +125,7 @@ export class TailwindDefaultBuilder {
 
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
+      console.log("x", x, y);
 
       const parsedX = numberToFixedString(x);
       const parsedY = numberToFixedString(y);
@@ -189,21 +190,21 @@ export class TailwindDefaultBuilder {
     const { node, optimizeLayout } = this;
     const { width, height } = tailwindSizePartial(node, optimizeLayout);
 
-    // if (node.type === "TEXT") {
-    //   switch (node.textAutoResize) {
-    //     case "WIDTH_AND_HEIGHT":
-    //       break;
-    //     case "HEIGHT":
-    //       this.addAttributes(width);
-    //       break;
-    //     case "NONE":
-    //     case "TRUNCATE":
-    //       this.addAttributes(width, height);
-    //       break;
-    //   }
-    // } else {
-    this.addAttributes(width, height);
-    // }
+    if (node.type === "TEXT") {
+      switch (node.textAutoResize) {
+        case "WIDTH_AND_HEIGHT":
+          break;
+        case "HEIGHT":
+          this.addAttributes(width);
+          break;
+        case "NONE":
+        case "TRUNCATE":
+          this.addAttributes(width, height);
+          break;
+      }
+    } else {
+      this.addAttributes(width, height);
+    }
 
     return this;
   }

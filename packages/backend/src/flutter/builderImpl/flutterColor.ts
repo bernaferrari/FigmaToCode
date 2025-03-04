@@ -22,6 +22,16 @@ export const flutterColorFromFills = (
     | ReadonlyArray<Paint>
     | PluginAPI["mixed"];
 
+  return flutterColorFromDirectFills(fills);
+};
+
+/**
+ * Retrieve the SOLID color for Flutter directly from fills when existent, otherwise ""
+ * @param fills The fills array to process
+ */
+export const flutterColorFromDirectFills = (
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+): string => {
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {

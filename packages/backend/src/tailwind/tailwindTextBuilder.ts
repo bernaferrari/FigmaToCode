@@ -1,4 +1,3 @@
-import { globalTextStyleSegments } from "../altNodes/altConversion";
 import {
   commonLetterSpacing,
   commonLineHeight,
@@ -12,14 +11,17 @@ import {
 } from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { config } from "./tailwindConfig";
+import { StyledTextSegmentSubset } from "types";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
-  getTextSegments(id: string): {
+  getTextSegments(node: TextNode): {
     style: string;
     text: string;
     openTypeFeatures: { [key: string]: boolean };
   }[] {
-    const segments = globalTextStyleSegments[id];
+    const segments = (node as any)
+      .styledTextSegments as StyledTextSegmentSubset[];
+
     if (!segments) {
       return [];
     }
@@ -53,8 +55,10 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         blurStyle,
         shadowStyle,
       ]
-        .filter((d) => d !== "")
+        .filter(Boolean)
         .join(" ");
+
+      console.log("styleClasses", styleClasses, segment);
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
       return {

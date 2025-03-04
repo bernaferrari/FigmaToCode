@@ -4,7 +4,6 @@ import {
   swiftuiBorder,
   swiftuiCornerRadius,
 } from "./builderImpl/swiftuiBorder";
-import { swiftuiBackground } from "./builderImpl/swiftuiColor";
 import { swiftuiPadding } from "./builderImpl/swiftuiPadding";
 import { swiftuiSize } from "./builderImpl/swiftuiSize";
 
@@ -20,6 +19,7 @@ import {
 } from "../common/commonPosition";
 import { SwiftUIElement } from "./builderImpl/swiftuiParser";
 import { SwiftUIModifier } from "types";
+import { swiftuiSolidColor } from "./builderImpl/swiftuiColor";
 
 export class SwiftuiDefaultBuilder {
   element: SwiftUIElement;
@@ -105,7 +105,7 @@ export class SwiftuiDefaultBuilder {
 
   shapeBackground(node: SceneNode): this {
     if ("fills" in node) {
-      const background = swiftuiBackground(node, "fills");
+      const background = swiftuiSolidColor(node, "fills");
       if (background) {
         this.pushModifier([`background`, background]);
       }

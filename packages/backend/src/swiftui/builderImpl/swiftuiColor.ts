@@ -42,6 +42,16 @@ export const swiftuiSolidColor = (
     | ReadonlyArray<Paint>
     | PluginAPI["mixed"];
 
+  return swiftuiSolidColorFromDirectFills(fills);
+};
+
+/**
+ * Retrieve the SwiftUI solid color directly from fills when existent, otherwise ""
+ * @param fills The fills array to process
+ */
+export const swiftuiSolidColorFromDirectFills = (
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+): string => {
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
@@ -59,34 +69,6 @@ export const swiftuiSolidColor = (
       },
       0.5,
     );
-  }
-
-  return "";
-};
-
-/**
- * Get SwiftUI background for a node
- * @param node SceneNode containing the property to examine
- * @param propertyPath Property path to extract fills from (e.g., 'fills', 'strokes') or direct fills array
- */
-export const swiftuiBackground = (
-  node: SceneNode,
-  propertyPath: string,
-): string => {
-  const fills = node[propertyPath as keyof SceneNode] as
-    | ReadonlyArray<Paint>
-    | PluginAPI["mixed"];
-
-  const fill = retrieveTopFill(fills);
-
-  if (fill && fill.type === "SOLID") {
-    const opacity = fill.opacity ?? 1.0;
-    return swiftuiColor(fill.color, opacity);
-  } else if (fill?.type === "GRADIENT_LINEAR") {
-    return swiftuiGradient(fill);
-  } else if (fill?.type === "IMAGE") {
-    addWarning("Image fills are replaced with placeholders");
-    return `AsyncImage(url: URL(string: "${getPlaceholderImage(node.width, node.height)}"))`;
   }
 
   return "";

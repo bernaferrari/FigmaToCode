@@ -1,24 +1,24 @@
 import { formatMultipleJSX, formatWithJSX } from "../common/parseJSX";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
-import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { htmlColorFromFills } from "./builderImpl/htmlColor";
 import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
-import { HTMLSettings } from "types";
+import { HTMLSettings, StyledTextSegmentSubset } from "types";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
   constructor(node: TextNode, settings: HTMLSettings) {
     super(node, settings);
   }
 
-  getTextSegments(id: string): {
+  getTextSegments(node: TextNode): {
     style: string;
     text: string;
     openTypeFeatures: { [key: string]: boolean };
   }[] {
-    const segments = globalTextStyleSegments[id];
+    const segments = (node as any)
+      .styledTextSegments as StyledTextSegmentSubset[];
     if (!segments) {
       return [];
     }
@@ -48,13 +48,13 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
           "line-height": this.lineHeight(segment.lineHeight, segment.fontSize),
           "letter-spacing": this.letterSpacing(
             segment.letterSpacing,
-            segment.fontSize
+            segment.fontSize,
           ),
           // "text-indent": segment.indentation,
           "word-wrap": "break-word",
           ...additionalStyles,
         },
-        this.isJSX
+        this.isJSX,
       );
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
@@ -163,7 +163,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
         (effect) =>
           effect.type === "LAYER_BLUR" &&
           effect.visible !== false &&
-          effect.radius > 0
+          effect.radius > 0,
       );
       if (blurEffect && blurEffect.radius) {
         return `blur(${blurEffect.radius}px)`;
@@ -179,7 +179,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     if (this.node && (this.node as TextNode).effects) {
       const effects = (this.node as TextNode).effects;
       const dropShadow = effects.find(
-        (effect) => effect.type === "DROP_SHADOW" && effect.visible !== false
+        (effect) => effect.type === "DROP_SHADOW" && effect.visible !== false,
       );
       if (dropShadow) {
         const ds = dropShadow as DropShadowEffect; // Type narrow the effect.
@@ -191,7 +191,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
         const b = Math.round(ds.color.b * 255);
         const a = ds.color.a;
         return `${offsetX}px ${offsetY}px ${blurRadius}px rgba(${r}, ${g}, ${b}, ${a.toFixed(
-          2
+          2,
         )})`;
       }
     }
