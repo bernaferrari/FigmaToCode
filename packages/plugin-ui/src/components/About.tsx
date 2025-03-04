@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  ArrowRightIcon,
   Code,
   Github,
   Heart,
@@ -108,17 +109,23 @@ const About = () => {
           </div>
           <ul className="text-neutral-600 dark:text-neutral-300 space-y-2 leading-relaxed">
             <li className="flex items-start gap-2">
-              <div className="mt-1 min-w-[18px]">•</div>
+              <div className="mt-1.5">
+                <ArrowRightIcon size={12} />
+              </div>
               <span>
                 Convert Figma designs to HTML, Tailwind, Flutter, and SwiftUI
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <div className="mt-1 min-w-[18px]">•</div>
+              <div className="mt-1.5">
+                <ArrowRightIcon size={12} />
+              </div>
               <span>Extract colors and gradients from your designs</span>
             </li>
             <li className="flex items-start gap-2">
-              <div className="mt-1 min-w-[18px]">•</div>
+              <div className="mt-1.5">
+                <ArrowRightIcon size={12} />
+              </div>
               <span>Get responsive code that matches your design</span>
             </li>
           </ul>

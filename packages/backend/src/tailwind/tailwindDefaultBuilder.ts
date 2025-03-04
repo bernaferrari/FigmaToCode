@@ -30,7 +30,7 @@ import {
 } from "../common/commonFormatAttributes";
 import { TailwindColorType, TailwindSettings } from "types";
 
-const isNotEmpty = (s: string) => s !== "";
+const isNotEmpty = (s: string) => s !== "" && s !== null && s !== undefined;
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
 
 export class TailwindDefaultBuilder {
@@ -63,10 +63,15 @@ export class TailwindDefaultBuilder {
   }
 
   addAttributes = (...newStyles: string[]) => {
-    this.attributes.push(...dropEmptyStrings(newStyles));
+    // Filter out empty strings and trim any extra spaces
+    const cleanedStyles = dropEmptyStrings(newStyles).map((s) => s.trim());
+    this.attributes.push(...cleanedStyles);
   };
+
   prependAttributes = (...newStyles: string[]) => {
-    this.attributes.unshift(...dropEmptyStrings(newStyles));
+    // Filter out empty strings and trim any extra spaces
+    const cleanedStyles = dropEmptyStrings(newStyles).map((s) => s.trim());
+    this.attributes.unshift(...cleanedStyles);
   };
 
   blend(): this {
@@ -184,21 +189,21 @@ export class TailwindDefaultBuilder {
     const { node, optimizeLayout } = this;
     const { width, height } = tailwindSizePartial(node, optimizeLayout);
 
-    if (node.type === "TEXT") {
-      switch (node.textAutoResize) {
-        case "WIDTH_AND_HEIGHT":
-          break;
-        case "HEIGHT":
-          this.addAttributes(width);
-          break;
-        case "NONE":
-        case "TRUNCATE":
-          this.addAttributes(width, height);
-          break;
-      }
-    } else {
-      this.addAttributes(width, height);
-    }
+    // if (node.type === "TEXT") {
+    //   switch (node.textAutoResize) {
+    //     case "WIDTH_AND_HEIGHT":
+    //       break;
+    //     case "HEIGHT":
+    //       this.addAttributes(width);
+    //       break;
+    //     case "NONE":
+    //     case "TRUNCATE":
+    //       this.addAttributes(width, height);
+    //       break;
+    //   }
+    // } else {
+    this.addAttributes(width, height);
+    // }
 
     return this;
   }
@@ -251,7 +256,9 @@ export class TailwindDefaultBuilder {
   }
 
   build(additionalAttr = ""): string {
-    this.addAttributes(additionalAttr);
+    if (additionalAttr) {
+      this.addAttributes(additionalAttr);
+    }
 
     if (this.name !== "") {
       this.prependAttributes(stringToClassName(this.name));
@@ -270,7 +277,7 @@ export class TailwindDefaultBuilder {
     const classLabel = getClassLabel(this.isJSX);
     const classNames =
       this.attributes.length > 0
-        ? ` ${classLabel}="${this.attributes.join(" ")}"`
+        ? ` ${classLabel}="${this.attributes.filter(Boolean).join(" ")}"`
         : "";
     const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
     const dataAttributes = this.data.join("");
