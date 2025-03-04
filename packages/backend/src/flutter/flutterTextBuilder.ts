@@ -167,11 +167,30 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
   }
 
   textAutoSize(node: TextNode): this {
-    this.child = wrapTextAutoResize(node, this.child);
-    // First wrap with SizedBox/Expanded as before, then apply layer blur if any.
-    let wrapped = wrapTextAutoResize(node, this.child);
-    wrapped = wrapTextWithLayerBlur(node, wrapped);
-    this.child = wrapped;
+    let result = this.child;
+    
+    switch (node.textAutoResize) {
+      case "WIDTH_AND_HEIGHT":
+        break;
+      case "HEIGHT":
+        result = generateWidgetCode("SizedBox", {
+          width: node.width,
+          child: result,
+        });
+        break;
+      case "NONE":
+      case "TRUNCATE":
+        result = generateWidgetCode("SizedBox", {
+          width: node.width,
+          height: node.height,
+          child: result,
+        });
+        break;
+    }
+    
+    result = wrapTextWithLayerBlur(node, result);
+    
+    this.child = result;
     return this;
   }
 
@@ -202,7 +221,6 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         const r = Math.round(ds.color.r * 255);
         const g = Math.round(ds.color.g * 255);
         const b = Math.round(ds.color.b * 255);
-        // Convert to hex for Flutter Color (e.g., Color(0xFF112233))
         const hex = ((1 << 24) + (r << 16) + (g << 8) + b)
           .toString(16)
           .slice(1)
@@ -216,41 +234,6 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
   }
 }
 
-export const wrapTextAutoResize = (node: TextNode, child: string): string => {
-  const { width, height, isExpanded } = flutterSize(node, false);
-  let result = "";
-
-  switch (node.textAutoResize) {
-    case "WIDTH_AND_HEIGHT":
-      break;
-    case "HEIGHT":
-      result = generateWidgetCode("SizedBox", {
-        width: width,
-        child: child,
-      });
-      break;
-    case "NONE":
-    case "TRUNCATE":
-      result = generateWidgetCode("SizedBox", {
-        width: width,
-        height: height,
-        child: child,
-      });
-      break;
-  }
-
-  if (isExpanded) {
-    return generateWidgetCode("Expanded", {
-      child: result,
-    });
-  } else if (result.length > 0) {
-    return result;
-  }
-
-  return child;
-};
-
-// New helper to wrap with layer blur using Flutter's ImageFiltered widget.
 export const wrapTextWithLayerBlur = (
   node: TextNode,
   child: string,

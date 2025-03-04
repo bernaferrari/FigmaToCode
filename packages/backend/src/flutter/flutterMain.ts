@@ -172,12 +172,38 @@ const flutterText = (node: TextNode): string => {
 const flutterFrame = (
   node: SceneNode & BaseFrameMixin & MinimalBlendMixin,
 ): string => {
-  const children = flutterWidgetGenerator(
-    commonSortChildrenWhenInferredAutoLayout(
-      node,
-      localSettings.optimizeLayout,
-    ),
+  // Sort children according to layout direction
+  const sortedChildren = commonSortChildrenWhenInferredAutoLayout(
+    node,
+    localSettings.optimizeLayout,
   );
+
+  // Check if any direct children need absolute positioning
+  const hasAbsoluteChildren = sortedChildren.some(
+    (child) => (child as any).layoutPositioning === "ABSOLUTE",
+  );
+
+  // Add warning if we need to use Stack due to absolute positioning
+  if (hasAbsoluteChildren && node.layoutMode !== "NONE") {
+    addWarning(
+      `Frame "${node.name}" has absolute positioned children. Using Stack instead of ${
+        node.layoutMode === "HORIZONTAL" ? "Row" : "Column"
+      }.`,
+    );
+  }
+
+  // Generate widget code for children
+  const children = flutterWidgetGenerator(sortedChildren);
+
+  // Force Stack for any frame that has absolute positioned children
+  if (hasAbsoluteChildren) {
+    return flutterContainer(
+      node,
+      generateWidgetCode("Stack", {
+        children: children !== "" ? [children] : [],
+      }),
+    );
+  }
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = makeRowColumn(node, children);
@@ -192,6 +218,7 @@ const flutterFrame = (
       return flutterContainer(node, generateWidgetCode("FlutterLogo", {}));
     }
 
+    // Default to Stack for frames without any layout
     return flutterContainer(
       node,
       generateWidgetCode("Stack", {
