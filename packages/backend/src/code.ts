@@ -206,10 +206,6 @@ export const run = async (settings: PluginSettings) => {
   const nodeJson = await nodesToJSON(selection, optimizeLayout);
   console.log("nodeJson", nodeJson);
 
-  postConversionStart();
-  // force postMessage to run right now.
-  await new Promise((resolve) => setTimeout(resolve, 30));
-
   // Now we work directly with the JSON nodes
   const convertedSelection = await convertNodesToAltNodes(nodeJson, null);
 

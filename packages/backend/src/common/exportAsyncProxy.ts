@@ -28,14 +28,16 @@ export const exportAsyncProxy = async <
     await new Promise((resolve) => setTimeout(resolve, 30));
   }
 
+  const figmaNode = (await figma.getNodeByIdAsync(node.id)) as ExportMixin;
+
   // The following is necessary for typescript to not lose its mind.
   let result;
   if (settings.format === "SVG_STRING") {
-    result = await node.exportAsync(settings as ExportSettingsSVGString);
+    result = await figmaNode.exportAsync(settings as ExportSettingsSVGString);
     // } else if (settings.format === "JSON_REST_V1") {
     //   result = await node.exportAsync(settings as ExportSettingsREST);
   } else {
-    result = await node.exportAsync(settings as ExportSettings);
+    result = await figmaNode.exportAsync(settings as ExportSettings);
   }
 
   isRunning = false;
