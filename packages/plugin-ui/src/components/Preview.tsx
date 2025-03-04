@@ -137,6 +137,7 @@ const Preview: React.FC<{
               {/* Content - no padding needed anymore */}
               <div className="w-full h-full flex justify-center items-center">
                 <div
+                  className="w-full"
                   style={{
                     zoom: scaleFactor,
                     transition: "all 0.3s ease",
