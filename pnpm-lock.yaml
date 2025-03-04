@@ -43,8 +43,8 @@ importers:
         version: 19.0.0(react@19.0.0)
     devDependencies:
       '@types/node':
-        specifier: ^20.17.21
-        version: 20.17.21
+        specifier: ^22.13.9
+        version: 22.13.9
       '@types/react':
         specifier: ^19.0.10
         version: 19.0.10
@@ -1193,6 +1193,9 @@ packages:
 
   '@types/node@20.17.21':
     resolution: {integrity: sha512-yw1WZ94lZpdZbpnaF+WRvlN/Sx2EZWe/YZVdK4mC4u02/ql6Ozen8qbRJhOtltOxCg97/kpijhGs5X6STwkvbg==}
+
+  '@types/node@22.13.9':
+    resolution: {integrity: sha512-acBjXdRJ3A6Pb3tqnw9HZmyR3Fiol3aGxRCK1x3d+6CDAMjl7I649wpSd+yNURCjbOUGu9tqtLKnTGxmK6CyGw==}
 
   '@types/react-dom@19.0.4':
     resolution: {integrity: sha512-4fSQ8vWFkg+TGhePfUzVmat3eC14TXYSsiiDSLI0dVLsrm9gZFABjPy/Qu6TKgl1tq1Bu1yDsuQgY3A3DOjCcg==}
@@ -2996,6 +2999,9 @@ packages:
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
+  undici-types@6.20.0:
+    resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
+
   update-browserslist-db@1.1.3:
     resolution: {integrity: sha512-UxhIZQ+QInVdunkDAaiazvvT/+fXL5Osr0JZlJulepYu6Jd7qJtDZjlur0emRlT71EN3ScPoE7gvsuIKKNavKw==}
     hasBin: true
@@ -3743,6 +3749,10 @@ snapshots:
   '@types/node@20.17.21':
     dependencies:
       undici-types: 6.19.8
+
+  '@types/node@22.13.9':
+    dependencies:
+      undici-types: 6.20.0
 
   '@types/react-dom@19.0.4(@types/react@19.0.10)':
     dependencies:
@@ -5883,6 +5893,8 @@ snapshots:
       which-boxed-primitive: 1.1.1
 
   undici-types@6.19.8: {}
+
+  undici-types@6.20.0: {}
 
   update-browserslist-db@1.1.3(browserslist@4.24.4):
     dependencies:
