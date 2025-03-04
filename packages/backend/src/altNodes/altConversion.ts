@@ -97,7 +97,8 @@ export const cloneNode = <T extends BaseNode>(
       prop !== "componentPropertyDefinitions" &&
       prop !== "exposedInstances" &&
       prop !== "componentProperties" &&
-      prop !== "componenPropertyReferences"
+      prop !== "componenPropertyReferences" &&
+      prop !== "constrainProportions"
     ) {
       cloned[prop as keyof T] = node[prop as keyof T];
     }
