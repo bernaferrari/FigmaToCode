@@ -40,7 +40,14 @@ const CodePanel = (props: CodePanelProps) => {
   // Helper function to add the prefix before every class (or className) in the code.
   // It finds every occurrence of class="..." or className="..." and, for each class,
   // prepends the custom prefix.
-  const applyPrefixToClasses = (codeString: string, prefix: string) => {
+  const applyPrefixToClasses = (
+    codeString: string,
+    prefix: string | undefined,
+  ) => {
+    if (!prefix) {
+      return codeString;
+    }
+
     return codeString.replace(
       /(class(?:Name)?)="([^"]*)"/g,
       (match, attr, classes) => {
@@ -58,7 +65,7 @@ const CodePanel = (props: CodePanelProps) => {
   const prefixedCode =
     selectedFramework === "Tailwind" &&
     settings?.customTailwindPrefix?.trim() !== ""
-      ? applyPrefixToClasses(code, settings.customTailwindPrefix)
+      ? applyPrefixToClasses(code, settings?.customTailwindPrefix)
       : code;
 
   const handleButtonHover = () => setSyntaxHovered(true);
