@@ -183,8 +183,8 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
 
           {/* Help text - balanced size */}
           {displayedWarnings.length > 0 && (
-            <div className="mt-2 py-1 px-2 text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/50 rounded border border-neutral-200 dark:border-neutral-700 flex items-center gap-1.5">
-              <Info size={10} className="flex-shrink-0" />
+            <div className="mt-2 py-1 px-1 text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/50 rounded border-neutral-200 dark:border-neutral-700 flex items-center gap-1.5">
+              {/* <Info size={10} className="flex-shrink-0" /> */}
               <span>
                 Addressing warnings can improve the quality of the generated
                 code.
