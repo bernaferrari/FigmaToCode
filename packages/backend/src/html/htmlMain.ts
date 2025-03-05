@@ -88,9 +88,11 @@ const htmlWidgetGenerator = async (
 const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
   console.log("converting", node);
 
-  if ((node as any).canBeFlattened) {
+  if (settings.embedVectors && (node as any).canBeFlattened) {
     const altNode = await renderAndAttachSVG(node);
-    if (altNode.svg) return htmlWrapSVG(altNode, settings);
+    if (altNode.svg) {
+      return htmlWrapSVG(altNode, settings);
+    }
   }
 
   switch (node.type) {
@@ -111,6 +113,10 @@ const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
     case "LINE":
       return htmlLine(node, settings);
     case "VECTOR":
+      addWarning(
+        "VectorNodes are not supported in HTML. They can be converted via Embed Vector setting",
+      );
+      return node;
       throw new Error(
         "Normally vector type nodes are converted to SVG so this code point should be unreachable.",
       );
@@ -273,7 +279,7 @@ const htmlContainer = async (
       ) {
         imgUrl = (await exportNodeAsBase64PNG(altNode, hasChildren)) ?? "";
       } else {
-        addWarning("Some images were exported as placeholder URLs");
+        // addWarning("Some images were exported as placeholder URLs");
         imgUrl = getPlaceholderImage(node.width, node.height);
       }
 

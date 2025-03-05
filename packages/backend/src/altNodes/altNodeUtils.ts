@@ -61,6 +61,7 @@ export const renderAndAttachSVG = async (node: any) => {
   // console.log(altNode);
   if (node.canBeFlattened) {
     console.log("altNode is", node);
+
     if (node.svg) {
       // console.log(`SVG already rendered for ${nodeName}`);
       return node;
