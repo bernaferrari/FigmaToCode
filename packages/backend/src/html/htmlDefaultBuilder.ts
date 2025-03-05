@@ -331,8 +331,8 @@ export class HtmlDefaultBuilder {
 
     let classAttribute = "";
     if (this.name) {
-      this.addData("layer", this.name);
-      const layerNameClass = stringToClassName(this.name);
+      this.addData("layer", this.name.trim());
+      const layerNameClass = stringToClassName(this.name.trim());
       classAttribute = formatClassAttribute(
         layerNameClass === "" ? [] : [layerNameClass],
         this.isJSX,

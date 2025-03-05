@@ -14,7 +14,7 @@ import { retrieveTopFill } from "../../common/retrieveFill";
  */
 export function tailwindColor(fill: SolidPaint) {
   const { hex, colorType, colorName, meta } = getColorInfo(fill);
-  const exportValue = tailwindSolidColor(fill, "solid");
+  const exportValue = tailwindSolidColor(fill, "bg");
   return {
     exportValue,
     colorName,

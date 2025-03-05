@@ -55,7 +55,7 @@ export const htmlColorFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"] | undefined,
   settings: HTMLSettings,
 ): string => {
-  const useCustomColors = settings.customTailwindColors === true;
+  const useCustomColors = settings.useColorVariables === true;
   const fill = retrieveTopFill(fills);
   if (fill) {
     const { color, opacity, boundVariable } = getColorAndVariable(fill);
@@ -133,7 +133,7 @@ export const htmlGradientFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
   settings: HTMLSettings,
 ): string => {
-  const useCustomColors = settings.customTailwindColors === true;
+  const useCustomColors = settings.useColorVariables === true;
   const fill = retrieveTopFill(fills);
   if (!fill) return "";
   switch (fill.type) {

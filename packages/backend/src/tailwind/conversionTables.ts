@@ -163,7 +163,7 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
 
   // variable
   if (
-    localTailwindSettings.customTailwindColors &&
+    localTailwindSettings.useColorVariables &&
     fill.boundVariables?.color
   ) {
     colorName = variableToColorName(fill.boundVariables.color);

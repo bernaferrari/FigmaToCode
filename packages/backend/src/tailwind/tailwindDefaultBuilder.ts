@@ -265,7 +265,7 @@ export class TailwindDefaultBuilder {
       this.prependAttributes(stringToClassName(this.name));
     }
     if (this.name) {
-      this.addData("layer", this.name);
+      this.addData("layer", this.name.trim());
     }
 
     if ("variantProperties" in this.node && this.node.variantProperties) {

@@ -11,12 +11,6 @@ import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { AltNode, PluginSettings, TailwindSettings } from "types";
 
 export let localTailwindSettings: PluginSettings;
-localTailwindSettings = {
-  // ...existing settings...
-  roundTailwindValues: true,
-  roundingThreshold: 15, // Maximum % difference allowed for rounding (e.g., 15%)
-  // ...existing settings...
-};
 let previousExecutionCache: {
   style: string;
   text: string;
@@ -80,10 +74,15 @@ const convertNode =
       case "SECTION":
         return tailwindSection(node, settings);
       case "VECTOR":
-        addWarning("VectorNodes are not supported in Tailwind");
-        break;
+        addWarning("Vector is not supported");
+        return tailwindContainer(
+          { ...node, type: "RECTANGLE" } as any,
+          "",
+          "",
+          settings,
+        );
       default:
-        addWarning(`${node.type} nodes are not supported in Tailwind`);
+        addWarning(`${node.type} node is not supported`);
     }
     return "";
   };

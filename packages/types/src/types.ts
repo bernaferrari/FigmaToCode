@@ -7,12 +7,12 @@ export interface HTMLSettings {
   showLayerNames: boolean;
   embedImages: boolean;
   embedVectors: boolean;
-  customTailwindColors: boolean;
+  useColorVariables: boolean;
 }
 export interface TailwindSettings extends HTMLSettings {
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
-  customTailwindColors: boolean;
+  useColorVariables: boolean;
   customTailwindPrefix?: string;
 }
 export interface FlutterSettings {
