@@ -10,6 +10,22 @@ export const nearestValue = (goal: number, array: Array<number>): number => {
   });
 };
 
+// New function to get nearest value only if it's within acceptable threshold
+export const nearestValueWithThreshold = (
+  goal: number,
+  array: Array<number>,
+  thresholdPercent: number = 15,
+): number | null => {
+  const nearest = nearestValue(goal, array);
+  const diff = Math.abs(nearest - goal);
+  const percentDiff = (diff / goal) * 100;
+
+  if (percentDiff <= thresholdPercent) {
+    return nearest;
+  }
+  return null;
+};
+
 export const exactValue = (
   goal: number,
   array: Array<number>,
@@ -36,12 +52,18 @@ const pxToRemToTailwind = (
   conversionMap: Record<number, string>,
 ): string => {
   const keys = Object.keys(conversionMap).map((d) => +d);
-  const convertedValue = exactValue(value / 16, keys);
+  const remValue = value / 16;
+  const convertedValue = exactValue(remValue, keys);
 
   if (convertedValue) {
     return conversionMap[convertedValue];
   } else if (localTailwindSettings.roundTailwindValues) {
-    return conversionMap[nearestValue(value / 16, keys)];
+    // Only round if the nearest value is within acceptable threshold
+    const thresholdValue = nearestValueWithThreshold(remValue, keys, 15);
+
+    if (thresholdValue !== null) {
+      return conversionMap[thresholdValue];
+    }
   }
 
   return `[${numberToFixedString(value)}px]`;
@@ -57,7 +79,12 @@ const pxToTailwind = (
   if (convertedValue) {
     return conversionMap[convertedValue];
   } else if (localTailwindSettings.roundTailwindValues) {
-    return conversionMap[nearestValue(value, keys)];
+    // Only round if the nearest value is within acceptable threshold
+    const thresholdValue = nearestValueWithThreshold(value, keys, 15);
+
+    if (thresholdValue !== null) {
+      return conversionMap[thresholdValue];
+    }
   }
 
   return `[${numberToFixedString(value)}px]`;

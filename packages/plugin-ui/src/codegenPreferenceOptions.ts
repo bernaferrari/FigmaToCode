@@ -29,7 +29,8 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "roundTailwindValues",
     label: "Round values",
-    description: "Round pixel values to nearest Tailwind sizes",
+    description:
+      "Round pixel values to nearest Tailwind sizes (within a 15% range)",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
@@ -63,7 +64,7 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     label: "Embed Vectors",
     description: "Convert vectors in the code.",
     isDefault: false,
-    includedLanguages: ["HTML"],
+    includedLanguages: ["HTML", "Tailwind"],
   },
   // Add your preferences data here
 ];

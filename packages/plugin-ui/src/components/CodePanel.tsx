@@ -75,7 +75,6 @@ const CodePanel = (props: CodePanelProps) => {
   const {
     essentialPreferences,
     stylingPreferences,
-    advancedPreferences,
     selectableSettingsFiltered,
   } = useMemo(() => {
     // Get preferences for the current framework
@@ -90,8 +89,9 @@ const CodePanel = (props: CodePanelProps) => {
       "roundTailwindColors",
       "customTailwindColors",
       "showLayerNames",
+      "embedImages",
+      "embedVectors",
     ];
-    const advancedPropertyNames = ["embedImages", "embedVectors"];
 
     // Group preferences by category
     return {
@@ -101,9 +101,7 @@ const CodePanel = (props: CodePanelProps) => {
       stylingPreferences: frameworkPreferences.filter((p) =>
         stylingPropertyNames.includes(p.propertyName),
       ),
-      advancedPreferences: frameworkPreferences.filter((p) =>
-        advancedPropertyNames.includes(p.propertyName),
-      ),
+
       selectableSettingsFiltered: selectPreferenceOptions.filter((p) =>
         p.includedLanguages?.includes(selectedFramework),
       ),
@@ -157,16 +155,6 @@ const CodePanel = (props: CodePanelProps) => {
                 />
               )}
             </SettingsGroup>
-          )}
-
-          {/* Advanced settings */}
-          {advancedPreferences.length > 0 && (
-            <SettingsGroup
-              title="Advanced Options"
-              settings={advancedPreferences}
-              selectedSettings={settings}
-              onPreferenceChanged={onPreferenceChanged}
-            />
           )}
 
           {/* Framework-specific options */}

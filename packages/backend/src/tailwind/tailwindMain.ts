@@ -11,6 +11,12 @@ import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { AltNode, PluginSettings, TailwindSettings } from "types";
 
 export let localTailwindSettings: PluginSettings;
+localTailwindSettings = {
+  // ...existing settings...
+  roundTailwindValues: true,
+  roundingThreshold: 15, // Maximum % difference allowed for rounding (e.g., 15%)
+  // ...existing settings...
+};
 let previousExecutionCache: {
   style: string;
   text: string;
@@ -49,9 +55,11 @@ const convertNode =
   (settings: TailwindSettings) =>
   async (node: SceneNode): Promise<string> => {
     console.log("altNode", node);
-    const altNode = await renderAndAttachSVG(node);
-    if (altNode.svg) {
-      return tailwindWrapSVG(altNode, settings);
+    if (settings.embedVectors && (node as any).canBeFlattened) {
+      const altNode = await renderAndAttachSVG(node);
+      if (altNode.svg) {
+        return tailwindWrapSVG(altNode, settings);
+      }
     }
 
     switch (node.type) {
