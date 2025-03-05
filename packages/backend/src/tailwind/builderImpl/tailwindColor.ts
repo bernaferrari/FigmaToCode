@@ -25,31 +25,72 @@ export function tailwindColor(fill: SolidPaint) {
 }
 
 /**
+ * Calculate effective opacity from a fill or color stop
+ * @param fill The color fill or stop to process
+ * @param parentOpacity Optional parent opacity to factor in
+ * @returns The calculated effective opacity value
+ */
+function calculateEffectiveOpacity(
+  fill: SolidPaint | ColorStop,
+  parentOpacity?: number,
+): number {
+  let effectiveOpacity =
+    typeof parentOpacity === "number" ? parentOpacity : 1.0;
+
+  // Apply fill-specific opacity
+  if ("opacity" in fill && typeof fill.opacity === "number") {
+    effectiveOpacity *= fill.opacity;
+  }
+
+  // For ColorStop, also consider the alpha channel in the color
+  if ("color" in fill && "a" in fill.color) {
+    effectiveOpacity *= fill.color.a;
+  }
+
+  return effectiveOpacity;
+}
+
+/**
  * Get the tailwind token name for a given color
  *
- * - variables: uses the tokenised variable name
- * - colors:    uses the nearest Tailwind color name
+ * @param fill The color fill to process
+ * @param kind Parameter specifying how the color will be used (e.g., 'text', 'bg')
+ * @returns Tailwind color string with prefix (e.g., text-red-500)
  */
 export const tailwindSolidColor = (
   fill: SolidPaint | ColorStop,
-  kind?: TailwindColorType,
+  kind: TailwindColorType,
 ): string => {
-  // example: stone-500 or custom-color-700
   const { colorName } = getColorInfo(fill);
+  const effectiveOpacity = calculateEffectiveOpacity(fill);
 
-  // if no kind, it's a variable stop, so just return the name
-  if (!kind) {
-    return colorName;
-  }
-
-  // grab opacity, or set it to full
+  // Only add opacity suffix if it's not 1.0
   const opacity =
-    "opacity" in fill && fill.opacity !== 1.0
-      ? `/${nearestOpacity(fill.opacity ?? 1.0)}`
-      : "";
+    effectiveOpacity !== 1.0 ? `/${nearestOpacity(effectiveOpacity)}` : "";
 
   // example: text-red-500, text-[#123abc], text-custom-color-700/25
   return `${kind}-${colorName}${opacity}`;
+};
+
+/**
+ * Get the color name for a gradient stop, including opacity if needed
+ *
+ * @param stop The gradient color stop
+ * @param parentOpacity The opacity of the parent gradient
+ * @returns Color name with optional opacity suffix
+ */
+export const tailwindGradientStop = (
+  stop: ColorStop,
+  parentOpacity: number = 1.0,
+): string => {
+  const { colorName } = getColorInfo(stop);
+  const effectiveOpacity = calculateEffectiveOpacity(stop, parentOpacity);
+
+  // Only add opacity suffix if it's not 1.0
+  const opacity =
+    effectiveOpacity !== 1.0 ? `/${nearestOpacity(effectiveOpacity)}` : "";
+
+  return `${colorName}${opacity}`;
 };
 
 // retrieve the SOLID color for tailwind
@@ -79,7 +120,6 @@ export const tailwindColorFromFills = (
 export const tailwindGradientFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
-  // [when testing] node.effects can be undefined
   const fill = retrieveTopFill(fills);
 
   // Return early if no fill exists
@@ -108,20 +148,33 @@ export const tailwindGradientFromFills = (
 export const tailwindGradient = (fill: GradientPaint): string => {
   const direction = gradientDirection(gradientAngle(fill));
 
+  // Get the overall fill opacity
+  const globalOpacity = fill.opacity !== undefined ? fill.opacity : 1.0;
+
   if (fill.gradientStops.length === 1) {
-    const fromColor = tailwindSolidColor(fill.gradientStops[0]);
+    const fromColor = tailwindGradientStop(
+      fill.gradientStops[0],
+      globalOpacity,
+    );
     return `${direction} from-${fromColor}`;
   } else if (fill.gradientStops.length === 2) {
-    const fromColor = tailwindSolidColor(fill.gradientStops[0]);
-    const toColor = tailwindSolidColor(fill.gradientStops[1]);
+    const fromColor = tailwindGradientStop(
+      fill.gradientStops[0],
+      globalOpacity,
+    );
+    const toColor = tailwindGradientStop(fill.gradientStops[1], globalOpacity);
     return `${direction} from-${fromColor} to-${toColor}`;
   } else {
-    const fromColor = tailwindSolidColor(fill.gradientStops[0]);
+    const fromColor = tailwindGradientStop(
+      fill.gradientStops[0],
+      globalOpacity,
+    );
     // middle (second color)
-    const viaColor = tailwindSolidColor(fill.gradientStops[1]);
+    const viaColor = tailwindGradientStop(fill.gradientStops[1], globalOpacity);
     // last
-    const toColor = tailwindSolidColor(
+    const toColor = tailwindGradientStop(
       fill.gradientStops[fill.gradientStops.length - 1],
+      globalOpacity,
     );
     return `${direction} from-${fromColor} via-${viaColor} to-${toColor}`;
   }
