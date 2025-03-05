@@ -48,7 +48,7 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
     return node.base64;
   }
 
-  const n: ExportableNode = node.originalNode;
+  const n: ExportableNode = node;
 
   const temporarilyHideChildren =
     excludeChildren && "children" in n && n.children.length > 0;
