@@ -14,13 +14,6 @@ export const exportAsyncProxy = async <
   node: SceneNode,
   settings: ExportSettings | ExportSettingsSVGString /*| ExportSettingsREST*/,
 ): Promise<T> => {
-  if (node.exportAsync === undefined) {
-    // console.log(node);
-    throw new TypeError(
-      "Something went wrong. This node doesn't have an exportAsync() function. Maybe check the type before calling this function.",
-    );
-  }
-
   if (isRunning === false) {
     isRunning = true;
     postConversionStart();
@@ -29,6 +22,14 @@ export const exportAsyncProxy = async <
   }
 
   const figmaNode = (await figma.getNodeByIdAsync(node.id)) as ExportMixin;
+  console.log("getting figma id for", figmaNode);
+
+  if (figmaNode.exportAsync === undefined) {
+    // console.log(node);
+    throw new TypeError(
+      "Something went wrong. This node doesn't have an exportAsync() function. Maybe check the type before calling this function.",
+    );
+  }
 
   // The following is necessary for typescript to not lose its mind.
   let result;

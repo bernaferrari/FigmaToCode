@@ -26,7 +26,7 @@ export const isTypeOrGroupOfTypes = curry(
   (matchTypes: NodeType[], node: SceneNode): boolean => {
     // Check if the current node's type is in the matchTypes array
     if (matchTypes.includes(node.type)) return true;
-    
+
     // Only check children if this is a container type node that can have children
     if ("children" in node) {
       for (let i = 0; i < node.children.length; i++) {
@@ -56,22 +56,19 @@ export const renderNodeAsSVG = async (node: SceneNode) =>
     format: "SVG_STRING",
   });
 
-export const renderAndAttachSVG = async (node: SceneNode) => {
-  const altNode = node as AltNode<typeof node>;
-
+export const renderAndAttachSVG = async (node: any) => {
   // const nodeName = `${node.type}:${node.id}`;
   // console.log(altNode);
-  if (altNode.canBeFlattened) {
-    console.log("altNode is", altNode);
-
-    if (altNode.svg) {
+  if (node.canBeFlattened) {
+    console.log("altNode is", node);
+    if (node.svg) {
       // console.log(`SVG already rendered for ${nodeName}`);
-      return altNode;
+      return node;
     }
     // console.log(`${nodeName} can be flattened!`);
-    const svg = (await renderNodeAsSVG(altNode.originalNode)) as string;
+    const svg = (await renderNodeAsSVG(node)) as string;
     // console.log(`${svg}`);
-    altNode.svg = svg;
+    node.svg = svg;
   }
-  return altNode;
+  return node;
 };
