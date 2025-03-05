@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Check, HelpCircle } from "lucide-react";
 
 type SelectableToggleProps = {
