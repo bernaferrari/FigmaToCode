@@ -7,12 +7,23 @@ import {
 } from "./altNodeUtils";
 
 // List of types that can be flattened into SVG
-const canBeFlattened = isTypeOrGroupOfTypes([
-  "VECTOR",
-  "STAR",
-  "POLYGON",
-  "BOOLEAN_OPERATION",
-]);
+const canBeFlattened = (node: SceneNode): boolean => {
+  // These node types should be directly flattened
+  const flattenableTypes: NodeType[] = [
+    "VECTOR",
+    "STAR",
+    "POLYGON",
+    "BOOLEAN_OPERATION"
+  ];
+  
+  // Handle special case for Rectangle nodes with zero or near-zero height
+  if (node.type === "RECTANGLE") {
+    // Check if the node is essentially a divider/line (near-zero height)
+    return false; // Rectangles should not be flattened by default
+  }
+  
+  return isTypeOrGroupOfTypes(flattenableTypes, node);
+};
 
 export const convertNodeToAltNode =
   (parent: ParentNode | null) =>

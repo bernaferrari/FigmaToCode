@@ -24,21 +24,24 @@ export function isNotEmpty<TValue>(
 
 export const isTypeOrGroupOfTypes = curry(
   (matchTypes: NodeType[], node: SceneNode): boolean => {
-    if (node.visible === false || matchTypes.includes(node.type)) return true;
-
+    // Check if the current node's type is in the matchTypes array
+    if (matchTypes.includes(node.type)) return true;
+    
+    // Only check children if this is a container type node that can have children
     if ("children" in node) {
       for (let i = 0; i < node.children.length; i++) {
         const childNode = node.children[i];
         const result = isTypeOrGroupOfTypes(matchTypes, childNode);
-        if (result) continue;
-        // child is false
-        return false;
+        if (!result) {
+          // If any child is not of the specified types, return false
+          return false;
+        }
       }
-      // all children are true
-      return true;
+      // All children are valid types
+      return node.children.length > 0; // Only return true if there are children
     }
 
-    // not group or vector
+    // Not a container node and not a matching type
     return false;
   },
 );
@@ -55,9 +58,12 @@ export const renderNodeAsSVG = async (node: SceneNode) =>
 
 export const renderAndAttachSVG = async (node: SceneNode) => {
   const altNode = node as AltNode<typeof node>;
+
   // const nodeName = `${node.type}:${node.id}`;
   // console.log(altNode);
   if (altNode.canBeFlattened) {
+    console.log("altNode is", altNode);
+
     if (altNode.svg) {
       // console.log(`SVG already rendered for ${nodeName}`);
       return altNode;
