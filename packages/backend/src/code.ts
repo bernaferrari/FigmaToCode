@@ -147,6 +147,15 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
     if (!node.layoutSizingVertical) {
       node.layoutSizingVertical = "FIXED";
     }
+    
+    // If layout sizing is HUG but there are no children, set it to FIXED
+    const hasChildren = node.children && Array.isArray(node.children) && node.children.length > 0;
+    if (node.layoutSizingHorizontal === "HUG" && !hasChildren) {
+      node.layoutSizingHorizontal = "FIXED";
+    }
+    if (node.layoutSizingVertical === "HUG" && !hasChildren) {
+      node.layoutSizingVertical = "FIXED";
+    }
   }
 
   // Process children recursively
