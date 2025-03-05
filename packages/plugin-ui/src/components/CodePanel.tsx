@@ -87,7 +87,7 @@ const CodePanel = (props: CodePanelProps) => {
     const stylingPropertyNames = [
       "roundTailwindValues",
       "roundTailwindColors",
-      "customTailwindColors",
+      "useColorVariables",
       "showLayerNames",
       "embedImages",
       "embedVectors",

@@ -49,18 +49,19 @@ export const generateHTMLPreview = async (
   settings: PluginSettings,
   code?: string,
 ): Promise<HTMLPreview> => {
-  const htmlCodeAlreadyGenerated =
-    settings.framework === "HTML" && settings.jsx === false && code;
-  const htmlCode = htmlCodeAlreadyGenerated
-    ? code
-    : await htmlMain(
-        nodes,
-        {
-          ...settings,
-          jsx: false,
-        },
-        true,
-      );
+  // const htmlCodeAlreadyGenerated =
+  //   settings.framework === "HTML" && settings.jsx === false && code;
+  const htmlCode =
+    //  htmlCodeAlreadyGenerated
+    //   ? code  :
+    await htmlMain(
+      nodes,
+      {
+        ...settings,
+        jsx: false,
+      },
+      true,
+    );
 
   return {
     size: {
@@ -113,14 +114,15 @@ const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
     case "LINE":
       return htmlLine(node, settings);
     case "VECTOR":
-      addWarning(
-        "VectorNodes are not supported in HTML. They can be converted via Embed Vector setting",
-      );
-      return node;
-      throw new Error(
-        "Normally vector type nodes are converted to SVG so this code point should be unreachable.",
+      addWarning("Vector is not supported");
+      return await htmlContainer(
+        { ...node, type: "RECTANGLE" } as any,
+        "",
+        [],
+        settings,
       );
     default:
+      addWarning(`${node.type} node is not supported`);
       return "";
   }
 };

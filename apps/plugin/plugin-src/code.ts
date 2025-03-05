@@ -28,7 +28,7 @@ export const defaultPluginSettings: PluginSettings = {
   swiftUIGenerationMode: "snippet",
   roundTailwindValues: false,
   roundTailwindColors: false,
-  customTailwindColors: false,
+  useColorVariables: false,
   customTailwindPrefix: "",
   embedImages: false,
   embedVectors: false,
