@@ -4,13 +4,14 @@ import {
   PluginSettings,
   SelectPreferenceOptions,
 } from "types";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 import SelectableToggle from "./SelectableToggle";
 import { CopyButton } from "./CopyButton";
 import EmptyState from "./EmptyState";
 import SettingsGroup from "./SettingsGroup";
+import CustomPrefixInput from "./CustomPrefixInput";
 
 interface CodePanelProps {
   code: string;
@@ -36,12 +37,6 @@ const CodePanel = (props: CodePanelProps) => {
   } = props;
   const isCodeEmpty = code === "";
 
-  // State for custom prefix for Tailwind classes.
-  // It is initially set from settings (if available) or an empty string.
-  const [customPrefix, setCustomPrefix] = useState(
-    settings?.customTailwindPrefix || "",
-  );
-
   // Helper function to add the prefix before every class (or className) in the code.
   // It finds every occurrence of class="..." or className="..." and, for each class,
   // prepends the custom prefix.
@@ -61,8 +56,9 @@ const CodePanel = (props: CodePanelProps) => {
 
   // If the selected framework is Tailwind and a prefix is provided then transform the code.
   const prefixedCode =
-    selectedFramework === "Tailwind" && customPrefix.trim() !== ""
-      ? applyPrefixToClasses(code, customPrefix)
+    selectedFramework === "Tailwind" &&
+    settings?.customTailwindPrefix?.trim() !== ""
+      ? applyPrefixToClasses(code, settings.customTailwindPrefix)
       : code;
 
   const handleButtonHover = () => setSyntaxHovered(true);
@@ -107,25 +103,10 @@ const CodePanel = (props: CodePanelProps) => {
     };
   }, [preferenceOptions, selectPreferenceOptions, selectedFramework]);
 
-  // Create the custom prefix input component
-  const CustomPrefixInput = () => (
-    <div className="mt-1">
-      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-        Custom Prefix
-      </label>
-      <input
-        type="text"
-        value={customPrefix}
-        onChange={(e) => {
-          const newVal = e.target.value;
-          setCustomPrefix(newVal);
-          onPreferenceChanged("customTailwindPrefix", newVal);
-        }}
-        placeholder="e.g., tw-"
-        className="p-1.5 px-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-neutral-800 text-sm w-full max-w-xs"
-      />
-    </div>
-  );
+  // Handle custom prefix change
+  const handleCustomPrefixChange = (newValue: string) => {
+    onPreferenceChanged("customTailwindPrefix", newValue);
+  };
 
   return (
     <div className="w-full flex flex-col gap-2 mt-2">
@@ -146,7 +127,7 @@ const CodePanel = (props: CodePanelProps) => {
         <div className="flex flex-col p-3 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
           {/* Essential settings always shown */}
           <SettingsGroup
-            title="Essential Options"
+            title=""
             settings={essentialPreferences}
             alwaysExpanded={true}
             selectedSettings={settings}
@@ -154,14 +135,20 @@ const CodePanel = (props: CodePanelProps) => {
           />
 
           {/* Styling preferences with custom prefix for Tailwind */}
-          {stylingPreferences.length > 0 && (
+          {(stylingPreferences.length > 0 ||
+            selectedFramework === "Tailwind") && (
             <SettingsGroup
               title="Styling Options"
               settings={stylingPreferences}
               selectedSettings={settings}
               onPreferenceChanged={onPreferenceChanged}
             >
-              {selectedFramework === "Tailwind" && <CustomPrefixInput />}
+              {selectedFramework === "Tailwind" && (
+                <CustomPrefixInput
+                  initialValue={settings?.customTailwindPrefix || ""}
+                  onValueChange={handleCustomPrefixChange}
+                />
+              )}
             </SettingsGroup>
           )}
 
