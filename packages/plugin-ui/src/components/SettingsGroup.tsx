@@ -32,24 +32,31 @@ const SettingsGroup: React.FC<SettingsGroupProps> = ({
   }
 
   return (
-    <div className="w-full mb-2">
-      {!alwaysExpanded && (
+    <div className="w-full mb-2.5 last:mb-0">
+      {alwaysExpanded ? (
+        <div className="flex items-center mb-1">
+          <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
+            {title}
+          </span>
+        </div>
+      ) : (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors w-full text-left"
+          className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors w-full text-left"
         >
           {expanded ? (
-            <ChevronDownIcon className="w-3 h-3 flex-shrink-0" />
+            <ChevronDownIcon className="w-3.5 h-3.5 flex-shrink-0" />
           ) : (
-            <ChevronRightIcon className="w-3 h-3 flex-shrink-0" />
+            <ChevronRightIcon className="w-3.5 h-3.5 flex-shrink-0" />
           )}
           <span className="truncate">{title}</span>
-          {/* <div className="flex-grow border-t border-dashed border-gray-300 dark:border-gray-600 mx-2" /> */}
         </button>
       )}
 
       {(expanded || alwaysExpanded) && (
-        <div className="flex flex-col gap-2 mt-2">
+        <div
+          className={`flex flex-col gap-2.5 ${!alwaysExpanded ? "px-4 mt-2" : ""}`}
+        >
           {/* Render preference toggles if any */}
           {settings.length > 0 && (
             <div className="flex gap-2 items-center flex-wrap">
