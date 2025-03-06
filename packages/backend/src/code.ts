@@ -83,6 +83,29 @@ const getColorVariables = async (node: any, settings: PluginSettings) => {
   }
 };
 
+function adjustChildrenOrder(node: any) {
+  if (!node.itemReverseZIndex || !node.children || node.layoutMode === "NONE") {
+    return;
+  }
+
+  const children = node.children;
+  const absoluteChildren = [];
+  const fixedChildren = [];
+
+  // Single pass to separate absolute and fixed children
+  for (let i = children.length - 1; i >= 0; i--) {
+    const child = children[i];
+    if (child.layoutPositioning === "ABSOLUTE") {
+      absoluteChildren.push(child);
+    } else {
+      fixedChildren.unshift(child); // Add to beginning to maintain original order
+    }
+  }
+
+  // Combine the arrays (reversed absolute children + original order fixed children)
+  node.children = [...absoluteChildren, ...fixedChildren];
+}
+
 /**
  * Recursively process node and its children to update with data not available in JSON
  * @param node The node to process
@@ -267,30 +290,7 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
       await processNodeData(child, settings);
     }
 
-    // Handle itemReverseZIndex for absolute-positioned children on AutoLayout
-    if (
-      "children" in node &&
-      "itemReverseZIndex" in node &&
-      node.itemReverseZIndex
-    ) {
-      const absoluteChildren = node.children.filter(
-        (child: SceneNode) =>
-          "layoutPositioning" in child &&
-          child.layoutPositioning === "ABSOLUTE",
-      );
-      const reversedAbsolute = [...absoluteChildren].reverse();
-      let index = 0;
-      node.children = node.children.map((child: SceneNode) => {
-        if (
-          "layoutPositioning" in child &&
-          child.layoutPositioning === "ABSOLUTE"
-        ) {
-          return reversedAbsolute[index++];
-        } else {
-          return child;
-        }
-      });
-    }
+    adjustChildrenOrder(node);
   }
 
   // Process children recursively
