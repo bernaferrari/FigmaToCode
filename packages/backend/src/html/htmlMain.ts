@@ -368,7 +368,6 @@ export const generateHTMLPreview = async (
     {
       ...settings,
       htmlGenerationMode: "html",
-      jsx: false,
     },
     true,
   );
@@ -386,7 +385,6 @@ const htmlWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
   settings: HTMLSettings,
 ): Promise<string> => {
-  console.log("htmlWidgetGenerator", sceneNode);
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
     convertNode(settings),
@@ -630,7 +628,11 @@ const htmlContainer = async (
 
       if (hasChildren) {
         builder.addStyles(
-          formatWithJSX("background-image", settings.jsx, `url(${imgUrl})`),
+          formatWithJSX(
+            "background-image",
+            settings.htmlGenerationMode === "jsx",
+            `url(${imgUrl})`,
+          ),
         );
       } else {
         tag = "img";
@@ -655,7 +657,10 @@ const htmlContainer = async (
     // Standard HTML approach for HTML, React, or Svelte
     if (children) {
       return `\n<${tag}${build}${src}>${indentString(children)}\n</${tag}>`;
-    } else if (selfClosingTags.includes(tag) || settings.jsx) {
+    } else if (
+      selfClosingTags.includes(tag) ||
+      settings.htmlGenerationMode === "jsx"
+    ) {
       return `\n<${tag}${build}${src} />`;
     } else {
       return `\n<${tag}${build}${src}></${tag}>`;

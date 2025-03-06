@@ -36,7 +36,7 @@ const GRADIENT_PROPERTIES = ["fills", "strokes", "effects"];
  * @param node The node to process
  * @param optimizeLayout Whether to extract and include inferredAutoLayout data
  */
-const processNodeData = (node: any, optimizeLayout: boolean) => {
+const processNodeData = async (node: any, optimizeLayout: boolean) => {
   if (node.id) {
     // Check if we need to fetch the Figma node at all
     const hasGradient = GRADIENT_PROPERTIES.some((propName) => {
@@ -71,7 +71,7 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
       node.type === "INSTANCE" ||
       node.type === "TEXT"
     ) {
-      const figmaNode = figma.getNodeById(node.id);
+      const figmaNode = await figma.getNodeByIdAsync(node.id);
 
       if (!figmaNode) {
         return;
@@ -168,7 +168,7 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
       }
     } else {
       // Hopefully one day this won't be needed anymore.
-      const figmaNode = figma.getNodeById(node.id);
+      const figmaNode = await figma.getNodeByIdAsync(node.id);
       if (figmaNode && "width" in figmaNode) {
         node.width = (figmaNode as any).width;
         node.height = (figmaNode as any).height;
@@ -196,9 +196,9 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
 
   // Process children recursively
   if (node.children && Array.isArray(node.children)) {
-    node.children.forEach((child: any) =>
-      processNodeData(child, optimizeLayout),
-    );
+    for (const child of node.children) {
+      await processNodeData(child, optimizeLayout);
+    }
   }
 };
 
@@ -227,7 +227,9 @@ export const nodesToJSON = async (
   )) as SceneNode[];
 
   // Process gradients and inferredAutoLayout in the JSON tree before adding parent references
-  nodeJson.forEach((node) => processNodeData(node, optimizeLayout));
+  for (const node of nodeJson) {
+    await processNodeData(node, optimizeLayout);
+  }
 
   // Add parent references to all children in the node tree
   nodeJson.forEach((node) => addParentReferences(node));

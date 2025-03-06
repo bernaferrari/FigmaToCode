@@ -48,7 +48,6 @@ const tailwindWidgetGenerator = async (
 const convertNode =
   (settings: TailwindSettings) =>
   async (node: SceneNode): Promise<string> => {
-    console.log("altNode", node);
     if (settings.embedVectors && (node as any).canBeFlattened) {
       const altNode = await renderAndAttachSVG(node);
       if (altNode.svg) {
