@@ -199,11 +199,14 @@ const CodePanel = (props: CodePanelProps) => {
         ) : (
           <SyntaxHighlighter
             language={
-              selectedFramework === "Flutter"
-                ? "dart"
-                : selectedFramework === "SwiftUI"
-                  ? "swift"
-                  : "html"
+              selectedFramework === "HTML" &&
+              settings?.htmlGenerationMode === "styled-components"
+                ? "jsx"
+                : selectedFramework === "Flutter"
+                  ? "dart"
+                  : selectedFramework === "SwiftUI"
+                    ? "swift"
+                    : "html"
             }
             style={theme}
             customStyle={{
