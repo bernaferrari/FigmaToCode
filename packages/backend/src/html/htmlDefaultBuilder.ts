@@ -122,6 +122,12 @@ export class HtmlDefaultBuilder {
     this.autoLayoutPadding();
     this.position();
     this.blend();
+    
+    // Add z-index if we have a custom value from the itemReverseZIndex handling
+    if ((this.node as any).customZIndex !== undefined) {
+      this.addStyles(`z-index: ${(this.node as any).customZIndex}`);
+    }
+    
     return this;
   }
 

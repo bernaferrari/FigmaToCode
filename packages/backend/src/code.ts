@@ -266,7 +266,35 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
     for (const child of node.children) {
       await processNodeData(child, settings);
     }
+
+    // Handle itemReverseZIndex for absolute-positioned children
+    if ("itemReverseZIndex" in node && node.itemReverseZIndex) {
+      const absoluteChildren = node.children.filter(
+        (child: SceneNode) =>
+          "layoutPositioning" in child &&
+          child.layoutPositioning === "ABSOLUTE",
+      );
+      const reversedAbsolute = [...absoluteChildren].reverse();
+      let index = 0;
+      node.children = node.children.map((child: SceneNode) => {
+        if (
+          "layoutPositioning" in child &&
+          child.layoutPositioning === "ABSOLUTE"
+        ) {
+          return reversedAbsolute[index++];
+        } else {
+          return child;
+        }
+      });
+    }
   }
+
+  // Process children recursively
+  // if (node.children && Array.isArray(node.children)) {
+  //   for (const child of node.children) {
+  //     await processNodeData(child, settings);
+  //   }
+  // }
 };
 
 /**
