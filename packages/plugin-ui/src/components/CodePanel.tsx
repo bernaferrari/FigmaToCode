@@ -85,6 +85,8 @@ const CodePanel = (props: CodePanelProps) => {
     // Define preference grouping based on property names
     const essentialPropertyNames = ["jsx", "optimizeLayout"];
     const stylingPropertyNames = [
+      "styledComponents",
+      "exportCSS",
       "roundTailwindValues",
       "roundTailwindColors",
       "useColorVariables",
@@ -139,27 +141,9 @@ const CodePanel = (props: CodePanelProps) => {
             onPreferenceChanged={onPreferenceChanged}
           />
 
-          {/* Styling preferences with custom prefix for Tailwind */}
-          {(stylingPreferences.length > 0 ||
-            selectedFramework === "Tailwind") && (
-            <SettingsGroup
-              title="Styling Options"
-              settings={stylingPreferences}
-              selectedSettings={settings}
-              onPreferenceChanged={onPreferenceChanged}
-            >
-              {selectedFramework === "Tailwind" && (
-                <CustomPrefixInput
-                  initialValue={settings?.customTailwindPrefix || ""}
-                  onValueChange={handleCustomPrefixChange}
-                />
-              )}
-            </SettingsGroup>
-          )}
-
           {/* Framework-specific options */}
           {selectableSettingsFiltered.length > 0 && (
-            <div className="mt-1">
+            <div className="mt-1 mb-4 last:mb-0">
               <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 {selectedFramework} Options
               </p>
@@ -192,6 +176,24 @@ const CodePanel = (props: CodePanelProps) => {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Styling preferences with custom prefix for Tailwind */}
+          {(stylingPreferences.length > 0 ||
+            selectedFramework === "Tailwind") && (
+            <SettingsGroup
+              title="Styling Options"
+              settings={stylingPreferences}
+              selectedSettings={settings}
+              onPreferenceChanged={onPreferenceChanged}
+            >
+              {selectedFramework === "Tailwind" && (
+                <CustomPrefixInput
+                  initialValue={settings?.customTailwindPrefix || ""}
+                  onValueChange={handleCustomPrefixChange}
+                />
+              )}
+            </SettingsGroup>
           )}
         </div>
       )}

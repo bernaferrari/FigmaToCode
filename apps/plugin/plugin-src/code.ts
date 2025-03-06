@@ -32,6 +32,8 @@ export const defaultPluginSettings: PluginSettings = {
   customTailwindPrefix: "",
   embedImages: false,
   embedVectors: false,
+  exportCSS: false,
+  styledComponents: false,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
@@ -107,12 +109,12 @@ const safeRun = async (settings: PluginSettings) => {
         // Handle non-standard errors or unknown error types
         const errorMessage = String(e);
         console.log("Unknown error: ", errorMessage);
-        figma.ui.postMessage({ 
-          type: "error", 
-          error: errorMessage || "Unknown error occurred"
+        figma.ui.postMessage({
+          type: "error",
+          error: errorMessage || "Unknown error occurred",
         });
       }
-      
+
       // Send a message to reset the UI state
       figma.ui.postMessage({ type: "conversion-complete", success: false });
     }
@@ -186,11 +188,13 @@ const codegenMode = async () => {
           return [
             {
               title: "Code",
-              code: await htmlMain(
-                convertedSelection,
-                { ...userPluginSettings, jsx: false },
-                true,
-              ),
+              code: (
+                await htmlMain(
+                  convertedSelection,
+                  { ...userPluginSettings, jsx: false },
+                  true,
+                )
+              ).html,
               language: "HTML",
             },
             {
@@ -203,11 +207,13 @@ const codegenMode = async () => {
           return [
             {
               title: "Code",
-              code: await htmlMain(
-                convertedSelection,
-                { ...userPluginSettings, jsx: true },
-                true,
-              ),
+              code: (
+                await htmlMain(
+                  convertedSelection,
+                  { ...userPluginSettings, jsx: true },
+                  true,
+                )
+              ).html,
               language: "HTML",
             },
             {

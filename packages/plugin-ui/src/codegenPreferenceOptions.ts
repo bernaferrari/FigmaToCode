@@ -7,7 +7,7 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     label: "React (JSX)",
     description: "",
     isDefault: false,
-    includedLanguages: ["HTML", "Tailwind"],
+    includedLanguages: ["Tailwind"],
   },
   {
     itemType: "individual_select",
@@ -71,6 +71,18 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
 ];
 
 export const selectPreferenceOptions: SelectPreferenceOptions[] = [
+  {
+    itemType: "select",
+    propertyName: "htmlGenerationMode",
+    label: "Mode",
+    options: [
+      { label: "HTML", value: "html" },
+      { label: "React (JSX)", value: "jsx" },
+      { label: "Svelte", value: "svelte" },
+      { label: "styled-components", value: "styled-components" },
+    ],
+    includedLanguages: ["HTML"],
+  },
   {
     itemType: "select",
     propertyName: "flutterGenerationMode",

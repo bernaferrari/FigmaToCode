@@ -8,10 +8,19 @@ import {
   clearWarnings,
   warnings,
 } from "./common/commonConversionWarnings";
-import { generateHTMLPreview } from "./html/htmlMain";
 import { postConversionComplete, postEmptyMessage } from "./messaging";
 import { PluginSettings } from "types";
 import { convertToCode } from "./common/retrieveUI/convertToCode";
+import { generateHTMLPreview } from "./html/htmlMain";
+
+export const generateId = (length: number = 4): string => {
+  const chars = "1234567890abcdefghijklmnopqrstuvwxyz";
+  return Array.from({ length }, () => 
+    chars.charAt(Math.floor(Math.random() * chars.length))
+  ).join('');
+};
+// Keep track of node names to identify duplicates
+const nodeNameRegistry: Map<string, number> = new Map();
 
 // Helper function to add parent references to all children in the node tree
 const addParentReferences = (node: any) => {
@@ -48,38 +57,52 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
       );
     });
 
-    // Only fetch the Figma node if we have gradients, optimizeLayout is enabled, or it's an instance
-    if (
-      hasGradient ||
-      optimizeLayout ||
-      node.type === "INSTANCE" ||
-      node.type === "TEXT"
-    ) {
-      try {
-        const figmaNode = figma.getNodeById(node.id);
-        if (figmaNode) {
-          // Handle gradients if needed
+    try {
+      const figmaNode = figma.getNodeById(node.id);
+      if (figmaNode) {
+        // Ensure node has a unique name - store directly on node
+        if (figmaNode.name) {
+          const cleanName = figmaNode.name.trim();
+
+          // Track names for uniqueness
+          const count = nodeNameRegistry.get(cleanName) || 0;
+          nodeNameRegistry.set(cleanName, count + 1);
+
+          // For first occurrence, use original name; for duplicates, add suffix
+          node.uniqueName =
+            count === 0
+              ? cleanName
+              : `${cleanName}_${generateId()}`;
+        }
+
+        // Handle additional node properties
+        if (
+          hasGradient ||
+          optimizeLayout ||
+          node.type === "INSTANCE" ||
+          node.type === "TEXT"
+        ) {
+          // Handle gradients
           if (hasGradient) {
             GRADIENT_PROPERTIES.forEach((propName) => {
               const property = node[propName];
-              if (property && Array.isArray(property) && property.length > 0) {
-                // We already know there's a gradient in at least one property
-                if (
-                  property.some(
-                    (item: any) =>
-                      item.type && item.type.startsWith("GRADIENT_"),
-                  ) &&
-                  propName in figmaNode
-                ) {
-                  // Replace with the actual property that contains proper gradient transforms
-                  node[propName] = JSON.parse(
-                    JSON.stringify((figmaNode as any)[propName]),
-                  );
-                }
+              if (
+                property &&
+                Array.isArray(property) &&
+                property.length > 0 &&
+                property.some(
+                  (item) => item.type && item.type.startsWith("GRADIENT_"),
+                ) &&
+                propName in figmaNode
+              ) {
+                node[propName] = JSON.parse(
+                  JSON.stringify((figmaNode as any)[propName]),
+                );
               }
             });
           }
 
+          // Handle text-specific properties
           if (figmaNode.type === "TEXT") {
             node.styledTextSegments = figmaNode.getStyledTextSegments([
               "fontName",
@@ -111,45 +134,36 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
           }
 
           // Extract component metadata from instances
-          if (figmaNode.type === "INSTANCE") {
-            if (figmaNode.variantProperties) {
-              node.variantProperties = figmaNode.variantProperties;
-            }
-          }
-
-          if ("width" in figmaNode) {
-            node.width = (figmaNode as any).width;
-            node.height = (figmaNode as any).height;
-            node.x = (figmaNode as any).x;
-            node.y = (figmaNode as any).y;
+          if (
+            node.type === "INSTANCE" &&
+            "variantProperties" in figmaNode &&
+            figmaNode.variantProperties
+          ) {
+            node.variantProperties = figmaNode.variantProperties;
           }
         }
-      } catch (e) {
-        // Silently fail if there's an error accessing the Figma node
+
+        // Always copy size and position
+        if ("width" in figmaNode) {
+          node.width = (figmaNode as any).width;
+          node.height = (figmaNode as any).height;
+          node.x = (figmaNode as any).x;
+          node.y = (figmaNode as any).y;
+        }
       }
-    } else {
-      const figmaNode = figma.getNodeById(node.id);
-      node.width = (figmaNode as any).width;
-      node.height = (figmaNode as any).height;
-      node.x = (figmaNode as any).x;
-      node.y = (figmaNode as any).y;
+    } catch (e) {
+      // Silently fail if there's an error accessing the Figma node
     }
 
-    if (!node.layoutMode) {
-      node.layoutMode = "NONE";
-    }
-    if (!node.layoutGrow) {
-      node.layoutGrow = 0;
-    }
-    if (!node.layoutSizingHorizontal) {
-      node.layoutSizingHorizontal = "FIXED";
-    }
-    if (!node.layoutSizingVertical) {
-      node.layoutSizingVertical = "FIXED";
-    }
-    
+    // Set default layout properties if missing
+    if (!node.layoutMode) node.layoutMode = "NONE";
+    if (!node.layoutGrow) node.layoutGrow = 0;
+    if (!node.layoutSizingHorizontal) node.layoutSizingHorizontal = "FIXED";
+    if (!node.layoutSizingVertical) node.layoutSizingVertical = "FIXED";
+
     // If layout sizing is HUG but there are no children, set it to FIXED
-    const hasChildren = node.children && Array.isArray(node.children) && node.children.length > 0;
+    const hasChildren =
+      node.children && Array.isArray(node.children) && node.children.length > 0;
     if (node.layoutSizingHorizontal === "HUG" && !hasChildren) {
       node.layoutSizingHorizontal = "FIXED";
     }
@@ -176,6 +190,9 @@ export const nodesToJSON = async (
   nodes: ReadonlyArray<SceneNode>,
   optimizeLayout: boolean = false,
 ): Promise<SceneNode[]> => {
+  // Reset name registry for each conversion
+  nodeNameRegistry.clear();
+
   const nodeJson = (await Promise.all(
     nodes.map(
       async (node) =>

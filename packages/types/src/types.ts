@@ -8,6 +8,7 @@ export interface HTMLSettings {
   embedImages: boolean;
   embedVectors: boolean;
   useColorVariables: boolean;
+  htmlGenerationMode: "html" | "jsx" | "styled-components" | "svelte";
 }
 export interface TailwindSettings extends HTMLSettings {
   roundTailwindValues: boolean;
