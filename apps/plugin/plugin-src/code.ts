@@ -103,7 +103,18 @@ const safeRun = async (settings: PluginSettings) => {
         const error = e as Error;
         console.log("error: ", error.stack);
         figma.ui.postMessage({ type: "error", error: error.message });
+      } else {
+        // Handle non-standard errors or unknown error types
+        const errorMessage = String(e);
+        console.log("Unknown error: ", errorMessage);
+        figma.ui.postMessage({ 
+          type: "error", 
+          error: errorMessage || "Unknown error occurred"
+        });
       }
+      
+      // Send a message to reset the UI state
+      figma.ui.postMessage({ type: "conversion-complete", success: false });
     }
   } else {
     console.log(

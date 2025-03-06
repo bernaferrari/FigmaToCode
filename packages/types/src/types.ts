@@ -14,6 +14,7 @@ export interface TailwindSettings extends HTMLSettings {
   roundTailwindColors: boolean;
   useColorVariables: boolean;
   customTailwindPrefix?: string;
+  embedVectors: boolean;
 }
 export interface FlutterSettings {
   flutterGenerationMode: string;

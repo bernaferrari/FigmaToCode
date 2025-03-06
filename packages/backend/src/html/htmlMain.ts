@@ -114,7 +114,9 @@ const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
     case "LINE":
       return htmlLine(node, settings);
     case "VECTOR":
-      addWarning("Vector is not supported");
+      if (!settings.embedVectors) {
+        addWarning("Vector is not supported");
+      }
       return await htmlContainer(
         { ...node, type: "RECTANGLE" } as any,
         "",

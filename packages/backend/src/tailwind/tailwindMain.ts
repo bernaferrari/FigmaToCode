@@ -74,7 +74,9 @@ const convertNode =
       case "SECTION":
         return tailwindSection(node, settings);
       case "VECTOR":
-        addWarning("Vector is not supported");
+        if (!settings.embedVectors) {
+          addWarning("Vector is not supported");
+        }
         return tailwindContainer(
           { ...node, type: "RECTANGLE" } as any,
           "",
