@@ -20,6 +20,7 @@ import {
   LinearGradientConversion,
   SolidColorConversion,
   Framework,
+  HTMLSettings,
 } from "types";
 
 export const retrieveGenericSolidUIColors = (
@@ -75,6 +76,7 @@ const convertSolidColor = (
 
 export const retrieveGenericLinearGradients = (
   framework: Framework,
+  settings: HTMLSettings,
 ): Array<LinearGradientConversion> => {
   const selectionColors = figma.getSelectionColors();
   const colorStr: Array<LinearGradientConversion> = [];
@@ -87,7 +89,7 @@ export const retrieveGenericLinearGradients = (
           exportValue = flutterGradient(paint);
           break;
         case "HTML":
-          exportValue = htmlGradientFromFills([paint]);
+          exportValue = htmlGradientFromFills([paint], settings);
           break;
         case "Tailwind":
           exportValue = tailwindGradient(paint);
@@ -97,7 +99,7 @@ export const retrieveGenericLinearGradients = (
           break;
       }
       colorStr.push({
-        cssPreview: htmlGradientFromFills([paint]),
+        cssPreview: htmlGradientFromFills([paint], settings),
         exportValue,
       });
     }

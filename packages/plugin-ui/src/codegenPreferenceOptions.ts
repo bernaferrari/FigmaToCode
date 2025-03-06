@@ -3,17 +3,9 @@ import { LocalCodegenPreferenceOptions, SelectPreferenceOptions } from "types";
 export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
   {
     itemType: "individual_select",
-    propertyName: "embedImages",
-    label: "Embed Images",
-    description: "Convert images to Base64 and embed them in the code.",
-    isDefault: false,
-    includedLanguages: ["HTML"],
-  },
-  {
-    itemType: "individual_select",
     propertyName: "jsx",
     label: "React (JSX)",
-    description: 'Render "class" attributes as "className"',
+    description: "",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
@@ -21,7 +13,8 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "optimizeLayout",
     label: "Optimize layout",
-    description: "Attempt to auto-layout suitable element groups",
+    description:
+      "Attempt to auto-layout suitable element groups. This may increase code quality, but may not always work as expected.",
     isDefault: true,
     includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
   },
@@ -29,7 +22,7 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "showLayerNames",
     label: "Layer names",
-    description: "Include layer names in classes",
+    description: "Include Figma layer names in classes.",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
@@ -37,7 +30,8 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "roundTailwindValues",
     label: "Round values",
-    description: "Round pixel values to nearest Tailwind sizes",
+    description:
+      "Round pixel values to nearest Tailwind sizes (within a 15% range).",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
@@ -45,19 +39,35 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "roundTailwindColors",
     label: "Round colors",
-    description: "Round color values to nearest Tailwind colors",
+    description: "Round Figma color values to nearest Tailwind colors.",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
   {
     itemType: "individual_select",
-    propertyName: "customTailwindColors",
-    label: "Custom colors",
-    description: "Use color variable names as custom color names",
+    propertyName: "useColorVariables",
+    label: "Color Variables",
+    description:
+      "Export code using Figma variables as colors. Example: 'bg-background' instead of 'bg-white'.",
     isDefault: false,
-    includedLanguages: ["Tailwind"],
+    includedLanguages: ["HTML", "Tailwind"],
   },
-  // Add your preferences data here
+  {
+    itemType: "individual_select",
+    propertyName: "embedImages",
+    label: "Embed Images",
+    description: "Convert Figma images to Base64 and embed them in the code.",
+    isDefault: false,
+    includedLanguages: ["HTML"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "embedVectors",
+    label: "Embed Vectors",
+    description: "Convert Figma vectors to code.",
+    isDefault: false,
+    includedLanguages: ["HTML", "Tailwind"],
+  },
 ];
 
 export const selectPreferenceOptions: SelectPreferenceOptions[] = [

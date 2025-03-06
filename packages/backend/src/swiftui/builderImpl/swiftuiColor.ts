@@ -5,6 +5,10 @@ import { numberToFixedString } from "../../common/numToAutoFixed";
 import { addWarning } from "../../common/commonConversionWarnings";
 import { getPlaceholderImage } from "../../common/images";
 
+/**
+ * Retrieve the SwiftUI color for a Paint object
+ * @param fill The paint object to extract color from
+ */
 export const swiftUISolidColor = (fill: Paint): string => {
   if (fill && fill.type === "SOLID") {
     return swiftuiColor(fill.color, fill.opacity ?? 1.0);
@@ -22,7 +26,30 @@ export const swiftUISolidColor = (fill: Paint): string => {
   return "";
 };
 
+/**
+ * Retrieve the SwiftUI solid color when existent, otherwise ""
+ * @param node SceneNode containing the property to examine
+ * @param propertyPath Property path to extract fills from (e.g., 'fills', 'strokes') or direct fills array
+ */
 export const swiftuiSolidColor = (
+  node: SceneNode,
+  propertyPath: string | keyof SceneNode,
+): string => {
+  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
+
+  // Property path string provided
+  fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
+  return swiftuiSolidColorFromDirectFills(fills);
+};
+
+/**
+ * Retrieve the SwiftUI solid color directly from fills when existent, otherwise ""
+ * @param fills The fills array to process
+ */
+export const swiftuiSolidColorFromDirectFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   const fill = retrieveTopFill(fills);
@@ -42,26 +69,6 @@ export const swiftuiSolidColor = (
       },
       0.5,
     );
-  }
-
-  return "";
-};
-
-export const swiftuiBackground = (
-  node: SceneNode,
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
-): string => {
-  const fill = retrieveTopFill(fills);
-
-  if (fill && fill.type === "SOLID") {
-    // opacity should only be null on set, not on get. But better be prevented.
-    const opacity = fill.opacity ?? 1.0;
-    return swiftuiColor(fill.color, opacity);
-  } else if (fill?.type === "GRADIENT_LINEAR") {
-    return swiftuiGradient(fill);
-  } else if (fill?.type === "IMAGE") {
-    addWarning("Image fills are replaced with placeholders");
-    return `AsyncImage(url: URL(string: "${getPlaceholderImage(node.width, node.height)}"))`;
   }
 
   return "";

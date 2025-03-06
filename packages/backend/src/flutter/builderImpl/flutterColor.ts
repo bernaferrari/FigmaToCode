@@ -10,8 +10,26 @@ import { getPlaceholderImage } from "../../common/images";
 
 /**
  * Retrieve the SOLID color for Flutter when existent, otherwise ""
+ * @param node SceneNode containing the property to examine
+ * @param propertyPath Property path to extract fills from (e.g., 'fills', 'strokes') or direct fills array
  */
 export const flutterColorFromFills = (
+  node: SceneNode,
+  propertyPath: string,
+): string => {
+  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
+  fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
+  return flutterColorFromDirectFills(fills);
+};
+
+/**
+ * Retrieve the SOLID color for Flutter directly from fills when existent, otherwise ""
+ * @param fills The fills array to process
+ */
+export const flutterColorFromDirectFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   const fill = retrieveTopFill(fills);
@@ -32,10 +50,18 @@ export const flutterColorFromFills = (
   return "";
 };
 
+/**
+ * Get box decoration properties for a Flutter node
+ */
 export const flutterBoxDecorationColor = (
   node: SceneNode,
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  propertyPath: string,
 ): Record<string, string> => {
+  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
+  fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
@@ -172,20 +198,28 @@ const gradientDirectionReadable = (angle: number): string => {
   }
 };
 
+/**
+ * Convert opacity (0-1) to alpha (0-255)
+ */
+const opacityToAlpha = (opacity: number): number => {
+  return Math.round(opacity * 255);
+};
+
 export const flutterColor = (color: RGB, opacity: number): string => {
   const sum = color.r + color.g + color.b;
 
   if (sum === 0) {
     return opacity === 1
       ? "Colors.black"
-      : `Colors.black.withOpacity(${opacity})`;
+      : `Colors.black.withValues(alpha: ${opacityToAlpha(opacity)})`;
   }
 
   if (sum === 3) {
     return opacity === 1
       ? "Colors.white"
-      : `Colors.white.withOpacity(${opacity})`;
+      : `Colors.white.withValues(alpha: ${opacityToAlpha(opacity)})`;
   }
 
+  // Always use full 8-digit hex which includes alpha channel
   return `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
 };

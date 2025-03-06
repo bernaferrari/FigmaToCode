@@ -11,7 +11,7 @@ import {
   HTMLSettings,
   ExportableNode,
 } from "types";
-import { isSVGNode, renderAndAttachSVG } from "../altNodes/altNodeUtils";
+import { renderAndAttachSVG } from "../altNodes/altNodeUtils";
 import { getVisibleNodes } from "../common/nodeVisibility";
 import {
   exportNodeAsBase64PNG,
@@ -49,18 +49,19 @@ export const generateHTMLPreview = async (
   settings: PluginSettings,
   code?: string,
 ): Promise<HTMLPreview> => {
-  const htmlCodeAlreadyGenerated =
-    settings.framework === "HTML" && settings.jsx === false && code;
-  const htmlCode = htmlCodeAlreadyGenerated
-    ? code
-    : await htmlMain(
-        nodes,
-        {
-          ...settings,
-          jsx: false,
-        },
-        true,
-      );
+  // const htmlCodeAlreadyGenerated =
+  //   settings.framework === "HTML" && settings.jsx === false && code;
+  const htmlCode =
+    //  htmlCodeAlreadyGenerated
+    //   ? code  :
+    await htmlMain(
+      nodes,
+      {
+        ...settings,
+        jsx: false,
+      },
+      true,
+    );
 
   return {
     size: {
@@ -71,11 +72,12 @@ export const generateHTMLPreview = async (
   };
 };
 
-// todo lint idea: replace BorderRadius.only(topleft: 8, topRight: 8) with BorderRadius.horizontal(8)
 const htmlWidgetGenerator = async (
   sceneNode: ReadonlyArray<SceneNode>,
   settings: HTMLSettings,
 ): Promise<string> => {
+  console.log("htmlWidgetGenerator", sceneNode);
+
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const promiseOfConvertedCode = getVisibleNodes(sceneNode).map(
     convertNode(settings),
@@ -85,9 +87,13 @@ const htmlWidgetGenerator = async (
 };
 
 const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
-  if (isSVGNode(node)) {
+  console.log("converting", node);
+
+  if (settings.embedVectors && (node as any).canBeFlattened) {
     const altNode = await renderAndAttachSVG(node);
-    if (altNode.svg) return htmlWrapSVG(altNode, settings);
+    if (altNode.svg) {
+      return htmlWrapSVG(altNode, settings);
+    }
   }
 
   switch (node.type) {
@@ -108,10 +114,17 @@ const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
     case "LINE":
       return htmlLine(node, settings);
     case "VECTOR":
-      throw new Error(
-        "Normally vector type nodes are converted to SVG so this code point should be unreachable.",
+      if (!settings.embedVectors) {
+        addWarning("Vector is not supported");
+      }
+      return await htmlContainer(
+        { ...node, type: "RECTANGLE" } as any,
+        "",
+        [],
+        settings,
       );
     default:
+      addWarning(`${node.type} node is not supported`);
       return "";
   }
 };
@@ -158,9 +171,10 @@ const htmlGroup = async (
 const htmlText = (node: TextNode, settings: HTMLSettings): string => {
   let layoutBuilder = new HtmlTextBuilder(node, settings)
     .commonPositionStyles()
-    .textAlign();
+    .textAlignHorizontal()
+    .textAlignVertical();
 
-  const styledHtml = layoutBuilder.getTextSegments(node.id);
+  const styledHtml = layoutBuilder.getTextSegments(node);
   previousExecutionCache.push(...styledHtml);
 
   let content = "";
@@ -269,7 +283,7 @@ const htmlContainer = async (
       ) {
         imgUrl = (await exportNodeAsBase64PNG(altNode, hasChildren)) ?? "";
       } else {
-        addWarning("Some images were exported as placeholder URLs");
+        // addWarning("Some images were exported as placeholder URLs");
         imgUrl = getPlaceholderImage(node.width, node.height);
       }
 
