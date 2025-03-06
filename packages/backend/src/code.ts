@@ -267,8 +267,12 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
       await processNodeData(child, settings);
     }
 
-    // Handle itemReverseZIndex for absolute-positioned children
-    if ("itemReverseZIndex" in node && node.itemReverseZIndex) {
+    // Handle itemReverseZIndex for absolute-positioned children on AutoLayout
+    if (
+      "children" in node &&
+      "itemReverseZIndex" in node &&
+      node.itemReverseZIndex
+    ) {
       const absoluteChildren = node.children.filter(
         (child: SceneNode) =>
           "layoutPositioning" in child &&
