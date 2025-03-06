@@ -1,24 +1,25 @@
 import { HTMLSettings } from "types";
 import { numberToFixedString } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
-import { variableToColorName } from "../../tailwind/conversionTables";
 import { getGradientTransformCoordinates } from "../../common/color";
 
 /**
  * Helper to process a color with variable binding if present
  */
-const processColorWithVariable = (
-  color: RGB,
-  opacity: number = 1,
-  boundVariable?: VariableAlias,
-  useCustomColors: boolean = false,
-): string => {
-  if (useCustomColors && boundVariable) {
-    const varName = variableToColorName(boundVariable);
-    const fallbackColor = htmlColor(color, opacity);
+const processColorWithVariable = (fill: {
+  color: RGB;
+  opacity?: number;
+  variableColorName?: string;
+}): string => {
+  const opacity = fill.opacity ?? 1;
+
+  if (fill.variableColorName) {
+    const varName = fill.variableColorName;
+    console.log("varName is", varName);
+    const fallbackColor = htmlColor(fill.color, opacity);
     return `var(--${varName}, ${fallbackColor})`;
   }
-  return htmlColor(color, opacity);
+  return htmlColor(fill.color, opacity);
 };
 
 /**
@@ -26,12 +27,16 @@ const processColorWithVariable = (
  */
 const getColorAndVariable = (
   fill: Paint,
-): { color: RGB; opacity: number; boundVariable?: VariableAlias } => {
+): {
+  color: RGB;
+  opacity: number;
+  variableColorName?: string;
+} => {
   if (fill.type === "SOLID") {
     return {
       color: fill.color,
       opacity: fill.opacity ?? 1,
-      boundVariable: fill.boundVariables?.color,
+      variableColorName: (fill as any).variableColorName,
     };
   } else if (
     (fill.type === "GRADIENT_LINEAR" ||
@@ -44,7 +49,7 @@ const getColorAndVariable = (
     return {
       color: firstStop.color,
       opacity: fill.opacity ?? 1,
-      boundVariable: firstStop.boundVariables?.color,
+      variableColorName: (firstStop as any).variableColorName,
     };
   }
   return { color: { r: 0, g: 0, b: 0 }, opacity: 0 };
@@ -55,16 +60,10 @@ export const htmlColorFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"] | undefined,
   settings: HTMLSettings,
 ): string => {
-  const useCustomColors = settings.useColorVariables === true;
   const fill = retrieveTopFill(fills);
   if (fill) {
-    const { color, opacity, boundVariable } = getColorAndVariable(fill);
-    return processColorWithVariable(
-      color,
-      opacity,
-      boundVariable,
-      useCustomColors,
-    );
+    const colorInfo = getColorAndVariable(fill);
+    return processColorWithVariable(colorInfo);
   }
   return "";
 };
@@ -91,19 +90,21 @@ export const htmlColor = (color: RGB, alpha: number = 1): string => {
 };
 
 // Process a single gradient stop with proper color and position
-const processGradientStop = (
+const processGradientStop = async (
   stop: ColorStop,
   useCustomColors: boolean,
   fillOpacity: number = 1,
   positionMultiplier: number = 100,
   unit: string = "%",
-): string => {
-  const color = processColorWithVariable(
-    stop.color,
-    stop.color.a * fillOpacity,
-    stop.boundVariables?.color,
-    useCustomColors,
-  );
+): Promise<string> => {
+  const fillInfo = {
+    color: stop.color,
+    opacity: stop.color.a * fillOpacity,
+    boundVariables: stop.boundVariables,
+    variableColorName: (stop as any).variableColorName,
+  };
+
+  const color = processColorWithVariable(fillInfo);
   const position = `${(stop.position * positionMultiplier).toFixed(0)}${unit}`;
   return `${color} ${position}`;
 };
@@ -129,10 +130,10 @@ const processGradientStops = (
     .join(", ");
 };
 
-export const htmlGradientFromFills = (
+export const htmlGradientFromFills = async (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
   settings: HTMLSettings,
-): string => {
+): Promise<string> => {
   const useCustomColors = settings.useColorVariables === true;
   const fill = retrieveTopFill(fills);
   if (!fill) return "";
@@ -140,9 +141,9 @@ export const htmlGradientFromFills = (
     case "GRADIENT_LINEAR":
       return htmlLinearGradient(fill, useCustomColors);
     case "GRADIENT_ANGULAR":
-      return htmlAngularGradient(fill, useCustomColors);
+      return await htmlAngularGradient(fill, useCustomColors);
     case "GRADIENT_RADIAL":
-      return htmlRadialGradient(fill, useCustomColors);
+      return await htmlRadialGradient(fill, useCustomColors);
     case "GRADIENT_DIAMOND":
       return htmlDiamondGradient(fill, useCustomColors); // Added diamond gradient case
     default:
@@ -168,10 +169,10 @@ export const cssGradientAngle = (angle: number): number => {
   return cssAngle < 0 ? cssAngle + 360 : cssAngle;
 };
 
-export const htmlLinearGradient = (
+export const htmlLinearGradient = async (
   fill: GradientPaint,
   useCustomColors: boolean,
-): string => {
+): Promise<string> => {
   const figmaAngle = gradientAngle2(fill);
   const angle = cssGradientAngle(figmaAngle).toFixed(0);
   const mappedFill = processGradientStops(
