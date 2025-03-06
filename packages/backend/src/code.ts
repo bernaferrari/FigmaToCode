@@ -144,6 +144,7 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
       hasGradient ||
       settings.optimizeLayout ||
       node.type === "INSTANCE" ||
+      node.type === "COMPONENT" ||
       node.type === "TEXT"
     ) {
       const figmaNode = await figma.getNodeByIdAsync(node.id);
@@ -239,11 +240,7 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
       }
 
       // Extract component metadata from instances
-      if (
-        node.type === "INSTANCE" &&
-        "variantProperties" in figmaNode &&
-        figmaNode.variantProperties
-      ) {
+      if ("variantProperties" in figmaNode && figmaNode.variantProperties) {
         node.variantProperties = figmaNode.variantProperties;
       }
 
@@ -288,6 +285,17 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
   if (node.children && Array.isArray(node.children)) {
     for (const child of node.children) {
       await processNodeData(child, settings);
+    }
+
+    if (
+      node.layoutMode !== "NONE" &&
+      "children" in node &&
+      node.children.some(
+        (d: any) =>
+          "layoutPositioning" in d && d.layoutPositioning === "ABSOLUTE",
+      )
+    ) {
+      (node as any).isRelative = true;
     }
 
     adjustChildrenOrder(node);
