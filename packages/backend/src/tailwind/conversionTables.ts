@@ -140,11 +140,10 @@ export const nearestColorFromRgb = (color: RGB) => {
   return { name, value };
 };
 
-export const variableToColorName = (alias: VariableAlias) => {
+export const variableToColorName = async (alias: VariableAlias) => {
   return (
-    figma.variables
-      .getVariableById(alias.id)
-      ?.name.replaceAll("/", "-")
+    (await figma.variables.getVariableByIdAsync(alias.id))?.name
+      .replaceAll("/", "-")
       .replaceAll(" ", "-") || alias.id.toLowerCase().replaceAll(":", "-")
   );
 };
@@ -161,12 +160,15 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
   let hex: string = "#" + rgbTo6hex(fill.color);
   let meta: string = "";
 
+  console.log(
+    "(fill as any).variableColorName",
+    fill,
+    (fill as any).variableColorName,
+  );
   // variable
-  if (
-    localTailwindSettings.useColorVariables &&
-    fill.boundVariables?.color
-  ) {
-    colorName = variableToColorName(fill.boundVariables.color);
+  if ((fill as any).variableColorName) {
+    // Use pre-computed variable name if available
+    colorName = (fill as any).variableColorName; // || variableToColorName(fill.boundVariables.color);
     colorType = "variable";
     meta = "custom";
 

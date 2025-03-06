@@ -12,6 +12,7 @@ import { postConversionComplete, postEmptyMessage } from "./messaging";
 import { PluginSettings } from "types";
 import { convertToCode } from "./common/retrieveUI/convertToCode";
 import { generateHTMLPreview } from "./html/htmlMain";
+import { variableToColorName } from "./tailwind/conversionTables";
 
 // Keep track of node names for sequential numbering
 const nodeNameCounters: Map<string, number> = new Map();
@@ -32,11 +33,62 @@ const addParentReferences = (node: any) => {
 const GRADIENT_PROPERTIES = ["fills", "strokes", "effects"];
 
 /**
+ * Process color variables in a paint style and add pre-computed variable names
+ * @param paint The paint style to process (fill or stroke)
+ */
+const processColorVariables = async (paint: Paint) => {
+  if (
+    paint.type === "GRADIENT_ANGULAR" ||
+    paint.type === "GRADIENT_DIAMOND" ||
+    paint.type === "GRADIENT_LINEAR" ||
+    paint.type === "GRADIENT_RADIAL"
+  ) {
+    for (const stop of paint.gradientStops) {
+      if (stop.boundVariables?.color) {
+        (stop as any).variableColorName = await variableToColorName(
+          stop.boundVariables.color,
+        );
+      }
+    }
+  } else if (paint.type === "SOLID" && paint.boundVariables?.color) {
+    // Pre-compute and store the variable name
+    (paint as any).variableColorName = await variableToColorName(
+      paint.boundVariables.color,
+    );
+  }
+};
+
+const getColorVariables = async (node: any, settings: PluginSettings) => {
+  if (settings.useColorVariables) {
+    // Process color variables in fills and strokes
+    if (node.fills && Array.isArray(node.fills)) {
+      for (const fill of node.fills) {
+        await processColorVariables(fill);
+      }
+    }
+
+    if (node.strokes && Array.isArray(node.strokes)) {
+      for (const stroke of node.strokes) {
+        await processColorVariables(stroke);
+      }
+    }
+    // Process color variables in effects if they exist
+    if (node.effects && Array.isArray(node.effects)) {
+      for (const effect of node.effects) {
+        if (effect.color) {
+          await processColorVariables(effect);
+        }
+      }
+    }
+  }
+};
+
+/**
  * Recursively process node and its children to update with data not available in JSON
  * @param node The node to process
  * @param optimizeLayout Whether to extract and include inferredAutoLayout data
  */
-const processNodeData = async (node: any, optimizeLayout: boolean) => {
+const processNodeData = async (node: any, settings: PluginSettings) => {
   if (node.id) {
     // Check if we need to fetch the Figma node at all
     const hasGradient = GRADIENT_PROPERTIES.some((propName) => {
@@ -67,7 +119,7 @@ const processNodeData = async (node: any, optimizeLayout: boolean) => {
     // Handle additional node properties
     if (
       hasGradient ||
-      optimizeLayout ||
+      settings.optimizeLayout ||
       node.type === "INSTANCE" ||
       node.type === "TEXT"
     ) {
@@ -100,7 +152,7 @@ const processNodeData = async (node: any, optimizeLayout: boolean) => {
       // Handle text-specific properties
       if (figmaNode.type === "TEXT") {
         // Get the text segments
-        const styledTextSegments = figmaNode.getStyledTextSegments([
+        let styledTextSegments = figmaNode.getStyledTextSegments([
           "fontName",
           "fills",
           "fontSize",
@@ -122,20 +174,32 @@ const processNodeData = async (node: any, optimizeLayout: boolean) => {
           const baseSegmentName = (node.uniqueName || node.name)
             .replace(/[^a-zA-Z0-9_-]/g, "")
             .toLowerCase();
+
           // Add a uniqueId to each segment
-          node.styledTextSegments = styledTextSegments.map(
-            (segment: any, index) => {
+          styledTextSegments = await Promise.all(
+            styledTextSegments.map(async (segment, index) => {
               const mutableSegment = Object.assign({}, segment);
+
+              if (settings.useColorVariables && segment.fills) {
+                mutableSegment.fills = segment.fills.map((d) => ({ ...d }));
+                for (const fill of mutableSegment.fills) {
+                  await processColorVariables(fill);
+                }
+              }
+
               // For single segments, don't add index suffix
               if (styledTextSegments.length === 1) {
-                mutableSegment.uniqueId = `${baseSegmentName}_span`;
+                (mutableSegment as any).uniqueId = `${baseSegmentName}_span`;
               } else {
                 // For multiple segments, add index suffix
-                mutableSegment.uniqueId = `${baseSegmentName}_span_${(index + 1).toString().padStart(2, "0")}`;
+                (mutableSegment as any).uniqueId =
+                  `${baseSegmentName}_span_${(index + 1).toString().padStart(2, "0")}`;
               }
               return mutableSegment;
-            },
+            }),
           );
+
+          node.styledTextSegments = styledTextSegments;
         }
 
         Object.assign(node, node.style);
@@ -145,7 +209,7 @@ const processNodeData = async (node: any, optimizeLayout: boolean) => {
       }
 
       // Extract inferredAutoLayout if optimizeLayout is enabled
-      if (optimizeLayout && "inferredAutoLayout" in figmaNode) {
+      if (settings.optimizeLayout && "inferredAutoLayout" in figmaNode) {
         node.inferredAutoLayout = JSON.parse(
           JSON.stringify((figmaNode as any).inferredAutoLayout),
         );
@@ -159,6 +223,7 @@ const processNodeData = async (node: any, optimizeLayout: boolean) => {
       ) {
         node.variantProperties = figmaNode.variantProperties;
       }
+
       // Always copy size and position
       if ("width" in figmaNode) {
         node.width = (figmaNode as any).width;
@@ -176,6 +241,8 @@ const processNodeData = async (node: any, optimizeLayout: boolean) => {
         node.y = (figmaNode as any).y;
       }
     }
+
+    await getColorVariables(node, settings);
 
     // Set default layout properties if missing
     if (!node.layoutMode) node.layoutMode = "NONE";
@@ -197,7 +264,7 @@ const processNodeData = async (node: any, optimizeLayout: boolean) => {
   // Process children recursively
   if (node.children && Array.isArray(node.children)) {
     for (const child of node.children) {
-      await processNodeData(child, optimizeLayout);
+      await processNodeData(child, settings);
     }
   }
 };
@@ -210,7 +277,7 @@ const processNodeData = async (node: any, optimizeLayout: boolean) => {
  */
 export const nodesToJSON = async (
   nodes: ReadonlyArray<SceneNode>,
-  optimizeLayout: boolean = false,
+  settings: PluginSettings,
 ): Promise<SceneNode[]> => {
   // Reset name counters for each conversion
   nodeNameCounters.clear();
@@ -228,7 +295,7 @@ export const nodesToJSON = async (
 
   // Process gradients and inferredAutoLayout in the JSON tree before adding parent references
   for (const node of nodeJson) {
-    await processNodeData(node, optimizeLayout);
+    await processNodeData(node, settings);
   }
 
   // Add parent references to all children in the node tree
@@ -240,7 +307,7 @@ export const nodesToJSON = async (
 export const run = async (settings: PluginSettings) => {
   clearWarnings();
 
-  const { framework, optimizeLayout } = settings;
+  const { framework } = settings;
   const selection = figma.currentPage.selection;
 
   if (selection.length > 1) {
@@ -249,7 +316,7 @@ export const run = async (settings: PluginSettings) => {
     );
   }
 
-  const nodeJson = await nodesToJSON(selection, optimizeLayout);
+  const nodeJson = await nodesToJSON(selection, settings);
   console.log("nodeJson", nodeJson);
 
   // Now we work directly with the JSON nodes
