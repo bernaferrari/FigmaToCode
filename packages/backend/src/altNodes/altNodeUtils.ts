@@ -1,6 +1,7 @@
 import { AltNode } from "types";
 import { curry } from "../common/curry";
 import { exportAsyncProxy } from "../common/exportAsyncProxy";
+import { addWarning } from "../common/commonConversionWarnings";
 
 export const overrideReadonlyProperty = curry(
   <T, K extends keyof T>(prop: K, value: any, obj: T): T =>
@@ -51,11 +52,6 @@ export const isSVGNode = (node: SceneNode) => {
   return altNode.canBeFlattened;
 };
 
-export const renderNodeAsSVG = async (node: SceneNode) =>
-  await exportAsyncProxy<string>(node, {
-    format: "SVG_STRING",
-  });
-
 export const renderAndAttachSVG = async (node: any) => {
   // const nodeName = `${node.type}:${node.id}`;
   // console.log(altNode);
@@ -66,10 +62,18 @@ export const renderAndAttachSVG = async (node: any) => {
       // console.log(`SVG already rendered for ${nodeName}`);
       return node;
     }
-    // console.log(`${nodeName} can be flattened!`);
-    const svg = (await renderNodeAsSVG(node)) as string;
-    // console.log(`${svg}`);
-    node.svg = svg;
+
+    try {
+      // console.log(`${nodeName} can be flattened!`);
+      const svg = (await exportAsyncProxy<string>(node, {
+        format: "SVG_STRING",
+      })) as string;
+      node.svg = svg;
+    } catch (error) {
+      addWarning(`Failed rendering SVG for ${node.name}`);
+      console.error(`Error rendering SVG for ${node.type}:${node.id}`);
+      console.error(error);
+    }
   }
   return node;
 };
