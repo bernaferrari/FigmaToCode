@@ -2,7 +2,6 @@ import "@figma/plugin-typings";
 // Settings
 export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 export interface HTMLSettings {
-  jsx: boolean;
   optimizeLayout: boolean;
   showLayerNames: boolean;
   embedImages: boolean;
@@ -11,6 +10,7 @@ export interface HTMLSettings {
   htmlGenerationMode: "html" | "jsx" | "styled-components" | "svelte";
 }
 export interface TailwindSettings extends HTMLSettings {
+  tailwindGenerationMode: "html" | "jsx";
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
   useColorVariables: boolean;

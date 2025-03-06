@@ -1,4 +1,3 @@
-import { btoa } from "js-base64";
 import { convertNodesToAltNodes } from "./altNodes/altConversion";
 import {
   retrieveGenericSolidUIColors,
@@ -65,7 +64,6 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
         ? cleanName
         : `${cleanName}_${count.toString().padStart(2, "0")}`;
 
-    console.log("going inside", node);
     // Handle additional node properties
     if (
       hasGradient ||
@@ -98,7 +96,6 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
           }
         });
       }
-      console.log("eee");
 
       // Handle text-specific properties
       if (figmaNode.type === "TEXT") {
@@ -136,7 +133,6 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
                 // For multiple segments, add index suffix
                 mutableSegment.uniqueId = `${baseSegmentName}_span_${(index + 1).toString().padStart(2, "0")}`;
               }
-              console.log("after");
               return mutableSegment;
             },
           );
@@ -163,8 +159,6 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
       ) {
         node.variantProperties = figmaNode.variantProperties;
       }
-
-      console.log("figmaNode", figmaNode);
       // Always copy size and position
       if ("width" in figmaNode) {
         node.width = (figmaNode as any).width;
@@ -267,11 +261,7 @@ export const run = async (settings: PluginSettings) => {
   }
 
   const code = await convertToCode(convertedSelection, settings);
-  const htmlPreview = await generateHTMLPreview(
-    convertedSelection,
-    settings,
-    code,
-  );
+  const htmlPreview = await generateHTMLPreview(convertedSelection, settings);
   const colors = retrieveGenericSolidUIColors(framework);
   const gradients = retrieveGenericGradients(framework, settings);
 

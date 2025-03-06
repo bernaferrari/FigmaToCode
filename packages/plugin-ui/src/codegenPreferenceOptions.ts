@@ -3,11 +3,11 @@ import { LocalCodegenPreferenceOptions, SelectPreferenceOptions } from "types";
 export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
   {
     itemType: "individual_select",
-    propertyName: "jsx",
-    label: "React (JSX)",
-    description: "",
+    propertyName: "showLayerNames",
+    label: "Layer names",
+    description: "Include Figma layer names in classes.",
     isDefault: false,
-    includedLanguages: ["Tailwind"],
+    includedLanguages: ["HTML", "Tailwind"],
   },
   {
     itemType: "individual_select",
@@ -17,14 +17,6 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
       "Attempt to auto-layout suitable element groups. This may increase code quality, but may not always work as expected.",
     isDefault: true,
     includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
-  },
-  {
-    itemType: "individual_select",
-    propertyName: "showLayerNames",
-    label: "Layer names",
-    description: "Include Figma layer names in classes.",
-    isDefault: false,
-    includedLanguages: ["HTML", "Tailwind"],
   },
   {
     itemType: "individual_select",
@@ -56,7 +48,8 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "embedImages",
     label: "Embed Images",
-    description: "Convert Figma images to Base64 and embed them in the code.",
+    description:
+      "Convert Figma images to Base64 and embed them in the code. This may be slow. If there are too many images, it could freeze Figma.",
     isDefault: false,
     includedLanguages: ["HTML"],
   },
@@ -64,7 +57,8 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "embedVectors",
     label: "Embed Vectors",
-    description: "Convert Figma vectors to code.",
+    description:
+      "Convert Figma vectors to code. This is faster than embedding images, but still slower than not embedding.",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
@@ -82,6 +76,16 @@ export const selectPreferenceOptions: SelectPreferenceOptions[] = [
       { label: "styled-components", value: "styled-components" },
     ],
     includedLanguages: ["HTML"],
+  },
+  {
+    itemType: "select",
+    propertyName: "tailwindGenerationMode",
+    label: "Mode",
+    options: [
+      { label: "HTML", value: "html" },
+      { label: "React (JSX)", value: "jsx" },
+    ],
+    includedLanguages: ["Tailwind"],
   },
   {
     itemType: "select",

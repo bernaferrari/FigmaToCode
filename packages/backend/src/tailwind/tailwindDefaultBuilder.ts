@@ -48,7 +48,7 @@ export class TailwindDefaultBuilder {
     return this.node.visible ?? true;
   }
   get isJSX() {
-    return this.settings.jsx;
+    return this.settings.tailwindGenerationMode === "jsx";
   }
   get optimizeLayout() {
     return this.settings.optimizeLayout;
