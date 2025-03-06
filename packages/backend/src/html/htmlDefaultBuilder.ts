@@ -315,7 +315,7 @@ export class HtmlDefaultBuilder {
     const { node, settings } = this;
     const { width, height } = htmlSizePartial(
       node,
-      settings.jsx,
+      settings.htmlGenerationMode === "jsx",
       settings.optimizeLayout,
     );
 

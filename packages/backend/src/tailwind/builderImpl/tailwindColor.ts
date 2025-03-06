@@ -61,6 +61,7 @@ export const tailwindSolidColor = (
   fill: SolidPaint | ColorStop,
   kind: TailwindColorType,
 ): string => {
+  console.log("fill is", fill);
   const { colorName } = getColorInfo(fill);
   const effectiveOpacity = calculateEffectiveOpacity(fill);
 

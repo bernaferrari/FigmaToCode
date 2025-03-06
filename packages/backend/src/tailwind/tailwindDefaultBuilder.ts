@@ -94,6 +94,7 @@ export class TailwindDefaultBuilder {
   }
 
   commonShapeStyles(): this {
+    console.log("this.node is", this.node);
     this.customColor((this.node as MinimalFillsMixin).fills, "bg");
     this.radius();
     this.shadow();
