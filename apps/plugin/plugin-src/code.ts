@@ -139,8 +139,8 @@ const standardMode = async () => {
     safeRun(userPluginSettings);
   });
 
-  // Listen for document changes
-  figma.on("documentchange", () => {
+  // Listen for page changes
+  figma.on("currentpagechange", () => {
     console.log("[DEBUG] documentchange event triggered");
     // Node: This was causing an infinite load when you try to export a background image from a group that contains children.
     // The reason for this is that the code will temporarily hide the children of the group in order to export a clean image
