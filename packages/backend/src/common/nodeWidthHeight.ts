@@ -22,30 +22,53 @@ export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
     ? node.parent.inferredAutoLayout?.layoutMode
     : node.parent.layoutMode;
 
-  const isWidthFill =
-    (parentLayoutMode === "HORIZONTAL" && nodeAuto.layoutGrow === 1) ||
-    (parentLayoutMode === "VERTICAL" && nodeAuto.layoutAlign === "STRETCH");
-  const isHeightFill =
-    (parentLayoutMode === "HORIZONTAL" && nodeAuto.layoutAlign === "STRETCH") ||
-    (parentLayoutMode === "VERTICAL" && nodeAuto.layoutGrow === 1);
-  const modesSwapped = parentLayoutMode === "HORIZONTAL";
-  const primaryAxisMode = modesSwapped
-    ? "counterAxisSizingMode"
-    : "primaryAxisSizingMode";
-  const counterAxisMode = modesSwapped
-    ? "primaryAxisSizingMode"
-    : "counterAxisSizingMode";
+  // Check for explicit layout sizing properties
+  if (
+    "layoutSizingHorizontal" in nodeAuto &&
+    "layoutSizingVertical" in nodeAuto
+  ) {
+    const width =
+      nodeAuto.layoutSizingHorizontal === "FILL"
+        ? "fill"
+        : nodeAuto.layoutSizingHorizontal === "HUG"
+          ? null
+          : node.width;
 
-  return {
-    width: isWidthFill
-      ? "fill"
-      : "layoutMode" in nodeAuto && nodeAuto[primaryAxisMode] === "AUTO"
-        ? null
-        : node.width,
-    height: isHeightFill
-      ? "fill"
-      : "layoutMode" in nodeAuto && nodeAuto[counterAxisMode] === "AUTO"
-        ? null
-        : node.height,
-  };
+    const height =
+      nodeAuto.layoutSizingVertical === "FILL"
+        ? "fill"
+        : nodeAuto.layoutSizingVertical === "HUG"
+          ? null
+          : node.height;
+
+    return { width, height };
+  }
+
+  return { width: node.width, height: node.height };
+
+  // const isWidthFill =
+  //   (parentLayoutMode === "HORIZONTAL" && nodeAuto.layoutGrow === 1) ||
+  //   (parentLayoutMode === "VERTICAL" && nodeAuto.layoutAlign === "STRETCH");
+  // const isHeightFill =
+  //   (parentLayoutMode === "HORIZONTAL" && nodeAuto.layoutAlign === "STRETCH") ||
+  //   (parentLayoutMode === "VERTICAL" && nodeAuto.layoutGrow === 1);
+  // const modesSwapped = parentLayoutMode === "HORIZONTAL";
+  // const primaryAxisMode = modesSwapped
+  //   ? "counterAxisSizingMode"
+  //   : "primaryAxisSizingMode";
+  // const counterAxisMode = modesSwapped
+  //   ? "primaryAxisSizingMode"
+  //   : "counterAxisSizingMode";
+
+  // return {
+  //   width: isWidthFill
+  //     ? "fill"
+  //     : "layoutMode" in nodeAuto && nodeAuto[primaryAxisMode] === "AUTO"
+  //       ? null
+  //       : node.width,
+  //   height: isHeightFill
+  //     ? "fill"
+  //     : "layoutMode" in nodeAuto && nodeAuto[counterAxisMode] === "AUTO"
+  //       ? null
+  //       : node.height,
 };

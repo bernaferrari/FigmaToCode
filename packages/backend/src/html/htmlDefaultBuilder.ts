@@ -122,12 +122,12 @@ export class HtmlDefaultBuilder {
     this.autoLayoutPadding();
     this.position();
     this.blend();
-    
+
     // Add z-index if we have a custom value from the itemReverseZIndex handling
     if ((this.node as any).customZIndex !== undefined) {
       this.addStyles(`z-index: ${(this.node as any).customZIndex}`);
     }
-    
+
     return this;
   }
 
@@ -242,7 +242,8 @@ export class HtmlDefaultBuilder {
         node.type === "GROUP" ||
         ("layoutMode" in node &&
           ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
-            ?.layoutMode === "NONE")
+            ?.layoutMode === "NONE") ||
+        (node as any).isRelative
       ) {
         this.addStyles(formatWithJSX("position", isJSX, "relative"));
       }
@@ -424,6 +425,8 @@ export class HtmlDefaultBuilder {
     }
 
     if ("variantProperties" in this.node && this.node.variantProperties) {
+      console.log("this.node.variantProperties", this.node.variantProperties);
+
       Object.entries(this.node.variantProperties)
         ?.map((prop) => formatDataAttribute(prop[0], prop[1]))
         .sort()

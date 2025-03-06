@@ -144,7 +144,8 @@ export class TailwindDefaultBuilder {
       node.type === "GROUP" ||
       ("layoutMode" in node &&
         ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
-          ?.layoutMode === "NONE")
+          ?.layoutMode === "NONE") ||
+      (node as any).isRelative
     ) {
       this.addAttributes("relative");
     }
