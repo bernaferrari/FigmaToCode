@@ -19,8 +19,6 @@ import {
   nodeHasImageFill,
 } from "../common/images";
 import { addWarning } from "../common/commonConversionWarnings";
-import { customAlphabet } from "nanoid";
-import { generateId } from "../code";
 
 const selfClosingTags = ["img"];
 
@@ -53,14 +51,28 @@ interface CSSCollection {
 
 export let cssCollection: CSSCollection = {};
 
-// Generate a unique class name with a prefix
+// Instance counters for class name generation - we keep this but primarily as a fallback
+const classNameCounters: Map<string, number> = new Map();
+
+// Generate a class name - prefer direct uniqueId, but fall back to counter-based if needed
 export function generateUniqueClassName(prefix = "figma"): string {
   // Sanitize the prefix to ensure valid CSS class
   const sanitizedPrefix =
     prefix.replace(/[^a-zA-Z0-9_-]/g, "").replace(/^[0-9_-]/, "f") || // Ensure it doesn't start with a number or special char
     "figma";
 
-  return `${sanitizedPrefix}-${generateId()}`;
+  // Most of the time, we'll just use the prefix directly as it's pre-generated to be unique
+  // But keep the counter logic as a fallback
+  const count = classNameCounters.get(sanitizedPrefix) || 0;
+  classNameCounters.set(sanitizedPrefix, count + 1);
+  
+  // Only add suffix if this isn't the first instance
+  return count === 0 ? sanitizedPrefix : `${sanitizedPrefix}_${count.toString().padStart(2, "0")}`;
+}
+
+// Reset all class name counters - call this at the start of processing
+export function resetClassNameCounters(): void {
+  classNameCounters.clear();
 }
 
 // Convert styles to CSS format
@@ -322,6 +334,7 @@ export const htmlMain = async (
   isPreviewGlobal = isPreview;
   previousExecutionCache = [];
   cssCollection = {};
+  resetClassNameCounters(); // Reset counters for each new generation
 
   let htmlContent = await htmlWidgetGenerator(sceneNode, settings);
 

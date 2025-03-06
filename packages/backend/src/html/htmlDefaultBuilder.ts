@@ -90,27 +90,29 @@ export class HtmlDefaultBuilder {
     this.styles = [];
     this.data = [];
 
-    // For both Svelte and styled-components, use similar naming pattern
+    // For both Svelte and styled-components, use sequential class names
     if (
       this.settings.htmlGenerationMode === "svelte" ||
       this.settings.htmlGenerationMode === "styled-components"
     ) {
-      // Always generate a unique classname that relates to the node name
-      const nodeName = (this.node as any).uniqueName || this.node.name;
-      
+      // Use uniqueName (which already has _01, _02 suffixes) if available
+      let baseClassName =
+        (this.node as any).uniqueName ||
+        this.node.name ||
+        this.node.type.toLowerCase();
+
       // Clean the name and create a valid CSS class name
-      let baseClassName = nodeName 
-        ? nodeName.replace(/[^a-zA-Z0-9\s_-]/g, "")
-            .replace(/\s+/g, "-")
-            .toLowerCase()
-        : this.node.type.toLowerCase();
-        
+      baseClassName = baseClassName
+        .replace(/[^a-zA-Z0-9\s_-]/g, "")
+        .replace(/\s+/g, "-")
+        .toLowerCase();
+
       // Make sure it's valid
       if (!/^[a-z]/i.test(baseClassName)) {
         baseClassName = `${this.node.type.toLowerCase()}-${baseClassName}`;
       }
 
-      // For Svelte, use the same prefix style as styled-components for consistency
+      // Generate unique class name with simple counter suffix
       this.cssClassName = generateUniqueClassName(baseClassName);
     }
   }
@@ -406,9 +408,12 @@ export class HtmlDefaultBuilder {
     let classNames: string[] = [];
     if (this.name) {
       this.addData("layer", this.name.trim());
-      const layerNameClass = stringToClassName(this.name.trim());
-      if (layerNameClass !== "") {
-        classNames.push(layerNameClass);
+
+      if (mode !== "svelte" && mode !== "styled-components") {
+        const layerNameClass = stringToClassName(this.name.trim());
+        if (layerNameClass !== "") {
+          classNames.push(layerNameClass);
+        }
       }
     }
 
@@ -467,16 +472,19 @@ export class HtmlDefaultBuilder {
     // Only override for really obvious cases
     if ((this.node as any).name?.toLowerCase().includes("button")) {
       element = "button";
-    } else if ((this.node as any).name?.toLowerCase().includes("img") || 
-               (this.node as any).name?.toLowerCase().includes("image")) {
-      element = "img";  
+    } else if (
+      (this.node as any).name?.toLowerCase().includes("img") ||
+      (this.node as any).name?.toLowerCase().includes("image")
+    ) {
+      element = "img";
     }
 
     cssCollection[this.cssClassName] = {
       styles: cssStyles,
-      nodeName: (this.node as any).uniqueName || 
-                this.node.name?.replace(/[^a-zA-Z0-9]/g, "") || 
-                undefined,
+      nodeName:
+        (this.node as any).uniqueName ||
+        this.node.name?.replace(/[^a-zA-Z0-9]/g, "") ||
+        undefined,
       nodeType: this.node.type,
       element: element,
     };
