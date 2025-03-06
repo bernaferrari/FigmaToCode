@@ -17,6 +17,6 @@ export const convertToCode = async (
       return await swiftuiMain(nodes, settings);
     case "HTML":
     default:
-      return await htmlMain(nodes, settings);
+      return (await htmlMain(nodes, settings)).html;
   }
 };
