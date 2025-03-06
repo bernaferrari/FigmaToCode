@@ -289,14 +289,11 @@ function generateReactComponent(
   return `${imports.join("\n")}
 ${styledComponentsCode ? `\n${styledComponentsCode}` : ""}
 
-const ${componentName} = () => {
+export const ${componentName} = () => {
   return (
 ${indentString(html, 4)}
   );
-};
-
-export default ${componentName};
-`;
+};`;
 }
 
 // Generate Svelte component from the collected styles and HTML
