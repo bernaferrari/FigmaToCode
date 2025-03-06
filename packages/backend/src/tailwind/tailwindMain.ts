@@ -246,7 +246,10 @@ export const tailwindContainer = (
   // Generate appropriate HTML
   if (children) {
     return `\n<${tag}${build}${src}>${indentString(children)}\n</${tag}>`;
-  } else if (SELF_CLOSING_TAGS.includes(tag) || settings.jsx) {
+  } else if (
+    SELF_CLOSING_TAGS.includes(tag) ||
+    settings.tailwindGenerationMode === "jsx"
+  ) {
     return `\n<${tag}${build}${src} />`;
   } else {
     return `\n<${tag}${build}${src}></${tag}>`;

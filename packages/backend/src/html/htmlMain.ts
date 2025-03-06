@@ -65,9 +65,11 @@ export function generateUniqueClassName(prefix = "figma"): string {
   // But keep the counter logic as a fallback
   const count = classNameCounters.get(sanitizedPrefix) || 0;
   classNameCounters.set(sanitizedPrefix, count + 1);
-  
+
   // Only add suffix if this isn't the first instance
-  return count === 0 ? sanitizedPrefix : `${sanitizedPrefix}_${count.toString().padStart(2, "0")}`;
+  return count === 0
+    ? sanitizedPrefix
+    : `${sanitizedPrefix}_${count.toString().padStart(2, "0")}`;
 }
 
 // Reset all class name counters - call this at the start of processing
@@ -260,9 +262,9 @@ function generateComponentCode(
 ): string {
   switch (mode) {
     case "styled-components":
-      return generateReactComponent(html, sceneNode, true);
+      return generateReactComponent(html, sceneNode);
     case "svelte":
-      return generateSvelteComponent(html, sceneNode);
+      return generateSvelteComponent(html);
     case "html":
     case "jsx":
     default:
@@ -274,18 +276,15 @@ function generateComponentCode(
 function generateReactComponent(
   html: string,
   sceneNode: Array<SceneNode>,
-  useStyledComponents: boolean = false,
 ): string {
-  const styledComponentsCode = useStyledComponents
-    ? generateStyledComponents()
-    : "";
+  const styledComponentsCode = generateStyledComponents();
+
   const componentName = getReactComponentName(sceneNode[0]);
 
-  const imports = ['import React from "react";'];
-
-  if (useStyledComponents) {
-    imports.push('import styled from "styled-components";');
-  }
+  const imports = [
+    'import React from "react";',
+    'import styled from "styled-components";',
+  ];
 
   return `${imports.join("\n")}
 ${styledComponentsCode ? `\n${styledComponentsCode}` : ""}
@@ -301,12 +300,7 @@ export default ${componentName};
 }
 
 // Generate Svelte component from the collected styles and HTML
-function generateSvelteComponent(
-  html: string,
-  sceneNode: Array<SceneNode>,
-): string {
-  const componentName = getReactComponentName(sceneNode[0]);
-
+function generateSvelteComponent(html: string): string {
   // Build CSS classes similar to styled-components but for Svelte
   const cssRules: string[] = [];
 
@@ -368,7 +362,6 @@ export const htmlMain = async (
 export const generateHTMLPreview = async (
   nodes: SceneNode[],
   settings: PluginSettings,
-  code?: string,
 ): Promise<HTMLPreview> => {
   const result = await htmlMain(
     nodes,

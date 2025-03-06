@@ -12,6 +12,7 @@ import { CopyButton } from "./CopyButton";
 import EmptyState from "./EmptyState";
 import SettingsGroup from "./SettingsGroup";
 import CustomPrefixInput from "./CustomPrefixInput";
+import FrameworkTabs from "./FrameworkTabs";
 
 interface CodePanelProps {
   code: string;
@@ -83,7 +84,7 @@ const CodePanel = (props: CodePanelProps) => {
     );
 
     // Define preference grouping based on property names
-    const essentialPropertyNames = ["jsx", "optimizeLayout"];
+    const essentialPropertyNames = ["jsx"];
     const stylingPropertyNames = [
       "styledComponents",
       "exportCSS",
@@ -91,6 +92,7 @@ const CodePanel = (props: CodePanelProps) => {
       "roundTailwindColors",
       "useColorVariables",
       "showLayerNames",
+      "optimizeLayout",
       "embedImages",
       "embedVectors",
     ];
@@ -143,38 +145,27 @@ const CodePanel = (props: CodePanelProps) => {
 
           {/* Framework-specific options */}
           {selectableSettingsFiltered.length > 0 && (
-            <div className="mt-1 mb-4 last:mb-0">
-              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            <div className="mt-1 mb-2 last:mb-0">
+              <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 {selectedFramework} Options
               </p>
-              <div className="flex gap-2 items-center flex-wrap">
-                {selectableSettingsFiltered.map((preference) => (
-                  <div
-                    key={preference.propertyName}
-                    className="flex gap-2 items-center flex-wrap"
-                  >
-                    {preference.options.map((option) => (
-                      <SelectableToggle
-                        key={option.label}
-                        title={option.label}
-                        isSelected={
-                          option.value ===
-                          (settings?.[preference.propertyName] ??
-                            option.isDefault)
-                        }
-                        onSelect={() => {
-                          onPreferenceChanged(
-                            preference.propertyName,
-                            option.value,
-                          );
-                        }}
-                        buttonClass="bg-blue-100 dark:bg-black dark:ring-blue-800"
-                        checkClass="bg-blue-400 dark:bg-black dark:bg-blue-500 dark:border-blue-500 ring-blue-300 border-blue-400"
-                      />
-                    ))}
-                  </div>
-                ))}
-              </div>
+              {selectableSettingsFiltered.map((preference) => {
+                // Regular toggle buttons for other options
+                return (
+                  <FrameworkTabs
+                    options={preference.options}
+                    selectedValue={
+                      (settings?.[preference.propertyName] ??
+                        preference.options.find((option) => option.isDefault)
+                          ?.value ??
+                        "") as string
+                    }
+                    onChange={(value) => {
+                      onPreferenceChanged(preference.propertyName, value);
+                    }}
+                  />
+                );
+              })}
             </div>
           )}
 

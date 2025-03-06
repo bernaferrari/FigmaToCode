@@ -19,7 +19,6 @@ let userPluginSettings: PluginSettings;
 
 export const defaultPluginSettings: PluginSettings = {
   framework: "HTML",
-  jsx: false,
   optimizeLayout: true,
   showLayerNames: false,
   inlineStyle: true,
@@ -32,8 +31,8 @@ export const defaultPluginSettings: PluginSettings = {
   customTailwindPrefix: "",
   embedImages: false,
   embedVectors: false,
-  exportCSS: false,
-  styledComponents: false,
+  htmlGenerationMode: "html",
+  tailwindGenerationMode: "jsx",
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
@@ -191,7 +190,7 @@ const codegenMode = async () => {
               code: (
                 await htmlMain(
                   convertedSelection,
-                  { ...userPluginSettings, jsx: false },
+                  { ...userPluginSettings, htmlGenerationMode: "html" },
                   true,
                 )
               ).html,
@@ -210,7 +209,7 @@ const codegenMode = async () => {
               code: (
                 await htmlMain(
                   convertedSelection,
-                  { ...userPluginSettings, jsx: true },
+                  { ...userPluginSettings, htmlGenerationMode: "jsx" },
                   true,
                 )
               ).html,
@@ -222,6 +221,50 @@ const codegenMode = async () => {
               language: "HTML",
             },
           ];
+
+        case "html_svelte":
+          return [
+            {
+              title: "Code",
+              code: (
+                await htmlMain(
+                  convertedSelection,
+                  { ...userPluginSettings, htmlGenerationMode: "svelte" },
+                  true,
+                )
+              ).html,
+              language: "HTML",
+            },
+            {
+              title: "Text Styles",
+              code: htmlCodeGenTextStyles(userPluginSettings),
+              language: "HTML",
+            },
+          ];
+
+        case "html_styled_components":
+          return [
+            {
+              title: "Code",
+              code: (
+                await htmlMain(
+                  convertedSelection,
+                  {
+                    ...userPluginSettings,
+                    htmlGenerationMode: "styled-components",
+                  },
+                  true,
+                )
+              ).html,
+              language: "HTML",
+            },
+            {
+              title: "Text Styles",
+              code: htmlCodeGenTextStyles(userPluginSettings),
+              language: "HTML",
+            },
+          ];
+
         case "tailwind":
         case "tailwind_jsx":
           return [
@@ -229,7 +272,8 @@ const codegenMode = async () => {
               title: "Code",
               code: await tailwindMain(convertedSelection, {
                 ...userPluginSettings,
-                jsx: language === "tailwind_jsx",
+                tailwindGenerationMode:
+                  language === "tailwind_jsx" ? "jsx" : "html",
               }),
               language: "HTML",
             },
