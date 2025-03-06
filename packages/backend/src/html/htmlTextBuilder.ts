@@ -80,17 +80,16 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
 
       // Add class name and component name for Svelte or styled-components modes
       const mode = this.settings.htmlGenerationMode;
-      if ((mode === "svelte" || mode === "styled-components") && styleAttributes) {
-        // Create a consistent naming scheme for both modes
-        const uniqueName = (node as any).uniqueName || node.name || "text";
+      if (
+        (mode === "svelte" || mode === "styled-components") &&
+        styleAttributes
+      ) {
+        // Use the pre-assigned uniqueId from the segment if available,
+        // or generate one if not (as a fallback)
+        const segmentName = (segment as any).uniqueId || 
+          `${((node as any).uniqueName || node.name || "text").replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase()}_text_${(index + 1).toString().padStart(2, "0")}`;
         
-        // Create segment name with index for uniqueness
-        const segmentPrefix = index > 0 
-          ? `${uniqueName.replace(/[^a-zA-Z0-9]/g, "")}-${index}` 
-          : uniqueName.replace(/[^a-zA-Z0-9]/g, "");
-          
-        // Always generate a unique className for consistent styling
-        const className = generateUniqueClassName(segmentPrefix);
+        const className = generateUniqueClassName(segmentName);
         result.className = className;
 
         // Convert styles to CSS format
@@ -99,7 +98,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
             .split(this.isJSX ? "," : ";")
             .map((style) => style.trim())
             .filter((style) => style),
-          this.isJSX
+          this.isJSX,
         );
 
         // In both modes, use span for text segments to avoid selector conflicts
@@ -108,16 +107,16 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
         // Store in cssCollection with consistent metadata
         cssCollection[className] = {
           styles: cssStyles,
-          nodeName: segmentPrefix,
+          nodeName: segmentName,
           nodeType: "TEXT",
-          element: elementTag, 
+          element: elementTag,
         };
 
         if (mode === "styled-components") {
           result.componentName = getComponentName(
-            { name: segmentPrefix },
+            { name: segmentName },
             className,
-            elementTag
+            elementTag,
           );
         }
       }

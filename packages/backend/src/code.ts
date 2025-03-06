@@ -1,3 +1,4 @@
+import { btoa } from "js-base64";
 import { convertNodesToAltNodes } from "./altNodes/altConversion";
 import {
   retrieveGenericSolidUIColors,
@@ -13,14 +14,8 @@ import { PluginSettings } from "types";
 import { convertToCode } from "./common/retrieveUI/convertToCode";
 import { generateHTMLPreview } from "./html/htmlMain";
 
-export const generateId = (length: number = 4): string => {
-  const chars = "1234567890abcdefghijklmnopqrstuvwxyz";
-  return Array.from({ length }, () => 
-    chars.charAt(Math.floor(Math.random() * chars.length))
-  ).join('');
-};
-// Keep track of node names to identify duplicates
-const nodeNameRegistry: Map<string, number> = new Map();
+// Keep track of node names for sequential numbering
+const nodeNameCounters: Map<string, number> = new Map();
 
 // Helper function to add parent references to all children in the node tree
 const addParentReferences = (node: any) => {
@@ -57,102 +52,135 @@ const processNodeData = (node: any, optimizeLayout: boolean) => {
       );
     });
 
-    try {
+    // Ensure node has a unique name with simple numbering
+    const cleanName = node.name.trim();
+
+    // Track names with simple counter
+    const count = nodeNameCounters.get(cleanName) || 0;
+    nodeNameCounters.set(cleanName, count + 1);
+
+    // For first occurrence, use original name; for duplicates, add sequential suffix
+    node.uniqueName =
+      count === 0
+        ? cleanName
+        : `${cleanName}_${count.toString().padStart(2, "0")}`;
+
+    console.log("going inside", node);
+    // Handle additional node properties
+    if (
+      hasGradient ||
+      optimizeLayout ||
+      node.type === "INSTANCE" ||
+      node.type === "TEXT"
+    ) {
       const figmaNode = figma.getNodeById(node.id);
-      if (figmaNode) {
-        // Ensure node has a unique name - store directly on node
-        if (figmaNode.name) {
-          const cleanName = figmaNode.name.trim();
 
-          // Track names for uniqueness
-          const count = nodeNameRegistry.get(cleanName) || 0;
-          nodeNameRegistry.set(cleanName, count + 1);
+      if (!figmaNode) {
+        return;
+      }
 
-          // For first occurrence, use original name; for duplicates, add suffix
-          node.uniqueName =
-            count === 0
-              ? cleanName
-              : `${cleanName}_${generateId()}`;
-        }
-
-        // Handle additional node properties
-        if (
-          hasGradient ||
-          optimizeLayout ||
-          node.type === "INSTANCE" ||
-          node.type === "TEXT"
-        ) {
-          // Handle gradients
-          if (hasGradient) {
-            GRADIENT_PROPERTIES.forEach((propName) => {
-              const property = node[propName];
-              if (
-                property &&
-                Array.isArray(property) &&
-                property.length > 0 &&
-                property.some(
-                  (item) => item.type && item.type.startsWith("GRADIENT_"),
-                ) &&
-                propName in figmaNode
-              ) {
-                node[propName] = JSON.parse(
-                  JSON.stringify((figmaNode as any)[propName]),
-                );
-              }
-            });
-          }
-
-          // Handle text-specific properties
-          if (figmaNode.type === "TEXT") {
-            node.styledTextSegments = figmaNode.getStyledTextSegments([
-              "fontName",
-              "fills",
-              "fontSize",
-              "fontWeight",
-              "hyperlink",
-              "indentation",
-              "letterSpacing",
-              "lineHeight",
-              "listOptions",
-              "textCase",
-              "textDecoration",
-              "textStyleId",
-              "fillStyleId",
-              "openTypeFeatures",
-            ]);
-            Object.assign(node, node.style);
-            if (!node.textAutoResize) {
-              node.textAutoResize = "NONE";
-            }
-          }
-
-          // Extract inferredAutoLayout if optimizeLayout is enabled
-          if (optimizeLayout && "inferredAutoLayout" in figmaNode) {
-            node.inferredAutoLayout = JSON.parse(
-              JSON.stringify((figmaNode as any).inferredAutoLayout),
+      // Handle gradients
+      if (hasGradient) {
+        GRADIENT_PROPERTIES.forEach((propName) => {
+          const property = node[propName];
+          if (
+            property &&
+            Array.isArray(property) &&
+            property.length > 0 &&
+            property.some(
+              (item) => item.type && item.type.startsWith("GRADIENT_"),
+            ) &&
+            propName in figmaNode
+          ) {
+            node[propName] = JSON.parse(
+              JSON.stringify((figmaNode as any)[propName]),
             );
           }
+        });
+      }
+      console.log("eee");
 
-          // Extract component metadata from instances
-          if (
-            node.type === "INSTANCE" &&
-            "variantProperties" in figmaNode &&
-            figmaNode.variantProperties
-          ) {
-            node.variantProperties = figmaNode.variantProperties;
-          }
+      // Handle text-specific properties
+      if (figmaNode.type === "TEXT") {
+        // Get the text segments
+        const styledTextSegments = figmaNode.getStyledTextSegments([
+          "fontName",
+          "fills",
+          "fontSize",
+          "fontWeight",
+          "hyperlink",
+          "indentation",
+          "letterSpacing",
+          "lineHeight",
+          "listOptions",
+          "textCase",
+          "textDecoration",
+          "textStyleId",
+          "fillStyleId",
+          "openTypeFeatures",
+        ]);
+
+        // Assign unique IDs to each segment
+        if (styledTextSegments.length > 0) {
+          const baseSegmentName = (node.uniqueName || node.name)
+            .replace(/[^a-zA-Z0-9_-]/g, "")
+            .toLowerCase();
+          // Add a uniqueId to each segment
+          node.styledTextSegments = styledTextSegments.map(
+            (segment: any, index) => {
+              const mutableSegment = Object.assign({}, segment);
+              // For single segments, don't add index suffix
+              if (styledTextSegments.length === 1) {
+                mutableSegment.uniqueId = `${baseSegmentName}_span`;
+              } else {
+                // For multiple segments, add index suffix
+                mutableSegment.uniqueId = `${baseSegmentName}_span_${(index + 1).toString().padStart(2, "0")}`;
+              }
+              console.log("after");
+              return mutableSegment;
+            },
+          );
         }
 
-        // Always copy size and position
-        if ("width" in figmaNode) {
-          node.width = (figmaNode as any).width;
-          node.height = (figmaNode as any).height;
-          node.x = (figmaNode as any).x;
-          node.y = (figmaNode as any).y;
+        Object.assign(node, node.style);
+        if (!node.textAutoResize) {
+          node.textAutoResize = "NONE";
         }
       }
-    } catch (e) {
-      // Silently fail if there's an error accessing the Figma node
+
+      // Extract inferredAutoLayout if optimizeLayout is enabled
+      if (optimizeLayout && "inferredAutoLayout" in figmaNode) {
+        node.inferredAutoLayout = JSON.parse(
+          JSON.stringify((figmaNode as any).inferredAutoLayout),
+        );
+      }
+
+      // Extract component metadata from instances
+      if (
+        node.type === "INSTANCE" &&
+        "variantProperties" in figmaNode &&
+        figmaNode.variantProperties
+      ) {
+        node.variantProperties = figmaNode.variantProperties;
+      }
+
+      console.log("figmaNode", figmaNode);
+      // Always copy size and position
+      if ("width" in figmaNode) {
+        node.width = (figmaNode as any).width;
+        node.height = (figmaNode as any).height;
+        node.x = (figmaNode as any).x;
+        node.y = (figmaNode as any).y;
+      }
+    } else {
+      // Hopefully one day this won't be needed anymore.
+      const figmaNode = figma.getNodeById(node.id);
+      if (figmaNode && "width" in figmaNode) {
+        node.width = (figmaNode as any).width;
+        node.height = (figmaNode as any).height;
+        node.x = (figmaNode as any).x;
+        node.y = (figmaNode as any).y;
+      }
     }
 
     // Set default layout properties if missing
@@ -190,8 +218,8 @@ export const nodesToJSON = async (
   nodes: ReadonlyArray<SceneNode>,
   optimizeLayout: boolean = false,
 ): Promise<SceneNode[]> => {
-  // Reset name registry for each conversion
-  nodeNameRegistry.clear();
+  // Reset name counters for each conversion
+  nodeNameCounters.clear();
 
   const nodeJson = (await Promise.all(
     nodes.map(
