@@ -170,12 +170,7 @@ export class HtmlDefaultBuilder {
         formatWithJSX("position", isJSX, "absolute"),
       );
     } else {
-      if (
-        node.type === "GROUP" ||
-        ("layoutMode" in node &&
-          ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
-            ?.layoutMode === "NONE")
-      ) {
+      if ("children" in node) {
         this.addStyles(formatWithJSX("position", isJSX, "relative"));
       }
     }
@@ -245,14 +240,12 @@ export class HtmlDefaultBuilder {
   }
 
   size(): this {
-    const { node, settings } = this;
-    const { width, height } = htmlSizePartial(
-      node,
-      settings.jsx,
-      settings.optimizeLayout,
-    );
+    const { node, settings, isJSX, optimizeLayout } = this;
+    const sizeStyles = htmlSizePartial(node, isJSX, optimizeLayout);
+    const { width, height } = sizeStyles;
 
     if (node.type === "TEXT") {
+      // TODO: add max width and height for text nodes if possible
       switch (node.textAutoResize) {
         case "WIDTH_AND_HEIGHT":
           break;
@@ -265,7 +258,7 @@ export class HtmlDefaultBuilder {
           break;
       }
     } else {
-      this.addStyles(width, height);
+      this.addStyles(...Object.values(sizeStyles));
     }
 
     return this;
