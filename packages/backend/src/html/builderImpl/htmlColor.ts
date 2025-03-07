@@ -121,11 +121,7 @@ const processGradientStops = (
     .join(", ");
 };
 
-export const htmlGradientFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
-  settings: HTMLSettings,
-): string => {
-  const fill = retrieveTopFill(fills);
+export const htmlGradientFromFills = (fill: Paint): string => {
   if (!fill) return "";
   switch (fill.type) {
     case "GRADIENT_LINEAR":
