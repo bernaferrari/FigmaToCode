@@ -28,6 +28,8 @@ interface CodePanelProps {
 
 const CodePanel = (props: CodePanelProps) => {
   const [syntaxHovered, setSyntaxHovered] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const initialLinesToShow = 25;
   const {
     code,
     preferenceOptions,
@@ -62,12 +64,34 @@ const CodePanel = (props: CodePanelProps) => {
     );
   };
 
+  // Function to truncate code to a specific number of lines
+  const truncateCode = (codeString: string, lines: number) => {
+    const codeLines = codeString.split("\n");
+    if (codeLines.length <= lines) {
+      return codeString;
+    }
+    return codeLines.slice(0, lines).join("\n") + "\n...";
+  };
+
   // If the selected framework is Tailwind and a prefix is provided then transform the code.
   const prefixedCode =
     selectedFramework === "Tailwind" &&
     settings?.customTailwindPrefix?.trim() !== ""
       ? applyPrefixToClasses(code, settings?.customTailwindPrefix)
       : code;
+
+  // Memoize the line count calculation to improve performance for large code blocks
+  const lineCount = useMemo(
+    () => prefixedCode.split("\n").length,
+    [prefixedCode],
+  );
+
+  // Determine if code should be truncated
+  const shouldTruncate = !isExpanded && lineCount > initialLinesToShow;
+  const displayedCode = shouldTruncate
+    ? truncateCode(prefixedCode, initialLinesToShow)
+    : prefixedCode;
+  const showMoreButton = lineCount > initialLinesToShow;
 
   const handleButtonHover = () => setSyntaxHovered(true);
   const handleButtonLeave = () => setSyntaxHovered(false);
@@ -197,31 +221,45 @@ const CodePanel = (props: CodePanelProps) => {
         {isCodeEmpty ? (
           <EmptyState />
         ) : (
-          <SyntaxHighlighter
-            language={
-              selectedFramework === "HTML" &&
-              settings?.htmlGenerationMode === "styled-components"
-                ? "jsx"
-                : selectedFramework === "Flutter"
-                  ? "dart"
-                  : selectedFramework === "SwiftUI"
-                    ? "swift"
-                    : "html"
-            }
-            style={theme}
-            customStyle={{
-              fontSize: 12,
-              borderRadius: 8,
-              marginTop: 0,
-              marginBottom: 0,
-              backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
-              transitionProperty: "all",
-              transitionTimingFunction: "ease",
-              transitionDuration: "0.2s",
-            }}
-          >
-            {prefixedCode}
-          </SyntaxHighlighter>
+          <>
+            <SyntaxHighlighter
+              language={
+                selectedFramework === "HTML" &&
+                settings?.htmlGenerationMode === "styled-components"
+                  ? "jsx"
+                  : selectedFramework === "Flutter"
+                    ? "dart"
+                    : selectedFramework === "SwiftUI"
+                      ? "swift"
+                      : "html"
+              }
+              style={theme}
+              customStyle={{
+                fontSize: 12,
+                borderRadius: 8,
+                marginTop: 0,
+                marginBottom: 0,
+                backgroundColor: syntaxHovered ? "#1E2B1A" : "#1B1B1B",
+                transitionProperty: "all",
+                transitionTimingFunction: "ease",
+                transitionDuration: "0.2s",
+              }}
+            >
+              {displayedCode}
+            </SyntaxHighlighter>
+            {showMoreButton && (
+              <div className="flex justify-center dark:bg-[#1B1B1B] border-t dark:border-gray-700">
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-xs w-full flex justify-center py-3 text-blue-500 hover:text-blue-400 transition-colors"
+                  aria-label="Show more code. This could be slow or freeze Figma for a few seconds."
+                  title="Show more code. This could be slow or freeze Figma for a few seconds."
+                >
+                  {isExpanded ? "Show Less" : "Show More"}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

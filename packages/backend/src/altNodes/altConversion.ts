@@ -13,22 +13,21 @@ const canBeFlattened = (node: SceneNode): boolean => {
     "VECTOR",
     "STAR",
     "POLYGON",
-    "BOOLEAN_OPERATION"
+    "BOOLEAN_OPERATION",
   ];
-  
+
   // Handle special case for Rectangle nodes with zero or near-zero height
   if (node.type === "RECTANGLE") {
     // Check if the node is essentially a divider/line (near-zero height)
     return false; // Rectangles should not be flattened by default
   }
-  
+
   return isTypeOrGroupOfTypes(flattenableTypes, node);
 };
 
 export const convertNodeToAltNode =
   (parent: ParentNode | null) =>
   async (node: SceneNode): Promise<SceneNode | null> => {
-    console.log("node is", node);
     (node as any).canBeFlattened = canBeFlattened(node);
     const type = node.type;
     switch (type) {
