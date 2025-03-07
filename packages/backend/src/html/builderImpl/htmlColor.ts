@@ -1,7 +1,6 @@
 import { HTMLSettings } from "types";
 import { numberToFixedString } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
-import { getGradientTransformCoordinates } from "../../common/color";
 
 /**
  * Helper to process a color with variable binding if present
@@ -90,13 +89,12 @@ export const htmlColor = (color: RGB, alpha: number = 1): string => {
 };
 
 // Process a single gradient stop with proper color and position
-const processGradientStop = async (
+const processGradientStop = (
   stop: ColorStop,
-  useCustomColors: boolean,
   fillOpacity: number = 1,
   positionMultiplier: number = 100,
   unit: string = "%",
-): Promise<string> => {
+): string => {
   const fillInfo = {
     color: stop.color,
     opacity: stop.color.a * fillOpacity,
@@ -112,40 +110,32 @@ const processGradientStop = async (
 // Process all gradient stops for any gradient type
 const processGradientStops = (
   stops: ReadonlyArray<ColorStop>,
-  useCustomColors: boolean,
   fillOpacity: number = 1,
   positionMultiplier: number = 100,
   unit: string = "%",
 ): string => {
   return stops
     .map((stop) =>
-      processGradientStop(
-        stop,
-        useCustomColors,
-        fillOpacity,
-        positionMultiplier,
-        unit,
-      ),
+      processGradientStop(stop, fillOpacity, positionMultiplier, unit),
     )
     .join(", ");
 };
 
-export const htmlGradientFromFills = async (
+export const htmlGradientFromFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
   settings: HTMLSettings,
-): Promise<string> => {
-  const useCustomColors = settings.useColorVariables === true;
+): string => {
   const fill = retrieveTopFill(fills);
   if (!fill) return "";
   switch (fill.type) {
     case "GRADIENT_LINEAR":
-      return htmlLinearGradient(fill, useCustomColors);
+      return htmlLinearGradient(fill);
     case "GRADIENT_ANGULAR":
-      return await htmlAngularGradient(fill, useCustomColors);
+      return htmlAngularGradient(fill);
     case "GRADIENT_RADIAL":
-      return await htmlRadialGradient(fill, useCustomColors);
+      return htmlRadialGradient(fill); // Updated to use radial gradient function
     case "GRADIENT_DIAMOND":
-      return htmlDiamondGradient(fill, useCustomColors); // Added diamond gradient case
+      return htmlDiamondGradient(fill);
     default:
       return "";
   }
@@ -169,15 +159,11 @@ export const cssGradientAngle = (angle: number): number => {
   return cssAngle < 0 ? cssAngle + 360 : cssAngle;
 };
 
-export const htmlLinearGradient = async (
-  fill: GradientPaint,
-  useCustomColors: boolean,
-): Promise<string> => {
+export const htmlLinearGradient = (fill: GradientPaint): string => {
   const figmaAngle = gradientAngle2(fill);
   const angle = cssGradientAngle(figmaAngle).toFixed(0);
   const mappedFill = processGradientStops(
     fill.gradientStops,
-    useCustomColors,
     fill.opacity ?? 1,
     100,
     "%",
@@ -187,47 +173,64 @@ export const htmlLinearGradient = async (
 
 export const invertYCoordinate = (y: number): number => 1 - y;
 
-export const htmlRadialGradient = (
-  fill: GradientPaint,
-  useCustomColors: boolean,
-): string => {
-  const mappedFill = processGradientStops(
-    fill.gradientStops,
-    useCustomColors,
-    fill.opacity ?? 1,
-    100,
-    "%",
-  );
-  const { centerX, centerY, radiusX, radiusY } =
-    getGradientTransformCoordinates(fill.gradientTransform);
-  return `radial-gradient(${radiusX}% ${radiusY}% at ${centerX}% ${centerY}%, ${mappedFill})`;
-};
-
-export const htmlAngularGradient = (
-  fill: GradientPaint,
-  useCustomColors: boolean,
-): string => {
+export const htmlAngularGradient = (fill: GradientPaint): string => {
   const angle = gradientAngle2(fill).toFixed(0);
-  const centerX = (fill.gradientTransform[0][2] * 100).toFixed(2);
-  const centerY = (fill.gradientTransform[1][2] * 100).toFixed(2);
+  // Extract matrix components
+  const a = fill.gradientTransform[0][0];
+  const b = fill.gradientTransform[0][1];
+  const tx = fill.gradientTransform[0][2];
+  const c = fill.gradientTransform[1][0];
+  const d = fill.gradientTransform[1][1];
+  const ty = fill.gradientTransform[1][2];
+  // Compute center by transforming (0.5, 0.5)
+  const centerX = (a * 0.5 + b * 0.5 + tx) * 100;
+  const centerY = (c * 0.5 + d * 0.5 + ty) * 100;
+  const centerXPercent = centerX.toFixed(2);
+  const centerYPercent = centerY.toFixed(2);
   const mappedFill = processGradientStops(
     fill.gradientStops,
-    useCustomColors,
     fill.opacity ?? 1,
     360,
     "deg",
   );
-  return `conic-gradient(from ${angle}deg at ${centerX}% ${centerY}%, ${mappedFill})`;
+  return `conic-gradient(from ${angle}deg at ${centerXPercent}% ${centerYPercent}%, ${mappedFill})`;
+};
+
+export const htmlRadialGradient = (fill: GradientPaint): string => {
+  const [[a, b, tx], [c, d, ty]] = fill.gradientTransform;
+
+  // Calculate inverse of the linear part of the gradientTransform matrix
+  const det = a * d - b * c;
+  if (Math.abs(det) < 1e-6) return ""; // Avoid division by zero
+
+  const invDet = 1 / det;
+  const invA = d * invDet;
+  const invB = -b * invDet;
+  const invC = -c * invDet;
+  const invD = a * invDet;
+
+  // Calculate center by solving inverse transform for (0.5, 0.5)
+  const cx = (invA * (0.5 - tx) + invB * (0.5 - ty)) * 100;
+  const cy = (invC * (0.5 - tx) + invD * (0.5 - ty)) * 100;
+
+  // Calculate column vectors of inverse matrix
+  const col1Length = Math.sqrt(invA ** 2 + invC ** 2) * 100;
+  const col2Length = Math.sqrt(invB ** 2 + invD ** 2) * 100;
+
+  // Get radii as half lengths of column vectors (sorted)
+  const radii = [col1Length / 2, col2Length / 2].sort((a, b) => b - a);
+
+  const mappedStops = processGradientStops(
+    fill.gradientStops,
+    fill.opacity ?? 1,
+  );
+  return `radial-gradient(ellipse ${radii[0].toFixed(2)}% ${radii[1].toFixed(2)}% at ${cx.toFixed(2)}% ${cy.toFixed(2)}%, ${mappedStops})`;
 };
 
 // Added function for diamond gradient
-export const htmlDiamondGradient = (
-  fill: GradientPaint,
-  useCustomColors: boolean,
-): string => {
+export const htmlDiamondGradient = (fill: GradientPaint): string => {
   const stops = processGradientStops(
     fill.gradientStops,
-    useCustomColors,
     fill.opacity ?? 1,
     50, // Adjusted multiplier for diamond gradient
     "%",

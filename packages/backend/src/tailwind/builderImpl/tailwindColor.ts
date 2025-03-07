@@ -8,6 +8,13 @@ import { TailwindColorType } from "types";
 import { addWarning } from "../../common/commonConversionWarnings";
 import { retrieveTopFill } from "../../common/retrieveFill";
 
+// Import the HTML gradient functions
+import {
+  htmlAngularGradient,
+  htmlRadialGradient,
+  htmlDiamondGradient,
+} from "../../html/builderImpl/htmlColor";
+
 /**
  * Get a tailwind color value object
  * @param fill
@@ -132,18 +139,31 @@ export const tailwindGradientFromFills = (
     return tailwindGradient(fill);
   }
 
-  // Show warning if there's a non-linear gradient
-  if (
-    fill.type === "GRADIENT_ANGULAR" ||
-    fill.type === "GRADIENT_RADIAL" ||
-    fill.type === "GRADIENT_DIAMOND"
-  ) {
-    addWarning(
-      "Gradients are not fully supported in Tailwind except for Linear Gradients.",
-    );
+  // Use arbitrary values with HTML-based gradient syntax for other gradient types
+  if (fill.type === "GRADIENT_ANGULAR") {
+    return tailwindArbitraryGradient(htmlAngularGradient(fill));
+  }
+
+  if (fill.type === "GRADIENT_RADIAL") {
+    return tailwindArbitraryGradient(htmlRadialGradient(fill));
+  }
+
+  if (fill.type === "GRADIENT_DIAMOND") {
+    return tailwindArbitraryGradient(htmlDiamondGradient(fill));
   }
 
   return "";
+};
+
+/**
+ * Converts CSS gradient syntax to Tailwind arbitrary value syntax
+ * @param cssGradient The CSS gradient string (e.g., "radial-gradient(...)")
+ * @returns Tailwind class with arbitrary value (e.g., "bg-[radial-gradient(...)]")
+ */
+const tailwindArbitraryGradient = (cssGradient: string): string => {
+  // Replace spaces with underscores for Tailwind compatibility
+  const tailwindValue = cssGradient.replace(/\s+/g, "_");
+  return `bg-[${tailwindValue}]`;
 };
 
 export const tailwindGradient = (fill: GradientPaint): string => {
