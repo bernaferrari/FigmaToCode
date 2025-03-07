@@ -5,6 +5,7 @@ import {
   Minimize2,
   MonitorSmartphone,
   Smartphone,
+  Circle,
 } from "lucide-react";
 
 const Preview: React.FC<{
@@ -13,6 +14,7 @@ const Preview: React.FC<{
   const [expanded, setExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [animationClass, setAnimationClass] = useState<string>("");
+  const [bgColor, setBgColor] = useState<"white" | "black">("white");
 
   // Define consistent dimensions regardless of mode
   const containerWidth = expanded ? 320 : 240;
@@ -63,6 +65,16 @@ const Preview: React.FC<{
           Preview
         </h3>
         <div className="flex items-center gap-1">
+          {/* Background Color Toggle */}
+          <button
+            onClick={() => setBgColor(bgColor === "white" ? "black" : "white")}
+            className="p-1.5 mr-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
+            aria-label={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
+            title={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
+          >
+            <Circle size={14} fill={bgColor} className="stroke-current" />
+          </button>
+
           {/* View Mode Toggle */}
           <div className="mr-1 flex bg-neutral-100 dark:bg-neutral-700 rounded-md p-0.5">
             <button
@@ -128,7 +140,9 @@ const Preview: React.FC<{
           >
             {/* Device frame - just a border for mobile, no status bar or home indicator */}
             <div
-              className={`w-full h-full flex justify-center items-center overflow-hidden bg-white dark:bg-black ${
+              className={`w-full h-full flex justify-center items-center overflow-hidden ${
+                bgColor === "white" ? "bg-white" : "bg-black"
+              } ${
                 viewMode === "desktop"
                   ? "border border-neutral-300 dark:border-neutral-600 rounded shadow-sm"
                   : "border-2 border-neutral-400 dark:border-neutral-500 rounded-xl shadow-sm"
