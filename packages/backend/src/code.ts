@@ -235,7 +235,7 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
       // Extract inferredAutoLayout if optimizeLayout is enabled
       if (settings.optimizeLayout && "inferredAutoLayout" in figmaNode) {
         node.inferredAutoLayout = JSON.parse(
-          JSON.stringify((figmaNode as any).inferredAutoLayout),
+          JSON.stringify(figmaNode.inferredAutoLayout),
         );
       }
 
@@ -246,20 +246,29 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
 
       // Always copy size and position
       if ("width" in figmaNode) {
-        node.width = (figmaNode as any).width;
-        node.height = (figmaNode as any).height;
-        node.x = (figmaNode as any).x;
-        node.y = (figmaNode as any).y;
+        node.width = figmaNode.width;
+        node.height = figmaNode.height;
+        node.x = figmaNode.x;
+        node.y = figmaNode.y;
       }
     } else {
       // Hopefully one day this won't be needed anymore.
       const figmaNode = await figma.getNodeByIdAsync(node.id);
-      if (figmaNode && "width" in figmaNode) {
-        node.width = (figmaNode as any).width;
-        node.height = (figmaNode as any).height;
-        node.x = (figmaNode as any).x;
-        node.y = (figmaNode as any).y;
+      if (figmaNode) {
+        if ("width" in figmaNode) {
+          node.width = figmaNode.width;
+          node.height = figmaNode.height;
+          node.x = figmaNode.x;
+          node.y = figmaNode.y;
+        }
       }
+    }
+
+    if ("individualStrokeWeights" in node) {
+      node.strokeTopWeight = node.individualStrokeWeights.top;
+      node.strokeBottomWeight = node.individualStrokeWeights.bottom;
+      node.strokeLeftWeight = node.individualStrokeWeights.left;
+      node.strokeRightWeight = node.individualStrokeWeights.right;
     }
 
     await getColorVariables(node, settings);

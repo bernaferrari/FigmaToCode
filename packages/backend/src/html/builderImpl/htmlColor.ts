@@ -14,7 +14,6 @@ const processColorWithVariable = (fill: {
 
   if (fill.variableColorName) {
     const varName = fill.variableColorName;
-    console.log("varName is", varName);
     const fallbackColor = htmlColor(fill.color, opacity);
     return `var(--${varName}, ${fallbackColor})`;
   }
