@@ -320,7 +320,7 @@ export class HtmlDefaultBuilder {
 
   size(): this {
     const { node, settings } = this;
-    const { width, height } = htmlSizePartial(
+    const { width, height, constraints } = htmlSizePartial(
       node,
       settings.htmlGenerationMode === "jsx",
       settings.optimizeLayout,
@@ -340,6 +340,11 @@ export class HtmlDefaultBuilder {
       }
     } else {
       this.addStyles(width, height);
+    }
+
+    // Add constraints as separate styles
+    if (constraints.length > 0) {
+      this.addStyles(...constraints);
     }
 
     return this;

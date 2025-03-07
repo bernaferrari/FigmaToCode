@@ -187,8 +187,8 @@ export class TailwindDefaultBuilder {
 
   // must be called before Position, because of the hasFixedSize attribute.
   size(): this {
-    const { node, optimizeLayout } = this;
-    const { width, height } = tailwindSizePartial(node, optimizeLayout);
+    const { node, optimizeLayout, settings } = this;
+    const { width, height, constraints } = tailwindSizePartial(node, optimizeLayout, settings);
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {
@@ -204,6 +204,11 @@ export class TailwindDefaultBuilder {
       }
     } else {
       this.addAttributes(width, height);
+    }
+
+    // Add any min/max constraints
+    if (constraints) {
+      this.addAttributes(constraints);
     }
 
     return this;

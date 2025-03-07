@@ -111,11 +111,29 @@ export const pxToBlur = (value: number): string | null => {
 };
 
 export const pxToLayoutSize = (value: number): string => {
-  const tailwindValue = pxToTailwind(value, config.layoutSize);
-  if (tailwindValue) {
-    return tailwindValue;
+  // First check if it's a direct match to avoid rounding errors
+  const exactValue = Object.keys(config.layoutSize)
+    .map(Number)
+    .find((size) => Math.abs(value - size) < 0.05);
+
+  if (exactValue !== undefined) {
+    return (config.layoutSize as any)[exactValue];
   }
 
+  // If not an exact match but rounding is enabled, check for a close match
+  if (localTailwindSettings.roundTailwindValues) {
+    const thresholdValue = nearestValueWithThreshold(
+      value,
+      Object.keys(config.layoutSize).map(Number),
+      15, // 15% threshold for layout sizes
+    );
+
+    if (thresholdValue !== null) {
+      return (config.layoutSize as any)[thresholdValue];
+    }
+  }
+
+  // No match found, return arbitrary value
   return `[${numberToFixedString(value)}px]`;
 };
 

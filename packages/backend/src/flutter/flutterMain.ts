@@ -239,7 +239,6 @@ const makeRowColumn = (
     // mainAxisSize: getFlex(node, autoLayout),
     mainAxisAlignment: getMainAxisAlignment(autoLayout),
     crossAxisAlignment: getCrossAxisAlignment(autoLayout),
-    children: [children],
   };
 
   // Add spacing parameter if itemSpacing is set
@@ -248,6 +247,8 @@ const makeRowColumn = (
   } else if (autoLayout.itemSpacing < 0) {
     addWarning("Flutter doesn't support negative itemSpacing");
   }
+
+  widgetProps.children = [children];
 
   return generateWidgetCode(rowOrColumn, widgetProps);
 };
