@@ -28,7 +28,10 @@ export const flutterContainer = (
 
   // ignore for Groups
   const propBoxDecoration = getDecoration(node);
-  const { width, height, isExpanded } = flutterSize(node, optimizeLayout);
+  const { width, height, isExpanded, constraints } = flutterSize(
+    node,
+    optimizeLayout,
+  );
 
   const clipBehavior =
     "clipsContent" in node && node.clipsContent === true
@@ -46,6 +49,8 @@ export const flutterContainer = (
   }
 
   let result: string;
+  const hasConstraints = constraints && Object.keys(constraints).length > 0;
+
   if (width || height || propBoxDecoration || clipBehavior) {
     const parsedDecoration = skipDefaultProperty(
       propBoxDecoration,
@@ -67,6 +72,14 @@ export const flutterContainer = (
     });
   } else {
     result = child;
+  }
+
+  // Apply constraints if any exist
+  if (hasConstraints) {
+    result = generateWidgetCode("ConstrainedBox", {
+      constraints: generateWidgetCode("BoxConstraints", constraints),
+      child: result,
+    });
   }
 
   // Add Expanded() when parent is a Row/Column and width is full.

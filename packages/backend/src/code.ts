@@ -333,6 +333,12 @@ const processNodePair = async (
   if (!jsonNode.layoutSizingHorizontal)
     jsonNode.layoutSizingHorizontal = "FIXED";
   if (!jsonNode.layoutSizingVertical) jsonNode.layoutSizingVertical = "FIXED";
+  if (!jsonNode.primaryAxisAlignItems) {
+    jsonNode.primaryAxisAlignItems = "MIN";
+  }
+  if (!jsonNode.counterAxisAlignItems) {
+    jsonNode.counterAxisAlignItems = "MIN";
+  }
 
   // If layout sizing is HUG but there are no children, set it to FIXED
   const hasChildren =

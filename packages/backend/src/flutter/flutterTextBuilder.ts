@@ -168,7 +168,34 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
 
   textAutoSize(node: TextNode): this {
     let result = this.child;
-    
+
+    // Get constraints for the node
+    const constraints: Record<string, string> = {};
+
+    if (node.minWidth !== undefined && node.minWidth !== null) {
+      constraints.minWidth = numberToFixedString(node.minWidth);
+    }
+
+    if (node.maxWidth !== undefined && node.maxWidth !== null) {
+      constraints.maxWidth = numberToFixedString(node.maxWidth);
+    }
+
+    if (node.minHeight !== undefined && node.minHeight !== null) {
+      constraints.minHeight = numberToFixedString(node.minHeight);
+    }
+
+    if (node.maxHeight !== undefined && node.maxHeight !== null) {
+      constraints.maxHeight = numberToFixedString(node.maxHeight);
+    }
+
+    const hasConstraints = Object.keys(constraints).length > 0;
+    if (hasConstraints) {
+      result = generateWidgetCode("ConstrainedBox", {
+        constraints: generateWidgetCode("BoxConstraints", constraints),
+        child: result,
+      });
+    }
+
     switch (node.textAutoResize) {
       case "WIDTH_AND_HEIGHT":
         break;
@@ -187,9 +214,8 @@ export class FlutterTextBuilder extends FlutterDefaultBuilder {
         });
         break;
     }
-    
+
     result = wrapTextWithLayerBlur(node, result);
-    
     this.child = result;
     return this;
   }

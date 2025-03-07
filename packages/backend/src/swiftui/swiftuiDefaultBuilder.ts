@@ -139,10 +139,14 @@ export class SwiftuiDefaultBuilder {
   }
 
   size(node: SceneNode, optimize: boolean): this {
-    const { width, height } = swiftuiSize(node, optimize);
-    const sizes = [width, height].filter((d) => d);
-    if (sizes.length > 0) {
-      this.pushModifier([`frame`, sizes.join(", ")]);
+    const { width, height, constraints } = swiftuiSize(node, optimize);
+    if (width || height) {
+      this.pushModifier([`frame`, [width, height].filter(Boolean).join(", ")]);
+    }
+
+    // Add constraints if any exist
+    if (constraints.length > 0) {
+      this.pushModifier([`frame`, constraints.join(", ")]);
     }
 
     return this;

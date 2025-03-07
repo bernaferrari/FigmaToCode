@@ -1,26 +1,10 @@
 import { Size } from "types";
 
 export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
-  const hasLayout =
-    "layoutAlign" in node && node.parent && "layoutMode" in node.parent;
-
-  if (!hasLayout) {
-    return { width: node.width, height: node.height };
-  }
-
   const nodeAuto =
     (optimizeLayout && "inferredAutoLayout" in node
       ? node.inferredAutoLayout
       : null) ?? node;
-
-  if ("layoutMode" in nodeAuto && nodeAuto.layoutMode === "NONE") {
-    return { width: node.width, height: node.height };
-  }
-
-  // const parentLayoutMode = node.parent.layoutMode;
-  const parentLayoutMode = optimizeLayout
-    ? node.parent.inferredAutoLayout?.layoutMode
-    : node.parent.layoutMode;
 
   // Check for explicit layout sizing properties
   if (
@@ -42,6 +26,17 @@ export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
           : node.height;
 
     return { width, height };
+  }
+
+  if ("layoutMode" in nodeAuto && nodeAuto.layoutMode === "NONE") {
+    return { width: node.width, height: node.height };
+  }
+
+  const hasLayout =
+    "layoutAlign" in node && node.parent && "layoutMode" in node.parent;
+
+  if (!hasLayout) {
+    return { width: node.width, height: node.height };
   }
 
   return { width: node.width, height: node.height };

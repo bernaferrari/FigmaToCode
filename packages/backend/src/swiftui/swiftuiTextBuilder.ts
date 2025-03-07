@@ -179,7 +179,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   };
 
   wrapTextAutoResize = (node: TextNode): string => {
-    const { width, height } = swiftuiSize(node);
+    const { width, height, constraints } = swiftuiSize(node);
 
     let comp: string[] = [];
     switch (node.textAutoResize) {
@@ -193,6 +193,8 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
         comp.push(width, height);
         break;
     }
+
+    comp.push(...constraints);
 
     if (comp.length > 0) {
       const align = this.textAlignment(node);

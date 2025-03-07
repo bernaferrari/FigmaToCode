@@ -197,6 +197,7 @@ const createDirectionalStack = (
 const getLayoutAlignment = (
   inferredAutoLayout: InferredAutoLayoutResult,
 ): string => {
+  console.log("inferred is", inferredAutoLayout);
   switch (inferredAutoLayout.counterAxisAlignItems) {
     case "MIN":
       return inferredAutoLayout.layoutMode === "VERTICAL" ? ".leading" : ".top";
