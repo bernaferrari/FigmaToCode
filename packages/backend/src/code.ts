@@ -372,7 +372,7 @@ export const run = async (settings: PluginSettings) => {
   const code = await convertToCode(convertedSelection, settings);
   const htmlPreview = await generateHTMLPreview(convertedSelection, settings);
   const colors = retrieveGenericSolidUIColors(framework);
-  const gradients = retrieveGenericGradients(framework, settings);
+  const gradients = retrieveGenericGradients(framework);
 
   postConversionComplete({
     code,

@@ -76,7 +76,6 @@ const convertSolidColor = (
 
 export const retrieveGenericLinearGradients = (
   framework: Framework,
-  settings: HTMLSettings,
 ): Array<LinearGradientConversion> => {
   const selectionColors = figma.getSelectionColors();
   const colorStr: Array<LinearGradientConversion> = [];
@@ -89,7 +88,7 @@ export const retrieveGenericLinearGradients = (
           exportValue = flutterGradient(paint);
           break;
         case "HTML":
-          exportValue = htmlGradientFromFills([paint], settings);
+          exportValue = htmlGradientFromFills(paint);
           break;
         case "Tailwind":
           exportValue = tailwindGradient(paint);
@@ -99,7 +98,7 @@ export const retrieveGenericLinearGradients = (
           break;
       }
       colorStr.push({
-        cssPreview: htmlGradientFromFills([paint], settings),
+        cssPreview: htmlGradientFromFills(paint),
         exportValue,
       });
     }

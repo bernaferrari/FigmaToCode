@@ -5,14 +5,12 @@ import {
   nearestValue,
 } from "../conversionTables";
 import { TailwindColorType } from "types";
-import { addWarning } from "../../common/commonConversionWarnings";
 import { retrieveTopFill } from "../../common/retrieveFill";
 
 // Import the HTML gradient functions
 import {
   htmlAngularGradient,
   htmlRadialGradient,
-  htmlDiamondGradient,
 } from "../../html/builderImpl/htmlColor";
 
 /**
