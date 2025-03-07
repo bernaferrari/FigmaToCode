@@ -149,7 +149,8 @@ export const tailwindGradientFromFills = (
   }
 
   if (fill.type === "GRADIENT_DIAMOND") {
-    return tailwindArbitraryGradient(htmlDiamondGradient(fill));
+    // Diamond is too complex, it is going to create 3 linear gradients, which gets too weird in Tailwind.
+    return "";
   }
 
   return "";
