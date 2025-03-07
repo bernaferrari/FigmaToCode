@@ -425,8 +425,7 @@ export class HtmlDefaultBuilder {
     }
 
     if ("variantProperties" in this.node && this.node.variantProperties) {
-      console.log("this.node.variantProperties", this.node.variantProperties);
-
+      // console.log("this.node.variantProperties", this.node.variantProperties);
       Object.entries(this.node.variantProperties)
         ?.map((prop) => formatDataAttribute(prop[0], prop[1]))
         .sort()
