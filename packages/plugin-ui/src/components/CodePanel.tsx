@@ -4,10 +4,9 @@ import {
   PluginSettings,
   SelectPreferenceOptions,
 } from "types";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
-import SelectableToggle from "./SelectableToggle";
 import { CopyButton } from "./CopyButton";
 import EmptyState from "./EmptyState";
 import SettingsGroup from "./SettingsGroup";

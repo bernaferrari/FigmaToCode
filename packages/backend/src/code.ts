@@ -38,14 +38,14 @@ const addParentReferences = (node: any) => {
   }
 };
 
-const variableCache = new Map<string, Promise<string>>();
+const variableCache = new Map<string, string>();
 
 const memoizedVariableToColorName = async (
   variableId: string,
 ): Promise<string> => {
   if (!variableCache.has(variableId)) {
-    const promise = variableToColorName(variableId);
-    variableCache.set(variableId, promise);
+    const colorName = await variableToColorName(variableId);
+    variableCache.set(variableId, colorName);
   }
   return variableCache.get(variableId)!;
 };
