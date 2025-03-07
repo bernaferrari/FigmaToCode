@@ -298,7 +298,7 @@ export class HtmlDefaultBuilder {
         paint.type === "GRADIENT_ANGULAR" ||
         paint.type === "GRADIENT_DIAMOND"
       ) {
-        return htmlGradientFromFills([paint], this.settings);
+        return htmlGradientFromFills(paint);
       }
 
       return ""; // Handle other paint types safely
@@ -347,10 +347,15 @@ export class HtmlDefaultBuilder {
 
   autoLayoutPadding(): this {
     const { node, isJSX, optimizeLayout } = this;
-    if ("paddingLeft" in node) {
+    if (
+      "paddingLeft" in node ||
+      "paddingRight" in node ||
+      "paddingTop" in node ||
+      "paddingBottom" in node
+    ) {
       this.addStyles(
         ...htmlPadding(
-          (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
+          (optimizeLayout ? (node as any).inferredAutoLayout : null) ?? node,
           isJSX,
         ),
       );

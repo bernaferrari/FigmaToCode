@@ -1,4 +1,4 @@
-import { HTMLSettings, PluginSettings } from "types";
+import { HTMLSettings } from "types";
 import { formatMultipleJSXArray } from "../../common/parseJSX";
 
 const getFlexDirection = (node: InferredAutoLayoutResult): string =>
@@ -60,5 +60,5 @@ export const htmlAutoLayoutProps = (
       gap: getGap(autoLayout),
       display: getFlex(node, autoLayout),
     },
-    settings.jsx,
+    settings.htmlGenerationMode === "jsx",
   );
