@@ -347,12 +347,7 @@ export class HtmlDefaultBuilder {
 
   autoLayoutPadding(): this {
     const { node, isJSX, optimizeLayout } = this;
-    if (
-      "paddingLeft" in node ||
-      "paddingRight" in node ||
-      "paddingTop" in node ||
-      "paddingBottom" in node
-    ) {
+    if ("paddingLeft" in node) {
       this.addStyles(
         ...htmlPadding(
           (optimizeLayout ? (node as any).inferredAutoLayout : null) ?? node,
