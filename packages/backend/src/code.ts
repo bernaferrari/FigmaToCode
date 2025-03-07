@@ -273,6 +273,22 @@ const processNodeData = async (node: any, settings: PluginSettings) => {
 
     await getColorVariables(node, settings);
 
+    // Some places check if paddingLeft exists. This makes sure they all exist, even if 0.
+    if (node.layoutMode) {
+      if (node.paddingLeft === undefined) {
+        node.paddingLeft = 0;
+      }
+      if (node.paddingRight === undefined) {
+        node.paddingRight = 0;
+      }
+      if (node.paddingTop === undefined) {
+        node.paddingTop = 0;
+      }
+      if (node.paddingBottom === undefined) {
+        node.paddingBottom = 0;
+      }
+    }
+
     // Set default layout properties if missing
     if (!node.layoutMode) node.layoutMode = "NONE";
     if (!node.layoutGrow) node.layoutGrow = 0;
