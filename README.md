@@ -13,7 +13,7 @@
 <a href="https://www.figma.com/community/plugin/842128343887142055"><img src="assets/badge.png" height="60"/></a>
 </p>
 
-Turning Figma designs into usable code can be a challenge, often requiring time-consuming manual work. Figma to Code simplifies that process. This plugin generates responsive layouts in `HTML`, `React (JSX)`, `Svelte`, `styled-components`, `Tailwind`, `Flutter`, and `SwiftUI` directly from your designs. Your feedback and ideas are always welcome.
+Converting Figma designs into usable code can be a challenge, often requiring time-consuming manual work. Figma to Code simplifies that process. This plugin generates responsive layouts in `HTML`, `React (JSX)`, `Svelte`, `styled-components`, `Tailwind`, `Flutter`, and `SwiftUI` directly from your designs. Your feedback and ideas are always welcome.
 
 ![Gif showing the conversion](assets/lossy_gif.gif)
 
@@ -39,11 +39,9 @@ Converting visual designs to code inevitably encounters complex edge cases. Here
 
 1. **Complex Layouts**: When working with mixed positioning (absolute + auto-layout), the plugin has to make intelligent decisions about how to structure the resulting code. It detects parent-child relationships and z-index ordering to produce the most accurate representation.
 
-2. **Text Styling**: Rich text with multiple styles requires breaking into multiple elements while preserving layout relationships.
+2. **Color Variables**: The plugin detects and processes color variables, allowing for theme-consistent output.
 
-3. **Color Variables**: The plugin detects and processes color variables, allowing for theme-consistent output.
-
-4. **Gradients and Effects**: Different frameworks handle gradients and effects in unique ways, requiring specialized conversion logic.
+3. **Gradients and Effects**: Different frameworks handle gradients and effects in unique ways, requiring specialized conversion logic.
 
 ![Conversion Workflow](assets/examples.png)
 
