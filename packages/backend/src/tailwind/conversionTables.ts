@@ -78,7 +78,7 @@ const pxToTailwind = (
   const keys = Object.keys(conversionMap).map((d) => +d);
   const convertedValue = exactValue(value, keys);
 
-  console.log("convertedValue", convertedValue);
+  console.log("convertedValue", convertedValue, value, keys);
 
   if (convertedValue) {
     return conversionMap[convertedValue];
@@ -108,6 +108,14 @@ export const pxToFontSize = (value: number): string => {
 
 export const pxToBorderRadius = (value: number): string => {
   return pxToRemToTailwind(value, config.borderRadius);
+};
+
+export const pxToBorderWidth = (value: number): string | null => {
+  return pxToTailwind(value, config.border);
+};
+
+export const pxToRing = (value: number): string | null => {
+  return pxToTailwind(value, config.ring);
 };
 
 export const pxToBlur = (value: number): string | null => {

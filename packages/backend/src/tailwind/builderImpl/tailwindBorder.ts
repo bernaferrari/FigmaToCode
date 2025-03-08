@@ -1,38 +1,92 @@
 import { getCommonRadius } from "../../common/commonRadius";
 import { commonStroke } from "../../common/commonStroke";
-import { nearestValue, pxToBorderRadius } from "../conversionTables";
+import {
+  nearestValue,
+  pxToBorderRadius,
+  pxToBorderWidth,
+  pxToRing,
+} from "../conversionTables";
+import { numberToFixedString } from "../../common/numToAutoFixed";
+import { addWarning } from "../../common/commonConversionWarnings";
+
+const getBorder = (weight: number, kind: string, isRing: boolean = false) => {
+  // Use ring utilities for outside strokes
+  if (isRing) {
+    // Special case: ring (without width) is 3px in Tailwind
+    if (weight === 3) {
+      return "ring";
+    }
+
+    const ringWidth = pxToRing(weight);
+    if (ringWidth === null) {
+      return `ring-[${numberToFixedString(weight)}px]`;
+    } else if (ringWidth === "3") {
+      // Ring is 3px
+      return `ring`;
+    } else {
+      return `ring-${ringWidth}`;
+    }
+  }
+
+  // Special case: border (without width) is 1px in Tailwind
+  if (weight === 1) {
+    return `border${kind}`;
+  }
+
+  // Use border utilities for default and inside strokes
+  const borderWidth = pxToBorderWidth(weight);
+  if (borderWidth === null) {
+    return `border${kind}-[${numberToFixedString(weight)}px]`;
+  } else if (borderWidth === "DEFAULT") {
+    // Border is 1px
+    return `border${kind}`;
+  } else {
+    return `border${kind}-${borderWidth}`;
+  }
+};
 
 /**
  * https://tailwindcss.com/docs/border-width/
  * example: border-2
  */
-export const tailwindBorderWidth = (node: SceneNode): string => {
+export const tailwindBorderWidth = (
+  node: SceneNode,
+): {
+  isRing: boolean;
+  property: string;
+} => {
   const commonBorder = commonStroke(node);
   if (!commonBorder) {
-    return "";
+    return {
+      isRing: false,
+      property: "",
+    };
   }
 
-  const getBorder = (weight: number, kind: string) => {
-    const allowedValues = [1, 2, 4, 8];
-    console.log("weight", weight);
-    const nearest = nearestValue(weight, allowedValues);
-    console.log("nearest", nearest);
-
-    if (nearest === 1) {
-      // special case
-      return `border${kind}`;
-    } else {
-      return `border${kind}-${nearest}`;
-    }
-  };
+  // Check if stroke is outside
+  const isRing =
+    "strokeAlign" in node &&
+    (node.strokeAlign === "OUTSIDE" || node.strokeAlign === "CENTER");
 
   if ("all" in commonBorder) {
     if (commonBorder.all === 0) {
-      return "";
+      return {
+        isRing: false,
+        property: "",
+      };
     }
-    return getBorder(commonBorder.all, "");
+    return {
+      isRing,
+      property: getBorder(commonBorder.all, "", isRing),
+    };
+  } else {
+    addWarning(
+      'Non-uniform borders are only supported with strokeAlign set to "inside". Will paint inside.',
+    );
   }
 
+  // If borders are non-uniform, always use border utilities for better control
+  // regardless of whether the stroke is outside or not
   const comp = [];
   if (commonBorder.left !== 0) {
     comp.push(getBorder(commonBorder.left, "-l"));
@@ -46,7 +100,11 @@ export const tailwindBorderWidth = (node: SceneNode): string => {
   if (commonBorder.bottom !== 0) {
     comp.push(getBorder(commonBorder.bottom, "-b"));
   }
-  return comp.join(" ");
+
+  return {
+    isRing,
+    property: comp.join(" "),
+  };
 };
 
 /**

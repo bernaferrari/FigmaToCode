@@ -1,5 +1,5 @@
 const layoutSize = {
-  // '0: 0',
+  "0": "0",
   1: "px",
   2: "0.5",
   4: "1",
@@ -37,7 +37,7 @@ const layoutSize = {
 };
 
 const borderRadius = {
-  // 0: "none",
+  0: "none",
   0.125: "sm",
   0.25: "",
   0.375: "md",
@@ -356,37 +356,54 @@ const fontWeight: Record<number, string> = {
   600: "semibold",
   700: "bold",
   800: "extrabold",
-  900: "black"
+  900: "black",
 };
 
 const fontFamily = {
   sans: [
-    'ui-sans-serif',
-    'system-ui',
-    'sans-serif',
-    'Apple Color Emoji',
-    'Segoe UI Emoji',
-    'Segoe UI Symbol',
-    'Noto Color Emoji'
+    "ui-sans-serif",
+    "system-ui",
+    "sans-serif",
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji",
   ],
   serif: [
-    'ui-serif',
-    'Georgia',
-    'Cambria',
-    'Times New Roman',
-    'Times',
-    'serif'
+    "ui-serif",
+    "Georgia",
+    "Cambria",
+    "Times New Roman",
+    "Times",
+    "serif",
   ],
   mono: [
-    'ui-monospace',
-    'SFMono-Regular',
-    'Menlo',
-    'Monaco',
-    'Consolas',
-    'Liberation Mono',
-    'Courier New',
-    'monospace'
-  ]
+    "ui-monospace",
+    "SFMono-Regular",
+    "Menlo",
+    "Monaco",
+    "Consolas",
+    "Liberation Mono",
+    "Courier New",
+    "monospace",
+  ],
+};
+
+const border = {
+  0: "0",
+  1: "1",
+  2: "2",
+  4: "4",
+  8: "8",
+};
+
+const ring = {
+  0: "0",
+  1: "1",
+  2: "2",
+  3: "3",
+  4: "4",
+  8: "8",
 };
 
 export const config = {
@@ -400,4 +417,6 @@ export const config = {
   color,
   fontWeight,
   fontFamily,
+  border,
+  ring,
 };
