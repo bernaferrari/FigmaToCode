@@ -169,7 +169,8 @@ const Preview: React.FC<{
       {/* Footer with size info */}
       <div className="px-3 py-1.5 text-xs text-neutral-500 dark:text-neutral-400 flex items-center justify-between border-t border-neutral-200 dark:border-neutral-700">
         <span>
-          {props.htmlPreview.size.width}×{props.htmlPreview.size.height}px
+          {props.htmlPreview.size.width.toFixed(0)}×
+          {props.htmlPreview.size.height.toFixed(0)}px
         </span>
         <div className="flex items-center gap-1.5">
           {viewMode === "mobile" ? (

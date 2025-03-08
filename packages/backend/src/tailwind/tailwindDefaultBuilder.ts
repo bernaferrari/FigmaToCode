@@ -114,8 +114,9 @@ export class TailwindDefaultBuilder {
 
   border(): this {
     if ("strokes" in this.node) {
-      this.addAttributes(tailwindBorderWidth(this.node));
-      this.customColor(this.node.strokes, "border");
+      const { isRing, property } = tailwindBorderWidth(this.node);
+      this.addAttributes(property);
+      this.customColor(this.node.strokes, isRing ? "ring" : "border");
     }
 
     return this;
@@ -188,7 +189,11 @@ export class TailwindDefaultBuilder {
   // must be called before Position, because of the hasFixedSize attribute.
   size(): this {
     const { node, optimizeLayout, settings } = this;
-    const { width, height, constraints } = tailwindSizePartial(node, optimizeLayout, settings);
+    const { width, height, constraints } = tailwindSizePartial(
+      node,
+      optimizeLayout,
+      settings,
+    );
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {
