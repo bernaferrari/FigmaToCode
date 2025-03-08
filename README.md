@@ -13,21 +13,37 @@
 <a href="https://www.figma.com/community/plugin/842128343887142055"><img src="assets/badge.png" height="60"/></a>
 </p>
 
-Most _design to code_ plugins are bad, some are even paid. This project aims to raise the bar by generating **responsive** layouts in [Tailwind](https://tailwindcss.com/), [Flutter](https://flutter.github.io/) and [SwiftUI](https://developer.apple.com/xcode/swiftui/). The plan is to eventually add support for [Jetpack Compose](https://developer.android.com/jetpack/compose) and possibly standard HTML or other frameworks like [React Native](https://reactnative.dev/), [Bootstrap](https://getbootstrap.com/) or [Fluent](https://www.microsoft.com/design/fluent/). Feedback, ideas and partnerships are appreciated!
+Turning Figma designs into usable code can be a challenge, often requiring time-consuming manual work. Figma to Code simplifies that process. This plugin generates responsive layouts in `HTML`, `React (JSX)`, `Svelte`, `styled-components`, `Tailwind`, `Flutter`, and `SwiftUI` directly from your designs. Your feedback and ideas are always welcome.
 
 ![Gif showing the conversion](assets/lossy_gif.gif)
 
 ## How it works
 
-This plugin takes an unconventional approach to improve code quality: it optimizes the layout before the conversion to code even begins. The standard Figma [Nodes](https://www.figma.com/plugin-docs/api/nodes/) (what represents each layer) is a joy to work with, but it can't modify a layer without modifying the user project. For this reason, I decided to virtualize it, remaking the official implementation and naming them `AltNodes`. During the process of converting a `Node` into an `AltNode`, the plugin does the following:
+The plugin uses a sophisticated multi-step process to transform your Figma designs into clean, optimized code:
+
+1. **Node Conversion**: First, the plugin converts Figma's native nodes into JSON representations, preserving all necessary properties while adding optimizations and parent references.
+
+2. **Intermediate Representation**: The JSON nodes are then transformed into `AltNodes` - a custom virtual representation that can be manipulated without affecting your original design.
+
+3. **Layout Optimization**: The plugin analyzes and optimizes layouts, detecting patterns like auto-layouts, responsive constraints and color variables.
+
+4. **Code Generation**: Finally, the optimized structure is transformed into the target framework's code, with special handling for each framework's unique patterns and best practices. If a feature is unsupported, the plugin will provide a warning.
 
 ![Conversion Workflow](assets/workflow.png)
 
-That process can also be seen as an [Intermediate Representation](https://en.wikipedia.org/wiki/Intermediate_representation) and might allow this plugin to, one day, live outside Figma.
+This intermediate representation approach allows for sophisticated transformations and optimizations before any code is generated, resulting in cleaner, more maintainable output.
 
 ## Hard cases
 
-When finding the unknown (a `Group` or `Frame` with more than one child and no vertical or horizontal alignment), Tailwind mode uses [insets](https://tailwindcss.com/docs/top-right-bottom-left/#app) for best cases and `left`, `top` from standard CSS for the worst cases. Flutter mode uses `Stack` and `Positioned.fill`. Both are usually not recommended and can easily defeat the responsiveness. In many scenarios, just wrapping some elements in a `Group` or `Frame` can solve:
+Converting visual designs to code inevitably encounters complex edge cases. Here are some challenges the plugin handles:
+
+1. **Complex Layouts**: When working with mixed positioning (absolute + auto-layout), the plugin has to make intelligent decisions about how to structure the resulting code. It detects parent-child relationships and z-index ordering to produce the most accurate representation.
+
+2. **Text Styling**: Rich text with multiple styles requires breaking into multiple elements while preserving layout relationships.
+
+3. **Color Variables**: The plugin detects and processes color variables, allowing for theme-consistent output.
+
+4. **Gradients and Effects**: Different frameworks handle gradients and effects in unique ways, requiring specialized conversion logic.
 
 ![Conversion Workflow](assets/examples.png)
 
@@ -35,20 +51,9 @@ When finding the unknown (a `Group` or `Frame` with more than one child and no v
 
 ### Todo
 
-- Vectors (tricky in HTML, unsupported in Flutter)
-- Images (they are local, how to support them?)
-- Line/Star/Polygon (todo. Rectangle and Ellipse were prioritized and are more common)
-- The source code is fully commented and there are more than 30 "todo"s there
-
-### Tailwind limitations
-
-- **Width:** Tailwind has a maximum width of 384px. If an item passes this, the width will be set to `w-full` (unless it is already relative like `w-1/2`, `w-1/3`, etc). This is usually a feature, but be careful: if most layers in your project are larger than 384px, the plugin's result might be less than optimal.
-
-### Flutter limits and ideas
-
-- **Stack:** in some simpler cases, a `Stack` could be replaced with a `Container` and a `BoxDecoration`. Discover those cases and optimize them.
-- **Material Styles**: text could be matched to existing Material styles (like outputting `Headline6` when text size is 20).
-- **Identify Buttons**: the plugin could identify specific buttons and output them instead of always using `Container` or `Material`.
+- Vectors (possible to enable in HTML and Tailwind)
+- Images (possible to enable to inline them in HTML and Tailwind)
+- Line/Star/Polygon
 
 ## How to build the project
 
@@ -70,16 +75,49 @@ The plugin is organized as a monorepo. There are several packages:
   - `ui-src` - loads the common `plugin-ui` and compiles to `index.html`
 - `apps/debug` - This is a debug mode plugin that is a more convenient way to see all the UI elements.
 
-The plugin is built using Turbo which in turn builds the internal packages.
+### Development Workflow
+
+The project uses [Turborepo](https://turbo.build/) for managing the monorepo, and each package is compiled using [esbuild](https://esbuild.github.io/) for fast development cycles. Only modified files are recompiled when changes are made, making the development process more efficient.
+
+#### Running the Project
+
+You have two main options for development:
+
+1. **Root development mode** (includes debug UI):
+
+   ```bash
+   pnpm dev
+   ```
+
+   This runs the plugin in dev mode and also starts a Next.js server for the debug UI. You can access the debug UI at `http://localhost:3000`.
+
+2. **Plugin-only development mode**:
+
+   ```bash
+   cd apps/plugin
+   pnpm dev
+   ```
+
+   This focuses only on the plugin without the Next.js debug UI. Use this when you're making changes specifically to the plugin.
+
+#### Where to Make Changes
+
+Most of your development work will happen in these directories:
+
+- `packages/backend` - For plugin backend
+- `packages/plugin-ui` - For plugin UI
+- `apps/plugin/` - The main plugin result that combines the backend and UI and is called by Figma.
+
+You'll rarely need to modify files directly in the `apps/` directory, as they mostly contain build configuration.
 
 #### Commands
 
 `pnpm run ...`
 
 - `dev` - runs the app in dev mode. This can be run in the Figma editor.
-- `build`
-- `build:watch`
-- `lint`
+- `build` - builds the project for production
+- `build:watch` - builds and watches for changes
+- `lint` - runs ESLint
 - `format` - formats with prettier (warning: may edit files!)
 
 #### Debug mode
