@@ -33,7 +33,7 @@ export const tailwindSizePartial = (
   optimizeLayout: boolean,
   settings?: TailwindSettings,
 ): { width: string; height: string; constraints: string } => {
-  const size = nodeSize(node, optimizeLayout);
+  const size = nodeSize(node);
   const nodeParent =
     (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
       ? node.parent.inferredAutoLayout

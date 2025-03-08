@@ -12,7 +12,7 @@ export const flutterSize = (
   node: SceneNode,
   optimizeLayout: boolean,
 ): { width: string; height: string; isExpanded: boolean; constraints: Record<string, string> } => {
-  const size = nodeSize(node, optimizeLayout);
+  const size = nodeSize(node);
   let isExpanded: boolean = false;
 
   const nodeParent =

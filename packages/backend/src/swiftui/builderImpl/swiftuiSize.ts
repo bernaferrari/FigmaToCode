@@ -3,9 +3,8 @@ import { numberToFixedString } from "../../common/numToAutoFixed";
 
 export const swiftuiSize = (
   node: SceneNode,
-  optimize: boolean = false,
 ): { width: string; height: string; constraints: string[] } => {
-  const size = nodeSize(node, optimize);
+  const size = nodeSize(node);
 
   const constraintProps: string[] = [];
   let width = "";
