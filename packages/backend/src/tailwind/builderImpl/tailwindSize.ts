@@ -12,14 +12,11 @@ const formatTailwindSizeValue = (
   prefix: string,
   settings?: TailwindSettings,
 ): string => {
-  // Try to find a matching Tailwind size class
-  if (settings?.roundTailwindValues) {
-    const tailwindSize = pxToLayoutSize(size);
+  const tailwindSize = pxToLayoutSize(size);
 
-    // If we found a matching Tailwind class, use it
-    if (!tailwindSize.startsWith("[")) {
-      return `${prefix}-${tailwindSize}`;
-    }
+  // If we found a matching Tailwind class, use it
+  if (!tailwindSize.startsWith("[")) {
+    return `${prefix}-${tailwindSize}`;
   }
 
   // No matching class or rounding disabled, use arbitrary value

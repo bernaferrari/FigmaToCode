@@ -12,6 +12,7 @@ import EmptyState from "./EmptyState";
 import SettingsGroup from "./SettingsGroup";
 import CustomPrefixInput from "./CustomPrefixInput";
 import FrameworkTabs from "./FrameworkTabs";
+import { TailwindSettings } from "./tailwindSettings";
 
 interface CodePanelProps {
   code: string;
@@ -21,7 +22,7 @@ interface CodePanelProps {
   selectPreferenceOptions: SelectPreferenceOptions[];
   onPreferenceChanged: (
     key: keyof PluginSettings,
-    value: boolean | string,
+    value: boolean | string | number,
   ) => void;
 }
 
@@ -202,9 +203,9 @@ const CodePanel = (props: CodePanelProps) => {
               onPreferenceChanged={onPreferenceChanged}
             >
               {selectedFramework === "Tailwind" && (
-                <CustomPrefixInput
-                  initialValue={settings?.customTailwindPrefix || ""}
-                  onValueChange={handleCustomPrefixChange}
+                <TailwindSettings
+                  settings={settings}
+                  onPreferenceChanged={onPreferenceChanged}
                 />
               )}
             </SettingsGroup>

@@ -33,6 +33,7 @@ export const defaultPluginSettings: PluginSettings = {
   embedVectors: false,
   htmlGenerationMode: "html",
   tailwindGenerationMode: "jsx",
+  baseFontSize: 16,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
@@ -175,7 +176,7 @@ const codegenMode = async () => {
         node,
       );
 
-      const nodeJson = await nodesToJSON([node]);
+      const nodeJson = await nodesToJSON([node], userPluginSettings);
       const convertedSelection = await convertIntoNodes(nodeJson, null);
       console.log(
         "[DEBUG] codegen.generate - Converted selection:",

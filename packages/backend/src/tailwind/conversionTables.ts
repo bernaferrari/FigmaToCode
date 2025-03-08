@@ -44,7 +44,7 @@ export const exactValue = (
 /**
  * convert pixel values to Tailwind attributes.
  * by default, Tailwind uses rem, while Figma uses px.
- * Therefore, a conversion is necessary. Rem = Pixel / 16.abs
+ * Therefore, a conversion is necessary. Rem = Pixel / baseFontSize
  * Then, find in the corresponding table the closest value.
  */
 const pxToRemToTailwind = (
@@ -52,7 +52,9 @@ const pxToRemToTailwind = (
   conversionMap: Record<number, string>,
 ): string => {
   const keys = Object.keys(conversionMap).map((d) => +d);
-  const remValue = value / 16;
+  // Use the configured base font size or fall back to default 16px
+  const baseFontSize = localTailwindSettings.baseFontSize || 16;
+  const remValue = value / baseFontSize;
   const convertedValue = exactValue(remValue, keys);
 
   if (convertedValue) {
@@ -75,6 +77,8 @@ const pxToTailwind = (
 ): string | null => {
   const keys = Object.keys(conversionMap).map((d) => +d);
   const convertedValue = exactValue(value, keys);
+
+  console.log("convertedValue", convertedValue);
 
   if (convertedValue) {
     return conversionMap[convertedValue];
@@ -111,30 +115,16 @@ export const pxToBlur = (value: number): string | null => {
 };
 
 export const pxToLayoutSize = (value: number): string => {
-  // First check if it's a direct match to avoid rounding errors
-  const exactValue = Object.keys(config.layoutSize)
-    .map(Number)
-    .find((size) => Math.abs(value - size) < 0.05);
+  // Scale the input value according to the base font size ratio
+  const baseFontSize = localTailwindSettings.baseFontSize || 16;
+  // If baseFontSize is different than 16, we need to adjust the pixel value
+  // For example, with baseFontSize=14, 7px should match with the key for 8px (w-2)
+  const scaledValue = (value * 16) / baseFontSize;
 
-  if (exactValue !== undefined) {
-    return (config.layoutSize as any)[exactValue];
-  }
-
-  // If not an exact match but rounding is enabled, check for a close match
-  if (localTailwindSettings.roundTailwindValues) {
-    const thresholdValue = nearestValueWithThreshold(
-      value,
-      Object.keys(config.layoutSize).map(Number),
-      15, // 15% threshold for layout sizes
-    );
-
-    if (thresholdValue !== null) {
-      return (config.layoutSize as any)[thresholdValue];
-    }
-  }
-
-  // No match found, return arbitrary value
-  return `[${numberToFixedString(value)}px]`;
+  // Use pxToTailwind directly with the scaled value, since the keys in config.layoutSize
+  // are likely in pixels based on a 16px base font size
+  const result = pxToTailwind(scaledValue, config.layoutSize);
+  return result !== null ? result : `[${numberToFixedString(value)}px]`;
 };
 
 export const nearestOpacity = (nodeOpacity: number): number => {
