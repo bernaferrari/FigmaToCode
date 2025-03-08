@@ -127,7 +127,7 @@ export const swiftuiContainer = (
   const result = new SwiftuiDefaultBuilder(kind)
     .shapeForeground(node)
     .autoLayoutPadding(node, localSettings.optimizeLayout)
-    .size(node, localSettings.optimizeLayout)
+    .size(node)
     .shapeBackground(node)
     .cornerRadius(node)
     .shapeBorder(node)
