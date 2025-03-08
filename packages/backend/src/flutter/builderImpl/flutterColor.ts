@@ -35,7 +35,11 @@ export const flutterColorFromDirectFills = (
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
-    return flutterColor(fill.color, fill.opacity ?? 1.0);
+    return flutterColor(
+      fill.color, 
+      fill.opacity ?? 1.0, 
+      (fill as any).variableColorName
+    );
   } else if (
     fill &&
     (fill.type === "GRADIENT_LINEAR" ||
@@ -43,7 +47,12 @@ export const flutterColorFromDirectFills = (
       fill.type === "GRADIENT_RADIAL")
   ) {
     if (fill.gradientStops.length > 0) {
-      return flutterColor(fill.gradientStops[0].color, fill.opacity ?? 1.0);
+      const stop = fill.gradientStops[0];
+      return flutterColor(
+        stop.color, 
+        fill.opacity ?? 1.0, 
+        (stop as any).variableColorName
+      );
     }
   }
 
@@ -66,7 +75,7 @@ export const flutterBoxDecorationColor = (
 
   if (fill && fill.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
-    return { color: flutterColor(fill.color, opacity) };
+    return { color: flutterColor(fill.color, opacity, (fill as any).variableColorName) };
   } else if (
     fill?.type === "GRADIENT_LINEAR" ||
     fill?.type === "GRADIENT_RADIAL" ||
@@ -126,7 +135,7 @@ const gradientDirection = (angle: number): string => {
 
 const flutterRadialGradient = (fill: GradientPaint): string => {
   const colors = fill.gradientStops
-    .map((d) => flutterColor(d.color, d.color.a))
+    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
     .join(", ");
 
   const x = numberToFixedString(fill.gradientTransform[0][2]);
@@ -144,7 +153,7 @@ const flutterRadialGradient = (fill: GradientPaint): string => {
 
 const flutterAngularGradient = (fill: GradientPaint): string => {
   const colors = fill.gradientStops
-    .map((d) => flutterColor(d.color, d.color.a))
+    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
     .join(", ");
 
   const x = numberToFixedString(fill.gradientTransform[0][2]);
@@ -166,7 +175,7 @@ const flutterLinearGradient = (fill: GradientPaint): string => {
   const y = Math.sin(radians).toFixed(2);
 
   const colors = fill.gradientStops
-    .map((d) => flutterColor(d.color, d.color.a))
+    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
     .join(", ");
 
   return generateWidgetCode("LinearGradient", {
@@ -205,21 +214,31 @@ const opacityToAlpha = (opacity: number): number => {
   return Math.round(opacity * 255);
 };
 
-export const flutterColor = (color: RGB, opacity: number): string => {
+export const flutterColor = (
+  color: RGB, 
+  opacity: number, 
+  variableColorName?: string
+): string => {
   const sum = color.r + color.g + color.b;
+  let colorCode = "";
 
   if (sum === 0) {
-    return opacity === 1
+    colorCode = opacity === 1
       ? "Colors.black"
       : `Colors.black.withValues(alpha: ${opacityToAlpha(opacity)})`;
-  }
-
-  if (sum === 3) {
-    return opacity === 1
+  } else if (sum === 3) {
+    colorCode = opacity === 1
       ? "Colors.white"
       : `Colors.white.withValues(alpha: ${opacityToAlpha(opacity)})`;
+  } else {
+    // Always use full 8-digit hex which includes alpha channel
+    colorCode = `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
   }
 
-  // Always use full 8-digit hex which includes alpha channel
-  return `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
+  // Add variable name as a comment if it exists
+  if (variableColorName) {
+    return `${colorCode} /* ${variableColorName} */`;
+  }
+  
+  return colorCode;
 };

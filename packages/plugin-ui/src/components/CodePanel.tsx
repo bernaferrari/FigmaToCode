@@ -129,7 +129,6 @@ const CodePanel = (props: CodePanelProps) => {
       stylingPreferences: frameworkPreferences.filter((p) =>
         stylingPropertyNames.includes(p.propertyName),
       ),
-
       selectableSettingsFiltered: selectPreferenceOptions.filter((p) =>
         p.includedLanguages?.includes(selectedFramework),
       ),
