@@ -1,177 +1,270 @@
 import React, { useState, useRef, useEffect } from "react";
 import { HelpCircle, Check } from "lucide-react";
 
-interface CustomPrefixInputProps {
-  initialValue: string;
-  onValueChange: (value: string) => void;
+interface FormFieldProps {
+  // Common props
+  label: string;
+  initialValue: string | number;
+  onValueChange: (value: string | number) => void;
+  placeholder?: string;
+  helpText?: string;
+
+  // Validation props
+  type?: "text" | "number";
+  min?: number;
+  max?: number;
+  suffix?: string;
+
+  // For text input validation
+  disallowedPattern?: RegExp;
+  disallowedMessage?: string;
+
+  // Optional preview (for text inputs)
+  showPreview?: boolean;
+  previewExamples?: string[];
+  previewTransform?: (value: string, example: string) => React.ReactNode;
 }
 
-const CustomPrefixInput = React.memo(({ initialValue, onValueChange }: CustomPrefixInputProps) => {
-  // Use internal state to manage the input value
-  const [inputValue, setInputValue] = useState(initialValue);
-  const [isFocused, setIsFocused] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  
-  // Update internal state when initialValue changes (from parent)
-  useEffect(() => {
-    setInputValue(initialValue);
-    setHasChanges(false);
-  }, [initialValue]);
-  
-  const examples = ["flex"];
-  const hasInvalidChars = /\s/.test(inputValue);
+const FormField = React.memo(
+  ({
+    label,
+    initialValue,
+    onValueChange,
+    placeholder,
+    helpText,
+    type = "text",
+    min,
+    max,
+    suffix,
+    disallowedPattern = /\s/,
+    disallowedMessage = "Input cannot contain spaces",
+    showPreview = false,
+    previewExamples = ["flex"],
+    previewTransform,
+  }: FormFieldProps) => {
+    // Use internal state to manage the input value
+    const [inputValue, setInputValue] = useState(String(initialValue));
+    const [isFocused, setIsFocused] = useState(false);
+    const [hasChanges, setHasChanges] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [hasError, setHasError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    setHasChanges(newValue !== initialValue);
-  };
+    // Update internal state when initialValue changes (from parent)
+    useEffect(() => {
+      setInputValue(String(initialValue));
+      setHasChanges(false);
+      setHasError(false);
+      setErrorMessage("");
+    }, [initialValue]);
 
-  const applyChanges = () => {
-    if (hasInvalidChars) return;
-    
-    onValueChange(inputValue);
-    setHasChanges(false);
-    
-    // Show success indicator briefly
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 1500);
-  };
+    const validateInput = (value: string): boolean => {
+      // Text validation
+      if (type === "text") {
+        if (disallowedPattern && disallowedPattern.test(value)) {
+          setHasError(true);
+          setErrorMessage(disallowedMessage);
+          return false;
+        }
+        setHasError(false);
+        setErrorMessage("");
+        return true;
+      }
 
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
+      // Number validation
+      if (type === "number") {
+        // Check for non-numeric characters
+        if (/[^0-9]/.test(value)) {
+          setHasError(true);
+          setErrorMessage("Only numbers are allowed");
+          return false;
+        }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      applyChanges();
-      inputRef.current?.blur();
-    }
-  };
+        const numValue = parseInt(value, 10);
 
-  return (
-    <div className="mt-2 mb-1">
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-          Custom Class Prefix
-        </label>
+        if (isNaN(numValue)) {
+          setHasError(true);
+          setErrorMessage("Please enter a valid number");
+          return false;
+        }
 
-        <div className="relative group">
-          <HelpCircle className="w-3 h-3 text-gray-400" />
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 w-56 p-2 bg-white dark:bg-gray-800 shadow-lg rounded border border-gray-200 dark:border-gray-700 text-xs hidden group-hover:block z-10">
-            Add a prefix to all generated Tailwind classes.
-            <br />
-            Useful for avoiding conflicts with existing CSS.
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white dark:border-t-gray-800"></div>
-          </div>
+        if (min !== undefined && numValue < min) {
+          setHasError(true);
+          setErrorMessage(`Minimum value is ${min}`);
+          return false;
+        }
+
+        if (max !== undefined && numValue > max) {
+          setHasError(true);
+          setErrorMessage(`Maximum value is ${max}`);
+          return false;
+        }
+
+        setHasError(false);
+        setErrorMessage("");
+        return true;
+      }
+
+      return true;
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      setInputValue(newValue);
+      validateInput(newValue);
+      setHasChanges(newValue !== String(initialValue));
+    };
+
+    const applyChanges = () => {
+      if (hasError) return;
+
+      if (type === "number") {
+        const numValue = parseInt(inputValue, 10);
+        if (!isNaN(numValue)) {
+          onValueChange(numValue);
+        }
+      } else {
+        onValueChange(inputValue);
+      }
+
+      setHasChanges(false);
+
+      // Show success indicator briefly
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 1500);
+    };
+
+    const handleBlur = () => {
+      setIsFocused(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        applyChanges();
+        inputRef.current?.blur();
+      }
+    };
+
+    // Default preview transform for text prefixes
+    const defaultPreviewTransform = (value: string, example: string) => (
+      <div className="flex items-center gap-1.5">
+        <div className="py-0.5 px-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs font-mono">
+          <span className="text-green-500 dark:text-green-400">{value}</span>
+          <span className="text-blue-500 dark:text-blue-400">{example}</span>
         </div>
-        
-        {showSuccess && (
-          <span className="text-xs text-green-500 flex items-center gap-1 animate-fade-in-out">
-            <Check className="w-3 h-3" /> Applied
-          </span>
-        )}
-      </div>
-
-      <div className="flex w-full items-center gap-2">
-        <div className="flex-1 relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={handleChange}
-            onFocus={() => setIsFocused(true)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            placeholder="e.g., tw-"
-            className={`p-1.5 px-2.5 border rounded-md text-sm w-full transition-all focus:outline-none ${
-              hasInvalidChars
-                ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
-                : isFocused
-                  ? "border-green-400 dark:border-green-600 ring-1 ring-green-300 dark:ring-green-800 bg-white dark:bg-neutral-800"
-                  : "border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 hover:border-gray-400 dark:hover:border-gray-500"
-            }`}
-          />
-          
-          {hasInvalidChars && (
-            <p className="text-xs text-red-500 mt-1 absolute">
-              Prefix cannot contain spaces
-            </p>
-          )}
+        <span className="text-xs text-gray-400 dark:text-gray-500">→</span>
+        <div className="py-0.5 px-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs font-mono text-blue-500 dark:text-blue-400">
+          {example}
         </div>
-        
-        {hasChanges && (
-          <button
-            onClick={applyChanges}
-            disabled={hasInvalidChars}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              hasInvalidChars
-                ? "bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed"
-                : "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
-            }`}
-          >
-            Done
-          </button>
-        )}
       </div>
+    );
 
-      {inputValue && !hasInvalidChars && (
-        <div className="flex flex-col w-full mt-2.5 rounded-md bg-gray-50 dark:bg-gray-800/50 p-2.5 border border-gray-200 dark:border-gray-700">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-            Preview{hasChanges ? " (not applied yet)" : ""}:
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {examples.map((example) => (
-              <div key={example} className="flex items-center gap-1.5">
-                <div className="py-0.5 px-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs font-mono">
-                  <span className="text-green-500 dark:text-green-400">
-                    {inputValue}
-                  </span>
-                  <span className="text-blue-500 dark:text-blue-400">
-                    {example}
-                  </span>
-                </div>
-                <span className="text-xs text-gray-400 dark:text-gray-500">
-                  →
-                </span>
-                <div className="py-0.5 px-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs font-mono text-blue-500 dark:text-blue-400">
-                  {example}
-                </div>
+    const renderPreview = previewTransform || defaultPreviewTransform;
+
+    return (
+      <div className="mt-2 mb-1">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            {label}
+          </label>
+
+          {helpText && (
+            <div className="relative group">
+              <HelpCircle className="w-3 h-3 text-gray-400" />
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 w-56 p-2 bg-white dark:bg-gray-800 shadow-lg rounded border border-gray-200 dark:border-gray-700 text-xs hidden group-hover:block z-10">
+                {helpText}
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white dark:border-t-gray-800"></div>
               </div>
-            ))}
-          </div>
-          
-          {hasChanges && (
-            <p className="text-xs text-amber-500 dark:text-amber-400 mt-2 italic">
-              Press Enter or click Done to apply changes
-            </p>
+            </div>
+          )}
+
+          {showSuccess && (
+            <span className="text-xs text-green-500 flex items-center gap-1 animate-fade-in-out">
+              <Check className="w-3 h-3" /> Applied
+            </span>
           )}
         </div>
-      )}
-    </div>
-  );
-});
 
-CustomPrefixInput.displayName = "CustomPrefixInput";
+        <div className="flex w-full items-start gap-2">
+          <div className="flex-1 flex flex-col">
+            <div className="flex items-center">
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputValue}
+                onChange={handleChange}
+                onFocus={() => setIsFocused(true)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                placeholder={placeholder}
+                className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-none ${
+                  suffix ? "rounded-l-md" : "rounded-md"
+                } ${
+                  hasError
+                    ? "border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+                    : isFocused
+                      ? "border border-green-400 dark:border-green-600 ring-1 ring-green-300 dark:ring-green-800 bg-white dark:bg-neutral-800"
+                      : "border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 hover:border-gray-400 dark:hover:border-gray-500"
+                }`}
+              />
 
-// Add a keyframe for fade-in-out animation
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @keyframes fadeInOut {
-      0% { opacity: 0; }
-      20% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-    .animate-fade-in-out {
-      animation: fadeInOut 1.5s ease-in-out;
-    }
-  `;
-  document.head.appendChild(style);
-}
+              {suffix && (
+                <span
+                  className="py-1.5 px-2.5 text-sm border border-l-0 border-gray-300 dark:border-gray-600 
+                bg-gray-100 dark:bg-gray-700 rounded-r-md text-gray-700 dark:text-gray-300"
+                >
+                  {suffix}
+                </span>
+              )}
+            </div>
 
-export default CustomPrefixInput;
+            {hasError && (
+              <p className="text-xs text-red-500 mt-1">{errorMessage}</p>
+            )}
+          </div>
+
+          {hasChanges && (
+            <button
+              onClick={applyChanges}
+              disabled={hasError}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                hasError
+                  ? "bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed"
+                  : "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
+              }`}
+            >
+              Done
+            </button>
+          )}
+        </div>
+
+        {showPreview && inputValue && !hasError && (
+          <div className="flex flex-col w-full mt-2.5 rounded-md bg-gray-50 dark:bg-gray-800/50 p-2.5 border border-gray-200 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              Preview{hasChanges ? " (not applied yet)" : ""}:
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {previewExamples.map((example) => (
+                <React.Fragment key={example}>
+                  {renderPreview(inputValue, example)}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {hasChanges && (
+              <p className="text-xs text-amber-500 dark:text-amber-400 mt-2 italic">
+                Press Enter or click Done to apply changes
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  },
+);
+
+FormField.displayName = "FormField";
+
+export default FormField;

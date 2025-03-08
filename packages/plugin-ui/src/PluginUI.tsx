@@ -31,7 +31,7 @@ type PluginUIProps = {
   settings: PluginSettings | null;
   onPreferenceChanged: (
     key: keyof PluginSettings,
-    value: boolean | string,
+    value: boolean | string | number,
   ) => void;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
@@ -97,9 +97,9 @@ export const PluginUI = (props: PluginUIProps) => {
             {isEmpty === false && props.htmlPreview && (
               <Preview htmlPreview={props.htmlPreview} />
             )}
-            
+
             {warnings.length > 0 && <WarningsPanel warnings={warnings} />}
-            
+
             <CodePanel
               code={props.code}
               selectedFramework={props.selectedFramework}
