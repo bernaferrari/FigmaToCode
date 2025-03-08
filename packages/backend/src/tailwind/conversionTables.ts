@@ -78,8 +78,6 @@ const pxToTailwind = (
   const keys = Object.keys(conversionMap).map((d) => +d);
   const convertedValue = exactValue(value, keys);
 
-  console.log("convertedValue", convertedValue, value, keys);
-
   if (convertedValue) {
     return conversionMap[convertedValue];
   } else if (localTailwindSettings.roundTailwindValues) {
@@ -176,11 +174,6 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
   let hex: string = "#" + rgbTo6hex(fill.color);
   let meta: string = "";
 
-  console.log(
-    "(fill as any).variableColorName",
-    fill,
-    (fill as any).variableColorName,
-  );
   // variable
   if ((fill as any).variableColorName) {
     // Use pre-computed variable name if available

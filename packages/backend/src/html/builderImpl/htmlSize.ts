@@ -16,6 +16,7 @@ export const htmlSizePartial = (
   }
 
   const size = nodeSize(node, optimizeLayout);
+  console.log("size", size);
   const nodeParent =
     (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
       ? node.parent.inferredAutoLayout

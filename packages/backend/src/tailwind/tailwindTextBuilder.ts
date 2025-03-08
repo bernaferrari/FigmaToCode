@@ -58,8 +58,6 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         .filter(Boolean)
         .join(" ");
 
-      console.log("styleClasses", styleClasses, segment);
-
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
       return {
         style: styleClasses,
