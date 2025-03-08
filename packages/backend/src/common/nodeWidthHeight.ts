@@ -1,34 +1,35 @@
 import { Size } from "types";
 
 export const nodeSize = (node: SceneNode, optimizeLayout: boolean): Size => {
-  const nodeAuto =
-    (optimizeLayout && "inferredAutoLayout" in node
-      ? node.inferredAutoLayout
-      : null) ?? node;
-
-  // Check for explicit layout sizing properties
-  if (
-    "layoutSizingHorizontal" in nodeAuto &&
-    "layoutSizingVertical" in nodeAuto
-  ) {
+  if ("layoutSizingHorizontal" in node && "layoutSizingVertical" in node) {
     const width =
-      nodeAuto.layoutSizingHorizontal === "FILL"
+      node.layoutSizingHorizontal === "FILL"
         ? "fill"
-        : nodeAuto.layoutSizingHorizontal === "HUG"
+        : node.layoutSizingHorizontal === "HUG"
           ? null
           : node.width;
 
     const height =
-      nodeAuto.layoutSizingVertical === "FILL"
+      node.layoutSizingVertical === "FILL"
         ? "fill"
-        : nodeAuto.layoutSizingVertical === "HUG"
+        : node.layoutSizingVertical === "HUG"
           ? null
           : node.height;
 
     return { width, height };
   }
 
-  if ("layoutMode" in nodeAuto && nodeAuto.layoutMode === "NONE") {
+  const nodeAuto =
+    (optimizeLayout && "inferredAutoLayout" in node
+      ? node.inferredAutoLayout
+      : null) ?? node;
+
+  if (
+    nodeAuto &&
+    typeof nodeAuto === "object" &&
+    "layoutMode" in nodeAuto &&
+    nodeAuto.layoutMode === "NONE"
+  ) {
     return { width: node.width, height: node.height };
   }
 

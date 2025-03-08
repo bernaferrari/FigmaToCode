@@ -135,11 +135,6 @@ const CodePanel = (props: CodePanelProps) => {
     };
   }, [preferenceOptions, selectPreferenceOptions, selectedFramework]);
 
-  // Handle custom prefix change
-  const handleCustomPrefixChange = (newValue: string) => {
-    onPreferenceChanged("customTailwindPrefix", newValue);
-  };
-
   return (
     <div className="w-full flex flex-col gap-2 mt-2">
       <div className="flex items-center justify-between w-full">

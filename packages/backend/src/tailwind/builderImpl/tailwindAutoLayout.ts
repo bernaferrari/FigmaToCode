@@ -36,6 +36,27 @@ const getGap = (node: InferredAutoLayoutResult): string =>
     ? `gap-${pxToLayoutSize(node.itemSpacing)}`
     : "";
 
+const getFlexWrap = (node: InferredAutoLayoutResult): string =>
+  node.layoutWrap === "WRAP" ? "flex-wrap" : "";
+
+const getAlignContent = (node: InferredAutoLayoutResult): string => {
+  if (node.layoutWrap !== "WRAP") return "";
+
+  switch (node.counterAxisAlignItems) {
+    case undefined:
+    case "MIN":
+      return "content-start";
+    case "CENTER":
+      return "content-center";
+    case "MAX":
+      return "content-end";
+    case "BASELINE":
+      return "content-baseline";
+    default:
+      return "content-normal";
+  }
+};
+
 const getFlex = (
   node: SceneNode,
   autoLayout: InferredAutoLayoutResult,
@@ -56,6 +77,8 @@ export const tailwindAutoLayoutProps = (
     getJustifyContent(autoLayout),
     getAlignItems(autoLayout),
     getGap(autoLayout),
+    getFlexWrap(autoLayout),
+    getAlignContent(autoLayout),
   ].filter(Boolean);
 
   return classes.join(" ");
