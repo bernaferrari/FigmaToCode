@@ -42,7 +42,7 @@ const getFlexWrap = (node: InferredAutoLayoutResult): string =>
 
 const getAlignContent = (node: InferredAutoLayoutResult): string => {
   if (node.layoutWrap !== "WRAP") return "";
-  
+
   switch (node.counterAxisAlignItems) {
     case undefined:
     case "MIN":
