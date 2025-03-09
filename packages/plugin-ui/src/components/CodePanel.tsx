@@ -12,7 +12,7 @@ import EmptyState from "./EmptyState";
 import SettingsGroup from "./SettingsGroup";
 import CustomPrefixInput from "./CustomPrefixInput";
 import FrameworkTabs from "./FrameworkTabs";
-import { TailwindSettings } from "./tailwindSettings";
+import { TailwindSettings } from "./TailwindSettings";
 
 interface CodePanelProps {
   code: string;
