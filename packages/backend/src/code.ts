@@ -21,7 +21,6 @@ let getStyledTextSegmentsTime = 0;
 let getStyledTextSegmentsCalls = 0;
 let processColorVariablesTime = 0;
 let processColorVariablesCalls = 0;
-let nodeCacheHits = 0;
 
 // Keep track of node names for sequential numbering
 const nodeNameCounters: Map<string, number> = new Map();
@@ -406,7 +405,6 @@ export const nodesToJSON = async (
 ): Promise<SceneNode[]> => {
   // Reset name counters for each conversion
   nodeNameCounters.clear();
-  nodeCacheHits = 0;
 
   const exportJsonStart = Date.now();
   // First get the JSON representation of nodes
@@ -444,7 +442,6 @@ export const run = async (settings: PluginSettings) => {
   getStyledTextSegmentsCalls = 0;
   processColorVariablesTime = 0;
   processColorVariablesCalls = 0;
-  nodeCacheHits = 0;
   variableCache.clear();
   clearWarnings();
 
