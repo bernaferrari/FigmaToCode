@@ -11,15 +11,6 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
   },
   {
     itemType: "individual_select",
-    propertyName: "optimizeLayout",
-    label: "Optimize layout",
-    description:
-      "Attempt to auto-layout suitable element groups. This may increase code quality, but may not always work as expected.",
-    isDefault: true,
-    includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
-  },
-  {
-    itemType: "individual_select",
     propertyName: "roundTailwindValues",
     label: "Round values",
     description:
