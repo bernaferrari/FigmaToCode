@@ -28,6 +28,8 @@ export class FlutterDefaultBuilder {
       this.child = flutterVisibility(node, this.child);
       this.child = flutterRotation(node, this.child);
       this.child = flutterOpacity(node, this.child);
+    } else if ("opacity" in node) {
+      this.child = flutterOpacity(node, this.child);
     }
     return this;
   }
