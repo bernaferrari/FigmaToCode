@@ -26,18 +26,6 @@ let nodeCacheHits = 0;
 // Keep track of node names for sequential numbering
 const nodeNameCounters: Map<string, number> = new Map();
 
-// Helper function to add parent references to all children in the node tree
-const addParentReferences = (node: any) => {
-  if (node.children && node.children.length > 0) {
-    for (const child of node.children) {
-      // Add parent reference to the child
-      child.parent = node;
-      // Recursively process this child's children
-      addParentReferences(child);
-    }
-  }
-};
-
 const variableCache = new Map<string, string>();
 
 const memoizedVariableToColorName = async (
@@ -171,13 +159,20 @@ function adjustChildrenOrder(node: any) {
  * @param jsonNode The JSON node to process
  * @param figmaNode The corresponding Figma node
  * @param settings Plugin settings
+ * @param parentNode Optional parent node reference to set
  */
 const processNodePair = async (
   jsonNode: any,
   figmaNode: SceneNode,
   settings: PluginSettings,
+  parentNode?: any
 ) => {
   if (!jsonNode.id) return;
+
+  // Set parent reference if parent is provided
+  if (parentNode) {
+    jsonNode.parent = parentNode;
+  }
 
   // Ensure node has a unique name with simple numbering
   const cleanName = jsonNode.name.trim();
@@ -295,13 +290,6 @@ const processNodePair = async (
     }
   }
 
-  // Extract inferredAutoLayout if optimizeLayout is enabled
-  if (settings.optimizeLayout && "inferredAutoLayout" in figmaNode) {
-    jsonNode.inferredAutoLayout = JSON.parse(
-      JSON.stringify(figmaNode.inferredAutoLayout),
-    );
-  }
-
   // Extract component metadata from instances
   if ("variantProperties" in figmaNode && figmaNode.variantProperties) {
     jsonNode.variantProperties = figmaNode.variantProperties;
@@ -311,8 +299,8 @@ const processNodePair = async (
   if ("width" in figmaNode) {
     jsonNode.width = figmaNode.width;
     jsonNode.height = figmaNode.height;
-    // jsonNode.x = figmaNode.x;
-    // jsonNode.y = figmaNode.y;
+    jsonNode.x = figmaNode.x;
+    jsonNode.y = figmaNode.y;
   }
 
   if ("rotation" in jsonNode) {
@@ -388,6 +376,7 @@ const processNodePair = async (
         jsonNode.children[i],
         figmaNode.children[i],
         settings,
+        jsonNode // Pass the current node as parent for its children
       );
     }
 
@@ -442,13 +431,6 @@ export const nodesToJSON = async (
   }
   console.log(
     `[benchmark][inside nodesToJSON] Process node pairs: ${Date.now() - processNodesStart}ms`,
-  );
-
-  const addParentStart = Date.now();
-  // Add parent references to all children in the node tree
-  nodeJson.forEach((node) => addParentReferences(node));
-  console.log(
-    `[benchmark][inside nodesToJSON] addParentReferences: ${Date.now() - addParentStart}ms`,
   );
 
   return nodeJson;
