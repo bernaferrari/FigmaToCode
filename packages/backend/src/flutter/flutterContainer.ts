@@ -56,14 +56,25 @@ export const flutterContainer = (
       propBoxDecoration,
       "BoxDecoration()",
     );
-    result = generateWidgetCode("Container", {
-      width: skipDefaultProperty(width, "0"),
-      height: skipDefaultProperty(height, "0"),
-      padding: propPadding,
-      clipBehavior: clipBehavior,
-      decoration: clipBehavior ? propBoxDecoration : parsedDecoration,
-      child: child,
-    });
+    const isEmptyProps = hasEmptyProps([
+      width,
+      height,
+      propPadding,
+      clipBehavior,
+      clipBehavior ? propBoxDecoration : parsedDecoration,
+    ]);
+    if (isEmptyProps) {
+      result = child;
+    } else {
+      result = generateWidgetCode("Container", {
+        width: skipDefaultProperty(width, "0"),
+        height: skipDefaultProperty(height, "0"),
+        padding: propPadding,
+        clipBehavior: clipBehavior,
+        decoration: clipBehavior ? propBoxDecoration : parsedDecoration,
+        child: child,
+      });
+    }
   } else if (propPadding) {
     // if there is just a padding, add Padding
     result = generateWidgetCode("Padding", {
@@ -91,6 +102,16 @@ export const flutterContainer = (
 
   return result;
 };
+
+const hasEmptyProps = (props: string[]): boolean => {
+  let isEmpty = true;
+  for (const key in props) {
+    const prop = props[key];
+    const def = prop.length > 0 ? "0" : "";
+    isEmpty = isEmpty && skipDefaultProperty(prop, def).length == 0;
+  }
+  return isEmpty;
+}
 
 const getDecoration = (node: SceneNode): string => {
   if (!("fills" in node)) {
