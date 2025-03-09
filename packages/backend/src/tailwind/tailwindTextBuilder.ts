@@ -137,8 +137,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       }
 
       const value = node.fontName.style
-        .replace("italic", "")
-        .replace(" ", "")
+        .replaceAll("italic", "")
+        .replaceAll(" ", "")
         .toLowerCase();
 
       this.addAttributes(`font-${value}`);

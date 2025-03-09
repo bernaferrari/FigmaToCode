@@ -243,3 +243,52 @@ export const htmlDiamondGradient = (fill: GradientPaint): string => {
     )
     .join(", ");
 };
+
+export const buildBackgroundValues = (
+  paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  settings: HTMLSettings,
+): string => {
+  if (paintArray === figma.mixed) {
+    return "";
+  }
+
+  // If only one fill, just use plain color/gradient
+  if (paintArray.length === 1) {
+    const paint = paintArray[0];
+    if (paint.type === "SOLID") {
+      return htmlColorFromFills(paintArray, settings);
+    } else if (
+      paint.type === "GRADIENT_LINEAR" ||
+      paint.type === "GRADIENT_RADIAL" ||
+      paint.type === "GRADIENT_ANGULAR" ||
+      paint.type === "GRADIENT_DIAMOND"
+    ) {
+      return htmlGradientFromFills(paint);
+    }
+    return "";
+  }
+
+  // Reverse the array to match CSS layering (first is top-most in CSS)
+  const styles = [...paintArray].reverse().map((paint, index) => {
+    if (paint.type === "SOLID") {
+      // For multiple fills, always convert solid colors to linear gradients
+      // to ensure proper layering in CSS backgrounds
+      const color = htmlColorFromFills([paint], settings);
+      if (index === 0) {
+        return `linear-gradient(0deg, ${color} 0%, ${color} 100%)`;
+      }
+
+      return color;
+    } else if (
+      paint.type === "GRADIENT_LINEAR" ||
+      paint.type === "GRADIENT_RADIAL" ||
+      paint.type === "GRADIENT_ANGULAR" ||
+      paint.type === "GRADIENT_DIAMOND"
+    ) {
+      return htmlGradientFromFills(paint);
+    }
+    return ""; // Handle other paint types safely
+  });
+
+  return styles.filter((value) => value !== "").join(", ");
+};

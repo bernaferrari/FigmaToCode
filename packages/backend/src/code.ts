@@ -44,8 +44,12 @@ const memoizedVariableToColorName = async (
   variableId: string,
 ): Promise<string> => {
   if (!variableCache.has(variableId)) {
-    const colorName = await variableToColorName(variableId);
+    const colorName = (await variableToColorName(variableId)).replaceAll(
+      ",",
+      "",
+    );
     variableCache.set(variableId, colorName);
+    return colorName;
   }
   return variableCache.get(variableId)!;
 };
@@ -255,9 +259,18 @@ const processNodePair = async (
           const mutableSegment = Object.assign({}, segment);
 
           if (settings.useColorVariables && segment.fills) {
-            mutableSegment.fills = segment.fills.map((d) => ({ ...d }));
-            await Promise.all(
-              mutableSegment.fills.map((fill) => processColorVariables(fill)),
+            mutableSegment.fills = await Promise.all(
+              segment.fills.map(async (d) => {
+                if (
+                  d.blendMode !== "PASS_THROUGH" &&
+                  d.blendMode !== "NORMAL"
+                ) {
+                  addWarning("BlendMode is not supported in Text colors");
+                }
+                const fill = { ...d };
+                await processColorVariables(fill);
+                return fill;
+              }),
             );
           }
 
@@ -298,8 +311,12 @@ const processNodePair = async (
   if ("width" in figmaNode) {
     jsonNode.width = figmaNode.width;
     jsonNode.height = figmaNode.height;
-    jsonNode.x = figmaNode.x;
-    jsonNode.y = figmaNode.y;
+    // jsonNode.x = figmaNode.x;
+    // jsonNode.y = figmaNode.y;
+  }
+
+  if ("rotation" in jsonNode) {
+    jsonNode.rotation = jsonNode.rotation * (180 / Math.PI);
   }
 
   if ("individualStrokeWeights" in jsonNode) {
