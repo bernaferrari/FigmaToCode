@@ -8,6 +8,7 @@ import {
   tailwindRotation,
   tailwindOpacity,
   tailwindBlendMode,
+  tailwindBackgroundBlendMode,
 } from "./builderImpl/tailwindBlend";
 import {
   tailwindBorderWidth,
@@ -167,6 +168,14 @@ export class TailwindDefaultBuilder {
       let gradient = "";
       if (kind === "bg") {
         gradient = tailwindGradientFromFills(paint);
+
+        // Add background blend mode class if applicable
+        if (paint !== figma.mixed) {
+          const blendModeClass = tailwindBackgroundBlendMode(paint);
+          if (blendModeClass) {
+            this.addAttributes(blendModeClass);
+          }
+        }
       }
       if (gradient) {
         this.addAttributes(gradient);
@@ -234,9 +243,11 @@ export class TailwindDefaultBuilder {
   blur() {
     const { node } = this;
     if ("effects" in node && node.effects.length > 0) {
-      const blur = node.effects.find((e) => e.type === "LAYER_BLUR");
+      const blur = node.effects.find(
+        (e) => e.type === "LAYER_BLUR" && e.visible,
+      );
       if (blur) {
-        const blurValue = pxToBlur(blur.radius);
+        const blurValue = pxToBlur(blur.radius / 2);
         if (blurValue) {
           this.addAttributes(
             blurValue === "blur" ? "blur" : `blur-${blurValue}`,
@@ -245,10 +256,10 @@ export class TailwindDefaultBuilder {
       }
 
       const backgroundBlur = node.effects.find(
-        (e) => e.type === "BACKGROUND_BLUR",
+        (e) => e.type === "BACKGROUND_BLUR" && e.visible,
       );
       if (backgroundBlur) {
-        const backgroundBlurValue = pxToBlur(backgroundBlur.radius);
+        const backgroundBlurValue = pxToBlur(backgroundBlur.radius / 2);
         if (backgroundBlurValue) {
           this.addAttributes(
             `backdrop-blur${

@@ -7,8 +7,8 @@ import {
   htmlBlendMode,
 } from "./builderImpl/htmlBlend";
 import {
+  buildBackgroundValues,
   htmlColorFromFills,
-  htmlGradientFromFills,
 } from "./builderImpl/htmlColor";
 import { htmlPadding } from "./builderImpl/htmlPadding";
 import { htmlSizePartial } from "./builderImpl/htmlSize";
@@ -31,7 +31,6 @@ import { HTMLSettings } from "types";
 import {
   cssCollection,
   generateUniqueClassName,
-  getSvelteClassName,
   stylesToCSS,
 } from "./htmlMain";
 
@@ -122,12 +121,6 @@ export class HtmlDefaultBuilder {
     this.autoLayoutPadding();
     this.position();
     this.blend();
-
-    // Add z-index if we have a custom value from the itemReverseZIndex handling
-    if ((this.node as any).customZIndex !== undefined) {
-      this.addStyles(`z-index: ${(this.node as any).customZIndex}`);
-    }
-
     return this;
   }
 
@@ -229,8 +222,11 @@ export class HtmlDefaultBuilder {
 
   position(): this {
     const { node, optimizeLayout, isJSX } = this;
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+    const isAbsolutePosition = commonIsAbsolutePosition(node, optimizeLayout);
+    console.log("isAbsolutePosition", isAbsolutePosition, "for node", node);
+    if (isAbsolutePosition) {
       const { x, y } = getCommonPositionValue(node);
+      console.log("x, y, are", x, y);
 
       this.addStyles(
         formatWithJSX("left", isJSX, x),
@@ -267,44 +263,39 @@ export class HtmlDefaultBuilder {
       return this;
     }
 
-    const backgroundValues = this.buildBackgroundValues(paintArray);
+    const backgroundValues = buildBackgroundValues(paintArray, this.settings);
     if (backgroundValues) {
       this.addStyles(formatWithJSX("background", this.isJSX, backgroundValues));
+
+      // Add blend mode property if multiple fills exist with different blend modes
+      if (paintArray !== figma.mixed) {
+        const blendModes = this.buildBackgroundBlendModes(paintArray);
+        if (blendModes) {
+          this.addStyles(
+            formatWithJSX("background-blend-mode", this.isJSX, blendModes),
+          );
+        }
+      }
     }
 
     return this;
   }
 
-  buildBackgroundValues(
-    paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"],
-  ): string {
-    if (paintArray === figma.mixed) {
+  buildBackgroundBlendModes(paintArray: ReadonlyArray<Paint>): string {
+    if (paintArray.length === 0) {
       return "";
     }
 
-    // If one fill and it's a solid, return the solid RGB color
-    if (paintArray.length === 1 && paintArray[0].type === "SOLID") {
-      return htmlColorFromFills(paintArray, this.settings);
-    }
-
-    // If multiple fills, deal with gradients and convert solid colors to a "dumb" linear-gradient
-    const styles = paintArray.map((paint) => {
-      if (paint.type === "SOLID") {
-        const color = htmlColorFromFills([paint], this.settings);
-        return `linear-gradient(0deg, ${color} 0%, ${color} 100%)`;
-      } else if (
-        paint.type === "GRADIENT_LINEAR" ||
-        paint.type === "GRADIENT_RADIAL" ||
-        paint.type === "GRADIENT_ANGULAR" ||
-        paint.type === "GRADIENT_DIAMOND"
-      ) {
-        return htmlGradientFromFills(paint);
+    // Reverse the array to match the background order
+    const blendModes = [...paintArray].reverse().map((paint) => {
+      if (paint.blendMode === "PASS_THROUGH") {
+        return "normal";
       }
 
-      return ""; // Handle other paint types safely
+      return paint.blendMode?.toLowerCase();
     });
 
-    return styles.filter((value) => value !== "").join(", ");
+    return blendModes.join(", ");
   }
 
   shadow(): this {
@@ -374,7 +365,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "filter",
             this.isJSX,
-            `blur(${numberToFixedString(blur.radius)}px)`,
+            `blur(${numberToFixedString(blur.radius / 2)}px)`,
           ),
         );
       }
@@ -387,7 +378,7 @@ export class HtmlDefaultBuilder {
           formatWithJSX(
             "backdrop-filter",
             this.isJSX,
-            `blur(${numberToFixedString(backgroundBlur.radius)}px)`,
+            `blur(${numberToFixedString(backgroundBlur.radius / 2)}px)`,
           ),
         );
       }
