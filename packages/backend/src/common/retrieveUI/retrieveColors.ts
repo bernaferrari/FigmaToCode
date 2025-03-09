@@ -20,6 +20,7 @@ import {
   LinearGradientConversion,
   SolidColorConversion,
   Framework,
+  HTMLSettings,
 } from "types";
 
 export const retrieveGenericSolidUIColors = (
@@ -87,7 +88,7 @@ export const retrieveGenericLinearGradients = (
           exportValue = flutterGradient(paint);
           break;
         case "HTML":
-          exportValue = htmlGradientFromFills([paint]);
+          exportValue = htmlGradientFromFills(paint);
           break;
         case "Tailwind":
           exportValue = tailwindGradient(paint);
@@ -97,7 +98,7 @@ export const retrieveGenericLinearGradients = (
           break;
       }
       colorStr.push({
-        cssPreview: htmlGradientFromFills([paint]),
+        cssPreview: htmlGradientFromFills(paint),
         exportValue,
       });
     }

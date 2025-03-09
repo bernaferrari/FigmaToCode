@@ -2,16 +2,21 @@ import "@figma/plugin-typings";
 // Settings
 export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 export interface HTMLSettings {
-  jsx: boolean;
   optimizeLayout: boolean;
   showLayerNames: boolean;
   embedImages: boolean;
+  embedVectors: boolean;
+  useColorVariables: boolean;
+  htmlGenerationMode: "html" | "jsx" | "styled-components" | "svelte";
 }
 export interface TailwindSettings extends HTMLSettings {
+  tailwindGenerationMode: "html" | "jsx";
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
-  customTailwindColors: boolean;
+  useColorVariables: boolean;
   customTailwindPrefix?: string;
+  embedVectors: boolean;
+  baseFontSize: number;
 }
 export interface FlutterSettings {
   flutterGenerationMode: string;
@@ -184,7 +189,7 @@ export interface TailwindTextConversion {
   contrastBlack: number;
 }
 
-export type TailwindColorType = "text" | "bg" | "border" | "solid";
+export type TailwindColorType = "text" | "bg" | "border" | "ring";
 
 export type SwiftUIModifier = [
   string,

@@ -10,14 +10,36 @@ import { getPlaceholderImage } from "../../common/images";
 
 /**
  * Retrieve the SOLID color for Flutter when existent, otherwise ""
+ * @param node SceneNode containing the property to examine
+ * @param propertyPath Property path to extract fills from (e.g., 'fills', 'strokes') or direct fills array
  */
 export const flutterColorFromFills = (
+  node: SceneNode,
+  propertyPath: string,
+): string => {
+  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
+  fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
+  return flutterColorFromDirectFills(fills);
+};
+
+/**
+ * Retrieve the SOLID color for Flutter directly from fills when existent, otherwise ""
+ * @param fills The fills array to process
+ */
+export const flutterColorFromDirectFills = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
 ): string => {
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
-    return flutterColor(fill.color, fill.opacity ?? 1.0);
+    return flutterColor(
+      fill.color, 
+      fill.opacity ?? 1.0, 
+      (fill as any).variableColorName
+    );
   } else if (
     fill &&
     (fill.type === "GRADIENT_LINEAR" ||
@@ -25,22 +47,35 @@ export const flutterColorFromFills = (
       fill.type === "GRADIENT_RADIAL")
   ) {
     if (fill.gradientStops.length > 0) {
-      return flutterColor(fill.gradientStops[0].color, fill.opacity ?? 1.0);
+      const stop = fill.gradientStops[0];
+      return flutterColor(
+        stop.color, 
+        fill.opacity ?? 1.0, 
+        (stop as any).variableColorName
+      );
     }
   }
 
   return "";
 };
 
+/**
+ * Get box decoration properties for a Flutter node
+ */
 export const flutterBoxDecorationColor = (
   node: SceneNode,
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  propertyPath: string,
 ): Record<string, string> => {
+  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
+  fills = node[propertyPath as keyof SceneNode] as
+    | ReadonlyArray<Paint>
+    | PluginAPI["mixed"];
+
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
-    return { color: flutterColor(fill.color, opacity) };
+    return { color: flutterColor(fill.color, opacity, (fill as any).variableColorName) };
   } else if (
     fill?.type === "GRADIENT_LINEAR" ||
     fill?.type === "GRADIENT_RADIAL" ||
@@ -100,7 +135,7 @@ const gradientDirection = (angle: number): string => {
 
 const flutterRadialGradient = (fill: GradientPaint): string => {
   const colors = fill.gradientStops
-    .map((d) => flutterColor(d.color, d.color.a))
+    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
     .join(", ");
 
   const x = numberToFixedString(fill.gradientTransform[0][2]);
@@ -118,7 +153,7 @@ const flutterRadialGradient = (fill: GradientPaint): string => {
 
 const flutterAngularGradient = (fill: GradientPaint): string => {
   const colors = fill.gradientStops
-    .map((d) => flutterColor(d.color, d.color.a))
+    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
     .join(", ");
 
   const x = numberToFixedString(fill.gradientTransform[0][2]);
@@ -140,7 +175,7 @@ const flutterLinearGradient = (fill: GradientPaint): string => {
   const y = Math.sin(radians).toFixed(2);
 
   const colors = fill.gradientStops
-    .map((d) => flutterColor(d.color, d.color.a))
+    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
     .join(", ");
 
   return generateWidgetCode("LinearGradient", {
@@ -172,20 +207,38 @@ const gradientDirectionReadable = (angle: number): string => {
   }
 };
 
-export const flutterColor = (color: RGB, opacity: number): string => {
+/**
+ * Convert opacity (0-1) to alpha (0-255)
+ */
+const opacityToAlpha = (opacity: number): number => {
+  return Math.round(opacity * 255);
+};
+
+export const flutterColor = (
+  color: RGB, 
+  opacity: number, 
+  variableColorName?: string
+): string => {
   const sum = color.r + color.g + color.b;
+  let colorCode = "";
 
   if (sum === 0) {
-    return opacity === 1
+    colorCode = opacity === 1
       ? "Colors.black"
-      : `Colors.black.withOpacity(${opacity})`;
-  }
-
-  if (sum === 3) {
-    return opacity === 1
+      : `Colors.black.withValues(alpha: ${opacityToAlpha(opacity)})`;
+  } else if (sum === 3) {
+    colorCode = opacity === 1
       ? "Colors.white"
-      : `Colors.white.withOpacity(${opacity})`;
+      : `Colors.white.withValues(alpha: ${opacityToAlpha(opacity)})`;
+  } else {
+    // Always use full 8-digit hex which includes alpha channel
+    colorCode = `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
   }
 
-  return `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
+  // Add variable name as a comment if it exists
+  if (variableColorName) {
+    return `${colorCode} /* ${variableColorName} */`;
+  }
+  
+  return colorCode;
 };

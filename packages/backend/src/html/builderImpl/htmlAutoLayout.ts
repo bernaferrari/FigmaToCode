@@ -1,4 +1,4 @@
-import { HTMLSettings, PluginSettings } from "types";
+import { HTMLSettings } from "types";
 import { formatMultipleJSXArray } from "../../common/parseJSX";
 
 const getFlexDirection = (node: InferredAutoLayoutResult): string =>
@@ -6,6 +6,7 @@ const getFlexDirection = (node: InferredAutoLayoutResult): string =>
 
 const getJustifyContent = (node: InferredAutoLayoutResult): string => {
   switch (node.primaryAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "flex-start";
     case "CENTER":
@@ -19,6 +20,7 @@ const getJustifyContent = (node: InferredAutoLayoutResult): string => {
 
 const getAlignItems = (node: InferredAutoLayoutResult): string => {
   switch (node.counterAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "flex-start";
     case "CENTER":
@@ -34,6 +36,27 @@ const getGap = (node: InferredAutoLayoutResult): string | number =>
   node.itemSpacing > 0 && node.primaryAxisAlignItems !== "SPACE_BETWEEN"
     ? node.itemSpacing
     : "";
+
+const getFlexWrap = (node: InferredAutoLayoutResult): string =>
+  node.layoutWrap === "WRAP" ? "wrap" : "";
+
+const getAlignContent = (node: InferredAutoLayoutResult): string => {
+  if (node.layoutWrap !== "WRAP") return "";
+
+  switch (node.counterAxisAlignItems) {
+    case undefined:
+    case "MIN":
+      return "flex-start";
+    case "CENTER":
+      return "center";
+    case "MAX":
+      return "flex-end";
+    case "BASELINE":
+      return "baseline";
+    default:
+      return "normal";
+  }
+};
 
 const getFlex = (
   node: SceneNode,
@@ -57,6 +80,8 @@ export const htmlAutoLayoutProps = (
       "align-items": getAlignItems(autoLayout),
       gap: getGap(autoLayout),
       display: getFlex(node, autoLayout),
+      "flex-wrap": getFlexWrap(autoLayout),
+      "align-content": getAlignContent(autoLayout),
     },
-    settings.jsx,
+    settings.htmlGenerationMode === "jsx",
   );

@@ -17,7 +17,7 @@ export const flutterBorder = (node: SceneNode): string => {
   }
 
   const color = skipDefaultProperty(
-    flutterColorFromFills(node.strokes),
+    flutterColorFromFills(node, "strokes"),
     "Colors.black",
   );
 

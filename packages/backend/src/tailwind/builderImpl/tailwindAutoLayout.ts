@@ -5,6 +5,7 @@ const getFlexDirection = (node: InferredAutoLayoutResult): string =>
 
 const getJustifyContent = (node: InferredAutoLayoutResult): string => {
   switch (node.primaryAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "justify-start";
     case "CENTER":
@@ -18,6 +19,7 @@ const getJustifyContent = (node: InferredAutoLayoutResult): string => {
 
 const getAlignItems = (node: InferredAutoLayoutResult): string => {
   switch (node.counterAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "items-start";
     case "CENTER":
@@ -34,6 +36,27 @@ const getGap = (node: InferredAutoLayoutResult): string =>
     ? `gap-${pxToLayoutSize(node.itemSpacing)}`
     : "";
 
+const getFlexWrap = (node: InferredAutoLayoutResult): string =>
+  node.layoutWrap === "WRAP" ? "flex-wrap" : "";
+
+const getAlignContent = (node: InferredAutoLayoutResult): string => {
+  if (node.layoutWrap !== "WRAP") return "";
+
+  switch (node.counterAxisAlignItems) {
+    case undefined:
+    case "MIN":
+      return "content-start";
+    case "CENTER":
+      return "content-center";
+    case "MAX":
+      return "content-end";
+    case "BASELINE":
+      return "content-baseline";
+    default:
+      return "content-normal";
+  }
+};
+
 const getFlex = (
   node: SceneNode,
   autoLayout: InferredAutoLayoutResult,
@@ -47,13 +70,16 @@ const getFlex = (
 export const tailwindAutoLayoutProps = (
   node: SceneNode,
   autoLayout: InferredAutoLayoutResult,
-): string =>
-  Object.values({
-    flexDirection: getFlexDirection(autoLayout),
-    justifyContent: getJustifyContent(autoLayout),
-    alignItems: getAlignItems(autoLayout),
-    gap: getGap(autoLayout),
-    flex: getFlex(node, autoLayout),
-  })
-    .filter((value) => value !== "")
-    .join(" ");
+): string => {
+  const classes = [
+    getFlex(node, autoLayout),
+    getFlexDirection(autoLayout),
+    getJustifyContent(autoLayout),
+    getAlignItems(autoLayout),
+    getGap(autoLayout),
+    getFlexWrap(autoLayout),
+    getAlignContent(autoLayout),
+  ].filter(Boolean);
+
+  return classes.join(" ");
+};

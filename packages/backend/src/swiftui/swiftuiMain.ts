@@ -8,6 +8,7 @@ import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
+import { getVisibleNodes } from "../common/nodeVisibility";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -66,10 +67,10 @@ const swiftuiWidgetGenerator = (
   indentLevel: number,
 ): string => {
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible);
+  const visibleSceneNode = getVisibleNodes(sceneNode);
   let comp: string[] = [];
 
-  visibleSceneNode.forEach((node, index) => {
+  visibleSceneNode.forEach((node) => {
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
@@ -92,6 +93,7 @@ const swiftuiWidgetGenerator = (
       case "VECTOR":
         addWarning("VectorNodes are not supported in SwiftUI");
         break;
+      case "SLICE":
       default:
         break;
     }
@@ -125,7 +127,7 @@ export const swiftuiContainer = (
   const result = new SwiftuiDefaultBuilder(kind)
     .shapeForeground(node)
     .autoLayoutPadding(node, localSettings.optimizeLayout)
-    .size(node, localSettings.optimizeLayout)
+    .size(node)
     .shapeBackground(node)
     .cornerRadius(node)
     .shapeBorder(node)
@@ -195,6 +197,7 @@ const createDirectionalStack = (
 const getLayoutAlignment = (
   inferredAutoLayout: InferredAutoLayoutResult,
 ): string => {
+  console.log("inferred is", inferredAutoLayout);
   switch (inferredAutoLayout.counterAxisAlignItems) {
     case "MIN":
       return inferredAutoLayout.layoutMode === "VERTICAL" ? ".leading" : ".top";

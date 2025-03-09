@@ -11,8 +11,8 @@ export const flutterSizeWH = (node: SceneNode): string => {
 export const flutterSize = (
   node: SceneNode,
   optimizeLayout: boolean,
-): { width: string; height: string; isExpanded: boolean } => {
-  const size = nodeSize(node, optimizeLayout);
+): { width: string; height: string; isExpanded: boolean; constraints: Record<string, string> } => {
+  const size = nodeSize(node);
   let isExpanded: boolean = false;
 
   const nodeParent =
@@ -53,5 +53,24 @@ export const flutterSize = (
     }
   }
 
-  return { width: propWidth, height: propHeight, isExpanded };
+  // Handle min/max constraints
+  const constraints: Record<string, string> = {};
+  
+  if (node.minWidth !== undefined && node.minWidth !== null) {
+    constraints.minWidth = numberToFixedString(node.minWidth);
+  }
+  
+  if (node.maxWidth !== undefined && node.maxWidth !== null) {
+    constraints.maxWidth = numberToFixedString(node.maxWidth);
+  }
+  
+  if (node.minHeight !== undefined && node.minHeight !== null) {
+    constraints.minHeight = numberToFixedString(node.minHeight);
+  }
+  
+  if (node.maxHeight !== undefined && node.maxHeight !== null) {
+    constraints.maxHeight = numberToFixedString(node.maxHeight);
+  }
+
+  return { width: propWidth, height: propHeight, isExpanded, constraints };
 };
