@@ -27,7 +27,6 @@ export function CopyButton({
     if (isCopied) {
       const timer = setTimeout(() => {
         setIsCopied(false);
-        console.log("iscopied false");
       }, successDuration);
 
       return () => clearTimeout(timer);
@@ -38,7 +37,6 @@ export function CopyButton({
     try {
       copy(value);
       setIsCopied(true);
-      console.log("iscopied true");
     } catch (error) {
       console.error("Failed to copy text: ", error);
     }

@@ -164,7 +164,7 @@ const processNodePair = async (
   jsonNode: any,
   figmaNode: SceneNode,
   settings: PluginSettings,
-  parentNode?: any
+  parentNode?: any,
 ) => {
   if (!jsonNode.id) return;
 
@@ -375,7 +375,7 @@ const processNodePair = async (
         jsonNode.children[i],
         figmaNode.children[i],
         settings,
-        jsonNode // Pass the current node as parent for its children
+        jsonNode, // Pass the current node as parent for its children
       );
     }
 
@@ -418,6 +418,9 @@ export const nodesToJSON = async (
         ).document,
     ),
   )) as SceneNode[];
+
+  console.log("[debug] initial nodeJson", { ...nodeJson[0] });
+
   console.log(
     `[benchmark][inside nodesToJSON] JSON_REST_V1 export: ${Date.now() - exportJsonStart}ms`,
   );
