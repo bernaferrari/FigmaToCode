@@ -397,11 +397,10 @@ const border = {
   8: "8",
 };
 
-const ring = {
+const outline = {
   0: "0",
   1: "1",
   2: "2",
-  3: "3",
   4: "4",
   8: "8",
 };
@@ -418,5 +417,5 @@ export const config = {
   fontWeight,
   fontFamily,
   border,
-  ring,
+  outline,
 };

@@ -1,30 +1,31 @@
 import { getCommonRadius } from "../../common/commonRadius";
 import { commonStroke } from "../../common/commonStroke";
 import {
-  nearestValue,
   pxToBorderRadius,
   pxToBorderWidth,
-  pxToRing,
+  pxToOutline,
 } from "../conversionTables";
 import { numberToFixedString } from "../../common/numToAutoFixed";
 import { addWarning } from "../../common/commonConversionWarnings";
 
-const getBorder = (weight: number, kind: string, isRing: boolean = false) => {
-  // Use ring utilities for outside strokes
-  if (isRing) {
-    // Special case: ring (without width) is 3px in Tailwind
-    if (weight === 3) {
-      return "ring";
-    }
+const getBorder = (
+  weight: number,
+  kind: string,
+  useOutline: boolean = false,
+  isBoxShadow: boolean = false,
+): string => {
+  // For box-shadow (inside stroke on non-autolayout), return empty string as we'll handle separately
+  if (isBoxShadow) {
+    return "";
+  }
 
-    const ringWidth = pxToRing(weight);
-    if (ringWidth === null) {
-      return `ring-[${numberToFixedString(weight)}px]`;
-    } else if (ringWidth === "3") {
-      // Ring is 3px
-      return `ring`;
+  // Use outline utilities for outside/center strokes
+  if (useOutline) {
+    const outlineWidth = pxToOutline(weight);
+    if (outlineWidth === null) {
+      return `outline-[${numberToFixedString(weight)}px]`;
     } else {
-      return `ring-${ringWidth}`;
+      return `outline-${outlineWidth}`;
     }
   }
 
@@ -52,41 +53,66 @@ const getBorder = (weight: number, kind: string, isRing: boolean = false) => {
 export const tailwindBorderWidth = (
   node: SceneNode,
 ): {
-  isRing: boolean;
+  isOutline: boolean;
   property: string;
+  shadowProperty?: string; // This can be removed if not used elsewhere
 } => {
   const commonBorder = commonStroke(node);
   if (!commonBorder) {
     return {
-      isRing: false,
+      isOutline: false,
       property: "",
     };
   }
 
-  // Check if stroke is outside
-  const isRing =
-    "strokeAlign" in node &&
-    (node.strokeAlign === "OUTSIDE" || node.strokeAlign === "CENTER");
+  // Check stroke alignment and layout mode
+  const strokeAlign = "strokeAlign" in node ? node.strokeAlign : "INSIDE";
+  const layoutMode = "layoutMode" in node ? node.layoutMode : "NONE";
 
   if ("all" in commonBorder) {
     if (commonBorder.all === 0) {
       return {
-        isRing: false,
+        isOutline: false,
         property: "",
       };
     }
-    return {
-      isRing,
-      property: getBorder(commonBorder.all, "", isRing),
-    };
+
+    const weight = commonBorder.all;
+
+    if (
+      strokeAlign === "CENTER" ||
+      strokeAlign === "OUTSIDE" ||
+      (strokeAlign === "INSIDE" && layoutMode === "NONE")
+    ) {
+      // For CENTER, OUTSIDE, or INSIDE+NONE, use outline
+      const property = getBorder(weight, "", true);
+      let offsetProperty = "";
+
+      if (strokeAlign === "CENTER") {
+        offsetProperty = `outline-offset-[-${numberToFixedString(weight / 2)}px]`;
+      } else if (strokeAlign === "INSIDE") {
+        offsetProperty = `outline-offset-[-${numberToFixedString(weight)}px]`;
+      }
+
+      return {
+        isOutline: true,
+        property: offsetProperty ? `${property} ${offsetProperty}` : property,
+      };
+    } else {
+      // Default case: use normal border (for INSIDE + AUTO_LAYOUT)
+      return {
+        isOutline: false,
+        property: getBorder(weight, "", false),
+      };
+    }
   } else {
+    // For non-uniform borders, we only support border (not outline)
     addWarning(
       'Non-uniform borders are only supported with strokeAlign set to "inside". Will paint inside.',
     );
   }
 
-  // If borders are non-uniform, always use border utilities for better control
-  // regardless of whether the stroke is outside or not
+  // Handle non-uniform borders with individual border properties
   const comp = [];
   if (commonBorder.left !== 0) {
     comp.push(getBorder(commonBorder.left, "-l"));
@@ -102,7 +128,7 @@ export const tailwindBorderWidth = (
   }
 
   return {
-    isRing,
+    isOutline: false,
     property: comp.join(" "),
   };
 };
