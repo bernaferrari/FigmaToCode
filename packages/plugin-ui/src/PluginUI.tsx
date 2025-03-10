@@ -43,10 +43,17 @@ const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
 export const PluginUI = (props: PluginUIProps) => {
   const [showAbout, setShowAbout] = useState(false);
 
+  const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [previewViewMode, setPreviewViewMode] = useState<
+    "desktop" | "mobile" | "precision"
+  >("precision");
+  const [previewBgColor, setPreviewBgColor] = useState<"white" | "black">(
+    "white",
+  );
+
   if (props.isLoading) return <Loading />;
 
   const isEmpty = props.code === "";
-
   const warnings = props.warnings ?? [];
 
   return (
@@ -95,7 +102,15 @@ export const PluginUI = (props: PluginUIProps) => {
         ) : (
           <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
             {isEmpty === false && props.htmlPreview && (
-              <Preview htmlPreview={props.htmlPreview} />
+              <Preview
+                htmlPreview={props.htmlPreview}
+                expanded={previewExpanded}
+                setExpanded={setPreviewExpanded}
+                viewMode={previewViewMode}
+                setViewMode={setPreviewViewMode}
+                bgColor={previewBgColor}
+                setBgColor={setPreviewBgColor}
+              />
             )}
 
             {warnings.length > 0 && <WarningsPanel warnings={warnings} />}
