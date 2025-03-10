@@ -163,11 +163,16 @@ function adjustChildrenOrder(node: any) {
  */
 const processNodePair = async (
   jsonNode: any,
-  figmaNode: SceneNode,
   settings: PluginSettings,
   parentNode?: any,
 ) => {
   if (!jsonNode.id) return;
+
+  const figmaNode = await figma.getNodeByIdAsync(jsonNode.id);
+
+  if (!figmaNode) {
+    return;
+  }
 
   // Set parent reference if parent is provided
   if (parentNode) {
@@ -352,12 +357,7 @@ const processNodePair = async (
     // );
 
     for (let i = 0; i < jsonNode.children.length; i++) {
-      await processNodePair(
-        jsonNode.children[i],
-        figmaNode.children[i],
-        settings,
-        jsonNode,
-      );
+      await processNodePair(jsonNode.children[i], settings, jsonNode);
     }
 
     if (
@@ -409,7 +409,7 @@ export const nodesToJSON = async (
   // Now process each top-level node pair (JSON node + Figma node)
   const processNodesStart = Date.now();
   for (let i = 0; i < nodes.length; i++) {
-    await processNodePair(nodeJson[i], nodes[i], settings);
+    await processNodePair(nodeJson[i], settings);
   }
   console.log(
     `[benchmark][inside nodesToJSON] Process node pairs: ${Date.now() - processNodesStart}ms`,
