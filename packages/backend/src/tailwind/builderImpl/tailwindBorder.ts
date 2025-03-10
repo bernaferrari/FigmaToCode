@@ -142,7 +142,7 @@ export const tailwindBorderRadius = (node: SceneNode): string => {
     return `rounded${getRadius(radius.all)}`;
   }
 
-  // todo optimize for tr/tl/br/bl instead of t/r/l/b
+  // todo optimize for t/r/l/b instead of tr/tl/br/bl
   let comp: string[] = [];
   if (radius.topLeft !== 0) {
     comp.push(`rounded-tl${getRadius(radius.topLeft)}`);
