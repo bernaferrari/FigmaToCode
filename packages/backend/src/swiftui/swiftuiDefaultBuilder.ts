@@ -36,8 +36,8 @@ export class SwiftuiDefaultBuilder {
     });
   }
 
-  commonPositionStyles(node: SceneNode, optimizeLayout: boolean): this {
-    this.position(node, optimizeLayout);
+  commonPositionStyles(node: SceneNode): this {
+    this.position(node);
     if ("layoutAlign" in node && "opacity" in node) {
       this.blend(node);
     }
@@ -75,8 +75,8 @@ export class SwiftuiDefaultBuilder {
     return { centerX: centerBasedX, centerY: centerBasedY };
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+  position(node: SceneNode): this {
+    if (commonIsAbsolutePosition(node)) {
       const { x, y } = getCommonPositionValue(node);
       const { centerX, centerY } = this.topLeftToCenterOffset(
         x,
@@ -152,13 +152,9 @@ export class SwiftuiDefaultBuilder {
     return this;
   }
 
-  autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
+  autoLayoutPadding(node: SceneNode): this {
     if ("paddingLeft" in node) {
-      this.pushModifier(
-        swiftuiPadding(
-          (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
-        ),
-      );
+      this.pushModifier(swiftuiPadding(node));
     }
     return this;
   }

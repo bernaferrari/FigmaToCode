@@ -14,11 +14,7 @@ import { numberToFixedString } from "../common/numToAutoFixed";
 import { getCommonRadius } from "../common/commonRadius";
 import { commonStroke } from "../common/commonStroke";
 
-export const flutterContainer = (
-  node: SceneNode,
-  child: string,
-  optimizeLayout: boolean,
-): string => {
+export const flutterContainer = (node: SceneNode, child: string): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -28,10 +24,7 @@ export const flutterContainer = (
 
   // ignore for Groups
   const propBoxDecoration = getDecoration(node);
-  const { width, height, isExpanded, constraints } = flutterSize(
-    node,
-    optimizeLayout,
-  );
+  const { width, height, isExpanded, constraints } = flutterSize(node);
 
   const clipBehavior =
     "clipsContent" in node && node.clipsContent === true
@@ -43,9 +36,7 @@ export const flutterContainer = (
   // [propPadding] will be "padding: const EdgeInsets.symmetric(...)" or ""
   let propPadding = "";
   if ("paddingLeft" in node) {
-    propPadding = flutterPadding(
-      (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
-    );
+    propPadding = flutterPadding(node);
   }
 
   let result: string;

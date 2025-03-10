@@ -3,22 +3,23 @@ import { numberToFixedString } from "../../common/numToAutoFixed";
 
 // Used in tests.
 export const flutterSizeWH = (node: SceneNode): string => {
-  const fSize = flutterSize(node, false);
+  const fSize = flutterSize(node);
   const size = fSize.width + fSize.height;
   return size;
 };
 
 export const flutterSize = (
   node: SceneNode,
-  optimizeLayout: boolean,
-): { width: string; height: string; isExpanded: boolean; constraints: Record<string, string> } => {
+): {
+  width: string;
+  height: string;
+  isExpanded: boolean;
+  constraints: Record<string, string>;
+} => {
   const size = nodeSize(node);
   let isExpanded: boolean = false;
 
-  const nodeParent =
-    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
-      ? node.parent.inferredAutoLayout
-      : null) ?? node.parent;
+  const nodeParent = node.parent;
 
   // this cast will always be true, since nodeWidthHeight was called with false to relative.
   let propWidth = "";
@@ -55,19 +56,19 @@ export const flutterSize = (
 
   // Handle min/max constraints
   const constraints: Record<string, string> = {};
-  
+
   if (node.minWidth !== undefined && node.minWidth !== null) {
     constraints.minWidth = numberToFixedString(node.minWidth);
   }
-  
+
   if (node.maxWidth !== undefined && node.maxWidth !== null) {
     constraints.maxWidth = numberToFixedString(node.maxWidth);
   }
-  
+
   if (node.minHeight !== undefined && node.minHeight !== null) {
     constraints.minHeight = numberToFixedString(node.minHeight);
   }
-  
+
   if (node.maxHeight !== undefined && node.maxHeight !== null) {
     constraints.maxHeight = numberToFixedString(node.maxHeight);
   }

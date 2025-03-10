@@ -51,9 +51,6 @@ export class TailwindDefaultBuilder {
   get isJSX() {
     return this.settings.tailwindGenerationMode === "jsx";
   }
-  get optimizeLayout() {
-    return this.settings.optimizeLayout;
-  }
 
   constructor(node: SceneNode, settings: TailwindSettings) {
     this.node = node;
@@ -123,8 +120,8 @@ export class TailwindDefaultBuilder {
   }
 
   position(): this {
-    const { node, optimizeLayout } = this;
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+    const { node } = this;
+    if (commonIsAbsolutePosition(node)) {
       const { x, y } = getCommonPositionValue(node);
 
       const parsedX = numberToFixedString(x);
@@ -143,10 +140,7 @@ export class TailwindDefaultBuilder {
       this.addAttributes(`absolute`);
     } else if (
       node.type === "GROUP" ||
-      ("layoutMode" in node &&
-        ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
-          ?.layoutMode === "NONE") ||
-      (node as any).isRelative
+      ("layoutMode" in node && (node as any)).isRelative
     ) {
       this.addAttributes("relative");
     }
@@ -196,12 +190,8 @@ export class TailwindDefaultBuilder {
 
   // must be called before Position, because of the hasFixedSize attribute.
   size(): this {
-    const { node, optimizeLayout, settings } = this;
-    const { width, height, constraints } = tailwindSizePartial(
-      node,
-      optimizeLayout,
-      settings,
-    );
+    const { node, settings } = this;
+    const { width, height, constraints } = tailwindSizePartial(node, settings);
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {
@@ -229,12 +219,7 @@ export class TailwindDefaultBuilder {
 
   autoLayoutPadding(): this {
     if ("paddingLeft" in this.node) {
-      this.addAttributes(
-        ...tailwindPadding(
-          (this.optimizeLayout ? this.node.inferredAutoLayout : null) ??
-            this.node,
-        ),
-      );
+      this.addAttributes(...tailwindPadding(this.node));
     }
     return this;
   }

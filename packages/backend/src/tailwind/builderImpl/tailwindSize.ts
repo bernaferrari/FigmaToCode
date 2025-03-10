@@ -30,14 +30,10 @@ const formatTailwindSizeValue = (
 
 export const tailwindSizePartial = (
   node: SceneNode,
-  optimizeLayout: boolean,
   settings?: TailwindSettings,
 ): { width: string; height: string; constraints: string } => {
   const size = nodeSize(node);
-  const nodeParent =
-    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
-      ? node.parent.inferredAutoLayout
-      : null) ?? node.parent;
+  const nodeParent = node.parent;
 
   let w = "";
   if (typeof size.width === "number") {

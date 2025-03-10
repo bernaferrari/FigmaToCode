@@ -116,7 +116,6 @@ const CodePanel = (props: CodePanelProps) => {
       "roundTailwindColors",
       "useColorVariables",
       "showLayerNames",
-      "optimizeLayout",
       "embedImages",
       "embedVectors",
     ];

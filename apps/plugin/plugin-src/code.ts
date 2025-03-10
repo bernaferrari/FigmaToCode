@@ -19,7 +19,6 @@ let userPluginSettings: PluginSettings;
 
 export const defaultPluginSettings: PluginSettings = {
   framework: "HTML",
-  optimizeLayout: true,
   showLayerNames: false,
   useOldPluginVersion2025: false,
   responsiveRoot: false,
