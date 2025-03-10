@@ -22,7 +22,7 @@ export const exportAsyncProxy = async <
   }
 
   const figmaNode = (await figma.getNodeByIdAsync(node.id)) as ExportMixin;
-  console.log("getting figma id for", figmaNode);
+  // console.log("getting figma id for", figmaNode);
 
   if (figmaNode.exportAsync === undefined) {
     // console.log(node);

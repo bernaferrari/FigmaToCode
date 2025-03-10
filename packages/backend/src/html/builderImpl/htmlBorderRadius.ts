@@ -2,13 +2,13 @@ import { getCommonRadius } from "../../common/commonRadius";
 import { formatWithJSX } from "../../common/parseJSX";
 
 export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
-  const radius = getCommonRadius(node);
   if (node.type === "ELLIPSE") {
     return [formatWithJSX("border-radius", isJsx, 9999)];
   }
 
+  const radius = getCommonRadius(node);
+
   let comp: string[] = [];
-  let cornerValues: number[] = [0, 0, 0, 0];
   let singleCorner: number = 0;
 
   if ("all" in radius) {
@@ -17,21 +17,28 @@ export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
     }
     singleCorner = radius.all;
     comp.push(formatWithJSX("border-radius", isJsx, radius.all));
-  } else if ("topLeftRadius" in node) {
-    cornerValues = handleIndividualRadius(node);
-    comp.push(
-      ...cornerValues
-        .filter((d) => d > 0)
-        .map((value, index) => {
-          const property = [
-            "border-top-left-radius",
-            "border-top-right-radius",
-            "border-bottom-right-radius",
-            "border-bottom-left-radius",
-          ][index];
-          return formatWithJSX(property, isJsx, value);
-        }),
-    );
+  } else {
+    const cornerValues = [
+      radius.topLeft,
+      radius.topRight,
+      radius.bottomRight,
+      radius.bottomLeft,
+    ];
+
+    // Map each corner value to its corresponding CSS property
+    const cornerProperties = [
+      "border-top-left-radius",
+      "border-top-right-radius",
+      "border-bottom-right-radius",
+      "border-bottom-left-radius",
+    ];
+
+    // Add CSS properties for non-zero corner values
+    for (let i = 0; i < 4; i++) {
+      if (cornerValues[i] > 0) {
+        comp.push(formatWithJSX(cornerProperties[i], isJsx, cornerValues[i]));
+      }
+    }
   }
 
   if (
@@ -44,14 +51,4 @@ export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
   }
 
   return comp;
-};
-
-const handleIndividualRadius = (node: RectangleCornerMixin): number[] => {
-  const cornerValues = [
-    node.topLeftRadius,
-    node.topRightRadius,
-    node.bottomRightRadius,
-    node.bottomLeftRadius,
-  ];
-  return cornerValues;
 };

@@ -6,13 +6,17 @@ import {
   MonitorSmartphone,
   Smartphone,
   Circle,
+  Ruler,
+  MonitorIcon,
 } from "lucide-react";
 
 const Preview: React.FC<{
   htmlPreview: HTMLPreview;
 }> = (props) => {
   const [expanded, setExpanded] = useState(false);
-  const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
+  const [viewMode, setViewMode] = useState<"desktop" | "mobile" | "precision">(
+    "desktop",
+  );
   const [animationClass, setAnimationClass] = useState<string>("");
   const [bgColor, setBgColor] = useState<"white" | "black">("white");
 
@@ -22,27 +26,26 @@ const Preview: React.FC<{
 
   // Calculate content dimensions based on view mode
   const contentWidth =
-    viewMode === "desktop" ? containerWidth : Math.floor(containerWidth * 0.4); // Narrower for mobile
-
-  // Adjust scale factor based on view mode
-  const scaleFactor =
     viewMode === "desktop"
-      ? Math.min(
-          containerWidth / props.htmlPreview.size.width,
-          containerHeight / props.htmlPreview.size.height,
-        )
-      : Math.min(
-          contentWidth / props.htmlPreview.size.width,
-          containerHeight / props.htmlPreview.size.height,
-        );
+      ? containerWidth
+      : viewMode === "mobile"
+        ? Math.floor(containerWidth * 0.4) // Narrower for mobile
+        : containerWidth; // For precision, use container width for the outer frame
+
+  const scaleFactor = Math.min(
+    containerWidth / props.htmlPreview.size.width,
+    containerHeight / props.htmlPreview.size.height,
+  );
 
   // Add animation when changing view mode
   useEffect(() => {
-    setAnimationClass(
-      viewMode === "desktop"
-        ? "animate-slide-in-left"
-        : "animate-slide-in-right",
-    );
+    if (viewMode === "desktop") {
+      setAnimationClass("animate-slide-in-left");
+    } else if (viewMode === "mobile") {
+      setAnimationClass("animate-slide-in-right");
+    } else {
+      setAnimationClass("animate-fade-in");
+    }
     const timer = setTimeout(() => setAnimationClass(""), 300); // Remove animation class after it completes
     return () => clearTimeout(timer);
   }, [viewMode]);
@@ -65,15 +68,19 @@ const Preview: React.FC<{
           Preview
         </h3>
         <div className="flex items-center gap-1">
-          {/* Background Color Toggle */}
-          <button
-            onClick={() => setBgColor(bgColor === "white" ? "black" : "white")}
-            className="p-1.5 mr-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
-            aria-label={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
-            title={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
-          >
-            <Circle size={14} fill={bgColor} className="stroke-current" />
-          </button>
+          {/* Background Color Toggle - Only show in desktop and mobile modes */}
+          {viewMode !== "precision" && (
+            <button
+              onClick={() =>
+                setBgColor(bgColor === "white" ? "black" : "white")
+              }
+              className="p-1.5 mr-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
+              aria-label={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
+              title={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
+            >
+              <Circle size={14} fill={bgColor} className="stroke-current" />
+            </button>
+          )}
 
           {/* View Mode Toggle */}
           <div className="mr-1 flex bg-neutral-100 dark:bg-neutral-700 rounded-md p-0.5">
@@ -100,6 +107,18 @@ const Preview: React.FC<{
               title="Mobile view"
             >
               <Smartphone size={14} />
+            </button>
+            <button
+              onClick={() => setViewMode("precision")}
+              className={`p-1 rounded text-xs ${
+                viewMode === "precision"
+                  ? "bg-white dark:bg-neutral-600 shadow-sm text-neutral-800 dark:text-white"
+                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white"
+              } transition-colors duration-200`}
+              aria-label="Precision view (exact dimensions)"
+              title="Precision view (exact dimensions)"
+            >
+              <Ruler size={14} />
             </button>
           </div>
 
@@ -134,26 +153,46 @@ const Preview: React.FC<{
               height:
                 viewMode === "mobile"
                   ? Math.min(containerHeight * 0.9, containerHeight)
-                  : containerHeight,
+                  : containerHeight, // Use full container height for both desktop and precision
               transition: "width 0.3s ease, height 0.3s ease",
             }}
           >
-            {/* Device frame - just a border for mobile, no status bar or home indicator */}
+            {/* Device frame - no background for precision mode */}
             <div
               className={`w-full h-full flex justify-center items-center overflow-hidden ${
-                bgColor === "white" ? "bg-white" : "bg-black"
+                viewMode === "precision"
+                  ? "" // No background in precision mode
+                  : bgColor === "white"
+                    ? "bg-white"
+                    : "bg-black"
               } ${
                 viewMode === "desktop"
                   ? "border border-neutral-300 dark:border-neutral-600 rounded shadow-sm"
-                  : "border-2 border-neutral-400 dark:border-neutral-500 rounded-xl shadow-sm"
+                  : viewMode === "mobile"
+                    ? "border-2 border-neutral-400 dark:border-neutral-500 rounded-xl shadow-sm"
+                    : "border border-indigo-400 dark:border-indigo-500 rounded shadow-sm" // Precision mode uses indigo border with rounded corners
               } transition-all duration-300 ease-in-out`}
             >
-              {/* Content - no padding needed anymore */}
+              {/* Content */}
               <div className="w-full h-full flex justify-center items-center">
                 <div
-                  className="w-full"
                   style={{
                     zoom: scaleFactor,
+                    width:
+                      viewMode === "precision"
+                        ? props.htmlPreview.size.width
+                        : "100%",
+                    height:
+                      viewMode === "precision"
+                        ? props.htmlPreview.size.height
+                        : "100%",
+                    transformOrigin: "center",
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    aspectRatio:
+                      viewMode === "precision"
+                        ? `${props.htmlPreview.size.width} / ${props.htmlPreview.size.height}`
+                        : undefined,
                     transition: "all 0.3s ease",
                   }}
                   dangerouslySetInnerHTML={{
@@ -178,9 +217,14 @@ const Preview: React.FC<{
               <Smartphone size={10} />
               <span>Mobile view</span>
             </span>
+          ) : viewMode === "precision" ? (
+            <span className="flex items-center gap-1">
+              <Ruler size={10} />
+              <span>Precision view</span>
+            </span>
           ) : (
             <span className="flex items-center gap-1">
-              <MonitorSmartphone size={10} />
+              <MonitorIcon size={10} />
               <span>Desktop view</span>
             </span>
           )}
