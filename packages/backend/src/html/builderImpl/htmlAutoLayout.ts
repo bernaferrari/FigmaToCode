@@ -69,19 +69,18 @@ const getFlex = (
     : "inline-flex";
 
 export const htmlAutoLayoutProps = (
-  node: SceneNode,
-  autoLayout: InferredAutoLayoutResult,
+  node: SceneNode & InferredAutoLayoutResult,
   settings: HTMLSettings,
 ): string[] =>
   formatMultipleJSXArray(
     {
-      "flex-direction": getFlexDirection(autoLayout),
-      "justify-content": getJustifyContent(autoLayout),
-      "align-items": getAlignItems(autoLayout),
-      gap: getGap(autoLayout),
-      display: getFlex(node, autoLayout),
-      "flex-wrap": getFlexWrap(autoLayout),
-      "align-content": getAlignContent(autoLayout),
+      "flex-direction": getFlexDirection(node),
+      "justify-content": getJustifyContent(node),
+      "align-items": getAlignItems(node),
+      gap: getGap(node),
+      display: getFlex(node, node),
+      "flex-wrap": getFlexWrap(node),
+      "align-content": getAlignContent(node),
     },
     settings.htmlGenerationMode === "jsx",
   );

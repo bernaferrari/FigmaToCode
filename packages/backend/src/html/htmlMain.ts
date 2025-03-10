@@ -564,22 +564,13 @@ const htmlFrame = async (
   );
 
   if (node.layoutMode !== "NONE") {
-    const rowColumn = htmlAutoLayoutProps(node, node, settings);
+    const rowColumn = htmlAutoLayoutProps(node, settings);
     return await htmlContainer(node, childrenStr, rowColumn, settings);
-  } else {
-    if (settings.optimizeLayout && node.inferredAutoLayout !== null) {
-      const rowColumn = htmlAutoLayoutProps(
-        node,
-        node.inferredAutoLayout,
-        settings,
-      );
-      return await htmlContainer(node, childrenStr, rowColumn, settings);
-    }
-
-    // node.layoutMode === "NONE" && node.children.length > 1
-    // children needs to be absolute
-    return await htmlContainer(node, childrenStr, [], settings);
   }
+
+  // node.layoutMode === "NONE" && node.children.length > 1
+  // children needs to be absolute
+  return await htmlContainer(node, childrenStr, [], settings);
 };
 
 // properties named propSomething always take care of ","

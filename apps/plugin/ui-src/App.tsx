@@ -104,7 +104,6 @@ export default function App() {
           break;
 
         case "selection-json":
-          console.log("selection json");
           const json = event.data.pluginMessage.data;
           copy(JSON.stringify(json, null, 2));
 

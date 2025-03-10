@@ -8,12 +8,6 @@ import {
   htmlMain,
   postSettingsChanged,
 } from "backend";
-import { convertNodesToAltNodes } from "backend/src/altNodes/altConversion";
-import {
-  disableParent,
-  oldConvertNodesToAltNodes,
-  setDisableParent,
-} from "backend/src/altNodes/oldAltConversion";
 import { nodesToJSON } from "backend/src/code";
 import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retrieveColors";
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
@@ -198,7 +192,17 @@ const standardMode = async () => {
       }
 
       try {
-        result.newConversion = await nodesToJSON(nodes, userPluginSettings);
+        const newNodes = await nodesToJSON(nodes, userPluginSettings);
+        const removeParent = (node: any) => {
+          if (node.parent) {
+            delete node.parent;
+          }
+          if (node.children) {
+            node.children.forEach(removeParent);
+          }
+        };
+        newNodes.forEach(removeParent);
+        result.newConversion = newNodes;
       } catch (error) {
         console.error("Error in new conversion:", error);
       }
