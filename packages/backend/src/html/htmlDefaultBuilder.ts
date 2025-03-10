@@ -163,9 +163,16 @@ export class HtmlDefaultBuilder {
 
     const strokes = ("strokes" in node && node.strokes) || undefined;
     const color = htmlColorFromFills(strokes, settings);
+    if (!color) {
+      return this;
+    }
     const borderStyle =
       "dashPattern" in node && node.dashPattern.length > 0 ? "dotted" : "solid";
 
+    const strokeAlign = "strokeAlign" in node ? node.strokeAlign : "INSIDE";
+    const layoutMode = "layoutMode" in node ? node.layoutMode : "NONE";
+
+    // Function to create border value string
     const consolidateBorders = (border: number): string =>
       [`${numberToFixedString(border)}px`, color, borderStyle]
         .filter((d) => d)
@@ -176,10 +183,40 @@ export class HtmlDefaultBuilder {
         return this;
       }
       const weight = commonBorder.all;
-      this.addStyles(
-        formatWithJSX("border", this.isJSX, consolidateBorders(weight)),
-      );
+
+      if (
+        strokeAlign === "CENTER" ||
+        strokeAlign === "OUTSIDE" ||
+        (strokeAlign === "INSIDE" && layoutMode === "NONE")
+      ) {
+        this.addStyles(
+          formatWithJSX("outline", this.isJSX, consolidateBorders(weight)),
+        );
+        if (strokeAlign === "CENTER") {
+          this.addStyles(
+            formatWithJSX(
+              "outline-offset",
+              this.isJSX,
+              `${numberToFixedString(-weight / 2)}px`,
+            ),
+          );
+        } else if (strokeAlign === "INSIDE") {
+          this.addStyles(
+            formatWithJSX(
+              "outline-offset",
+              this.isJSX,
+              `${numberToFixedString(-weight)}px`,
+            ),
+          );
+        }
+      } else {
+        // Default: use regular border on autolayout + strokeAlign: inside
+        this.addStyles(
+          formatWithJSX("border", this.isJSX, consolidateBorders(weight)),
+        );
+      }
     } else {
+      // For non-uniform borders, always use individual border properties
       if (commonBorder.left !== 0) {
         this.addStyles(
           formatWithJSX(
@@ -280,7 +317,12 @@ export class HtmlDefaultBuilder {
   }
 
   buildBackgroundBlendModes(paintArray: ReadonlyArray<Paint>): string {
-    if (paintArray.length === 0) {
+    if (
+      paintArray.length === 0 ||
+      paintArray.every(
+        (d) => d.blendMode === "NORMAL" || d.blendMode === "PASS_THROUGH",
+      )
+    ) {
       return "";
     }
 

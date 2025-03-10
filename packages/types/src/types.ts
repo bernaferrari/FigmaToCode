@@ -189,7 +189,7 @@ export interface TailwindTextConversion {
   contrastBlack: number;
 }
 
-export type TailwindColorType = "text" | "bg" | "border" | "ring";
+export type TailwindColorType = "text" | "bg" | "border" | "outline";
 
 export type SwiftUIModifier = [
   string,

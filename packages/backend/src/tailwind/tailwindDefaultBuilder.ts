@@ -115,9 +115,9 @@ export class TailwindDefaultBuilder {
 
   border(): this {
     if ("strokes" in this.node) {
-      const { isRing, property } = tailwindBorderWidth(this.node);
+      const { isOutline, property } = tailwindBorderWidth(this.node);
       this.addAttributes(property);
-      this.customColor(this.node.strokes, isRing ? "ring" : "border");
+      this.customColor(this.node.strokes, isOutline ? "outline" : "border");
     }
 
     return this;

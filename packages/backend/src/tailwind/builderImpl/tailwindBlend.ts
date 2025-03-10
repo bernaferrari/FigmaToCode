@@ -64,7 +64,12 @@ export const tailwindBlendMode = (node: MinimalBlendMixin): string => {
 export const tailwindBackgroundBlendMode = (
   paintArray: ReadonlyArray<Paint>,
 ): string => {
-  if (paintArray.length === 0) {
+  if (
+    paintArray.length === 0 ||
+    paintArray.every(
+      (d) => d.blendMode === "NORMAL" || d.blendMode === "PASS_THROUGH",
+    )
+  ) {
     return "";
   }
 

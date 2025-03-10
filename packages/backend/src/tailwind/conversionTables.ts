@@ -112,8 +112,8 @@ export const pxToBorderWidth = (value: number): string | null => {
   return pxToTailwind(value, config.border);
 };
 
-export const pxToRing = (value: number): string | null => {
-  return pxToTailwind(value, config.ring);
+export const pxToOutline = (value: number): string | null => {
+  return pxToTailwind(value, config.outline);
 };
 
 export const pxToBlur = (value: number): string | null => {
