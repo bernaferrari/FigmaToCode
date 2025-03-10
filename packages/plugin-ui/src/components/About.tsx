@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   ArrowRightIcon,
   Code,
@@ -9,9 +9,46 @@ import {
   MessageCircle,
   Star,
   Zap,
+  Copy,
+  CheckCircle,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
+import { PluginSettings } from "types";
 
-const About = () => {
+type AboutProps = {
+  useOldPluginVersion?: boolean;
+  onPreferenceChanged: (
+    key: keyof PluginSettings,
+    value: boolean | string | number,
+  ) => void;
+};
+
+const About = ({
+  useOldPluginVersion = false,
+  onPreferenceChanged,
+}: AboutProps) => {
+  const [copied, setCopied] = useState(false);
+
+  const copySelectionJson = async () => {
+    try {
+      // Send message to the plugin to get selection JSON
+      parent.postMessage(
+        { pluginMessage: { type: "get-selection-json" } },
+        "*",
+      );
+
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy selection JSON:", error);
+    }
+  };
+
+  const togglePluginVersion = () => {
+    onPreferenceChanged("useOldPluginVersion2025", !useOldPluginVersion);
+  };
+
   return (
     <div className="flex flex-col p-5 gap-6 text-sm max-w-2xl mx-auto">
       {/* Header Section with Logo and Title */}
@@ -165,6 +202,56 @@ const About = () => {
               <Github size={16} />
               <span>Report an issue on GitHub</span>
             </a>
+          </div>
+        </div>
+
+        {/* Debug Helper Card */}
+        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-rose-100 dark:bg-rose-900/40 rounded-lg">
+              <Code size={20} className="text-rose-600 dark:text-rose-400" />
+            </div>
+            <h3 className="font-semibold text-base">Debug Helper</h3>
+          </div>
+          <p className="text-neutral-600 dark:text-neutral-300 leading-relaxed mb-4">
+            Having an issue? Help me debug by copying the JSON of your selected
+            elements. This can be attached when reporting issues.
+          </p>
+          <button
+            onClick={copySelectionJson}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-700 rounded-md text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors mb-3"
+          >
+            {copied ? (
+              <>
+                <CheckCircle size={16} className="text-green-500" />
+                <span>Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy size={16} />
+                <span>Copy Selection JSON</span>
+              </>
+            )}
+          </button>
+
+          {/* Hidden setting for using old plugin version */}
+          <div className="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
+            <button
+              onClick={togglePluginVersion}
+              className="inline-flex items-center gap-2 w-full text-left text-neutral-600 dark:text-neutral-400 text-xs hover:text-neutral-800 dark:hover:text-neutral-300 transition-colors"
+            >
+              {useOldPluginVersion ? (
+                <ToggleRight size={16} className="text-green-500" />
+              ) : (
+                <ToggleLeft size={16} />
+              )}
+              <span>Use previous plugin version</span>
+            </button>
+            <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
+              The new version is up to 100x faster, but might still cause some issues. 
+              If you encounter problems, you can switch to the old version 
+              (and please report issues so they can be fixed).
+            </p>
           </div>
         </div>
       </div>

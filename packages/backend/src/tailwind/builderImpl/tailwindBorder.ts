@@ -82,9 +82,11 @@ export const tailwindBorderWidth = (
     if (
       strokeAlign === "CENTER" ||
       strokeAlign === "OUTSIDE" ||
-      (strokeAlign === "INSIDE" && layoutMode === "NONE")
+      node.type === "FRAME" ||
+      node.type === "INSTANCE" ||
+      node.type === "COMPONENT"
     ) {
-      // For CENTER, OUTSIDE, or INSIDE+NONE, use outline
+      // For CENTER, OUTSIDE, or INSIDE+Frame, use outline
       const property = getBorder(weight, "", true);
       let offsetProperty = "";
 

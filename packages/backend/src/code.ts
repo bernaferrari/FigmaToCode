@@ -13,6 +13,7 @@ import { PluginSettings } from "types";
 import { convertToCode } from "./common/retrieveUI/convertToCode";
 import { generateHTMLPreview } from "./html/htmlMain";
 import { variableToColorName } from "./tailwind/conversionTables";
+import { oldConvertNodesToAltNodes } from "./altNodes/oldAltConversion";
 
 // Performance tracking counters
 let getNodeByIdAsyncTime = 0;
@@ -448,7 +449,7 @@ export const run = async (settings: PluginSettings) => {
   variableCache.clear();
   clearWarnings();
 
-  const { framework } = settings;
+  const { framework, useOldPluginVersion2025 } = settings;
   const selection = figma.currentPage.selection;
 
   if (selection.length === 0) {
@@ -462,16 +463,24 @@ export const run = async (settings: PluginSettings) => {
 
   // Timing with Date.now() instead of console.time
   const nodeToJSONStart = Date.now();
-  const nodeJson = await nodesToJSON(selection, settings);
-  console.log(`[benchmark] nodesToJSON: ${Date.now() - nodeToJSONStart}ms`);
-  console.log("nodeJson", nodeJson);
 
-  // Now we work directly with the JSON nodes
-  const convertNodesStart = Date.now();
-  const convertedSelection = await convertNodesToAltNodes(nodeJson, null);
-  console.log(
-    `[benchmark] convertNodesToAltNodes: ${Date.now() - convertNodesStart}ms`,
-  );
+  let convertedSelection: any;
+  if (useOldPluginVersion2025) {
+    convertedSelection = oldConvertNodesToAltNodes(selection, null);
+    console.log("convertedSelection", convertedSelection);
+    console.log("convertedSelection", convertedSelection[0].children[0]);
+  } else {
+    const nodeJson = await nodesToJSON(selection, settings);
+    console.log(`[benchmark] nodesToJSON: ${Date.now() - nodeToJSONStart}ms`);
+    console.log("nodeJson", nodeJson);
+
+    // Now we work directly with the JSON nodes
+    const convertNodesStart = Date.now();
+    convertedSelection = await convertNodesToAltNodes(nodeJson, null);
+    console.log(
+      `[benchmark] convertNodesToAltNodes: ${Date.now() - convertNodesStart}ms`,
+    );
+  }
 
   // ignore when nothing was selected
   // If the selection was empty, the converted selection will also be empty.

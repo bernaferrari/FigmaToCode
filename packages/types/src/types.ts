@@ -30,7 +30,7 @@ export interface PluginSettings
     FlutterSettings,
     SwiftUISettings {
   framework: Framework;
-  inlineStyle: boolean;
+  useOldPluginVersion2025: boolean;
   responsiveRoot: boolean;
 }
 // Messaging
