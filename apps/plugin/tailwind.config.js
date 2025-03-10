@@ -6,9 +6,5 @@ module.exports = {
     "../../packages/plugin-ui/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: "class",
-  theme: {
-    extend: {},
-  },
-  variants: {},
-  plugins: [],
+  
 };

@@ -13,6 +13,7 @@ import {
   Warning,
 } from "types";
 import { postUISettingsChangingMessage } from "./messaging";
+import copy from "copy-to-clipboard";
 
 interface AppState {
   code: string;
@@ -26,6 +27,7 @@ interface AppState {
 }
 
 const emptyPreview = { size: { width: 0, height: 0 }, content: "" };
+
 export default function App() {
   const [state, setState] = useState<AppState>({
     code: "",
@@ -100,6 +102,11 @@ export default function App() {
             isLoading: false,
           }));
           break;
+
+        case "selection-json":
+          const json = event.data.pluginMessage.data;
+          copy(JSON.stringify(json, null, 2));
+
         default:
           break;
       }
@@ -124,7 +131,7 @@ export default function App() {
   };
   const handlePreferencesChange = (
     key: keyof PluginSettings,
-    value: boolean | string,
+    value: boolean | string | number,
   ) => {
     if (state.settings && state.settings[key] === value) {
       // do nothing

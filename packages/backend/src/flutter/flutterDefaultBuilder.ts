@@ -18,8 +18,8 @@ export class FlutterDefaultBuilder {
     this.child = optChild;
   }
 
-  createContainer(node: SceneNode, optimizeLayout: boolean): this {
-    this.child = flutterContainer(node, this.child, optimizeLayout);
+  createContainer(node: SceneNode): this {
+    this.child = flutterContainer(node, this.child);
     return this;
   }
 
@@ -28,12 +28,14 @@ export class FlutterDefaultBuilder {
       this.child = flutterVisibility(node, this.child);
       this.child = flutterRotation(node, this.child);
       this.child = flutterOpacity(node, this.child);
+    } else if ("opacity" in node) {
+      this.child = flutterOpacity(node, this.child);
     }
     return this;
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+  position(node: SceneNode): this {
+    if (commonIsAbsolutePosition(node)) {
       const { x, y } = getCommonPositionValue(node);
       this.child = generateWidgetCode("Positioned", {
         left: x,

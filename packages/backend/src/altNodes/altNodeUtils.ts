@@ -1,6 +1,7 @@
 import { AltNode } from "types";
 import { curry } from "../common/curry";
 import { exportAsyncProxy } from "../common/exportAsyncProxy";
+import { addWarning } from "../common/commonConversionWarnings";
 
 export const overrideReadonlyProperty = curry(
   <T, K extends keyof T>(prop: K, value: any, obj: T): T =>
@@ -24,21 +25,24 @@ export function isNotEmpty<TValue>(
 
 export const isTypeOrGroupOfTypes = curry(
   (matchTypes: NodeType[], node: SceneNode): boolean => {
-    if (node.visible === false || matchTypes.includes(node.type)) return true;
+    // Check if the current node's type is in the matchTypes array
+    if (matchTypes.includes(node.type)) return true;
 
+    // Only check children if this is a container type node that can have children
     if ("children" in node) {
       for (let i = 0; i < node.children.length; i++) {
         const childNode = node.children[i];
         const result = isTypeOrGroupOfTypes(matchTypes, childNode);
-        if (result) continue;
-        // child is false
-        return false;
+        if (!result) {
+          // If any child is not of the specified types, return false
+          return false;
+        }
       }
-      // all children are true
-      return true;
+      // All children are valid types
+      return node.children.length > 0; // Only return true if there are children
     }
 
-    // not group or vector
+    // Not a container node and not a matching type
     return false;
   },
 );
@@ -48,24 +52,26 @@ export const isSVGNode = (node: SceneNode) => {
   return altNode.canBeFlattened;
 };
 
-export const renderNodeAsSVG = async (node: SceneNode) =>
-  await exportAsyncProxy<string>(node, {
-    format: "SVG_STRING",
-  });
-
-export const renderAndAttachSVG = async (node: SceneNode) => {
-  const altNode = node as AltNode<typeof node>;
+export const renderAndAttachSVG = async (node: any) => {
   // const nodeName = `${node.type}:${node.id}`;
   // console.log(altNode);
-  if (altNode.canBeFlattened) {
-    if (altNode.svg) {
+  if (node.canBeFlattened) {
+    if (node.svg) {
       // console.log(`SVG already rendered for ${nodeName}`);
-      return altNode;
+      return node;
     }
-    // console.log(`${nodeName} can be flattened!`);
-    const svg = (await renderNodeAsSVG(altNode.originalNode)) as string;
-    // console.log(`${svg}`);
-    altNode.svg = svg;
+
+    try {
+      // console.log(`${nodeName} can be flattened!`);
+      const svg = (await exportAsyncProxy<string>(node, {
+        format: "SVG_STRING",
+      })) as string;
+      node.svg = svg;
+    } catch (error) {
+      addWarning(`Failed rendering SVG for ${node.name}`);
+      console.error(`Error rendering SVG for ${node.type}:${node.id}`);
+      console.error(error);
+    }
   }
-  return altNode;
+  return node;
 };

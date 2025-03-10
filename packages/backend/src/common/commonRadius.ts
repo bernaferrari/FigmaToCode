@@ -1,6 +1,25 @@
 import { CornerRadius } from "types";
 
 export const getCommonRadius = (node: SceneNode): CornerRadius => {
+  if ("rectangleCornerRadii" in node) {
+    const [topLeft, topRight, bottomRight, bottomLeft] =
+      node.rectangleCornerRadii as any;
+    if (
+      topLeft === topRight &&
+      topLeft === bottomRight &&
+      topLeft === bottomLeft
+    ) {
+      return { all: topLeft };
+    }
+
+    return {
+      topLeft,
+      topRight,
+      bottomRight,
+      bottomLeft,
+    };
+  }
+
   if (
     "cornerRadius" in node &&
     node.cornerRadius !== figma.mixed &&

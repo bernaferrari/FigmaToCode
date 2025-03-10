@@ -1,4 +1,3 @@
-import { globalTextStyleSegments } from "../altNodes/altConversion";
 import {
   commonLetterSpacing,
   commonLineHeight,
@@ -12,14 +11,17 @@ import {
 } from "./conversionTables";
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { config } from "./tailwindConfig";
+import { StyledTextSegmentSubset } from "types";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
-  getTextSegments(id: string): {
+  getTextSegments(node: TextNode): {
     style: string;
     text: string;
     openTypeFeatures: { [key: string]: boolean };
   }[] {
-    const segments = globalTextStyleSegments[id];
+    const segments = (node as any)
+      .styledTextSegments as StyledTextSegmentSubset[];
+
     if (!segments) {
       return [];
     }
@@ -53,7 +55,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         blurStyle,
         shadowStyle,
       ]
-        .filter((d) => d !== "")
+        .filter(Boolean)
         .join(" ");
 
       const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
@@ -135,8 +137,8 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       }
 
       const value = node.fontName.style
-        .replace("italic", "")
-        .replace(" ", "")
+        .replaceAll("italic", "")
+        .replaceAll(" ", "")
         .toLowerCase();
 
       this.addAttributes(`font-${value}`);
@@ -176,7 +178,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
    * https://tailwindcss.com/docs/text-align/
    * example: text-justify
    */
-  textAlign(): this {
+  textAlignHorizontal(): this {
     // if alignHorizontal is LEFT, don't do anything because that is native
     const node = this.node as TextNode;
     // only undefined in testing
@@ -195,6 +197,29 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         default:
           break;
       }
+    }
+
+    return this;
+  }
+
+  /**
+   * https://tailwindcss.com/docs/vertical-align/
+   * example: align-top, align-middle, align-bottom
+   */
+  textAlignVertical(): this {
+    const node = this.node as TextNode;
+    switch (node.textAlignVertical) {
+      case "TOP":
+        this.addAttributes("justify-start");
+        break;
+      case "CENTER":
+        this.addAttributes("justify-center");
+        break;
+      case "BOTTOM":
+        this.addAttributes("justify-end");
+        break;
+      default:
+        break;
     }
 
     return this;

@@ -11,10 +11,10 @@ import {
   getCrossAxisAlignment,
   getMainAxisAlignment,
 } from "./builderImpl/flutterAutoLayout";
-import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 import { getPlaceholderImage } from "../common/images";
+import { getVisibleNodes } from "../common/nodeVisibility";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -88,10 +88,10 @@ const flutterWidgetGenerator = (
   let comp: string[] = [];
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible);
+  const visibleSceneNode = getVisibleNodes(sceneNode);
   const sceneLen = visibleSceneNode.length;
 
-  visibleSceneNode.forEach((node, index) => {
+  visibleSceneNode.forEach((node) => {
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
@@ -118,15 +118,9 @@ const flutterWidgetGenerator = (
       case "VECTOR":
         addWarning("VectorNodes are not supported in Flutter");
         break;
+      case "SLICE":
       default:
       // do nothing
-    }
-
-    if (index !== sceneLen - 1) {
-      const spacing = addSpacingIfNeeded(node, localSettings.optimizeLayout);
-      if (spacing) {
-        comp.push(spacing);
-      }
     }
   });
 
@@ -157,9 +151,9 @@ const flutterContainer = (node: SceneNode, child: string): string => {
   }
 
   const builder = new FlutterDefaultBuilder(propChild)
-    .createContainer(node, localSettings.optimizeLayout)
+    .createContainer(node)
     .blendAttr(node)
-    .position(node, localSettings.optimizeLayout);
+    .position(node);
 
   return builder.child;
 };
@@ -168,27 +162,44 @@ const flutterText = (node: TextNode): string => {
   const builder = new FlutterTextBuilder().createText(node);
   previousExecutionCache.push(builder.child);
 
-  return builder
-    .blendAttr(node)
-    .textAutoSize(node)
-    .position(node, localSettings.optimizeLayout).child;
+  return builder.blendAttr(node).textAutoSize(node).position(node).child;
 };
 
 const flutterFrame = (
   node: SceneNode & BaseFrameMixin & MinimalBlendMixin,
 ): string => {
-  const children = flutterWidgetGenerator(
-    commonSortChildrenWhenInferredAutoLayout(
-      node,
-      localSettings.optimizeLayout,
-    ),
+  // Check if any direct children need absolute positioning
+  const hasAbsoluteChildren = node.children.some(
+    (child: any) => (child as any).layoutPositioning === "ABSOLUTE",
   );
+
+  // Add warning if we need to use Stack due to absolute positioning
+  if (hasAbsoluteChildren && node.layoutMode !== "NONE") {
+    addWarning(
+      `Frame "${node.name}" has absolute positioned children. Using Stack instead of ${
+        node.layoutMode === "HORIZONTAL" ? "Row" : "Column"
+      }.`,
+    );
+  }
+
+  // Generate widget code for children
+  const children = flutterWidgetGenerator(sortedChildren);
+
+  // Force Stack for any frame that has absolute positioned children
+  if (hasAbsoluteChildren) {
+    return flutterContainer(
+      node,
+      generateWidgetCode("Stack", {
+        children: children !== "" ? [children] : [],
+      }),
+    );
+  }
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = makeRowColumn(node, children);
     return flutterContainer(node, rowColumn);
   } else {
-    if (localSettings.optimizeLayout && node.inferredAutoLayout) {
+    if (node.inferredAutoLayout) {
       const rowColumn = makeRowColumn(node.inferredAutoLayout, children);
       return flutterContainer(node, rowColumn);
     }
@@ -197,6 +208,7 @@ const flutterFrame = (
       return flutterContainer(node, generateWidgetCode("FlutterLogo", {}));
     }
 
+    // Default to Stack for frames without any layout
     return flutterContainer(
       node,
       generateWidgetCode("Stack", {
@@ -212,45 +224,23 @@ const makeRowColumn = (
 ): string => {
   const rowOrColumn = autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
-  const widgetProps = {
+  const widgetProps: Record<string, any> = {
     mainAxisSize: "MainAxisSize.min",
     // mainAxisSize: getFlex(node, autoLayout),
     mainAxisAlignment: getMainAxisAlignment(autoLayout),
     crossAxisAlignment: getCrossAxisAlignment(autoLayout),
-    children: [children],
   };
 
-  return generateWidgetCode(rowOrColumn, widgetProps);
-};
-
-const addSpacingIfNeeded = (
-  node: SceneNode,
-  optimizeLayout: boolean,
-): string => {
-  const nodeParentLayout =
-    optimizeLayout && node.parent && "itemSpacing" in node.parent
-      ? node.parent.inferredAutoLayout
-      : node.parent;
-
-  if (
-    nodeParentLayout &&
-    node.parent?.type === "FRAME" &&
-    "itemSpacing" in nodeParentLayout &&
-    nodeParentLayout.layoutMode !== "NONE"
-  ) {
-    if (nodeParentLayout.itemSpacing > 0) {
-      if (nodeParentLayout.layoutMode === "HORIZONTAL") {
-        return generateWidgetCode("const SizedBox", {
-          width: nodeParentLayout.itemSpacing,
-        });
-      } else if (nodeParentLayout.layoutMode === "VERTICAL") {
-        return generateWidgetCode("const SizedBox", {
-          height: nodeParentLayout.itemSpacing,
-        });
-      }
-    }
+  // Add spacing parameter if itemSpacing is set
+  if (autoLayout.itemSpacing > 0) {
+    widgetProps.spacing = autoLayout.itemSpacing;
+  } else if (autoLayout.itemSpacing < 0) {
+    addWarning("Flutter doesn't support negative itemSpacing");
   }
-  return "";
+
+  widgetProps.children = [children];
+
+  return generateWidgetCode(rowOrColumn, widgetProps);
 };
 
 export const flutterCodeGenTextStyles = () => {
