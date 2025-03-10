@@ -468,7 +468,6 @@ export const run = async (settings: PluginSettings) => {
   if (useOldPluginVersion2025) {
     convertedSelection = oldConvertNodesToAltNodes(selection, null);
     console.log("convertedSelection", convertedSelection);
-    console.log("convertedSelection", convertedSelection[0].children[0]);
   } else {
     const nodeJson = await nodesToJSON(selection, settings);
     console.log(`[benchmark] nodesToJSON: ${Date.now() - nodeToJSONStart}ms`);
