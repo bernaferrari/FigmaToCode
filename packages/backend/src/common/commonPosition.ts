@@ -14,10 +14,7 @@ export const getCommonPositionValue = (
   };
 };
 
-export const commonIsAbsolutePosition = (
-  node: SceneNode,
-  optimizeLayout: boolean,
-) => {
+export const commonIsAbsolutePosition = (node: SceneNode) => {
   if ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") {
     return true;
   }

@@ -58,10 +58,6 @@ export class HtmlDefaultBuilder {
     return this.settings.htmlGenerationMode === "jsx";
   }
 
-  get optimizeLayout() {
-    return this.settings.optimizeLayout;
-  }
-
   get exportCSS() {
     return this.settings.htmlGenerationMode === "svelte";
   }
@@ -260,8 +256,8 @@ export class HtmlDefaultBuilder {
   }
 
   position(): this {
-    const { node, optimizeLayout, isJSX } = this;
-    const isAbsolutePosition = commonIsAbsolutePosition(node, optimizeLayout);
+    const { node, isJSX } = this;
+    const isAbsolutePosition = commonIsAbsolutePosition(node);
     if (isAbsolutePosition) {
       const { x, y } = getCommonPositionValue(node);
 
@@ -273,10 +269,7 @@ export class HtmlDefaultBuilder {
     } else {
       if (
         node.type === "GROUP" ||
-        ("layoutMode" in node &&
-          ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
-            ?.layoutMode === "NONE") ||
-        (node as any).isRelative
+        ("layoutMode" in node && (node as any).isRelative)
       ) {
         this.addStyles(formatWithJSX("position", isJSX, "relative"));
       }
@@ -356,7 +349,6 @@ export class HtmlDefaultBuilder {
     const { width, height, constraints } = htmlSizePartial(
       node,
       settings.htmlGenerationMode === "jsx",
-      settings.optimizeLayout,
     );
 
     if (node.type === "TEXT") {
@@ -384,14 +376,9 @@ export class HtmlDefaultBuilder {
   }
 
   autoLayoutPadding(): this {
-    const { node, isJSX, optimizeLayout } = this;
+    const { node, isJSX } = this;
     if ("paddingLeft" in node) {
-      this.addStyles(
-        ...htmlPadding(
-          (optimizeLayout ? (node as any).inferredAutoLayout : null) ?? node,
-          isJSX,
-        ),
-      );
+      this.addStyles(...htmlPadding(node, isJSX));
     }
     return this;
   }

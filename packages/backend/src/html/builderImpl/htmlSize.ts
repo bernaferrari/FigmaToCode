@@ -5,7 +5,6 @@ import { isPreviewGlobal } from "../htmlMain";
 export const htmlSizePartial = (
   node: SceneNode,
   isJsx: boolean,
-  optimizeLayout: boolean,
 ): { width: string; height: string; constraints: string[] } => {
   if (isPreviewGlobal && node.parent === undefined) {
     return {
@@ -16,10 +15,7 @@ export const htmlSizePartial = (
   }
 
   const size = nodeSize(node);
-  const nodeParent =
-    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
-      ? node.parent.inferredAutoLayout
-      : null) ?? node.parent;
+  const nodeParent = node.parent;
 
   let w = "";
   if (typeof size.width === "number") {

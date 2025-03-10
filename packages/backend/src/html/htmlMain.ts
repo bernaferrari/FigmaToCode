@@ -3,7 +3,6 @@ import { HtmlTextBuilder } from "./htmlTextBuilder";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlAutoLayoutProps } from "./builderImpl/htmlAutoLayout";
 import { formatWithJSX } from "../common/parseJSX";
-import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import {
   PluginSettings,
   HTMLPreview,
@@ -558,10 +557,7 @@ const htmlFrame = async (
   node: SceneNode & BaseFrameMixin,
   settings: HTMLSettings,
 ): Promise<string> => {
-  const childrenStr = await htmlWidgetGenerator(
-    commonSortChildrenWhenInferredAutoLayout(node, settings.optimizeLayout),
-    settings,
-  );
+  const childrenStr = await htmlWidgetGenerator(node.children, settings);
 
   if (node.layoutMode !== "NONE") {
     const rowColumn = htmlAutoLayoutProps(node, settings);

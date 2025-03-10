@@ -2,7 +2,6 @@ import "@figma/plugin-typings";
 // Settings
 export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
 export interface HTMLSettings {
-  optimizeLayout: boolean;
   showLayerNames: boolean;
   embedImages: boolean;
   embedVectors: boolean;

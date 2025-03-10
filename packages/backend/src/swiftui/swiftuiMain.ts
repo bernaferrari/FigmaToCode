@@ -5,7 +5,6 @@ import {
 } from "../common/numToAutoFixed";
 import { SwiftuiTextBuilder } from "./swiftuiTextBuilder";
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
-import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 import { getVisibleNodes } from "../common/nodeVisibility";
@@ -126,12 +125,12 @@ export const swiftuiContainer = (
 
   const result = new SwiftuiDefaultBuilder(kind)
     .shapeForeground(node)
-    .autoLayoutPadding(node, localSettings.optimizeLayout)
+    .autoLayoutPadding(node)
     .size(node)
     .shapeBackground(node)
     .cornerRadius(node)
     .shapeBorder(node)
-    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .commonPositionStyles(node)
     .effects(node)
     .build(kind === stack ? -2 : 0);
 
@@ -153,9 +152,7 @@ const swiftuiText = (node: TextNode): string => {
   const result = new SwiftuiTextBuilder().createText(node);
   previousExecutionCache.push(result.build());
 
-  return result
-    .commonPositionStyles(node, localSettings.optimizeLayout)
-    .build();
+  return result.commonPositionStyles(node).build();
 };
 
 const swiftuiFrame = (
@@ -167,12 +164,7 @@ const swiftuiFrame = (
     node.children.length > 1 ? indentLevel + 1 : indentLevel,
   );
 
-  const anyStack = createDirectionalStack(
-    children,
-    localSettings.optimizeLayout && node.inferredAutoLayout !== null
-      ? node.inferredAutoLayout
-      : node,
-  );
+  const anyStack = createDirectionalStack(children, node);
   return swiftuiContainer(node, anyStack);
 };
 
@@ -250,21 +242,12 @@ const widgetGeneratorWithLimits = (
 ) => {
   if (node.children.length < 10) {
     // standard way
-    return swiftuiWidgetGenerator(
-      commonSortChildrenWhenInferredAutoLayout(
-        node,
-        localSettings.optimizeLayout,
-      ),
-      indentLevel,
-    );
+    return swiftuiWidgetGenerator(node.children, indentLevel);
   }
 
   const chunk = 10;
   let strBuilder = "";
-  const slicedChildren = commonSortChildrenWhenInferredAutoLayout(
-    node,
-    localSettings.optimizeLayout,
-  ).slice(0, 100);
+  const slicedChildren = node.children.slice(0, 100);
 
   // I believe no one should have more than 100 items in a single nesting level. If you do, please email me.
   if (node.children.length > 100) {

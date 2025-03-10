@@ -11,7 +11,6 @@ import {
   getCrossAxisAlignment,
   getMainAxisAlignment,
 } from "./builderImpl/flutterAutoLayout";
-import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 import { getPlaceholderImage } from "../common/images";
@@ -152,9 +151,9 @@ const flutterContainer = (node: SceneNode, child: string): string => {
   }
 
   const builder = new FlutterDefaultBuilder(propChild)
-    .createContainer(node, localSettings.optimizeLayout)
+    .createContainer(node)
     .blendAttr(node)
-    .position(node, localSettings.optimizeLayout);
+    .position(node);
 
   return builder.child;
 };
@@ -163,24 +162,15 @@ const flutterText = (node: TextNode): string => {
   const builder = new FlutterTextBuilder().createText(node);
   previousExecutionCache.push(builder.child);
 
-  return builder
-    .blendAttr(node)
-    .textAutoSize(node)
-    .position(node, localSettings.optimizeLayout).child;
+  return builder.blendAttr(node).textAutoSize(node).position(node).child;
 };
 
 const flutterFrame = (
   node: SceneNode & BaseFrameMixin & MinimalBlendMixin,
 ): string => {
-  // Sort children according to layout direction
-  const sortedChildren = commonSortChildrenWhenInferredAutoLayout(
-    node,
-    localSettings.optimizeLayout,
-  );
-
   // Check if any direct children need absolute positioning
-  const hasAbsoluteChildren = sortedChildren.some(
-    (child) => (child as any).layoutPositioning === "ABSOLUTE",
+  const hasAbsoluteChildren = node.children.some(
+    (child: any) => (child as any).layoutPositioning === "ABSOLUTE",
   );
 
   // Add warning if we need to use Stack due to absolute positioning
@@ -209,7 +199,7 @@ const flutterFrame = (
     const rowColumn = makeRowColumn(node, children);
     return flutterContainer(node, rowColumn);
   } else {
-    if (localSettings.optimizeLayout && node.inferredAutoLayout) {
+    if (node.inferredAutoLayout) {
       const rowColumn = makeRowColumn(node.inferredAutoLayout, children);
       return flutterContainer(node, rowColumn);
     }

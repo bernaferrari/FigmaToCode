@@ -1,7 +1,6 @@
 import { retrieveTopFill } from "../common/retrieveFill";
 import { indentString } from "../common/indentString";
 import { addWarning } from "../common/commonConversionWarnings";
-import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { getVisibleNodes } from "../common/nodeVisibility";
 import { getPlaceholderImage } from "../common/images";
 import { TailwindTextBuilder } from "./tailwindTextBuilder";
@@ -173,11 +172,7 @@ const tailwindFrame = async (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   settings: TailwindSettings,
 ): Promise<string> => {
-  const sortedChildren = commonSortChildrenWhenInferredAutoLayout(
-    node,
-    localTailwindSettings.optimizeLayout,
-  );
-  const childrenStr = await tailwindWidgetGenerator(sortedChildren, settings);
+  const childrenStr = await tailwindWidgetGenerator(node.children, settings);
 
   const clipsContentClass =
     node.clipsContent && "children" in node && node.children.length > 0
@@ -187,11 +182,6 @@ const tailwindFrame = async (
 
   if (node.layoutMode !== "NONE") {
     layoutProps = tailwindAutoLayoutProps(node, node);
-  } else if (
-    localTailwindSettings.optimizeLayout &&
-    node.inferredAutoLayout !== null
-  ) {
-    layoutProps = tailwindAutoLayoutProps(node, node.inferredAutoLayout);
   }
 
   // Combine classes properly, ensuring no extra spaces
