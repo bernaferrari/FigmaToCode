@@ -2,18 +2,29 @@ import { getCommonRadius } from "../../common/commonRadius";
 import { formatWithJSX } from "../../common/parseJSX";
 
 export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
+  let comp: string[] = [];
+
+  if (
+    "children" in node &&
+    node.children.length > 0 &&
+    "clipsContent" in node &&
+    node.clipsContent === true
+  ) {
+    comp.push(formatWithJSX("overflow", isJsx, "hidden"));
+  }
+
   if (node.type === "ELLIPSE") {
-    return [formatWithJSX("border-radius", isJsx, 9999)];
+    comp.push(formatWithJSX("border-radius", isJsx, 9999));
+    return comp;
   }
 
   const radius = getCommonRadius(node);
 
-  let comp: string[] = [];
   let singleCorner: number = 0;
 
   if ("all" in radius) {
     if (radius.all === 0) {
-      return [];
+      return comp;
     }
     singleCorner = radius.all;
     comp.push(formatWithJSX("border-radius", isJsx, radius.all));
@@ -41,14 +52,6 @@ export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
     }
   }
 
-  if (
-    "children" in node &&
-    "clipsContent" in node &&
-    node.children.length > 0 &&
-    node.clipsContent === true
-  ) {
-    comp.push(formatWithJSX("overflow", isJsx, "hidden"));
-  }
-
+  console.log("comp was", comp);
   return comp;
 };

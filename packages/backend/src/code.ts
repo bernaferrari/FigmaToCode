@@ -187,38 +187,18 @@ const processNodePair = async (
       ? cleanName
       : `${cleanName}_${count.toString().padStart(2, "0")}`;
 
-  // Check if we need to handle gradients
-  const hasGradient = GRADIENT_PROPERTIES.some((propName) => {
+  GRADIENT_PROPERTIES.forEach((propName) => {
     const property = jsonNode[propName];
-    return (
+    if (
+      propName in figmaNode &&
       property &&
-      Array.isArray(property) &&
-      property.length > 0 &&
-      property.some(
-        (item: any) => item.type && item.type.startsWith("GRADIENT_"),
-      )
-    );
+      property.some((item: any) => item.type.startsWith("GRADIENT_"))
+    ) {
+      jsonNode[propName] = JSON.parse(
+        JSON.stringify((figmaNode as any)[propName]),
+      );
+    }
   });
-
-  // Handle gradients
-  if (hasGradient) {
-    GRADIENT_PROPERTIES.forEach((propName) => {
-      const property = jsonNode[propName];
-      if (
-        property &&
-        Array.isArray(property) &&
-        property.length > 0 &&
-        property.some(
-          (item) => item.type && item.type.startsWith("GRADIENT_"),
-        ) &&
-        propName in figmaNode
-      ) {
-        jsonNode[propName] = JSON.parse(
-          JSON.stringify((figmaNode as any)[propName]),
-        );
-      }
-    });
-  }
 
   // Handle text-specific properties
   if (figmaNode.type === "TEXT") {
@@ -376,7 +356,7 @@ const processNodePair = async (
         jsonNode.children[i],
         figmaNode.children[i],
         settings,
-        jsonNode, // Pass the current node as parent for its children
+        jsonNode,
       );
     }
 

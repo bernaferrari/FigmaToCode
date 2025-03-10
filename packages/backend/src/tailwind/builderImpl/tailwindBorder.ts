@@ -67,7 +67,6 @@ export const tailwindBorderWidth = (
 
   // Check stroke alignment and layout mode
   const strokeAlign = "strokeAlign" in node ? node.strokeAlign : "INSIDE";
-  const layoutMode = "layoutMode" in node ? node.layoutMode : "NONE";
 
   if ("all" in commonBorder) {
     if (commonBorder.all === 0) {
