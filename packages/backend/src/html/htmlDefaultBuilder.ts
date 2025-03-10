@@ -262,7 +262,6 @@ export class HtmlDefaultBuilder {
   position(): this {
     const { node, optimizeLayout, isJSX } = this;
     const isAbsolutePosition = commonIsAbsolutePosition(node, optimizeLayout);
-    console.log("node is absolute", isAbsolutePosition, node, node.parent);
     if (isAbsolutePosition) {
       const { x, y } = getCommonPositionValue(node);
 

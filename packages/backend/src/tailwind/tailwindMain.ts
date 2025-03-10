@@ -179,7 +179,10 @@ const tailwindFrame = async (
   );
   const childrenStr = await tailwindWidgetGenerator(sortedChildren, settings);
 
-  const clipsContentClass = node.clipsContent ? "overflow-hidden" : "";
+  const clipsContentClass =
+    node.clipsContent && "children" in node && node.children.length > 0
+      ? "overflow-hidden"
+      : "";
   let layoutProps = "";
 
   if (node.layoutMode !== "NONE") {

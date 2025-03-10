@@ -198,10 +198,7 @@ const standardMode = async () => {
       }
 
       try {
-        result.newConversion = await convertNodesToAltNodes(
-          result.json || [],
-          null,
-        );
+        result.newConversion = await nodesToJSON(nodes, userPluginSettings);
       } catch (error) {
         console.error("Error in new conversion:", error);
       }
