@@ -5,6 +5,7 @@ import {
   assignChildren,
   isTypeOrGroupOfTypes,
 } from "./altNodeUtils";
+import { addWarning } from "../common/commonConversionWarnings";
 
 // List of types that can be flattened into SVG
 const canBeFlattened = (node: SceneNode): boolean => {
@@ -62,9 +63,11 @@ export const convertNodeToAltNode =
       case "SLICE":
         return null;
       default:
-        throw new Error(
-          `Sorry, an unsupported node type was selected. Type:${node.type} id:${node.id}`,
-        );
+        addWarning(`${node.type} node is not supported`);
+        return node;
+      // throw new Error(
+      //   `Sorry, an unsupported node type was selected. Type:${node.type} id:${node.id}`,
+      // );
     }
   };
 

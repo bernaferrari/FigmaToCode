@@ -23,14 +23,14 @@ export const commonIsAbsolutePosition = (
   }
 
   // No position when parent is inferred auto layout.
-  if (
-    optimizeLayout &&
-    node.parent &&
-    "layoutMode" in node.parent &&
-    node.parent.inferredAutoLayout !== null
-  ) {
-    return false;
-  }
+  // if (
+  //   optimizeLayout &&
+  //   node.parent &&
+  //   "layoutMode" in node.parent &&
+  //   node.parent.inferredAutoLayout !== null
+  // ) {
+  //   return false;
+  // }
 
   if (!node.parent || node.parent === undefined) {
     return false;

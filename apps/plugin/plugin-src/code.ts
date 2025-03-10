@@ -8,6 +8,12 @@ import {
   htmlMain,
   postSettingsChanged,
 } from "backend";
+import { convertNodesToAltNodes } from "backend/src/altNodes/altConversion";
+import {
+  disableParent,
+  oldConvertNodesToAltNodes,
+  setDisableParent,
+} from "backend/src/altNodes/oldAltConversion";
 import { nodesToJSON } from "backend/src/code";
 import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retrieveColors";
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
@@ -21,7 +27,7 @@ export const defaultPluginSettings: PluginSettings = {
   framework: "HTML",
   optimizeLayout: true,
   showLayerNames: false,
-  inlineStyle: true,
+  useOldPluginVersion2025: false,
   responsiveRoot: false,
   flutterGenerationMode: "snippet",
   swiftUIGenerationMode: "snippet",
@@ -150,7 +156,7 @@ const standardMode = async () => {
     safeRun(userPluginSettings);
   });
 
-  figma.ui.onmessage = (msg) => {
+  figma.ui.onmessage = async (msg) => {
     console.log("[DEBUG] figma.ui.onmessage", msg);
 
     if (msg.type === "pluginSettingWillChange") {
@@ -159,6 +165,56 @@ const standardMode = async () => {
       (userPluginSettings as any)[key] = value;
       figma.clientStorage.setAsync("userPluginSettings", userPluginSettings);
       safeRun(userPluginSettings);
+    } else if (msg.type === "get-selection-json") {
+      console.log("[DEBUG] get-selection-json message received");
+
+      const nodes = figma.currentPage.selection;
+      if (nodes.length === 0) {
+        figma.ui.postMessage({
+          type: "selection-json",
+          data: { message: "No nodes selected" },
+        });
+        return;
+      }
+      const result: {
+        json?: SceneNode[];
+        oldConversion?: any;
+        newConversion?: any;
+      } = {};
+
+      try {
+        result.json = (await Promise.all(
+          nodes.map(
+            async (node) =>
+              (
+                (await node.exportAsync({
+                  format: "JSON_REST_V1",
+                })) as any
+              ).document,
+          ),
+        )) as SceneNode[];
+      } catch (error) {
+        console.error("Error exporting JSON:", error);
+      }
+
+      try {
+        result.newConversion = await convertNodesToAltNodes(
+          result.json || [],
+          null,
+        );
+      } catch (error) {
+        console.error("Error in new conversion:", error);
+      }
+
+      const nodeJson = result;
+
+      console.log("[DEBUG] Exported node JSON:", nodeJson);
+
+      // Send the JSON data back to the UI
+      figma.ui.postMessage({
+        type: "selection-json",
+        data: nodeJson,
+      });
     }
   };
 };

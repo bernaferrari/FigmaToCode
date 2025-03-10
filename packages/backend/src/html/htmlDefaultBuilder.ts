@@ -187,7 +187,9 @@ export class HtmlDefaultBuilder {
       if (
         strokeAlign === "CENTER" ||
         strokeAlign === "OUTSIDE" ||
-        (strokeAlign === "INSIDE" && layoutMode === "NONE")
+        node.type === "FRAME" ||
+        node.type === "INSTANCE" ||
+        node.type === "COMPONENT"
       ) {
         this.addStyles(
           formatWithJSX("outline", this.isJSX, consolidateBorders(weight)),
@@ -260,6 +262,7 @@ export class HtmlDefaultBuilder {
   position(): this {
     const { node, optimizeLayout, isJSX } = this;
     const isAbsolutePosition = commonIsAbsolutePosition(node, optimizeLayout);
+    console.log("node is absolute", isAbsolutePosition, node, node.parent);
     if (isAbsolutePosition) {
       const { x, y } = getCommonPositionValue(node);
 

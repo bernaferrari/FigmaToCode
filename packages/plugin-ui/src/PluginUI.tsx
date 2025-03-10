@@ -98,7 +98,10 @@ export const PluginUI = (props: PluginUIProps) => {
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
         {showAbout ? (
-          <About />
+          <About 
+            useOldPluginVersion={props.settings?.useOldPluginVersion2025} 
+            onPreferenceChanged={props.onPreferenceChanged}
+          />
         ) : (
           <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
             {isEmpty === false && props.htmlPreview && (
