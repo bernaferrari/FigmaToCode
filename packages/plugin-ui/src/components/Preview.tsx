@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { HTMLPreview } from "types";
 import {
   Maximize2,
@@ -7,22 +7,41 @@ import {
   Smartphone,
   Circle,
   Ruler,
-  MonitorIcon,
+  Monitor,
 } from "lucide-react";
+import { cn } from "../lib/utils";
 
+// Update the component props to receive state from parent
 const Preview: React.FC<{
   htmlPreview: HTMLPreview;
+  expanded: boolean;
+  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+  viewMode: "desktop" | "mobile" | "precision";
+  setViewMode: React.Dispatch<
+    React.SetStateAction<"desktop" | "mobile" | "precision">
+  >;
+  bgColor: "white" | "black";
+  setBgColor: React.Dispatch<React.SetStateAction<"white" | "black">>;
 }> = (props) => {
-  const [expanded, setExpanded] = useState(false);
-  const [viewMode, setViewMode] = useState<"desktop" | "mobile" | "precision">(
-    "desktop",
-  );
-  const [animationClass, setAnimationClass] = useState<string>("");
-  const [bgColor, setBgColor] = useState<"white" | "black">("white");
+  const {
+    htmlPreview,
+    expanded,
+    setExpanded,
+    viewMode,
+    setViewMode,
+    bgColor,
+    setBgColor,
+  } = props;
 
   // Define consistent dimensions regardless of mode
   const containerWidth = expanded ? 320 : 240;
   const containerHeight = expanded ? 180 : 120;
+
+  // Calculate scale factor first to use in content width calculation
+  const scaleFactor = Math.min(
+    containerWidth / htmlPreview.size.width,
+    containerHeight / htmlPreview.size.height,
+  );
 
   // Calculate content dimensions based on view mode
   const contentWidth =
@@ -30,34 +49,7 @@ const Preview: React.FC<{
       ? containerWidth
       : viewMode === "mobile"
         ? Math.floor(containerWidth * 0.4) // Narrower for mobile
-        : containerWidth; // For precision, use container width for the outer frame
-
-  const scaleFactor = Math.min(
-    containerWidth / props.htmlPreview.size.width,
-    containerHeight / props.htmlPreview.size.height,
-  );
-
-  // Add animation when changing view mode
-  useEffect(() => {
-    if (viewMode === "desktop") {
-      setAnimationClass("animate-slide-in-left");
-    } else if (viewMode === "mobile") {
-      setAnimationClass("animate-slide-in-right");
-    } else {
-      setAnimationClass("animate-fade-in");
-    }
-    const timer = setTimeout(() => setAnimationClass(""), 300); // Remove animation class after it completes
-    return () => clearTimeout(timer);
-  }, [viewMode]);
-
-  // Add animation when changing size
-  useEffect(() => {
-    const timer = setTimeout(() => setAnimationClass("animate-scale-in"), 50);
-    return () => {
-      clearTimeout(timer);
-      setAnimationClass("");
-    };
-  }, [expanded]);
+        : htmlPreview.size.width * scaleFactor; // For precision, use scaled original width
 
   return (
     <div className="flex flex-col w-full bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700">
@@ -69,21 +61,18 @@ const Preview: React.FC<{
         </h3>
         <div className="flex items-center gap-1">
           {/* Background Color Toggle - Only show in desktop and mobile modes */}
-          {viewMode !== "precision" && (
-            <button
-              onClick={() =>
-                setBgColor(bgColor === "white" ? "black" : "white")
-              }
-              className="p-1.5 mr-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
-              aria-label={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
-              title={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
-            >
-              <Circle size={14} fill={bgColor} className="stroke-current" />
-            </button>
-          )}
+
+          <button
+            onClick={() => setBgColor(bgColor === "white" ? "black" : "white")}
+            className="p-1.5 mr-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
+            aria-label={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
+            title={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
+          >
+            <Circle size={14} fill={bgColor} className="stroke-current" />
+          </button>
 
           {/* View Mode Toggle */}
-          <div className="mr-1 flex bg-neutral-100 dark:bg-neutral-700 rounded-md p-0.5">
+          {/* <div className="mr-1 flex bg-neutral-100 dark:bg-neutral-700 rounded-md p-0.5">
             <button
               onClick={() => setViewMode("desktop")}
               className={`p-1 rounded text-xs ${
@@ -94,7 +83,7 @@ const Preview: React.FC<{
               aria-label="Desktop view"
               title="Desktop view"
             >
-              <MonitorSmartphone size={14} />
+              <Monitor size={14} />
             </button>
             <button
               onClick={() => setViewMode("mobile")}
@@ -120,7 +109,7 @@ const Preview: React.FC<{
             >
               <Ruler size={14} />
             </button>
-          </div>
+          </div> */}
 
           {/* Expand/Collapse Button */}
           <button
@@ -147,31 +136,30 @@ const Preview: React.FC<{
         >
           {/* Inner content positioned based on view mode */}
           <div
-            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${animationClass}`}
+            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
             style={{
               width: contentWidth,
               height:
                 viewMode === "mobile"
                   ? Math.min(containerHeight * 0.9, containerHeight)
-                  : containerHeight, // Use full container height for both desktop and precision
+                  : viewMode === "precision"
+                    ? htmlPreview.size.height * scaleFactor // Use scaled height for precision
+                    : containerHeight,
               transition: "width 0.3s ease, height 0.3s ease",
             }}
           >
             {/* Device frame - no background for precision mode */}
             <div
-              className={`w-full h-full flex justify-center items-center overflow-hidden ${
-                viewMode === "precision"
-                  ? "" // No background in precision mode
-                  : bgColor === "white"
-                    ? "bg-white"
-                    : "bg-black"
-              } ${
+              className={cn(
+                "w-full h-full flex justify-center items-center overflow-hidden",
+                bgColor === "white" ? "bg-white" : "bg-black",
                 viewMode === "desktop"
                   ? "border border-neutral-300 dark:border-neutral-600 rounded shadow-sm"
                   : viewMode === "mobile"
                     ? "border-2 border-neutral-400 dark:border-neutral-500 rounded-xl shadow-sm"
-                    : "border border-indigo-400 dark:border-indigo-500 rounded shadow-sm" // Precision mode uses indigo border with rounded corners
-              } transition-all duration-300 ease-in-out`}
+                    : "border border-indigo-400 dark:border-indigo-500 rounded shadow-sm",
+                `transition-all duration-300 ease-in-out`,
+              )}
             >
               {/* Content */}
               <div className="w-full h-full flex justify-center items-center">
@@ -180,23 +168,23 @@ const Preview: React.FC<{
                     zoom: scaleFactor,
                     width:
                       viewMode === "precision"
-                        ? props.htmlPreview.size.width
+                        ? htmlPreview.size.width
                         : "100%",
                     height:
                       viewMode === "precision"
-                        ? props.htmlPreview.size.height
+                        ? htmlPreview.size.height
                         : "100%",
                     transformOrigin: "center",
                     maxWidth: "100%",
                     maxHeight: "100%",
                     aspectRatio:
                       viewMode === "precision"
-                        ? `${props.htmlPreview.size.width} / ${props.htmlPreview.size.height}`
+                        ? `${htmlPreview.size.width} / ${htmlPreview.size.height}`
                         : undefined,
                     transition: "all 0.3s ease",
                   }}
                   dangerouslySetInnerHTML={{
-                    __html: props.htmlPreview.content,
+                    __html: htmlPreview.content,
                   }}
                 />
               </div>
@@ -208,10 +196,10 @@ const Preview: React.FC<{
       {/* Footer with size info */}
       <div className="px-3 py-1.5 text-xs text-neutral-500 dark:text-neutral-400 flex items-center justify-between border-t border-neutral-200 dark:border-neutral-700">
         <span>
-          {props.htmlPreview.size.width.toFixed(0)}×
-          {props.htmlPreview.size.height.toFixed(0)}px
+          {htmlPreview.size.width.toFixed(0)}×
+          {htmlPreview.size.height.toFixed(0)}px
         </span>
-        <div className="flex items-center gap-1.5">
+        {/* <div className="flex items-center gap-1.5">
           {viewMode === "mobile" ? (
             <span className="flex items-center gap-1">
               <Smartphone size={10} />
@@ -224,11 +212,11 @@ const Preview: React.FC<{
             </span>
           ) : (
             <span className="flex items-center gap-1">
-              <MonitorIcon size={10} />
+              <Monitor size={10} />
               <span>Desktop view</span>
             </span>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
