@@ -1,6 +1,6 @@
-import { HTMLSettings } from "types";
 import { numberToFixedString } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
+import { GradientPaint, Paint } from "../../api_types";
 
 /**
  * Helper to process a color with variable binding if present
@@ -53,10 +53,11 @@ const getColorAndVariable = (
   return { color: { r: 0, g: 0, b: 0 }, opacity: 0 };
 };
 
-// Retrieve the SOLID color or approximate gradient as HTML color
+/**
+ * Convert fills to an HTML color string
+ */
 export const htmlColorFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"] | undefined,
-  settings: HTMLSettings,
+  fills: ReadonlyArray<Paint> | undefined,
 ): string => {
   const fill = retrieveTopFill(fills);
   if (fill) {
@@ -66,6 +67,9 @@ export const htmlColorFromFills = (
   return "";
 };
 
+/**
+ * Convert RGB color to CSS color string
+ */
 export const htmlColor = (color: RGB, alpha: number = 1): string => {
   if (color.r === 1 && color.g === 1 && color.b === 1 && alpha === 1) {
     return "white";
@@ -87,7 +91,9 @@ export const htmlColor = (color: RGB, alpha: number = 1): string => {
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
 
-// Process a single gradient stop with proper color and position
+/**
+ * Process a single gradient stop
+ */
 const processGradientStop = (
   stop: ColorStop,
   fillOpacity: number = 1,
@@ -106,7 +112,9 @@ const processGradientStop = (
   return `${color} ${position}`;
 };
 
-// Process all gradient stops for any gradient type
+/**
+ * Process all gradient stops for a gradient
+ */
 const processGradientStops = (
   stops: ReadonlyArray<ColorStop>,
   fillOpacity: number = 1,
@@ -120,6 +128,9 @@ const processGradientStops = (
     .join(", ");
 };
 
+/**
+ * Determine the appropriate gradient function based on fill type
+ */
 export const htmlGradientFromFills = (fill: Paint): string => {
   if (!fill) return "";
   switch (fill.type) {
@@ -128,7 +139,7 @@ export const htmlGradientFromFills = (fill: Paint): string => {
     case "GRADIENT_ANGULAR":
       return htmlAngularGradient(fill);
     case "GRADIENT_RADIAL":
-      return htmlRadialGradient(fill); // Updated to use radial gradient function
+      return htmlRadialGradient(fill);
     case "GRADIENT_DIAMOND":
       return htmlDiamondGradient(fill);
     default:
@@ -136,98 +147,70 @@ export const htmlGradientFromFills = (fill: Paint): string => {
   }
 };
 
-export const gradientAngle2 = (fill: GradientPaint): number => {
-  const x1 = fill.gradientTransform[0][2];
-  const y1 = fill.gradientTransform[1][2];
-  const x2 = fill.gradientTransform[0][0] + x1;
-  const y2 = fill.gradientTransform[1][0] + y1;
-  const dx = x2 - x1;
-  const dy = y1 - y2;
-  const radians = Math.atan2(dy, dx);
-  const unadjustedAngle = (radians * 180) / Math.PI;
-  const adjustedAngle = unadjustedAngle + 90;
-  return adjustedAngle;
-};
-
-export const cssGradientAngle = (angle: number): number => {
-  const cssAngle = angle;
-  return cssAngle < 0 ? cssAngle + 360 : cssAngle;
-};
-
-export const htmlLinearGradient = (fill: GradientPaint): string => {
-  const figmaAngle = gradientAngle2(fill);
-  const angle = cssGradientAngle(figmaAngle).toFixed(0);
+/**
+ * Generate CSS linear gradient
+ */
+export const htmlLinearGradient = (fill: GradientPaint) => {
+  const [start, end] = fill.gradientHandlePositions;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  let angle = Math.atan2(dy, dx) * (180 / Math.PI); // Angle in degrees
+  angle = (angle + 360) % 360; // Normalize to 0-360
+  const cssAngle = (angle + 90) % 360; // Adjust for CSS convention
   const mappedFill = processGradientStops(
     fill.gradientStops,
     fill.opacity ?? 1,
-    100,
-    "%",
   );
-  return `linear-gradient(${angle}deg, ${mappedFill})`;
+  return `linear-gradient(${cssAngle.toFixed(0)}deg, ${mappedFill})`;
 };
 
-export const invertYCoordinate = (y: number): number => 1 - y;
+/**
+ * Generate CSS radial gradient
+ */
+export const htmlRadialGradient = (fill: GradientPaint) => {
+  const [center, h1, h2] = fill.gradientHandlePositions;
+  const cx = center.x * 100; // Center X as percentage
+  const cy = center.y * 100; // Center Y as percentage
+  // Calculate horizontal radius (distance from center to h1)
+  const rx = Math.sqrt((h1.x - center.x) ** 2 + (h1.y - center.y) ** 2) * 100;
+  // Calculate vertical radius (distance from center to h2)
+  const ry = Math.sqrt((h2.x - center.x) ** 2 + (h2.y - center.y) ** 2) * 100;
+  const mappedStops = processGradientStops(
+    fill.gradientStops,
+    fill.opacity ?? 1,
+  );
+  return `radial-gradient(ellipse ${rx.toFixed(2)}% ${ry.toFixed(2)}% at ${cx.toFixed(2)}% ${cy.toFixed(2)}%, ${mappedStops})`;
+};
 
-export const htmlAngularGradient = (fill: GradientPaint): string => {
-  const angle = gradientAngle2(fill).toFixed(0);
-  // Extract matrix components
-  const a = fill.gradientTransform[0][0];
-  const b = fill.gradientTransform[0][1];
-  const tx = fill.gradientTransform[0][2];
-  const c = fill.gradientTransform[1][0];
-  const d = fill.gradientTransform[1][1];
-  const ty = fill.gradientTransform[1][2];
-  // Compute center by transforming (0.5, 0.5)
-  const centerX = (a * 0.5 + b * 0.5 + tx) * 100;
-  const centerY = (c * 0.5 + d * 0.5 + ty) * 100;
-  const centerXPercent = centerX.toFixed(2);
-  const centerYPercent = centerY.toFixed(2);
+/**
+ * Generate CSS conic (angular) gradient
+ */
+export const htmlAngularGradient = (fill: GradientPaint) => {
+  const [center, _, startDirection] = fill.gradientHandlePositions;
+  const cx = center.x * 100; // Center X as percentage
+  const cy = center.y * 100; // Center Y as percentage
+  // Calculate the starting angle
+  const dx = startDirection.x - center.x;
+  const dy = startDirection.y - center.y;
+  let angle = Math.atan2(dy, dx) * (180 / Math.PI); // Convert to degrees
+  angle = (angle + 360) % 360; // Normalize to 0-360 degrees
   const mappedFill = processGradientStops(
     fill.gradientStops,
     fill.opacity ?? 1,
     360,
     "deg",
   );
-  return `conic-gradient(from ${angle}deg at ${centerXPercent}% ${centerYPercent}%, ${mappedFill})`;
+  return `conic-gradient(from ${angle.toFixed(0)}deg at ${cx.toFixed(2)}% ${cy.toFixed(2)}%, ${mappedFill})`;
 };
 
-export const htmlRadialGradient = (fill: GradientPaint): string => {
-  const [[a, b, tx], [c, d, ty]] = fill.gradientTransform;
-
-  // Calculate inverse of the linear part of the gradientTransform matrix
-  const det = a * d - b * c;
-  if (Math.abs(det) < 1e-6) return ""; // Avoid division by zero
-
-  const invDet = 1 / det;
-  const invA = d * invDet;
-  const invB = -b * invDet;
-  const invC = -c * invDet;
-  const invD = a * invDet;
-
-  // Calculate center by solving inverse transform for (0.5, 0.5)
-  const cx = (invA * (0.5 - tx) + invB * (0.5 - ty)) * 100;
-  const cy = (invC * (0.5 - tx) + invD * (0.5 - ty)) * 100;
-
-  // Calculate column vectors of inverse matrix
-  const col1Length = Math.sqrt(invA ** 2 + invC ** 2) * 100;
-  const col2Length = Math.sqrt(invB ** 2 + invD ** 2) * 100;
-
-  // Get radii as half lengths of column vectors (sorted)
-  const radii = [col1Length / 2, col2Length / 2].sort((a, b) => b - a);
-
-  const mappedStops = processGradientStops(
-    fill.gradientStops,
-    fill.opacity ?? 1,
-  );
-  return `radial-gradient(ellipse ${radii[0].toFixed(2)}% ${radii[1].toFixed(2)}% at ${cx.toFixed(2)}% ${cy.toFixed(2)}%, ${mappedStops})`;
-};
-
-// Added function for diamond gradient
-export const htmlDiamondGradient = (fill: GradientPaint): string => {
+/**
+ * Generate CSS diamond gradient (approximation using four linear gradients)
+ */
+export const htmlDiamondGradient = (fill: GradientPaint) => {
   const stops = processGradientStops(
     fill.gradientStops,
     fill.opacity ?? 1,
-    50, // Adjusted multiplier for diamond gradient
+    50,
     "%",
   );
   const gradientConfigs = [
@@ -244,19 +227,21 @@ export const htmlDiamondGradient = (fill: GradientPaint): string => {
     .join(", ");
 };
 
+/**
+ * Build CSS background value from an array of paints
+ */
 export const buildBackgroundValues = (
   paintArray: ReadonlyArray<Paint> | PluginAPI["mixed"],
-  settings: HTMLSettings,
 ): string => {
   if (paintArray === figma.mixed) {
     return "";
   }
 
-  // If only one fill, just use plain color/gradient
+  // If only one fill, use plain color or gradient
   if (paintArray.length === 1) {
     const paint = paintArray[0];
     if (paint.type === "SOLID") {
-      return htmlColorFromFills(paintArray, settings);
+      return htmlColorFromFills(paintArray);
     } else if (
       paint.type === "GRADIENT_LINEAR" ||
       paint.type === "GRADIENT_RADIAL" ||
@@ -268,16 +253,14 @@ export const buildBackgroundValues = (
     return "";
   }
 
-  // Reverse the array to match CSS layering (first is top-most in CSS)
+  // For multiple fills, reverse to match CSS layering (first is top-most)
   const styles = [...paintArray].reverse().map((paint, index) => {
     if (paint.type === "SOLID") {
-      // For multiple fills, always convert solid colors to linear gradients
-      // to ensure proper layering in CSS backgrounds
-      const color = htmlColorFromFills([paint], settings);
+      // Convert solid colors to gradients for proper layering
+      const color = htmlColorFromFills([paint]);
       if (index === 0) {
         return `linear-gradient(0deg, ${color} 0%, ${color} 100%)`;
       }
-
       return color;
     } else if (
       paint.type === "GRADIENT_LINEAR" ||

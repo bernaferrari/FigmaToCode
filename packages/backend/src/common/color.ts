@@ -59,42 +59,24 @@ export const rgbToCssColor = (color: RGB | RGBA, alpha: number = 1): string => {
 
 // ---- Gradient Transformation ----
 export const gradientAngle = (fill: GradientPaint): number => {
-  // Thanks Gleb and Liam for helping!
-  const decomposed = decomposeRelativeTransform(
-    fill.gradientTransform[0],
-    fill.gradientTransform[1],
-  );
-
-  return (decomposed.rotation * 180) / Math.PI;
+  const [start, end] = fill.gradientHandlePositions;
+  return calculateAngle(start, end);
 };
 
-// Calculate gradient angle for CSS (different coordinate system)
-export const cssGradientAngle = (angle: number): number => {
-  // Normalize angle: if negative, add 360 to make it positive.
-  return angle < 0 ? angle + 360 : angle;
-};
-
-// Calculate gradient coordinates for a matrix transform
-export const getGradientTransformCoordinates = (
-  gradientTransform: number[][],
-): { centerX: string; centerY: string; radiusX: string; radiusY: string } => {
-  const a = gradientTransform[0][0];
-  const b = gradientTransform[0][1];
-  const c = gradientTransform[1][0];
-  const d = gradientTransform[1][1];
-  const e = gradientTransform[0][2];
-  const f = gradientTransform[1][2];
-
-  const scaleX = Math.sqrt(a ** 2 + b ** 2);
-  const scaleY = Math.sqrt(c ** 2 + d ** 2);
-
-  const centerX = ((e * scaleX * 100) / (1 - scaleX)).toFixed(2);
-  const centerY = (((1 - f) * scaleY * 100) / (1 - scaleY)).toFixed(2);
-
-  const radiusX = (scaleX * 100).toFixed(2);
-  const radiusY = (scaleY * 100).toFixed(2);
-
-  return { centerX, centerY, radiusX, radiusY };
+/**
+ * Calculate the angle between two points in degrees
+ * @param start Starting point {x, y} in normalized coordinates (0-1)
+ * @param end Ending point {x, y} in normalized coordinates (0-1)
+ * @returns Angle in degrees (0-360)
+ */
+export const calculateAngle = (
+  start: { x: number; y: number },
+  end: { x: number; y: number },
+): number => {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+  return (angle + 360) % 360; // Normalize to 0-360 degrees
 };
 
 // from https://math.stackexchange.com/a/2888105

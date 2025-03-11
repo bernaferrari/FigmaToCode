@@ -1,12 +1,13 @@
-import { rgbTo8hex, gradientAngle } from "../../common/color";
+import { StarNode } from "./../../api_types";
+import { rgbTo8hex } from "../../common/color";
 import { addWarning } from "../../common/commonConversionWarnings";
 import {
   generateWidgetCode,
   numberToFixedString,
 } from "../../common/numToAutoFixed";
 import { retrieveTopFill } from "../../common/retrieveFill";
-import { nearestValue } from "../../tailwind/conversionTables";
 import { getPlaceholderImage } from "../../common/images";
+import { GradientPaint, ImagePaint, Paint } from "../../api_types";
 
 /**
  * Retrieve the SOLID color for Flutter when existent, otherwise ""
@@ -17,11 +18,9 @@ export const flutterColorFromFills = (
   node: SceneNode,
   propertyPath: string,
 ): string => {
-  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
-  fills = node[propertyPath as keyof SceneNode] as
-    | ReadonlyArray<Paint>
-    | PluginAPI["mixed"];
-
+  let fills: ReadonlyArray<Paint> = node[
+    propertyPath as keyof SceneNode
+  ] as ReadonlyArray<Paint>;
   return flutterColorFromDirectFills(fills);
 };
 
@@ -30,15 +29,15 @@ export const flutterColorFromFills = (
  * @param fills The fills array to process
  */
 export const flutterColorFromDirectFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  fills: ReadonlyArray<Paint>,
 ): string => {
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
     return flutterColor(
-      fill.color, 
-      fill.opacity ?? 1.0, 
-      (fill as any).variableColorName
+      fill.color,
+      fill.opacity ?? 1.0,
+      (fill as any).variableColorName,
     );
   } else if (
     fill &&
@@ -49,9 +48,9 @@ export const flutterColorFromDirectFills = (
     if (fill.gradientStops.length > 0) {
       const stop = fill.gradientStops[0];
       return flutterColor(
-        stop.color, 
-        fill.opacity ?? 1.0, 
-        (stop as any).variableColorName
+        stop.color,
+        fill.opacity ?? 1.0,
+        (stop as any).variableColorName,
       );
     }
   }
@@ -66,16 +65,16 @@ export const flutterBoxDecorationColor = (
   node: SceneNode,
   propertyPath: string,
 ): Record<string, string> => {
-  let fills: ReadonlyArray<Paint> | PluginAPI["mixed"];
-  fills = node[propertyPath as keyof SceneNode] as
-    | ReadonlyArray<Paint>
-    | PluginAPI["mixed"];
+  let fills: ReadonlyArray<Paint>;
+  fills = node[propertyPath as keyof SceneNode] as ReadonlyArray<Paint>;
 
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
     const opacity = fill.opacity ?? 1.0;
-    return { color: flutterColor(fill.color, opacity, (fill as any).variableColorName) };
+    return {
+      color: flutterColor(fill.color, opacity, (fill as any).variableColorName),
+    };
   } else if (
     fill?.type === "GRADIENT_LINEAR" ||
     fill?.type === "GRADIENT_RADIAL" ||
@@ -100,13 +99,13 @@ export const flutterDecorationImage = (node: SceneNode, fill: ImagePaint) => {
 const fitToBoxFit = (fill: ImagePaint): string => {
   switch (fill.scaleMode) {
     case "FILL":
-      return "BoxFit.fill";
+      return "BoxFit.cover"; // FILL in Figma covers the entire area, similar to BoxFit.cover
     case "FIT":
-      return "BoxFit.contain";
-    case "CROP":
-      return "BoxFit.cover";
+      return "BoxFit.contain"; // FIT in Figma fits the image while maintaining aspect ratio, like BoxFit.contain
+    case "STRETCH":
+      return "BoxFit.fill"; // STRETCH in Figma stretches the image, like BoxFit.fill
     case "TILE":
-      return "BoxFit.none";
+      return "BoxFit.none"; // TILE doesn't have a direct equivalent, but BoxFit.none is closest
     default:
       return "BoxFit.cover";
   }
@@ -126,85 +125,90 @@ export const flutterGradient = (fill: GradientPaint): string => {
   }
 };
 
-const gradientDirection = (angle: number): string => {
-  const radians = (angle * Math.PI) / 180;
-  const x = Math.cos(radians).toFixed(2);
-  const y = Math.sin(radians).toFixed(2);
-  return `begin: Alignment(${x}, ${y}), end: Alignment(${-x}, ${-y})`;
-};
-
-const flutterRadialGradient = (fill: GradientPaint): string => {
-  const colors = fill.gradientStops
-    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
-    .join(", ");
-
-  const x = numberToFixedString(fill.gradientTransform[0][2]);
-  const y = numberToFixedString(fill.gradientTransform[1][2]);
-  const scaleX = fill.gradientTransform[0][0];
-  const scaleY = fill.gradientTransform[1][1];
-  const r = numberToFixedString(Math.sqrt(scaleX * scaleX + scaleY * scaleY));
-
-  return generateWidgetCode("RadialGradient", {
-    center: `Alignment(${x}, ${y})`,
-    radius: r,
-    colors: `[${colors}]`,
-  });
-};
-
-const flutterAngularGradient = (fill: GradientPaint): string => {
-  const colors = fill.gradientStops
-    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
-    .join(", ");
-
-  const x = numberToFixedString(fill.gradientTransform[0][2]);
-  const y = numberToFixedString(fill.gradientTransform[1][2]);
-  const startAngle = numberToFixedString(-fill.gradientTransform[0][0]);
-  const endAngle = numberToFixedString(-fill.gradientTransform[0][1]);
-
-  return generateWidgetCode("SweepGradient", {
-    center: `Alignment(${x}, ${y})`,
-    startAngle: startAngle,
-    endAngle: endAngle,
-    colors: `[${colors}]`,
-  });
-};
-
+/**
+ * Generate a Flutter LinearGradient widget
+ * @param fill The linear gradient fill
+ * @returns LinearGradient widget code
+ */
 const flutterLinearGradient = (fill: GradientPaint): string => {
-  const radians = (-gradientAngle(fill) * Math.PI) / 180;
-  const x = Math.cos(radians).toFixed(2);
-  const y = Math.sin(radians).toFixed(2);
-
+  const [start, end] = fill.gradientHandlePositions;
   const colors = fill.gradientStops
     .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
     .join(", ");
-
   return generateWidgetCode("LinearGradient", {
-    begin: `Alignment(${x}, ${y})`,
-    end: `Alignment(${-x}, ${-y})`,
+    begin: `Alignment(${start.x.toFixed(2)}, ${start.y.toFixed(2)})`,
+    end: `Alignment(${end.x.toFixed(2)}, ${end.y.toFixed(2)})`,
     colors: `[${colors}]`,
   });
 };
 
-const gradientDirectionReadable = (angle: number): string => {
-  switch (nearestValue(angle, [-180, -135, -90, -45, 0, 45, 90, 135, 180])) {
-    case 0:
-      return "begin: Alignment.centerLeft, end: Alignment.centerRight";
-    case 45:
-      return "begin: Alignment.topLeft, end: Alignment.bottomRight";
-    case 90:
-      return "begin: Alignment.topCenter, end: Alignment.bottomCenter";
-    case 135:
-      return "begin: Alignment.topRight, end: Alignment.bottomLeft";
-    case -45:
-      return "begin: Alignment.bottomLeft, end: Alignment.topRight";
-    case -90:
-      return "begin: Alignment.bottomCenter, end: Alignment.topCenter";
-    case -135:
-      return "begin: Alignment.bottomRight, end: Alignment.topLeft";
-    default:
-      // 180 and -180
-      return "begin: Alignment.centerRight, end: Alignment.centerLeft";
-  }
+/**
+ * Generate a Flutter RadialGradient widget
+ * @param fill The radial gradient fill
+ * @returns RadialGradient widget code
+ */
+const flutterRadialGradient = (fill: GradientPaint): string => {
+  const [center, h1, h2] = (fill as any).gradientHandlePositions;
+  const radius1 = Math.sqrt((h1.x - center.x) ** 2 + (h1.y - center.y) ** 2);
+  const radius2 = Math.sqrt((h2.x - center.x) ** 2 + (h2.y - center.y) ** 2);
+  const radius = Math.max(radius1, radius2);
+  const colors = fill.gradientStops
+    .map((d) => flutterColor(d.color, d.color.a, (d as any).variableColorName))
+    .join(", ");
+  return generateWidgetCode("RadialGradient", {
+    center: `Alignment(${center.x.toFixed(2)}, ${center.y.toFixed(2)})`,
+    radius: radius.toFixed(2),
+    colors: `[${colors}]`,
+  });
+};
+
+/**
+ * Convert Figma's normalized coordinates (0 to 1) to Flutter's Alignment (-1 to 1)
+ * @param x Figma's x coordinate (0 to 1)
+ * @param y Figma's y coordinate (0 to 1)
+ * @returns Flutter's Alignment string
+ */
+const figmaToFlutterAlignment = (x: number, y: number): string => {
+  const alignmentX = x * 2 - 1;
+  const alignmentY = y * 2 - 1;
+  return `Alignment(${numberToFixedString(alignmentX)}, ${numberToFixedString(alignmentY)})`;
+};
+
+/**
+ * Generate a Flutter SweepGradient widget (for angular gradients)
+ * @param fill The angular gradient fill
+ * @returns SweepGradient widget code
+ */
+export const flutterAngularGradient = (fill: GradientPaint): string => {
+  // TODO This function is not 100% perfect but gets close. It is hard to get AngularGradient in Flutter.
+  const [center, _, startDirection] = fill.gradientHandlePositions;
+
+  // Center alignment
+  const centerAlignment = figmaToFlutterAlignment(center.x, center.y);
+
+  // Starting angle
+  const dx = startDirection.x - center.x;
+  const dy = startDirection.y - center.y;
+  const startAngle = -(90 * Math.PI) / 180 + Math.atan2(dy, dx);
+
+  // Generate colors and stops
+  const colors = fill.gradientStops
+    .map((stop) => flutterColor(stop.color, stop.color.a))
+    .join(", ");
+
+  const stops = fill.gradientStops
+    .map((stop) => numberToFixedString(stop.position))
+    .join(", ");
+
+  // Generate SweepGradient code
+  return generateWidgetCode("SweepGradient", {
+    center: centerAlignment,
+    startAngle: numberToFixedString(startAngle),
+    endAngle: numberToFixedString(startAngle + 2 * Math.PI),
+    colors: `[${colors}]`,
+    stops: `[${stops}]`,
+    transform: `GradientRotation(${numberToFixedString(startAngle)})`,
+  });
 };
 
 /**
@@ -215,21 +219,23 @@ const opacityToAlpha = (opacity: number): number => {
 };
 
 export const flutterColor = (
-  color: RGB, 
-  opacity: number, 
-  variableColorName?: string
+  color: RGB,
+  opacity: number,
+  variableColorName?: string,
 ): string => {
   const sum = color.r + color.g + color.b;
   let colorCode = "";
 
   if (sum === 0) {
-    colorCode = opacity === 1
-      ? "Colors.black"
-      : `Colors.black.withValues(alpha: ${opacityToAlpha(opacity)})`;
+    colorCode =
+      opacity === 1
+        ? "Colors.black"
+        : `Colors.black.withValues(alpha: ${opacityToAlpha(opacity)})`;
   } else if (sum === 3) {
-    colorCode = opacity === 1
-      ? "Colors.white"
-      : `Colors.white.withValues(alpha: ${opacityToAlpha(opacity)})`;
+    colorCode =
+      opacity === 1
+        ? "Colors.white"
+        : `Colors.white.withValues(alpha: ${opacityToAlpha(opacity)})`;
   } else {
     // Always use full 8-digit hex which includes alpha channel
     colorCode = `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
@@ -239,6 +245,6 @@ export const flutterColor = (
   if (variableColorName) {
     return `${colorCode} /* ${variableColorName} */`;
   }
-  
+
   return colorCode;
 };

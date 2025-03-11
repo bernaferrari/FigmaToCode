@@ -396,6 +396,7 @@ const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
       return htmlWrapSVG(altNode, settings);
     }
   }
+  console.log("[convert] node is", node);
 
   switch (node.type) {
     case "RECTANGLE":

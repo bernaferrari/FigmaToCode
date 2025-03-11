@@ -89,7 +89,6 @@ const flutterWidgetGenerator = (
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = getVisibleNodes(sceneNode);
-  const sceneLen = visibleSceneNode.length;
 
   visibleSceneNode.forEach((node) => {
     switch (node.type) {
@@ -183,7 +182,7 @@ const flutterFrame = (
   }
 
   // Generate widget code for children
-  const children = flutterWidgetGenerator(sortedChildren);
+  const children = flutterWidgetGenerator(node.children);
 
   // Force Stack for any frame that has absolute positioned children
   if (hasAbsoluteChildren) {

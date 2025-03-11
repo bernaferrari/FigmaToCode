@@ -52,6 +52,5 @@ export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
     }
   }
 
-  console.log("comp was", comp);
   return comp;
 };

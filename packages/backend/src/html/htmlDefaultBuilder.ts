@@ -122,6 +122,7 @@ export class HtmlDefaultBuilder {
 
   commonShapeStyles(): this {
     if ("fills" in this.node) {
+      console.log("node is", this.node);
       this.applyFillsToStyle(
         this.node.fills,
         this.node.type === "TEXT" ? "text" : "background",
@@ -158,7 +159,7 @@ export class HtmlDefaultBuilder {
     }
 
     const strokes = ("strokes" in node && node.strokes) || undefined;
-    const color = htmlColorFromFills(strokes, settings);
+    const color = htmlColorFromFills(strokes as any);
     if (!color) {
       return this;
     }
@@ -166,7 +167,6 @@ export class HtmlDefaultBuilder {
       "dashPattern" in node && node.dashPattern.length > 0 ? "dotted" : "solid";
 
     const strokeAlign = "strokeAlign" in node ? node.strokeAlign : "INSIDE";
-    const layoutMode = "layoutMode" in node ? node.layoutMode : "NONE";
 
     // Function to create border value string
     const consolidateBorders = (border: number): string =>
@@ -287,13 +287,13 @@ export class HtmlDefaultBuilder {
         formatWithJSX(
           "text",
           this.isJSX,
-          htmlColorFromFills(paintArray, this.settings),
+          htmlColorFromFills(paintArray as any),
         ),
       );
       return this;
     }
 
-    const backgroundValues = buildBackgroundValues(paintArray, this.settings);
+    const backgroundValues = buildBackgroundValues(paintArray as any);
     if (backgroundValues) {
       this.addStyles(formatWithJSX("background", this.isJSX, backgroundValues));
 
