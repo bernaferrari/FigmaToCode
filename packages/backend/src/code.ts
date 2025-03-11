@@ -13,7 +13,10 @@ import { convertToCode } from "./common/retrieveUI/convertToCode";
 import { generateHTMLPreview } from "./html/htmlMain";
 import { variableToColorName } from "./tailwind/conversionTables";
 import { oldConvertNodesToAltNodes } from "./altNodes/oldAltConversion";
-import { convertNodesToAltNodes, convertNodeToAltNode } from "./altNodes/altConversion";
+import {
+  convertNodesToAltNodes,
+  convertNodeToAltNode,
+} from "./altNodes/altConversion";
 
 // Performance tracking counters
 let getNodeByIdAsyncTime = 0;
@@ -348,7 +351,7 @@ const processNodePair = async (
     }
 
     if (
-      jsonNode.layoutMode !== "NONE" &&
+      jsonNode.layoutMode === "NONE" ||
       jsonNode.children.some(
         (d: any) =>
           "layoutPositioning" in d && d.layoutPositioning === "ABSOLUTE",

@@ -267,10 +267,7 @@ export class HtmlDefaultBuilder {
         formatWithJSX("position", isJSX, "absolute"),
       );
     } else {
-      if (
-        node.type === "GROUP" ||
-        ("layoutMode" in node && (node as any).isRelative)
-      ) {
+      if (node.type === "GROUP" || (node as any).isRelative) {
         this.addStyles(formatWithJSX("position", isJSX, "relative"));
       }
     }
