@@ -12,6 +12,7 @@ import {
   htmlAngularGradient,
   htmlRadialGradient,
 } from "../../html/builderImpl/htmlColor";
+import { Paint } from "../../api_types";
 
 /**
  * Get a tailwind color value object
@@ -100,7 +101,7 @@ export const tailwindGradientStop = (
 
 // retrieve the SOLID color for tailwind
 export const tailwindColorFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  fills: ReadonlyArray<Paint>,
   kind: TailwindColorType,
 ): string => {
   // [when testing] fills can be undefined
@@ -123,7 +124,7 @@ export const tailwindColorFromFills = (
 };
 
 export const tailwindGradientFromFills = (
-  fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
+  fills: ReadonlyArray<Paint>,
 ): string => {
   const fill = retrieveTopFill(fills);
 

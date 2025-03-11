@@ -19,25 +19,14 @@ export const commonIsAbsolutePosition = (node: SceneNode) => {
     return true;
   }
 
-  // No position when parent is inferred auto layout.
-  // if (
-  //   optimizeLayout &&
-  //   node.parent &&
-  //   "layoutMode" in node.parent &&
-  //   node.parent.inferredAutoLayout !== null
-  // ) {
-  //   return false;
-  // }
-
   if (!node.parent || node.parent === undefined) {
     return false;
   }
 
-  const parentLayoutIsNone =
-    "layoutMode" in node.parent && node.parent.layoutMode === "NONE";
-  const hasNoLayoutMode = !("layoutMode" in node.parent);
-
-  if (parentLayoutIsNone || hasNoLayoutMode) {
+  if (
+    ("layoutMode" in node.parent && node.parent.layoutMode === "NONE") ||
+    !("layoutMode" in node.parent)
+  ) {
     return true;
   }
 

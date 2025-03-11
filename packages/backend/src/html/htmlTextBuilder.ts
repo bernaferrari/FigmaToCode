@@ -52,7 +52,7 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
 
       const styleAttributes = formatMultipleJSX(
         {
-          color: htmlColorFromFills(segment.fills, this.settings),
+          color: htmlColorFromFills(segment.fills as any),
           "font-size": segment.fontSize,
           "font-family": segment.fontName.family,
           "font-style": this.getFontStyle(segment.fontName.style),
@@ -86,9 +86,10 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
       ) {
         // Use the pre-assigned uniqueId from the segment if available,
         // or generate one if not (as a fallback)
-        const segmentName = (segment as any).uniqueId || 
+        const segmentName =
+          (segment as any).uniqueId ||
           `${((node as any).uniqueName || node.name || "text").replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase()}_text_${(index + 1).toString().padStart(2, "0")}`;
-        
+
         const className = generateUniqueClassName(segmentName);
         result.className = className;
 

@@ -2,8 +2,6 @@ import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 import { nearestValue } from "../../tailwind/conversionTables";
 import { numberToFixedString } from "../../common/numToAutoFixed";
-import { addWarning } from "../../common/commonConversionWarnings";
-import { getPlaceholderImage } from "../../common/images";
 
 /**
  * Retrieve the SwiftUI color for a Paint object
@@ -74,13 +72,21 @@ export const swiftuiSolidColorFromDirectFills = (
   return "";
 };
 
+/**
+ * Generate a SwiftUI gradient from a GradientPaint object
+ * @param fill The gradient fill object from Figma
+ * @returns SwiftUI gradient code as a string
+ */
 export const swiftuiGradient = (fill: GradientPaint): string => {
-  const direction = gradientDirection(gradientAngle(fill));
+  if (fill.type !== "GRADIENT_LINEAR") {
+    return ""; // Only handling linear gradients here for simplicity
+  }
+
+  const angle = gradientAngle(fill);
+  const direction = gradientDirection(angle);
 
   const colors = fill.gradientStops
-    .map((d) => {
-      return swiftuiColor(d.color, d.color.a);
-    })
+    .map((d) => swiftuiColor(d.color, d.color.a))
     .join(", ");
 
   return `LinearGradient(gradient: Gradient(colors: [${colors}]), ${direction})`;
