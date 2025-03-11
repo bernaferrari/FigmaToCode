@@ -138,10 +138,7 @@ export class TailwindDefaultBuilder {
       }
 
       this.addAttributes(`absolute`);
-    } else if (
-      node.type === "GROUP" ||
-      ("layoutMode" in node && (node as any)).isRelative
-    ) {
+    } else if (node.type === "GROUP" || (node as any).isRelative) {
       this.addAttributes("relative");
     }
     return this;
