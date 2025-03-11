@@ -125,9 +125,8 @@ export const htmlRotation = (node: LayoutMixin, isJsx: boolean): string[] => {
   const parentRotation: number =
     parent && "rotation" in parent ? parent.rotation : 0;
 
-  const cssRotationDegrees = node.rotation || 0;
-  const nodeRotation = cssRotationDegrees;
-  const rotation = Math.round(nodeRotation) ?? 0;
+  const nodeRotation = -node.rotation || 0;
+  const rotation = Math.round(parentRotation - nodeRotation) ?? 0;
 
   if (
     roundToNearestHundreth(parentRotation) !== 0 &&
