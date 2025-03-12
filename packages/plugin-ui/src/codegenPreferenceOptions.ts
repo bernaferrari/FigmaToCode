@@ -49,7 +49,7 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     propertyName: "embedVectors",
     label: "Embed Vectors",
     description:
-      "Convert Figma vectors to code. This is faster than embedding images, but still slower than not embedding.",
+      "Enable this to convert vector shapes to SVGs and embed them in the design. This can be a slow operation. If unchecked, shapes will be converted into rectangles.",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
