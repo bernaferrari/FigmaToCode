@@ -158,6 +158,7 @@ const canBeFlattened = (node: Node): boolean => {
     "STAR",
     "POLYGON",
     "BOOLEAN_OPERATION",
+    "REGULAR_POLYGON",
   ];
 
   // Handle special case for Rectangle nodes with zero or near-zero height
