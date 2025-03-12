@@ -177,7 +177,7 @@ const canBeFlattened = (node: Node): boolean => {
  * @param settings Plugin settings
  * @param parentNode Optional parent node reference to set
  * @param parentCumulativeRotation Optional parent cumulative rotation to inherit
- * @returns Potentially modified jsonNode
+ * @returns Potentially modified jsonNode, array of nodes (for inlined groups), or null
  */
 const processNodePair = async (
   jsonNode: Node,
@@ -185,7 +185,7 @@ const processNodePair = async (
   settings: PluginSettings,
   parentNode?: Node,
   parentCumulativeRotation: number = 0,
-): Promise<Node | null> => {
+): Promise<Node | Node[] | null> => {
   if (!jsonNode.id) return null;
   if (jsonNode.visible === false) return null;
 
@@ -194,6 +194,9 @@ const processNodePair = async (
 
   // Handle node type-specific conversions (from convertNodeToAltNode)
   const nodeType = jsonNode.type;
+
+  // Store the cumulative rotation (parent's cumulative + node's own)
+  jsonNode.cumulativeRotation = parentCumulativeRotation;
 
   // Handle empty frames and convert to rectangles
   if (
@@ -214,21 +217,46 @@ const processNodePair = async (
     );
   }
 
-  // Handle single-child groups that should be ungrouped
-  if (
-    nodeType === "GROUP" &&
-    jsonNode.children &&
-    jsonNode.children.length === 1 &&
-    jsonNode.visible
-  ) {
-    // Process the child directly, but preserve parent reference
-    return processNodePair(
-      jsonNode.children[0],
-      (figmaNode as GroupNode).children[0],
-      settings,
-      parentNode,
-      parentCumulativeRotation,
-    );
+  if ("rotation" in jsonNode) {
+    jsonNode.rotation = -jsonNode.rotation * (180 / Math.PI);
+  }
+
+  // Inline all GROUP nodes by processing their children directly
+  if (nodeType === "GROUP" && jsonNode.children) {
+    const processedChildren = [];
+
+    if (
+      Array.isArray(jsonNode.children) &&
+      figmaNode &&
+      "children" in figmaNode &&
+      figmaNode.children.length === jsonNode.children.length
+    ) {
+      for (let i = 0; i < jsonNode.children.length; i++) {
+        const child = jsonNode.children[i];
+        const figmaChild = figmaNode.children[i];
+        if (!figmaChild) continue;
+
+        const processedChild = await processNodePair(
+          child,
+          figmaChild,
+          settings,
+          parentNode, // The group’s parent
+          parentCumulativeRotation + (jsonNode.rotation || 0),
+        );
+
+        // Push the processed group children directly
+        if (processedChild !== null) {
+          if (Array.isArray(processedChild)) {
+            processedChildren.push(...processedChild);
+          } else {
+            processedChildren.push(processedChild);
+          }
+        }
+      }
+    }
+
+    // Simply return the processed children; skip splicing parent’s children
+    return processedChildren;
   }
 
   // Return null for unsupported nodes
@@ -239,11 +267,6 @@ const processNodePair = async (
   // Set parent reference if parent is provided
   if (parentNode) {
     (jsonNode as any).parent = parentNode;
-  }
-
-  // Store the cumulative rotation (parent's cumulative + node's own)
-  if (parentNode?.type === "GROUP") {
-    jsonNode.cumulativeRotation = parentCumulativeRotation;
   }
 
   // Ensure node has a unique name with simple numbering
@@ -342,10 +365,6 @@ const processNodePair = async (
     jsonNode.y = figmaNode.y;
   }
 
-  if ("rotation" in jsonNode) {
-    jsonNode.rotation = jsonNode.rotation * (180 / Math.PI);
-  }
-
   if ("individualStrokeWeights" in jsonNode) {
     jsonNode.strokeTopWeight = jsonNode.individualStrokeWeights.top;
     jsonNode.strokeBottomWeight = jsonNode.individualStrokeWeights.bottom;
@@ -424,7 +443,11 @@ const processNodePair = async (
       );
 
       if (processedChild !== null) {
-        processedChildren.push(processedChild);
+        if (Array.isArray(processedChild)) {
+          processedChildren.push(...processedChild);
+        } else {
+          processedChildren.push(processedChild);
+        }
       }
     }
 
@@ -488,12 +511,28 @@ export const nodesToJSON = async (
 
   // Now process each top-level node pair (JSON node + Figma node)
   const processNodesStart = Date.now();
+  const result: Node[] = [];
+
   for (let i = 0; i < nodes.length; i++) {
-    await processNodePair(nodeJson[i], nodes[i], settings);
+    const processedNode = await processNodePair(
+      nodeJson[i],
+      nodes[i],
+      settings,
+    );
+    if (processedNode !== null) {
+      if (Array.isArray(processedNode)) {
+        // If processNodePair returns an array (inlined group), add all nodes
+        result.push(...processedNode);
+      } else {
+        // If it returns a single node, add it directly
+        result.push(processedNode);
+      }
+    }
   }
+
   console.log(
     `[benchmark][inside nodesToJSON] Process node pairs: ${Date.now() - processNodesStart}ms`,
   );
 
-  return nodeJson;
+  return result;
 };

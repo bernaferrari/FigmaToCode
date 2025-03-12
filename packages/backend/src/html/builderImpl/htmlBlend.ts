@@ -111,31 +111,8 @@ export const htmlVisibility = (
  * if rotation was changed, let it be perceived. Therefore, 1 => 45
  */
 export const htmlRotation = (node: LayoutMixin, isJsx: boolean): string[] => {
-  // For some reason, a group with rotation also has rotated nodes.
-  // - group 1 - rotation 45°
-  //   - child 1 - rotation 45°
-  //
-  // if the child is also rotated 45° the effect is doubled
-  // - group 1 - rotation 45°
-  //   - child 1 - rotation 90°
-  //
-  // because of this, we subtract the rotation of the parent from the children.
-  const parent =
-    "parent" in node && node.parent ? (node.parent as LayoutMixin) : null;
-  const parentRotation: number =
-    parent && "rotation" in parent ? parent.rotation : 0;
-
-  const nodeRotation = -node.rotation || 0;
-  const rotation = Math.round(parentRotation - nodeRotation) ?? 0;
-
-  if (
-    roundToNearestHundreth(parentRotation) !== 0 &&
-    roundToNearestHundreth(rotation) !== 0
-  ) {
-    addWarning(
-      "Rotated elements within rotated containers are not currently supported.",
-    );
-  }
+  const rotation =
+    -Math.round((node.rotation || 0) + (node.cumulativeRotation || 0)) || 0;
 
   if (rotation !== 0) {
     return [

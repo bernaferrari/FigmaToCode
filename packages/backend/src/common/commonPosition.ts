@@ -12,7 +12,7 @@ export const getCommonPositionValue = (
         x: x,
         y: y,
       },
-      node.cumulativeRotation || node.rotation || 0,
+      -(node.rotation + (node.cumulativeRotation || 0)),
     );
 
     return { x: rect.left, y: rect.top };
