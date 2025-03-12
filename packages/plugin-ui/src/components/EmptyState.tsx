@@ -3,7 +3,7 @@ import { Code, MousePointer, Eye, Copy } from "lucide-react";
 
 const EmptyState = () => {
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-neutral-50 dark:bg-neutral-800/50 border border-dashed border-neutral-300 dark:border-neutral-600 rounded-lg text-center">
+    <div className="flex flex-col items-center justify-center p-8 bg-card/50 border border-dashed border-neutral-300 dark:border-neutral-600 rounded-lg text-center">
       {/* Icon with "no code" symbol */}
       <div className="w-16 h-16 bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-700 dark:to-neutral-800 rounded-full flex items-center justify-center mb-5 shadow-sm">
         <div className="relative">

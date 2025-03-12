@@ -28,7 +28,11 @@ export const htmlSizePartial = (
     ) {
       w = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
-      w = formatWithJSX("align-self", isJsx, "stretch");
+      if (node.maxWidth) {
+        w = formatWithJSX("width", isJsx, "100%");
+      } else {
+        w = formatWithJSX("align-self", isJsx, "stretch");
+      }
     }
   }
 
@@ -43,7 +47,11 @@ export const htmlSizePartial = (
     ) {
       h = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
-      h = formatWithJSX("align-self", isJsx, "stretch");
+      if (node.maxHeight) {
+        h = formatWithJSX("height", isJsx, "100%");
+      } else {
+        h = formatWithJSX("align-self", isJsx, "stretch");
+      }
     }
   }
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Copy, CheckCircle, Check } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import copy from "copy-to-clipboard";
+import { cn } from "../lib/utils";
 
 interface CopyButtonProps {
   value: string;
@@ -47,11 +48,14 @@ export function CopyButton({
       onClick={handleCopy}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium border border-green-500 rounded-md shadow-sm hover:bg-green-500 dark:hover:bg-green-600 hover:text-white hover:border-transparent transition-all duration-300 ${
+      className={cn(
+        `inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium border rounded-md transition-all duration-300`,
         isCopied
-          ? "bg-green-600 text-white dark:text-white hover:bg-green-500"
-          : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600"
-      } ${className || ""} relative`}
+          ? "bg-primary border-primary text-primary-foreground"
+          : "bg-neutral-100 dark:bg-neutral-700 dark:hover:bg-muted-foreground/30  border-border text-foreground",
+        className,
+        `relative`,
+      )}
       aria-label={isCopied ? "Copied!" : "Copy to clipboard"}
     >
       <div className="relative h-4 w-4 mr-1.5">
@@ -62,13 +66,7 @@ export function CopyButton({
               : "opacity-100 scale-100 rotate-0"
           }`}
         >
-          <Copy
-            className={`h-4 w-4 ${
-              isCopied
-                ? "text-white"
-                : "text-neutral-700 dark:text-neutral-200 group-hover:text-white"
-            }`}
-          />
+          <Copy className="h-4 w-4 text-foreground" />
         </span>
         <span
           className={`absolute inset-0 transition-all duration-200 ${
@@ -77,23 +75,17 @@ export function CopyButton({
               : "opacity-0 scale-75 rotate-[10deg]"
           }`}
         >
-          <Check className="h-4 w-4 text-white" />
+          <Check className="h-4 w-4 text-primary-foreground" />
         </span>
       </div>
 
       {showLabel && (
-        <span
-          className={`font-medium transition-all duration-200 ${
-            isCopied ? "text-white" : "text-neutral-700 dark:text-neutral-200"
-          }`}
-        >
-          {isCopied ? "Copied" : "Copy"}
-        </span>
+        <span className="font-medium">{isCopied ? "Copied" : "Copy"}</span>
       )}
 
       {isCopied && (
         <span
-          className="absolute inset-0 rounded-md animate-pulse bg-green-400/10"
+          className="absolute inset-0 rounded-md animate-pulse bg-primary/10"
           aria-hidden="true"
         />
       )}

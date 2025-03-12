@@ -46,7 +46,11 @@ export const tailwindSizePartial = (
     ) {
       w = "flex-1";
     } else {
-      w = "self-stretch";
+      if (node.maxWidth) {
+        w = "w-full";
+      } else {
+        w = "self-stretch";
+      }
     }
   }
 
@@ -61,7 +65,11 @@ export const tailwindSizePartial = (
     ) {
       h = "flex-1";
     } else {
-      h = "self-stretch";
+      if (node.maxHeight) {
+        h = "h-full";
+      } else {
+        h = "self-stretch";
+      }
     }
   }
 

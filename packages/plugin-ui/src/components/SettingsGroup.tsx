@@ -35,14 +35,14 @@ const SettingsGroup: React.FC<SettingsGroupProps> = ({
     <div className="w-full mb-2.5 last:mb-0">
       {alwaysExpanded ? (
         <div className="flex items-center mb-1">
-          <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+          <span className="text-xs font-semibold text-foreground">
             {title}
           </span>
         </div>
       ) : (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors w-full text-left"
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left"
         >
           {expanded ? (
             <ChevronDownIcon className="w-3.5 h-3.5 flex-shrink-0" />

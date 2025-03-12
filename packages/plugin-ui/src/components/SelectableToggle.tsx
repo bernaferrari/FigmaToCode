@@ -33,10 +33,10 @@ const SelectableToggle = ({
           `h-8 px-2 flex items-center justify-center rounded-md transition-all duration-200 border`,
           isSelected
             ? `${buttonClass} text-white shadow-sm border-transparent`
-            : "bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border-neutral-100 dark:border-neutral-700",
+            : "bg-muted hover:bg-neutral-200 dark:hover:bg-neutral-700 text-muted-foreground border",
         )}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <div
             className={`h-4 w-4 flex-shrink-0 flex items-center justify-center rounded-md transition-all duration-200 border ${
               isSelected
@@ -49,12 +49,19 @@ const SelectableToggle = ({
             )}
           </div>
 
-          <span className="text-sm font-medium whitespace-nowrap">{title}</span>
+          <span
+            className={cn(
+              "text-sm font-medium whitespace-nowrap",
+              isSelected && "text-green-800 dark:text-foreground",
+            )}
+          >
+            {title}
+          </span>
 
           {/* Help icon for description */}
           {description && (
             <div
-              className="text-current opacity-70 hover:opacity-100 transition-opacity cursor-help"
+              className="hover:text-foreground transition-opacity cursor-help"
               onMouseEnter={() => setShowTooltip(true)}
               onMouseLeave={() => setShowTooltip(false)}
             >

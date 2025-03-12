@@ -18,7 +18,7 @@ const FrameworkTabs: React.FC<FrameworkTabsProps> = ({
 }) => {
   return (
     <div className="flex flex-wrap gap-1 my-2">
-      <div className="flex flex-wrap bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg gap-1 w-fit">
+      <div className="flex flex-wrap bg-muted p-1 rounded-lg gap-1 w-fit">
         {options.map((option) => {
           const isSelected = option.value === selectedValue;
           return (
@@ -27,8 +27,8 @@ const FrameworkTabs: React.FC<FrameworkTabsProps> = ({
               onClick={() => onChange(option.value)}
               className={`py-1.5 px-3 rounded-md text-xs font-medium transition-all duration-200 ${
                 isSelected
-                  ? "bg-white dark:bg-blue-500 shadow-sm dark:text-white"
-                  : "hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300"
+                  ? "bg-blue-500 dark:bg-blue-500 text-primary-foreground shadow-sm"
+                  : "hover:bg-muted-foreground/10 text-muted-foreground"
               }`}
             >
               {option.label}

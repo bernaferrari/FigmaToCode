@@ -40,6 +40,43 @@ type PluginUIProps = {
 
 const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
 
+type FrameworkTabsProps = {
+  frameworks: Framework[];
+  selectedFramework: Framework;
+  setSelectedFramework: (framework: Framework) => void;
+  showAbout: boolean;
+  setShowAbout: (show: boolean) => void;
+};
+
+const FrameworkTabs = ({
+  frameworks,
+  selectedFramework,
+  setSelectedFramework,
+  showAbout,
+  setShowAbout,
+}: FrameworkTabsProps) => {
+  return (
+    <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1 flex-grow">
+      {frameworks.map((tab) => (
+        <button
+          key={`tab ${tab}`}
+          className={`w-full text-sm rounded-md transition-colors font-medium ${
+            selectedFramework === tab && !showAbout
+              ? "bg-primary text-primary-foreground shadow"
+              : "bg-muted hover:bg-primary/90 hover:text-primary-foreground"
+          }`}
+          onClick={() => {
+            setSelectedFramework(tab as Framework);
+            setShowAbout(false);
+          }}
+        >
+          {tab}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 export const PluginUI = (props: PluginUIProps) => {
   const [showAbout, setShowAbout] = useState(false);
 
@@ -58,36 +95,27 @@ export const PluginUI = (props: PluginUIProps) => {
 
   return (
     <div className="flex flex-col h-full dark:text-white">
-      <div className="p-2 flex gap-1">
-        <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1 flex-grow">
-          {frameworks.map((tab) => (
-            <button
-              key={`tab ${tab}`}
-              className={`w-full p-1 text-sm ${
-                props.selectedFramework === tab && !showAbout
-                  ? "bg-green-500 dark:bg-green-600 text-white rounded-md font-semibold shadow-sm"
-                  : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-600 dark:hover:bg-green-800 dark:hover:border-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
-              }`}
-              onClick={() => {
-                props.setSelectedFramework(tab as Framework);
-                setShowAbout(false);
-              }}
-            >
-              {tab}
-            </button>
-          ))}
+      <div className="p-2 dark:bg-card">
+        <div className="flex gap-1 bg-muted dark:bg-card rounded-lg p-1">
+          <FrameworkTabs
+            frameworks={frameworks}
+            selectedFramework={props.selectedFramework}
+            setSelectedFramework={props.setSelectedFramework}
+            showAbout={showAbout}
+            setShowAbout={setShowAbout}
+          />
+          <button
+            className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
+              showAbout
+                ? "bg-primary text-primary-foreground shadow"
+                : "bg-muted hover:bg-primary/90 hover:text-primary-foreground"
+            }`}
+            onClick={() => setShowAbout(!showAbout)}
+            aria-label="About"
+          >
+            <InfoIcon size={16} />
+          </button>
         </div>
-        <button
-          className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
-            showAbout
-              ? "bg-green-500 dark:bg-green-600 text-white shadow-sm"
-              : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600 hover:bg-green-600 dark:hover:bg-green-800 dark:hover:border-green-800 hover:text-white dark:hover:text-white shadow-sm"
-          }`}
-          onClick={() => setShowAbout(!showAbout)}
-          aria-label="About"
-        >
-          <InfoIcon size={16} />
-        </button>
       </div>
       <div
         style={{
@@ -98,8 +126,8 @@ export const PluginUI = (props: PluginUIProps) => {
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
         {showAbout ? (
-          <About 
-            useOldPluginVersion={props.settings?.useOldPluginVersion2025} 
+          <About
+            useOldPluginVersion={props.settings?.useOldPluginVersion2025}
             onPreferenceChanged={props.onPreferenceChanged}
           />
         ) : (

@@ -49,14 +49,14 @@ const Preview: React.FC<{
       ? containerWidth
       : viewMode === "mobile"
         ? Math.floor(containerWidth * 0.4) // Narrower for mobile
-        : htmlPreview.size.width * scaleFactor; // For precision, use scaled original width
+        : htmlPreview.size.width * scaleFactor + 2; // I don't know why I need the 2, but it works always. I guess rounding error for zoom.
 
   return (
-    <div className="flex flex-col w-full bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700">
+    <div className="flex flex-col w-full bg-card rounded-lg border border-border">
       {/* Header with view mode controls */}
-      <div className="flex justify-between items-center px-3 py-2 border-b border-neutral-200 dark:border-neutral-700">
-        <h3 className="text-sm font-medium text-neutral-800 dark:text-white flex items-center gap-2">
-          <MonitorSmartphone size={16} className="text-neutral-500" />
+      <div className="flex justify-between items-center px-3 py-2 border-b border-border">
+        <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <MonitorSmartphone size={16} />
           Preview
         </h3>
         <div className="flex items-center gap-1">

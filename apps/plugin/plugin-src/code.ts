@@ -4,11 +4,10 @@ import {
   flutterMain,
   tailwindMain,
   swiftuiMain,
-  convertIntoNodes,
   htmlMain,
   postSettingsChanged,
 } from "backend";
-import { nodesToJSON } from "backend/src/code";
+import { nodesToJSON } from "backend/src/altNodes/jsonNodeConversion";
 import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retrieveColors";
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
 import { htmlCodeGenTextStyles } from "backend/src/html/htmlMain";
@@ -140,7 +139,8 @@ const standardMode = async () => {
   });
 
   // Listen for page changes
-  figma.on("currentpagechange", () => {
+  figma.loadAllPagesAsync();
+  figma.on("documentchange", () => {
     console.log("[DEBUG] documentchange event triggered");
     // Node: This was causing an infinite load when you try to export a background image from a group that contains children.
     // The reason for this is that the code will temporarily hide the children of the group in order to export a clean image

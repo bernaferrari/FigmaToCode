@@ -169,7 +169,7 @@ const About = ({
         </div>
 
         {/* Contact Card */}
-        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+        <div className="bg-card rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
               <MessageCircle
@@ -206,7 +206,7 @@ const About = ({
         </div>
 
         {/* Debug Helper Card */}
-        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+        <div className="bg-card rounded-xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-rose-100 dark:bg-rose-900/40 rounded-lg">
               <Code size={20} className="text-rose-600 dark:text-rose-400" />
@@ -219,11 +219,11 @@ const About = ({
           </p>
           <button
             onClick={copySelectionJson}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-700 rounded-md text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors mb-3"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-muted rounded-md text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors mb-3"
           >
             {copied ? (
               <>
-                <CheckCircle size={16} className="text-green-500" />
+                <CheckCircle size={16} />
                 <span>Copied!</span>
               </>
             ) : (
@@ -248,9 +248,9 @@ const About = ({
               <span>Use previous plugin version</span>
             </button>
             <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
-              The new version is up to 100x faster, but might still cause some issues. 
-              If you encounter problems, you can switch to the old version 
-              (and please report issues so they can be fixed).
+              The new version is up to 100x faster, but might still cause some
+              issues. If you encounter problems, you can switch to the old
+              version (and please report issues so they can be fixed).
             </p>
           </div>
         </div>

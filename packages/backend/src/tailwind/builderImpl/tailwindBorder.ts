@@ -23,9 +23,9 @@ const getBorder = (
   if (useOutline) {
     const outlineWidth = pxToOutline(weight);
     if (outlineWidth === null) {
-      return `outline-[${numberToFixedString(weight)}px]`;
+      return `outline outline-[${numberToFixedString(weight)}px]`;
     } else {
-      return `outline-${outlineWidth}`;
+      return `outline outline-${outlineWidth}`;
     }
   }
 

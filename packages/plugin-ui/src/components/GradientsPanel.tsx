@@ -17,8 +17,8 @@ const GradientsPanel = (props: {
   };
 
   return (
-    <div className="bg-gray-100 dark:bg-neutral-900 w-full rounded-lg p-4 flex flex-col gap-2">
-      <div className="p-0 pb-2 border-neutral-200 dark:border-neutral-700">
+    <div className="bg-card border w-full rounded-lg p-4 flex flex-col gap-2">
+      <div className="p-0 pb-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
             {/* <div className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div> */}

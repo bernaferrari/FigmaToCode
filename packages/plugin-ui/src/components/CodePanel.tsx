@@ -10,7 +10,6 @@ import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/p
 import { CopyButton } from "./CopyButton";
 import EmptyState from "./EmptyState";
 import SettingsGroup from "./SettingsGroup";
-import CustomPrefixInput from "./CustomPrefixInput";
 import FrameworkTabs from "./FrameworkTabs";
 import { TailwindSettings } from "./TailwindSettings";
 
@@ -150,7 +149,7 @@ const CodePanel = (props: CodePanelProps) => {
       </div>
 
       {!isCodeEmpty && (
-        <div className="flex flex-col p-3 dark:bg-black dark:bg-opacity-25 bg-neutral-100 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-lg text-sm">
+        <div className="flex flex-col p-3 bg-card border rounded-lg text-sm">
           {/* Essential settings always shown */}
           <SettingsGroup
             title=""
