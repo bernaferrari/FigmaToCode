@@ -259,7 +259,9 @@ export class HtmlDefaultBuilder {
     const { node, isJSX } = this;
     const isAbsolutePosition = commonIsAbsolutePosition(node);
     if (isAbsolutePosition) {
-      const { x, y } = getCommonPositionValue(node);
+      const { x, y } = getCommonPositionValue(node, this.settings);
+
+      console.log("for node", node.name, x, y);
 
       this.addStyles(
         formatWithJSX("left", isJSX, x),

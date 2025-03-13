@@ -122,7 +122,7 @@ export class TailwindDefaultBuilder {
   position(): this {
     const { node } = this;
     if (commonIsAbsolutePosition(node)) {
-      const { x, y } = getCommonPositionValue(node);
+      const { x, y } = getCommonPositionValue(node, this.settings);
 
       const parsedX = numberToFixedString(x);
       const parsedY = numberToFixedString(y);

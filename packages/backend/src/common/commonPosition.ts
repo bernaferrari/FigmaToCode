@@ -1,9 +1,17 @@
+import { HTMLSettings, TailwindSettings } from "types";
+
 export const getCommonPositionValue = (
   node: SceneNode,
+  settings?: HTMLSettings | TailwindSettings,
 ): { x: number; y: number } => {
   if (node.parent && node.parent.absoluteBoundingBox) {
     const x = node.absoluteBoundingBox.x - node.parent.absoluteBoundingBox.x;
     const y = node.absoluteBoundingBox.y - node.parent.absoluteBoundingBox.y;
+
+    if (settings?.embedVectors && node.svg) {
+      // When embedding vectors, we need to use the absolute position, since it already includes the rotation.
+      return { x: x, y: y };
+    }
 
     const rect = calculateRectangleFromBoundingBox(
       {
