@@ -232,8 +232,7 @@ const codegenMode = async () => {
         node,
       );
 
-      const nodeJson = await nodesToJSON([node], userPluginSettings);
-      const convertedSelection = await convertIntoNodes(nodeJson, null);
+      const convertedSelection = await nodesToJSON([node], userPluginSettings);
       console.log(
         "[DEBUG] codegen.generate - Converted selection:",
         convertedSelection,
