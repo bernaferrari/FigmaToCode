@@ -24,10 +24,12 @@ export class FlutterDefaultBuilder {
   }
 
   blendAttr(node: SceneNode): this {
-    if ("layoutAlign" in node && "opacity" in node && "visible" in node) {
-      this.child = flutterVisibility(node, this.child);
+    console.log("rotation is", node.rotation);
+    if ("rotation" in node) {
       this.child = flutterRotation(node, this.child);
-      this.child = flutterOpacity(node, this.child);
+    }
+    if ("visible" in node) {
+      this.child = flutterVisibility(node, this.child);
     } else if ("opacity" in node) {
       this.child = flutterOpacity(node, this.child);
     }
