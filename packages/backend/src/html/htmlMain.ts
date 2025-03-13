@@ -359,19 +359,23 @@ export const generateHTMLPreview = async (
   nodes: SceneNode[],
   settings: PluginSettings,
 ): Promise<HTMLPreview> => {
-  const result = await htmlMain(
+  let result = await htmlMain(
     nodes,
     {
       ...settings,
       htmlGenerationMode: "html",
     },
-    true,
+    nodes.length > 1 ? false : true,
   );
+
+  if (nodes.length > 1) {
+    result.html = `<div style="width: 100%; height: 100%">${result.html}</div>`;
+  }
 
   return {
     size: {
-      width: nodes[0].width,
-      height: nodes[0].height,
+      width: Math.max(...nodes.map((node) => node.width)),
+      height: nodes.reduce((sum, node) => sum + node.height, 0),
     },
     content: result.html,
   };

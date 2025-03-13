@@ -33,10 +33,6 @@ export const run = async (settings: PluginSettings) => {
   if (selection.length === 0) {
     postEmptyMessage();
     return;
-  } else if (selection.length > 1) {
-    addWarning(
-      "Ungrouped elements may have incorrect positioning. If this happens, try wrapping the selection in a Frame or Group.",
-    );
   }
 
   // Timing with Date.now() instead of console.time

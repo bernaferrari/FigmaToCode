@@ -5,25 +5,15 @@ export const getCommonPositionValue = (
   settings?: HTMLSettings | TailwindSettings,
 ): { x: number; y: number } => {
   if (node.parent && node.parent.absoluteBoundingBox) {
-    const x = node.absoluteBoundingBox.x - node.parent.absoluteBoundingBox.x;
-    const y = node.absoluteBoundingBox.y - node.parent.absoluteBoundingBox.y;
-
     if (settings?.embedVectors && node.svg) {
       // When embedding vectors, we need to use the absolute position, since it already includes the rotation.
-      return { x: x, y: y };
+      return {
+        x: node.absoluteBoundingBox.x - node.parent.absoluteBoundingBox.x,
+        y: node.absoluteBoundingBox.y - node.parent.absoluteBoundingBox.y,
+      };
     }
 
-    const rect = calculateRectangleFromBoundingBox(
-      {
-        width: node.absoluteBoundingBox.width,
-        height: node.absoluteBoundingBox.height,
-        x: x,
-        y: y,
-      },
-      -((node.rotation || 0) + (node.cumulativeRotation || 0)),
-    );
-
-    return { x: rect.left, y: rect.top };
+    return { x: node.x, y: node.y };
   }
 
   if (node.parent && node.parent.type === "GROUP") {
@@ -54,7 +44,7 @@ interface RectangleStyle {
   rotation: number; // Rotation in degrees
 }
 
-function calculateRectangleFromBoundingBox(
+export function calculateRectangleFromBoundingBox(
   boundingBox: BoundingBox,
   figmaRotationDegrees: number,
 ): RectangleStyle {

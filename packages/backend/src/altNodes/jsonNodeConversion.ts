@@ -2,6 +2,7 @@ import { addWarning } from "../common/commonConversionWarnings";
 import { PluginSettings } from "types";
 import { variableToColorName } from "../tailwind/conversionTables";
 import { HasGeometryTrait, Node, Paint } from "../api_types";
+import { calculateRectangleFromBoundingBox } from "../common/commonPosition";
 
 // Performance tracking counters
 export let getNodeByIdAsyncTime = 0;
@@ -196,7 +197,11 @@ const processNodePair = async (
   const nodeType = jsonNode.type;
 
   // Store the cumulative rotation (parent's cumulative + node's own)
-  jsonNode.cumulativeRotation = parentCumulativeRotation;
+  if (parentNode) {
+    // Only add cumulative when there is a parent. This is useful for the GROUP -> FRAME transformation, where
+    // we want to move the rotation of the GROUP to children, but want to se FRAME to 0.
+    jsonNode.cumulativeRotation = parentCumulativeRotation;
+  }
 
   // Handle empty frames and convert to rectangles
   if (
@@ -358,11 +363,33 @@ const processNodePair = async (
   }
 
   // Always copy size and position
-  if ("width" in figmaNode) {
-    jsonNode.width = figmaNode.width;
-    jsonNode.height = figmaNode.height;
-    jsonNode.x = figmaNode.x;
-    jsonNode.y = figmaNode.y;
+  if ("absoluteBoundingBox" in jsonNode && jsonNode.absoluteBoundingBox) {
+    if (jsonNode.parent) {
+      // Extract width and height from bounding box and rotation. This is necessary because Figma JSON API doesn't have width and height.
+      const rect = calculateRectangleFromBoundingBox(
+        {
+          width: jsonNode.absoluteBoundingBox.width,
+          height: jsonNode.absoluteBoundingBox.height,
+          x:
+            jsonNode.absoluteBoundingBox.x -
+            (jsonNode.parent?.absoluteBoundingBox.x || 0),
+          y:
+            jsonNode.absoluteBoundingBox.y -
+            (jsonNode.parent?.absoluteBoundingBox.y || 0),
+        },
+        -((jsonNode.rotation || 0) + (jsonNode.cumulativeRotation || 0)),
+      );
+
+      jsonNode.width = rect.width;
+      jsonNode.height = rect.height;
+      jsonNode.x = rect.left;
+      jsonNode.y = rect.top;
+    } else {
+      jsonNode.width = jsonNode.absoluteBoundingBox.width;
+      jsonNode.height = jsonNode.absoluteBoundingBox.height;
+      jsonNode.x = 0;
+      jsonNode.y = 0;
+    }
   }
 
   if ("individualStrokeWeights" in jsonNode) {
@@ -425,8 +452,6 @@ const processNodePair = async (
     "children" in figmaNode &&
     figmaNode.children.length === jsonNode.children.length
   ) {
-    console.log("cumulative", parentCumulativeRotation);
-
     const cumulative =
       parentCumulativeRotation +
       (jsonNode.type === "GROUP" ? jsonNode.rotation || 0 : 0);
@@ -489,21 +514,38 @@ export const nodesToJSON = async (
 ): Promise<Node[]> => {
   // Reset name counters for each conversion
   nodeNameCounters.clear();
-
   const exportJsonStart = Date.now();
-  // First get the JSON representation of nodes
-  const nodeJson = (await Promise.all(
-    nodes.map(
-      async (node) =>
-        (
-          (await node.exportAsync({
-            format: "JSON_REST_V1",
-          })) as any
-        ).document,
-    ),
-  )) as Node[];
+  // First get the JSON representation of nodes with rotation handling
+  const nodeResults = await Promise.all(
+    nodes.map(async (node) => {
+      // Export node to JSON
+      const nodeDoc = (
+        (await node.exportAsync({
+          format: "JSON_REST_V1",
+        })) as any
+      ).document;
 
-  console.log("[debug] initial nodeJson", { ...nodeJson[0] });
+      let nodeCumulativeRotation = 0;
+
+      // Wire GROUPs into FRAME.
+      if (node.type === "GROUP") {
+        nodeDoc.type = "FRAME";
+
+        // Fix rotation for children.
+        if ("rotation" in nodeDoc && nodeDoc.rotation) {
+          nodeCumulativeRotation = -nodeDoc.rotation * (180 / Math.PI);
+          nodeDoc.rotation = 0;
+        }
+      }
+
+      return {
+        nodeDoc,
+        nodeCumulativeRotation,
+      };
+    }),
+  );
+
+  console.log("[debug] initial nodeJson", { ...nodes[0] });
 
   console.log(
     `[benchmark][inside nodesToJSON] JSON_REST_V1 export: ${Date.now() - exportJsonStart}ms`,
@@ -515,9 +557,11 @@ export const nodesToJSON = async (
 
   for (let i = 0; i < nodes.length; i++) {
     const processedNode = await processNodePair(
-      nodeJson[i],
+      nodeResults[i].nodeDoc,
       nodes[i],
       settings,
+      undefined,
+      nodeResults[i].nodeCumulativeRotation,
     );
     if (processedNode !== null) {
       if (Array.isArray(processedNode)) {
