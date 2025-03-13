@@ -139,10 +139,8 @@ const flutterGroup = (node: GroupNode): string => {
 const flutterContainer = (node: SceneNode, child: string): string => {
   let propChild = "";
 
-  let image = "";
   if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
     addWarning("Image fills are replaced with placeholders");
-    image = `Image.network("${getPlaceholderImage(node.width, node.height)}")`;
   }
 
   if (child.length > 0) {
