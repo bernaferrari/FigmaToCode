@@ -30,6 +30,7 @@ import {
   getClassLabel,
 } from "../common/commonFormatAttributes";
 import { TailwindColorType, TailwindSettings } from "types";
+import { MinimalFillsTrait, Paint } from "../api_types";
 
 const isNotEmpty = (s: string) => s !== "" && s !== null && s !== undefined;
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
@@ -92,7 +93,7 @@ export class TailwindDefaultBuilder {
   }
 
   commonShapeStyles(): this {
-    this.customColor((this.node as MinimalFillsMixin).fills, "bg");
+    this.customColor((this.node as MinimalFillsTrait).fills, "bg");
     this.radius();
     this.shadow();
     this.border();
@@ -113,7 +114,10 @@ export class TailwindDefaultBuilder {
     if ("strokes" in this.node) {
       const { isOutline, property } = tailwindBorderWidth(this.node);
       this.addAttributes(property);
-      this.customColor(this.node.strokes, isOutline ? "outline" : "border");
+      this.customColor(
+        this.node.strokes as MinimalStrokesTrait,
+        isOutline ? "outline" : "border",
+      );
     }
 
     return this;
@@ -150,21 +154,16 @@ export class TailwindDefaultBuilder {
    * example: text-opacity-25
    * example: bg-blue-500
    */
-  customColor(
-    paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
-    kind: TailwindColorType,
-  ): this {
+  customColor(paint: ReadonlyArray<Paint>, kind: TailwindColorType): this {
     if (this.visible) {
       let gradient = "";
       if (kind === "bg") {
         gradient = tailwindGradientFromFills(paint);
 
         // Add background blend mode class if applicable
-        if (paint !== figma.mixed) {
-          const blendModeClass = tailwindBackgroundBlendMode(paint);
-          if (blendModeClass) {
-            this.addAttributes(blendModeClass);
-          }
+        const blendModeClass = tailwindBackgroundBlendMode(paint);
+        if (blendModeClass) {
+          this.addAttributes(blendModeClass);
         }
       }
       if (gradient) {

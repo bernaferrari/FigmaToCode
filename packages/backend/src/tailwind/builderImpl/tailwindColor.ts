@@ -12,7 +12,7 @@ import {
   htmlAngularGradient,
   htmlRadialGradient,
 } from "../../html/builderImpl/htmlColor";
-import { Paint } from "../../api_types";
+import { GradientPaint, Paint } from "../../api_types";
 
 /**
  * Get a tailwind color value object

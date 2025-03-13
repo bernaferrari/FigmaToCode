@@ -1,3 +1,4 @@
+import { GradientPaint } from "../api_types";
 import { numberToFixedString } from "./numToAutoFixed";
 
 // ---- Color Format Conversion ----

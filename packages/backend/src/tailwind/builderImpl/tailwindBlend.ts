@@ -1,5 +1,6 @@
+import { Paint } from "../../api_types";
 import { numberToFixedString } from "../../common/numToAutoFixed";
-import { exactValue, nearestOpacity, nearestValue } from "../conversionTables";
+import { exactValue, nearestOpacity } from "../conversionTables";
 
 /**
  * https://tailwindcss.com/docs/opacity/
