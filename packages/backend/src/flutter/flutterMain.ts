@@ -10,6 +10,8 @@ import { indentString } from "../common/indentString";
 import {
   getCrossAxisAlignment,
   getMainAxisAlignment,
+  getWrapAlignment,
+  getWrapRunAlignment,
 } from "./builderImpl/flutterAutoLayout";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
@@ -193,12 +195,12 @@ const flutterFrame = (
   }
 
   if (node.layoutMode !== "NONE") {
-    const rowColumn = makeRowColumn(node, children);
-    return flutterContainer(node, rowColumn);
+    const rowColumnWrap = makeRowColumnWrap(node, children);
+    return flutterContainer(node, rowColumnWrap);
   } else {
     if (node.inferredAutoLayout) {
-      const rowColumn = makeRowColumn(node.inferredAutoLayout, children);
-      return flutterContainer(node, rowColumn);
+      const rowColumnWrap = makeRowColumnWrap(node.inferredAutoLayout, children);
+      return flutterContainer(node, rowColumnWrap);
     }
 
     if (node.isAsset) {
@@ -215,21 +217,35 @@ const flutterFrame = (
   }
 };
 
-const makeRowColumn = (
+const makeRowColumnWrap = (
   autoLayout: InferredAutoLayoutResult,
   children: string,
 ): string => {
-  const rowOrColumn = autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
+  const rowOrColumn = autoLayout.layoutWrap == "WRAP" && autoLayout.primaryAxisSizingMode == "FIXED" ?
+    "Wrap" : autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
-  const widgetProps: Record<string, any> = {
-    mainAxisSize: "MainAxisSize.min",
-    // mainAxisSize: getFlex(node, autoLayout),
-    mainAxisAlignment: getMainAxisAlignment(autoLayout),
-    crossAxisAlignment: getCrossAxisAlignment(autoLayout),
-  };
+  const widgetProps: Record<string, any> = autoLayout.layoutWrap == "WRAP"
+    ? {
+      alignment: getWrapAlignment(autoLayout),
+      runAlignment: getWrapRunAlignment(autoLayout),
+    } : 
+    {
+      mainAxisSize: "MainAxisSize.min",
+      // mainAxisSize: getFlex(node, autoLayout),
+      mainAxisAlignment: getMainAxisAlignment(autoLayout),
+      crossAxisAlignment: getCrossAxisAlignment(autoLayout),
+      
+    };
 
   // Add spacing parameter if itemSpacing is set
-  if (autoLayout.itemSpacing > 0) {
+  if (autoLayout.layoutWrap == "WRAP") {
+    if (autoLayout.primaryAxisAlignItems != "SPACE_BETWEEN" && autoLayout.itemSpacing != undefined) {
+      widgetProps.spacing = autoLayout.itemSpacing;
+    }
+    if (autoLayout.counterAxisAlignContent != "SPACE_BETWEEN" && autoLayout.counterAxisSpacing != undefined) {
+      widgetProps.runSpacing = autoLayout.counterAxisSpacing;
+    }
+  } else if (autoLayout.itemSpacing > 0) {
     widgetProps.spacing = autoLayout.itemSpacing;
   } else if (autoLayout.itemSpacing < 0) {
     addWarning("Flutter doesn't support negative itemSpacing");
