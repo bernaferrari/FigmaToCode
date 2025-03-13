@@ -419,7 +419,7 @@ const convertNode = (settings: HTMLSettings) => async (node: SceneNode) => {
     case "LINE":
       return htmlLine(node, settings);
     case "VECTOR":
-      if (!settings.embedVectors) {
+      if (!settings.embedVectors && !isPreviewGlobal) {
         addWarning("Vector is not supported");
       }
       return await htmlContainer(
