@@ -122,7 +122,6 @@ export class HtmlDefaultBuilder {
 
   commonShapeStyles(): this {
     if ("fills" in this.node) {
-      console.log("node is", this.node);
       this.applyFillsToStyle(
         this.node.fills,
         this.node.type === "TEXT" ? "text" : "background",
@@ -260,8 +259,6 @@ export class HtmlDefaultBuilder {
     const isAbsolutePosition = commonIsAbsolutePosition(node);
     if (isAbsolutePosition) {
       const { x, y } = getCommonPositionValue(node, this.settings);
-
-      console.log("for node", node.name, x, y);
 
       this.addStyles(
         formatWithJSX("left", isJSX, x),
