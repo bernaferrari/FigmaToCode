@@ -13,6 +13,7 @@ import { generateWidgetCode } from "../common/numToAutoFixed";
 
 export class FlutterDefaultBuilder {
   child: string;
+  rotationApplied: boolean = false;
 
   constructor(optChild: string) {
     this.child = optChild;
@@ -20,14 +21,17 @@ export class FlutterDefaultBuilder {
 
   createContainer(node: SceneNode): this {
     this.child = flutterContainer(node, this.child);
+    this.rotationApplied = true;
+
     return this;
   }
 
   blendAttr(node: SceneNode): this {
-    console.log("rotation is", node.rotation);
-    if ("rotation" in node) {
+    // Only apply rotation via Transform if it wasn't already handled in the container
+    if ("rotation" in node && !this.rotationApplied) {
       this.child = flutterRotation(node, this.child);
     }
+
     if ("visible" in node) {
       this.child = flutterVisibility(node, this.child);
     } else if ("opacity" in node) {

@@ -37,7 +37,6 @@ export const flutterVisibility = (node: SceneNode, child: string): string => {
 /**
  * https://api.flutter.dev/flutter/widgets/Transform-class.html
  * that's how you convert angles to clockwise radians: angle * -pi/180
- * using 3.14159 as Pi for enough precision and to avoid importing math lib.
  */
 export const flutterRotation = (node: LayoutMixin, child: string): string => {
   if (
@@ -45,12 +44,28 @@ export const flutterRotation = (node: LayoutMixin, child: string): string => {
     child !== "" &&
     Math.round(node.rotation) !== 0
   ) {
-    return generateWidgetCode("Transform", {
-      transform: `Matrix4.identity()..translate(0.0, 0.0)..rotateZ(${numberToFixedString(
-        node.rotation * (-3.14159 / 180),
-      )})`,
-      child: child,
-    });
+    const matrix = generateRotationMatrix(node);
+    if (matrix) {
+      return generateWidgetCode("Transform", {
+        transform: matrix,
+        child: child,
+      });
+    }
   }
   return child;
+};
+
+/**
+ * Generates a rotation matrix string for Flutter transforms
+ */
+export const generateRotationMatrix = (node: LayoutMixin): string => {
+  const rotation = (node.rotation || 0) + (node.cumulativeRotation || 0);
+
+  if (Math.round(rotation) === 0) {
+    return "";
+  }
+
+  return `Matrix4.identity()..translate(0.0, 0.0)..rotateZ(${numberToFixedString(
+    rotation * (-Math.PI / 180),
+  )})`;
 };

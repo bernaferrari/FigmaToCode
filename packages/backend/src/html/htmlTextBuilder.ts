@@ -134,6 +134,14 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
     return this;
   }
 
+  textTrim(): this {
+    if ("leadingTrim" in this.node && this.node.leadingTrim === "CAP_HEIGHT") {
+      this.addStyles(formatWithJSX("text-box-trim", this.isJSX, "trim-both"));
+      this.addStyles(formatWithJSX("text-box-edge", this.isJSX, "cap alphabetic"));
+    }
+    return this;
+  }
+
   textDecoration(textDecoration: TextDecoration): string {
     switch (textDecoration) {
       case "STRIKETHROUGH":

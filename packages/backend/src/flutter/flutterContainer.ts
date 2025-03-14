@@ -13,6 +13,7 @@ import {
 import { numberToFixedString } from "../common/numToAutoFixed";
 import { getCommonRadius } from "../common/commonRadius";
 import { commonStroke } from "../common/commonStroke";
+import { generateRotationMatrix } from "./builderImpl/flutterBlend";
 
 export const flutterContainer = (node: SceneNode, child: string): string => {
   // ignore the view when size is zero or less
@@ -42,6 +43,18 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
   let result: string;
   const hasConstraints = constraints && Object.keys(constraints).length > 0;
 
+  const properties: Record<string, string> = {};
+
+  // If node has rotation, get the matrix for the transform property
+  if ("rotation" in node) {
+    const matrix = generateRotationMatrix(node);
+    if (matrix) {
+      properties.transform = matrix;
+    }
+  }
+
+  properties.child = child;
+
   if (width || height || propBoxDecoration || clipBehavior) {
     const parsedDecoration = skipDefaultProperty(
       propBoxDecoration,
@@ -53,7 +66,7 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
       padding: propPadding,
       clipBehavior: clipBehavior,
       decoration: clipBehavior ? propBoxDecoration : parsedDecoration,
-      child: child,
+      ...properties,
     });
   } else if (propPadding) {
     // if there is just a padding, add Padding
