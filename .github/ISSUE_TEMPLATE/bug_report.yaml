@@ -1,0 +1,64 @@
+name: Bug Report
+description: Report a bug in the project
+title: "[bug]: "
+labels: ["bug", "needs triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: "## 🐛 Bug Report\nPlease fill out the details below."
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Settings / Steps to Reproduce"
+      description: "Provide a step-by-step guide on how to reproduce the bug. Please include the plugin settings you were using."
+      placeholder: "Framework: Tailwind with JSX\n1. Selected design\n2. Selected Optimize Layers\n3. See error"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: "Expected Behavior"
+      description: "What did you expect to happen?"
+      placeholder: "The button should navigate to the dashboard."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: "Actual Behavior"
+      description: "What actually happened?"
+      placeholder: "The button does nothing."
+    validations:
+      required: true
+
+  - type: input
+    id: design-link
+    attributes:
+      label: "Design Reference"
+      description: "Provide a link to the design that you were working on (if possible)."
+      placeholder: "Figma design link"
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: "Screenshots or Videos"
+      description: "If applicable, add screenshots or screen recordings to help explain the issue."
+      placeholder: "Drag and drop images here or paste them from your clipboard."
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: "Environment"
+      description: "Optionally provide details about your development environment."
+      placeholder: "OS: macOS 14.1\nBrowser: Chrome 120\nNode.js: 18.17.0"
+    validations:
+      required: true
