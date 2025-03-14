@@ -7,14 +7,18 @@ assignees: []
 body:
   - type: markdown
     attributes:
-      value: "## 🐛 Bug Report\nPlease fill out the details below."
+      value: "## 🐛 Bug Report\nPlease fill out the details below to help us resolve your issue quickly."
 
   - type: textarea
-    id: reproduction
+    id: steps
     attributes:
-      label: "Settings / Steps to Reproduce"
-      description: "Provide a step-by-step guide on how to reproduce the bug. Please include the plugin settings you were using."
-      placeholder: "Framework: Tailwind with JSX\n1. Selected design\n2. Selected Optimize Layers\n3. See error"
+      label: "Steps to Reproduce"
+      description: "Provide a step-by-step guide of the actions you took that led to the bug."
+      placeholder: |
+        1. Open the plugin
+        2. Select a text layer
+        3. Reorder the layer.
+        4. Observe the error
     validations:
       required: true
 
@@ -22,26 +26,26 @@ body:
     id: expected-behavior
     attributes:
       label: "Expected Behavior"
-      description: "What did you expect to happen?"
-      placeholder: "The button should navigate to the dashboard."
+      description: "Describe what you expected to happen."
+      placeholder: "The code should be generated successfully and displayed in the output panel."
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: actual-behavior
     attributes:
       label: "Actual Behavior"
-      description: "What actually happened?"
-      placeholder: "The button does nothing."
+      description: "Describe what actually happened. Include any error messages or logs if applicable."
+      placeholder: "An error message appears: 'Failed to generate code due to invalid layer configuration.'"
     validations:
-      required: true
+      required: false
 
   - type: input
     id: design-link
     attributes:
       label: "Design Reference"
-      description: "Provide a link to the design that you were working on (if possible)."
-      placeholder: "Figma design link"
+      description: "If applicable, provide a link to the design related to this bug (e.g., Figma link)."
+      placeholder: "e.g., https://www.figma.com/file/example"
     validations:
       required: false
 
@@ -49,16 +53,7 @@ body:
     id: screenshots
     attributes:
       label: "Screenshots or Videos"
-      description: "If applicable, add screenshots or screen recordings to help explain the issue."
-      placeholder: "Drag and drop images here or paste them from your clipboard."
+      description: "If applicable, add screenshots or provide links to videos to help explain the issue. You can drag and drop images here or paste them from your clipboard."
+      placeholder: "Drag and drop images or videos here"
     validations:
       required: false
-
-  - type: textarea
-    id: environment
-    attributes:
-      label: "Environment"
-      description: "Optionally provide details about your development environment."
-      placeholder: "OS: macOS 14.1\nBrowser: Chrome 120\nNode.js: 18.17.0"
-    validations:
-      required: true

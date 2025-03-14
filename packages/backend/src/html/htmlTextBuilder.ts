@@ -11,7 +11,6 @@ import {
   generateUniqueClassName,
   stylesToCSS,
   getComponentName,
-  getSvelteClassName,
 } from "./htmlMain";
 
 export class HtmlTextBuilder extends HtmlDefaultBuilder {
@@ -137,7 +136,9 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
   textTrim(): this {
     if ("leadingTrim" in this.node && this.node.leadingTrim === "CAP_HEIGHT") {
       this.addStyles(formatWithJSX("text-box-trim", this.isJSX, "trim-both"));
-      this.addStyles(formatWithJSX("text-box-edge", this.isJSX, "cap alphabetic"));
+      this.addStyles(
+        formatWithJSX("text-box-edge", this.isJSX, "cap alphabetic"),
+      );
     }
     return this;
   }
