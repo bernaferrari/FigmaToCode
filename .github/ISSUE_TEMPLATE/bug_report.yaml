@@ -1,8 +1,7 @@
 name: Bug Report
 description: Report a bug in the project
 title: "[bug]: "
-labels: ["bug", "needs triage"]
-assignees: []
+labels: ["bug"]
 
 body:
   - type: markdown
