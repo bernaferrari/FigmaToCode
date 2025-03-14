@@ -1,100 +1,21 @@
-import { LayoutMode } from "types";
-import { parentCoordinates } from "./parentCoordinates";
-
-export const commonPosition = (
-  node: SceneNode & DimensionAndPositionMixin,
-): LayoutMode => {
-  // if node is same size as height, position is not necessary
-
-  // detect if Frame's width is same as Child when Frame has Padding.
-  // warning: this may return true even when false, if size is same, but position is different. However, it would be an unexpected layout.
-  let hPadding = 0;
-  let vPadding = 0;
-  if (node.parent && "layoutMode" in node.parent) {
-    hPadding = node.parent.paddingLeft + node.parent.paddingRight;
-    vPadding = node.parent.paddingTop + node.parent.paddingBottom;
-  }
-
-  if (
-    !node.parent ||
-    !("width" in node.parent) ||
-    (node.width === node.parent.width - hPadding &&
-      node.height === node.parent.height - vPadding)
-  ) {
-    return "";
-  }
-
-  // position is absolute, parent is relative
-  // return "absolute inset-0 m-auto ";
-
-  const [parentX, parentY] = parentCoordinates(node.parent);
-
-  // if view is too small, anything will be detected; this is necessary to reduce the tolerance.
-  let threshold = 8;
-  if (node.width < 16 || node.height < 16) {
-    threshold = 1;
-  }
-
-  // < 4 is a threshold. If === is used, there can be rounding errors (28.002 !== 28)
-  const centerX =
-    Math.abs(2 * (node.x - parentX) + node.width - node.parent.width) <
-    threshold;
-  const centerY =
-    Math.abs(2 * (node.y - parentY) + node.height - node.parent.height) <
-    threshold;
-
-  const minX = node.x - parentX < threshold;
-  const minY = node.y - parentY < threshold;
-
-  const maxX = node.parent.width - (node.x - parentX + node.width) < threshold;
-  const maxY =
-    node.parent.height - (node.y - parentY + node.height) < threshold;
-
-  // this needs to be on top, because Tailwind is incompatible with Center, so this will give preference.
-  if (minX && minY) {
-    // x left, y top
-    return "TopStart";
-  } else if (minX && maxY) {
-    // x left, y bottom
-    return "BottomStart";
-  } else if (maxX && minY) {
-    // x right, y top
-    return "TopEnd";
-  } else if (maxX && maxY) {
-    // x right, y bottom
-    return "BottomEnd";
-  }
-
-  if (centerX && centerY) {
-    return "Center";
-  }
-
-  if (centerX) {
-    if (minY) {
-      // x center, y top
-      return "TopCenter";
-    }
-    if (maxY) {
-      // x center, y bottom
-      return "BottomCenter";
-    }
-  } else if (centerY) {
-    if (minX) {
-      // x left, y center
-      return "CenterStart";
-    }
-    if (maxX) {
-      // x right, y center
-      return "CenterEnd";
-    }
-  }
-
-  return "Absolute";
-};
+import { HTMLSettings, TailwindSettings } from "types";
 
 export const getCommonPositionValue = (
   node: SceneNode,
+  settings?: HTMLSettings | TailwindSettings,
 ): { x: number; y: number } => {
+  if (node.parent && node.parent.absoluteBoundingBox) {
+    if (settings?.embedVectors && node.svg) {
+      // When embedding vectors, we need to use the absolute position, since it already includes the rotation.
+      return {
+        x: node.absoluteBoundingBox.x - node.parent.absoluteBoundingBox.x,
+        y: node.absoluteBoundingBox.y - node.parent.absoluteBoundingBox.y,
+      };
+    }
+
+    return { x: node.x, y: node.y };
+  }
+
   if (node.parent && node.parent.type === "GROUP") {
     return {
       x: node.x - node.parent.x,
@@ -108,36 +29,81 @@ export const getCommonPositionValue = (
   };
 };
 
-export const commonIsAbsolutePosition = (
-  node: SceneNode,
-  optimizeLayout: boolean,
-) => {
-  // No position when parent is inferred auto layout.
-  if (
-    optimizeLayout &&
-    node.parent &&
-    "layoutMode" in node.parent &&
-    node.parent.inferredAutoLayout !== null
-  ) {
+interface BoundingBox {
+  width: number; // w_b
+  height: number; // h_b
+  x: number; // x_b
+  y: number; // y_b
+}
+
+interface RectangleStyle {
+  width: number; // Original width (w)
+  height: number; // Original height (h)
+  left: number; // Final CSS left
+  top: number; // Final CSS top
+  rotation: number; // Rotation in degrees
+}
+
+export function calculateRectangleFromBoundingBox(
+  boundingBox: BoundingBox,
+  figmaRotationDegrees: number,
+): RectangleStyle {
+  const cssRotationDegrees = -figmaRotationDegrees; // Direct CSS mapping
+  const theta = (cssRotationDegrees * Math.PI) / 180;
+  const cosTheta = Math.cos(theta);
+  const sinTheta = Math.sin(theta);
+  const absCosTheta = Math.abs(cosTheta);
+  const absSinTheta = Math.abs(sinTheta);
+
+  const { width: w_b, height: h_b, x: x_b, y: y_b } = boundingBox;
+
+  // For top-left origin, bounding box depends on rotation direction
+  const denominator = absCosTheta * absCosTheta - absSinTheta * absSinTheta;
+  const h = (w_b * absSinTheta - h_b * absCosTheta) / -denominator;
+  const w = (w_b - h * absSinTheta) / absCosTheta;
+
+  // Rotate corners to find bounding box offsets
+  const corners = [
+    { x: 0, y: 0 },
+    { x: w, y: 0 },
+    { x: w, y: h },
+    { x: 0, y: h },
+  ];
+  const rotatedCorners = corners.map(({ x, y }) => ({
+    x: x * cosTheta + y * sinTheta,
+    y: -x * sinTheta + y * cosTheta,
+  }));
+
+  const minX = Math.min(...rotatedCorners.map((c) => c.x));
+  const minY = Math.min(...rotatedCorners.map((c) => c.y));
+
+  const left = x_b - minX;
+  const top = y_b - minY;
+
+  return {
+    width: parseFloat(w.toFixed(2)),
+    height: parseFloat(h.toFixed(2)),
+    left: parseFloat(left.toFixed(2)),
+    top: parseFloat(top.toFixed(2)),
+    rotation: cssRotationDegrees,
+  };
+}
+
+export const commonIsAbsolutePosition = (node: SceneNode) => {
+  if ("layoutPositioning" in node && node.layoutPositioning === "ABSOLUTE") {
+    return true;
+  }
+
+  if (!node.parent || node.parent === undefined) {
     return false;
   }
 
-  if ("layoutAlign" in node) {
-    if (!node.parent || node.parent === undefined) {
-      return false;
-    }
-
-    const parentLayoutIsNone =
-      "layoutMode" in node.parent && node.parent.layoutMode === "NONE";
-    const hasNoLayoutMode = !("layoutMode" in node.parent);
-
-    if (
-      node.layoutPositioning === "ABSOLUTE" ||
-      parentLayoutIsNone ||
-      hasNoLayoutMode
-    ) {
-      return true;
-    }
+  if (
+    ("layoutMode" in node.parent && node.parent.layoutMode === "NONE") ||
+    !("layoutMode" in node.parent)
+  ) {
+    return true;
   }
+
   return false;
 };

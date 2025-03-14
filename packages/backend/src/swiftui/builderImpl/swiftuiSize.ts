@@ -3,39 +3,38 @@ import { numberToFixedString } from "../../common/numToAutoFixed";
 
 export const swiftuiSize = (
   node: SceneNode,
-  optimizeLayout: boolean = false,
-): { width: string; height: string } => {
-  const size = nodeSize(node, optimizeLayout);
+): { width: string; height: string; constraints: string[] } => {
+  const size = nodeSize(node);
 
-  // if width is set as maxWidth, height must also be set as maxHeight (not height)
-  const shouldExtend = size.height === "fill" || size.width === "fill";
+  const constraintProps: string[] = [];
+  let width = "";
+  let height = "";
 
-  // this cast will always be true, since nodeWidthHeight was called with false to relative.
-  let propWidth = "";
+  // Handle width and height
   if (typeof size.width === "number") {
-    const w = numberToFixedString(size.width);
-
-    if (shouldExtend) {
-      propWidth = `minWidth: ${w}, maxWidth: ${w}`;
-    } else {
-      propWidth = `width: ${w}`;
-    }
-  } else if (size.width === "fill") {
-    propWidth = `maxWidth: .infinity`;
+    width = `width: ${numberToFixedString(size.width)}`;
   }
-
-  let propHeight = "";
   if (typeof size.height === "number") {
-    const h = numberToFixedString(size.height);
-
-    if (shouldExtend) {
-      propHeight = `minHeight: ${h}, maxHeight: ${h}`;
-    } else {
-      propHeight = `height: ${h}`;
-    }
-  } else if (size.height === "fill") {
-    propHeight = `maxHeight: .infinity`;
+    height = `height: ${numberToFixedString(size.height)}`;
   }
 
-  return { width: propWidth, height: propHeight };
+  // Handle min/max constraints
+  if (node.minWidth !== undefined && node.minWidth !== null) {
+    constraintProps.push(`minWidth: ${numberToFixedString(node.minWidth)}`);
+  }
+  if (node.maxWidth !== undefined && node.maxWidth !== null) {
+    constraintProps.push(`maxWidth: ${numberToFixedString(node.maxWidth)}`);
+  }
+  if (node.minHeight !== undefined && node.minHeight !== null) {
+    constraintProps.push(`minHeight: ${numberToFixedString(node.minHeight)}`);
+  }
+  if (node.maxHeight !== undefined && node.maxHeight !== null) {
+    constraintProps.push(`maxHeight: ${numberToFixedString(node.maxHeight)}`);
+  }
+
+  return {
+    width,
+    height,
+    constraints: constraintProps,
+  };
 };

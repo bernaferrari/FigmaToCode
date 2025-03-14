@@ -1,4 +1,4 @@
-import { stringToClassName as stringToClassName } from "./numToAutoFixed";
+import { lowercaseFirstLetter } from "./lowercaseFirstLetter";
 
 export const getClassLabel = (isJSX: boolean = false) =>
   isJSX ? "className" : "class";
@@ -18,7 +18,7 @@ export const formatStyleAttribute = (
 };
 
 export const formatDataAttribute = (label: string, value?: string) =>
-  ` data-${label}${value === undefined ? `` : `="${value}"`}`;
+  ` data-${lowercaseFirstLetter(label).replace(" ", "-")}${value === undefined ? `` : `="${value}"`}`;
 
 export const formatClassAttribute = (
   classes: string[],

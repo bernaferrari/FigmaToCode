@@ -13,27 +13,35 @@ import { generateWidgetCode } from "../common/numToAutoFixed";
 
 export class FlutterDefaultBuilder {
   child: string;
+  rotationApplied: boolean = false;
 
   constructor(optChild: string) {
     this.child = optChild;
   }
 
-  createContainer(node: SceneNode, optimizeLayout: boolean): this {
-    this.child = flutterContainer(node, this.child, optimizeLayout);
+  createContainer(node: SceneNode): this {
+    this.child = flutterContainer(node, this.child);
+    this.rotationApplied = true;
+
     return this;
   }
 
   blendAttr(node: SceneNode): this {
-    if ("layoutAlign" in node && "opacity" in node && "visible" in node) {
-      this.child = flutterVisibility(node, this.child);
+    // Only apply rotation via Transform if it wasn't already handled in the container
+    if ("rotation" in node && !this.rotationApplied) {
       this.child = flutterRotation(node, this.child);
+    }
+
+    if ("visible" in node) {
+      this.child = flutterVisibility(node, this.child);
+    } else if ("opacity" in node) {
       this.child = flutterOpacity(node, this.child);
     }
     return this;
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+  position(node: SceneNode): this {
+    if (commonIsAbsolutePosition(node)) {
       const { x, y } = getCommonPositionValue(node);
       this.child = generateWidgetCode("Positioned", {
         left: x,

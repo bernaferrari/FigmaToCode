@@ -14,17 +14,25 @@ const ColorsPanel = (props: {
   };
 
   return (
-    <div className="bg-gray-100 dark:bg-neutral-900 w-full rounded-lg p-2 flex flex-col gap-2">
-      <h2 className="text-gray-800 dark:text-gray-200 text-lg font-medium">
-        Colors
-      </h2>
+    <div className="bg-card border w-full rounded-lg p-4 flex flex-col gap-2">
+      <div className="p-0 pb-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            Color Palette
+          </h2>
+          <span className="text-xs bg-muted dark:bg-muted px-2 py-1 rounded-xl text-muted-foreground">
+            {props.colors.length} color{props.colors.length > 1 ? "s" : ""}
+          </span>
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 gap-2">
         {props.colors.map((color, idx) => (
           <button
             key={"button" + idx}
             className={`w-full h-16 rounded-lg text-sm font-semibold shadow-sm transition-all duration-300 ${
               isPressed === idx
-                ? "ring-4 ring-green-300 ring-opacity-50 animate-pulse"
+                ? "ring-4 ring-primary ring-opacity-50 animate-pulse"
                 : "ring-0"
             }`}
             style={{ backgroundColor: color.hex }}

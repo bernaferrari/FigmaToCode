@@ -30,11 +30,9 @@ export const swiftuiVisibility = (
  * https://developer.apple.com/documentation/swiftui/modifiedcontent/rotationeffect(_:anchor:)
  */
 export const swiftuiRotation = (node: LayoutMixin): SwiftUIModifier | null => {
-  if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
-    return [
-      "rotationEffect",
-      `.degrees(${numberToFixedString(node.rotation)})`,
-    ];
+  const rotation = (node.rotation || 0) + (node.cumulativeRotation || 0);
+  if (Math.round(rotation) !== 0) {
+    return ["rotationEffect", `.degrees(${numberToFixedString(rotation)})`];
   }
   return null;
 };

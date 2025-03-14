@@ -8,6 +8,7 @@ import {
   tailwindRotation,
   tailwindOpacity,
   tailwindBlendMode,
+  tailwindBackgroundBlendMode,
 } from "./builderImpl/tailwindBlend";
 import {
   tailwindBorderWidth,
@@ -29,8 +30,9 @@ import {
   getClassLabel,
 } from "../common/commonFormatAttributes";
 import { TailwindColorType, TailwindSettings } from "types";
+import { MinimalFillsTrait, Paint } from "../api_types";
 
-const isNotEmpty = (s: string) => s !== "";
+const isNotEmpty = (s: string) => s !== "" && s !== null && s !== undefined;
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
 
 export class TailwindDefaultBuilder {
@@ -45,13 +47,10 @@ export class TailwindDefaultBuilder {
     return this.settings.showLayerNames ? this.node.name : "";
   }
   get visible() {
-    return this.node.visible;
+    return this.node.visible ?? true;
   }
   get isJSX() {
-    return this.settings.jsx;
-  }
-  get optimizeLayout() {
-    return this.settings.optimizeLayout;
+    return this.settings.tailwindGenerationMode === "jsx";
   }
 
   constructor(node: SceneNode, settings: TailwindSettings) {
@@ -63,10 +62,15 @@ export class TailwindDefaultBuilder {
   }
 
   addAttributes = (...newStyles: string[]) => {
-    this.attributes.push(...dropEmptyStrings(newStyles));
+    // Filter out empty strings and trim any extra spaces
+    const cleanedStyles = dropEmptyStrings(newStyles).map((s) => s.trim());
+    this.attributes.push(...cleanedStyles);
   };
+
   prependAttributes = (...newStyles: string[]) => {
-    this.attributes.unshift(...dropEmptyStrings(newStyles));
+    // Filter out empty strings and trim any extra spaces
+    const cleanedStyles = dropEmptyStrings(newStyles).map((s) => s.trim());
+    this.attributes.unshift(...cleanedStyles);
   };
 
   blend(): this {
@@ -89,7 +93,7 @@ export class TailwindDefaultBuilder {
   }
 
   commonShapeStyles(): this {
-    this.customColor((this.node as MinimalFillsMixin).fills, "bg");
+    this.customColor((this.node as MinimalFillsTrait).fills, "bg");
     this.radius();
     this.shadow();
     this.border();
@@ -108,18 +112,21 @@ export class TailwindDefaultBuilder {
 
   border(): this {
     if ("strokes" in this.node) {
-      this.addAttributes(tailwindBorderWidth(this.node));
-      this.customColor(this.node.strokes, "border");
+      const { isOutline, property } = tailwindBorderWidth(this.node);
+      this.addAttributes(property);
+      this.customColor(
+        this.node.strokes as MinimalStrokesTrait,
+        isOutline ? "outline" : "border",
+      );
     }
 
     return this;
   }
 
   position(): this {
-    const { node, optimizeLayout } = this;
-
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
-      const { x, y } = getCommonPositionValue(node);
+    const { node } = this;
+    if (commonIsAbsolutePosition(node)) {
+      const { x, y } = getCommonPositionValue(node, this.settings);
 
       const parsedX = numberToFixedString(x);
       const parsedY = numberToFixedString(y);
@@ -135,12 +142,7 @@ export class TailwindDefaultBuilder {
       }
 
       this.addAttributes(`absolute`);
-    } else if (
-      node.type === "GROUP" ||
-      ("layoutMode" in node &&
-        ((optimizeLayout ? node.inferredAutoLayout : null) ?? node)
-          ?.layoutMode === "NONE")
-    ) {
+    } else if (node.type === "GROUP" || (node as any).isRelative) {
       this.addAttributes("relative");
     }
     return this;
@@ -152,15 +154,17 @@ export class TailwindDefaultBuilder {
    * example: text-opacity-25
    * example: bg-blue-500
    */
-  customColor(
-    paint: ReadonlyArray<Paint> | PluginAPI["mixed"],
-    kind: TailwindColorType,
-  ): this {
-    // visible is true or undefinied (tests)
+  customColor(paint: ReadonlyArray<Paint>, kind: TailwindColorType): this {
     if (this.visible) {
       let gradient = "";
       if (kind === "bg") {
         gradient = tailwindGradientFromFills(paint);
+
+        // Add background blend mode class if applicable
+        const blendModeClass = tailwindBackgroundBlendMode(paint);
+        if (blendModeClass) {
+          this.addAttributes(blendModeClass);
+        }
       }
       if (gradient) {
         this.addAttributes(gradient);
@@ -182,8 +186,8 @@ export class TailwindDefaultBuilder {
 
   // must be called before Position, because of the hasFixedSize attribute.
   size(): this {
-    const { node, optimizeLayout } = this;
-    const { width, height } = tailwindSizePartial(node, optimizeLayout);
+    const { node, settings } = this;
+    const { width, height, constraints } = tailwindSizePartial(node, settings);
 
     if (node.type === "TEXT") {
       switch (node.textAutoResize) {
@@ -201,17 +205,17 @@ export class TailwindDefaultBuilder {
       this.addAttributes(width, height);
     }
 
+    // Add any min/max constraints
+    if (constraints) {
+      this.addAttributes(constraints);
+    }
+
     return this;
   }
 
   autoLayoutPadding(): this {
     if ("paddingLeft" in this.node) {
-      this.addAttributes(
-        ...tailwindPadding(
-          (this.optimizeLayout ? this.node.inferredAutoLayout : null) ??
-            this.node,
-        ),
-      );
+      this.addAttributes(...tailwindPadding(this.node));
     }
     return this;
   }
@@ -219,9 +223,11 @@ export class TailwindDefaultBuilder {
   blur() {
     const { node } = this;
     if ("effects" in node && node.effects.length > 0) {
-      const blur = node.effects.find((e) => e.type === "LAYER_BLUR");
+      const blur = node.effects.find(
+        (e) => e.type === "LAYER_BLUR" && e.visible,
+      );
       if (blur) {
-        const blurValue = pxToBlur(blur.radius);
+        const blurValue = pxToBlur(blur.radius / 2);
         if (blurValue) {
           this.addAttributes(
             blurValue === "blur" ? "blur" : `blur-${blurValue}`,
@@ -230,10 +236,10 @@ export class TailwindDefaultBuilder {
       }
 
       const backgroundBlur = node.effects.find(
-        (e) => e.type === "BACKGROUND_BLUR",
+        (e) => e.type === "BACKGROUND_BLUR" && e.visible,
       );
       if (backgroundBlur) {
-        const backgroundBlurValue = pxToBlur(backgroundBlur.radius);
+        const backgroundBlurValue = pxToBlur(backgroundBlur.radius / 2);
         if (backgroundBlurValue) {
           this.addAttributes(
             `backdrop-blur${
@@ -252,19 +258,28 @@ export class TailwindDefaultBuilder {
   }
 
   build(additionalAttr = ""): string {
-    this.addAttributes(additionalAttr);
+    if (additionalAttr) {
+      this.addAttributes(additionalAttr);
+    }
 
     if (this.name !== "") {
       this.prependAttributes(stringToClassName(this.name));
     }
     if (this.name) {
-      this.addData("layer", this.name);
+      this.addData("layer", this.name.trim());
+    }
+
+    if ("variantProperties" in this.node && this.node.variantProperties) {
+      Object.entries(this.node.variantProperties)
+        ?.map((prop) => formatDataAttribute(prop[0], prop[1]))
+        .sort()
+        .forEach((d) => this.data.push(d));
     }
 
     const classLabel = getClassLabel(this.isJSX);
     const classNames =
       this.attributes.length > 0
-        ? ` ${classLabel}="${this.attributes.join(" ")}"`
+        ? ` ${classLabel}="${this.attributes.filter(Boolean).join(" ")}"`
         : "";
     const styles = this.style.length > 0 ? ` style="${this.style}"` : "";
     const dataAttributes = this.data.join("");
