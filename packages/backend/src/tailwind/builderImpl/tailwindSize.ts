@@ -19,7 +19,8 @@ export const tailwindSizePartial = (
     "layoutSizingHorizontal" in node &&
     node.layoutSizingHorizontal === "FIXED"
   ) {
-    w = `w-${pxToLayoutSize(size.width)}`;
+    const converted = pxToLayoutSize(size.width);
+    w = `w-${converted}`;
   } else if (size.width === "fill") {
     if (
       nodeParent &&
@@ -34,10 +35,10 @@ export const tailwindSizePartial = (
 
   let h = "";
   if (typeof size.height === "number") {
-    h = `h-${pxToLayoutSize(size.height)}`;
+    const converted = pxToLayoutSize(size.height);
+    h = `h-${converted}`;
   } else if (size.height === "fill") {
     if (
-      size.height === "fill" &&
       nodeParent &&
       "layoutMode" in nodeParent &&
       nodeParent.layoutMode === "VERTICAL"
@@ -45,6 +46,16 @@ export const tailwindSizePartial = (
       h = `grow shrink basis-0`;
     } else {
       h = `self-stretch`;
+    }
+  }
+
+  // If both width and height are fixed number classes and they have the same value,
+  // combine them into a single "size-XX" class.
+  if (w.startsWith("w-") && h.startsWith("h-")) {
+    const wValue = w.substring(2);
+    const hValue = h.substring(2);
+    if (wValue === hValue) {
+      return { width: `size-${wValue}`, height: "" };
     }
   }
 
