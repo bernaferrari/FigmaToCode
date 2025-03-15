@@ -53,21 +53,27 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
     }
   }
 
-  properties.child = child;
-
   if (width || height || propBoxDecoration || clipBehavior) {
+    properties.width = skipDefaultProperty(width, "0");
+    properties.height = skipDefaultProperty(height, "0");
+    properties.padding = propPadding;
+    properties.clipBehavior = clipBehavior;
+
     const parsedDecoration = skipDefaultProperty(
       propBoxDecoration,
       "BoxDecoration()",
     );
-    result = generateWidgetCode("Container", {
-      width: skipDefaultProperty(width, "0"),
-      height: skipDefaultProperty(height, "0"),
-      padding: propPadding,
-      clipBehavior: clipBehavior,
-      decoration: clipBehavior ? propBoxDecoration : parsedDecoration,
-      ...properties,
-    });
+    properties.decoration = clipBehavior ? propBoxDecoration : parsedDecoration;
+    
+    const isEmptyProps = hasEmptyProps(properties);
+    if (isEmptyProps) {
+      result = child;
+    } else {
+      properties.child = child;
+      result = generateWidgetCode("Container", {
+        ...properties,
+      });
+    }
   } else if (propPadding) {
     // if there is just a padding, add Padding
     result = generateWidgetCode("Padding", {
@@ -95,6 +101,16 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
 
   return result;
 };
+
+const hasEmptyProps = (props: Record<string, string>): boolean => {
+  let isEmpty = true;
+  for (const key in props) {
+    const value = props[key];
+    const defValue = value.length > 0 ? "0" : "";
+    isEmpty = isEmpty && skipDefaultProperty(value, defValue).length == 0;
+  }
+  return isEmpty;
+}
 
 const getDecoration = (node: SceneNode): string => {
   if (!("fills" in node)) {
