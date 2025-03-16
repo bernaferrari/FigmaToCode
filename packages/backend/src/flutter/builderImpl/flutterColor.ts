@@ -229,12 +229,12 @@ export const flutterColor = (
   if (sum === 0) {
     colorCode =
       opacity === 1
-        ? "const Colors.black"
+        ? "Colors.black"
         : `Colors.black.withValues(alpha: ${opacityToAlpha(opacity)})`;
   } else if (sum === 3) {
     colorCode =
       opacity === 1
-        ? "const Colors.white"
+        ? "Colors.white"
         : `Colors.white.withValues(alpha: ${opacityToAlpha(opacity)})`;
   } else {
     // Always use full 8-digit hex which includes alpha channel
