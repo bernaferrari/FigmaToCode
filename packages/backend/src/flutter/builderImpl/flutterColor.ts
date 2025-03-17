@@ -238,7 +238,7 @@ export const flutterColor = (
         : `Colors.white.withValues(alpha: ${opacityToAlpha(opacity)})`;
   } else {
     // Always use full 8-digit hex which includes alpha channel
-    colorCode = `Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
+    colorCode = `const Color(0x${rgbTo8hex(color, opacity).toUpperCase()})`;
   }
 
   // Add variable name as a comment if it exists
