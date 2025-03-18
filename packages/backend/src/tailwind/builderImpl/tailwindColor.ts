@@ -149,20 +149,34 @@ export const tailwindGradientFromFills = (
     return tailwindGradient(fill);
   }
 
-  // Use arbitrary values with HTML-based gradient syntax for other gradient types
-  if (fill.type === "GRADIENT_ANGULAR") {
-    return tailwindArbitraryGradient(htmlAngularGradient(fill));
-  }
+  // Tailwind 4 has built-in support for radial and conic gradients
+  if (localTailwindSettings.useTailwind4) {
+    if (fill.type === "GRADIENT_RADIAL") {
+      return tailwindRadialGradient(fill);
+    }
+    if (fill.type === "GRADIENT_ANGULAR") {
+      return tailwindConicGradient(fill);
+    }
+    // Diamond is still too complex for direct Tailwind support
+    if (fill.type === "GRADIENT_DIAMOND") {
+      return "";
+    }
+  } else {
+    // Use arbitrary values with HTML-based gradient syntax for other gradient types
+    if (fill.type === "GRADIENT_ANGULAR") {
+      return tailwindArbitraryGradient(htmlAngularGradient(fill));
+    }
 
-  if (fill.type === "GRADIENT_RADIAL") {
-    return tailwindArbitraryGradient(htmlRadialGradient(fill));
-  }
+    if (fill.type === "GRADIENT_RADIAL") {
+      return tailwindArbitraryGradient(htmlRadialGradient(fill));
+    }
 
-  if (fill.type === "GRADIENT_DIAMOND") {
-    // Diamond is too complex, it is going to create 3 linear gradients, which gets too weird in Tailwind.
-    return "";
+    if (fill.type === "GRADIENT_DIAMOND") {
+      // Diamond is too complex, it is going to create 3 linear gradients, which gets too weird in Tailwind.
+      return "";
+    }
   }
-
+  
   return "";
 };
 
@@ -177,59 +191,208 @@ const tailwindArbitraryGradient = (cssGradient: string): string => {
   return `bg-[${tailwindValue}]`;
 };
 
-export const tailwindGradient = (fill: GradientPaint): string => {
-  const direction = gradientDirection(gradientAngle(fill));
+/**
+ * Maps an angle to a gradient direction class for both Tailwind 3 and 4
+ * @param angle The angle in degrees
+ * @param useTailwind4 Whether to use Tailwind 4 syntax
+ * @returns The appropriate gradient direction class
+ */
+const directionMap: Record<number, { tailwind3: string; tailwind4: string }> = {
+  0: { tailwind3: "bg-gradient-to-r", tailwind4: "bg-linear-to-r" },
+  45: { tailwind3: "bg-gradient-to-br", tailwind4: "bg-linear-to-br" },
+  90: { tailwind3: "bg-gradient-to-b", tailwind4: "bg-linear-to-b" },
+  135: { tailwind3: "bg-gradient-to-bl", tailwind4: "bg-linear-to-bl" },
+  "-45": { tailwind3: "bg-gradient-to-tr", tailwind4: "bg-linear-to-tr" },
+  "-90": { tailwind3: "bg-gradient-to-t", tailwind4: "bg-linear-to-t" },
+  "-135": { tailwind3: "bg-gradient-to-tl", tailwind4: "bg-linear-to-tl" },
+  180: { tailwind3: "bg-gradient-to-l", tailwind4: "bg-linear-to-l" },
+};
 
-  // Get the overall fill opacity
-  const globalOpacity = fill.opacity !== undefined ? fill.opacity : 1.0;
+function getGradientDirectionClass(angle: number, useTailwind4: boolean): string {
+  let snappedAngle = nearestValue(angle, [
+    0, 45, 90, 135, 180, -45, -90, -135, -180,
+  ]);
+  if (snappedAngle === -180) snappedAngle = 180;
+
+  // Check if angle is in the map
+  const entry = directionMap[snappedAngle];
+  if (entry) {
+    return useTailwind4 ? entry.tailwind4 : entry.tailwind3;
+  }
+  
+  // For non-standard angles in Tailwind 4, use exact angle
+  if (useTailwind4) {
+    const exactAngle = Math.round(((angle % 360) + 360) % 360);
+    return `bg-linear-${exactAngle}`;
+  }
+
+  // Fallback for Tailwind 3 (nearest standard direction)
+  return snappedAngle === 180 ? "bg-gradient-to-l" : "bg-gradient-to-r";
+}
+
+/**
+ * Check if a stop position needs a position override
+ * @param actual The actual position (0-1)
+ * @param expected The expected default position (0-1)
+ * @returns True if position needs to be specified
+ */
+const needsPositionOverride = (actual: number, expected: number): boolean => {
+  // Only include position if it deviates by more than 5% from expected
+  return Math.abs(actual - expected) > 0.05;
+};
+
+/**
+ * Gets position modifier string for a gradient stop if needed
+ * @param stopPosition The stop position (0-1)
+ * @param expectedPosition The expected default position (0-1)
+ * @param unit The unit to use (%, deg)
+ * @param multiplier Multiplier for the position value
+ * @returns Position string or empty string
+ */
+const getStopPositionModifier = (
+  stopPosition: number,
+  expectedPosition: number,
+  unit: string = "%",
+  multiplier: number = 100
+): string => {
+  if (needsPositionOverride(stopPosition, expectedPosition)) {
+    const position = Math.round(stopPosition * multiplier);
+    return ` ${position}${unit}`;
+  }
+  return "";
+};
+
+/**
+ * Generates a complete gradient stop with position if needed
+ * @param prefix The stop prefix (from-, via-, to-)
+ * @param stop The gradient stop
+ * @param globalOpacity The global opacity
+ * @param expectedPosition The expected default position (0-1)
+ * @param unit The unit to use (%, deg)
+ * @param multiplier Multiplier for the position value
+ * @returns Complete gradient stop string
+ */
+function generateGradientStop(
+  prefix: string,
+  stop: ColorStop,
+  globalOpacity: number = 1.0,
+  expectedPosition: number,
+  unit: string = "%",
+  multiplier: number = 100
+): string {
+  const colorValue = tailwindGradientStop(stop, globalOpacity);
+  const colorPart = `${prefix}-${colorValue}`;
+
+  if (!localTailwindSettings.useTailwind4) {
+    return colorPart;
+  }
+
+  // Only add position if it significantly differs from the default
+  const positionModifier = getStopPositionModifier(
+    stop.position,
+    expectedPosition,
+    unit,
+    multiplier
+  );
+  return positionModifier ? `${colorPart} ${prefix}${positionModifier}` : colorPart;
+}
+
+export const tailwindGradient = (fill: GradientPaint): string => {
+  const globalOpacity = fill.opacity ?? 1.0;
+  const direction = getGradientDirectionClass(
+    gradientAngle(fill),
+    localTailwindSettings.useTailwind4
+  );
 
   if (fill.gradientStops.length === 1) {
-    const fromColor = tailwindGradientStop(
-      fill.gradientStops[0],
-      globalOpacity,
-    );
-    return `${direction} from-${fromColor}`;
+    const fromStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0);
+    return [direction, fromStop].filter(Boolean).join(" ");
   } else if (fill.gradientStops.length === 2) {
-    const fromColor = tailwindGradientStop(
-      fill.gradientStops[0],
-      globalOpacity,
-    );
-    const toColor = tailwindGradientStop(fill.gradientStops[1], globalOpacity);
-    return `${direction} from-${fromColor} to-${toColor}`;
+    const firstStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0);
+    const lastStop = generateGradientStop("to", fill.gradientStops[1], globalOpacity, 1);
+    return [direction, firstStop, lastStop].filter(Boolean).join(" ");
   } else {
-    const fromColor = tailwindGradientStop(
-      fill.gradientStops[0],
-      globalOpacity,
-    );
-    // middle (second color)
-    const viaColor = tailwindGradientStop(fill.gradientStops[1], globalOpacity);
-    // last
-    const toColor = tailwindGradientStop(
+    const firstStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0);
+    const viaStop = generateGradientStop("via", fill.gradientStops[1], globalOpacity, 0.5);
+    const lastStop = generateGradientStop(
+      "to",
       fill.gradientStops[fill.gradientStops.length - 1],
       globalOpacity,
+      1
     );
-    return `${direction} from-${fromColor} via-${viaColor} to-${toColor}`;
+    return [direction, firstStop, viaStop, lastStop].filter(Boolean).join(" ");
   }
 };
 
-const gradientDirection = (angle: number): string => {
-  switch (nearestValue(angle, [-180, -135, -90, -45, 0, 45, 90, 135, 180])) {
-    case 0:
-      return "bg-gradient-to-r";
-    case 45:
-      return "bg-gradient-to-br";
-    case 90:
-      return "bg-gradient-to-b";
-    case 135:
-      return "bg-gradient-to-bl";
-    case -45:
-      return "bg-gradient-to-tr";
-    case -90:
-      return "bg-gradient-to-t";
-    case -135:
-      return "bg-gradient-to-tl";
-    default:
-      // 180 and -180
-      return "bg-gradient-to-l";
+/**
+ * Generate Tailwind 4 radial gradient
+ */
+const tailwindRadialGradient = (fill: GradientPaint): string => {
+  const globalOpacity = fill.opacity ?? 1.0;
+  const [center] = fill.gradientHandlePositions;
+  const cx = Math.round(center.x * 100);
+  const cy = Math.round(center.y * 100);
+  const isCustomPosition = Math.abs(cx - 50) > 5 || Math.abs(cy - 50) > 5;
+  const baseClass = isCustomPosition ? `bg-radial-[at_${cx}%_${cy}%]` : "bg-radial";
+
+  if (fill.gradientStops.length === 1) {
+    const fromStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0);
+    return [baseClass, fromStop].filter(Boolean).join(" ");
+  } else if (fill.gradientStops.length === 2) {
+    const firstStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0);
+    const lastStop = generateGradientStop("to", fill.gradientStops[1], globalOpacity, 1);
+    return [baseClass, firstStop, lastStop].filter(Boolean).join(" ");
+  } else {
+    const firstStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0);
+    const viaStop = generateGradientStop("via", fill.gradientStops[1], globalOpacity, 0.5);
+    const lastStop = generateGradientStop(
+      "to",
+      fill.gradientStops[fill.gradientStops.length - 1],
+      globalOpacity,
+      1
+    );
+    return [baseClass, firstStop, viaStop, lastStop].filter(Boolean).join(" ");
+  }
+};
+
+/**
+ * Generate Tailwind 4 conic gradient
+ */
+const tailwindConicGradient = (fill: GradientPaint): string => {
+  const [center, , startDirection] = fill.gradientHandlePositions;
+  const globalOpacity = fill.opacity ?? 1.0;
+  const dx = startDirection.x - center.x;
+  const dy = startDirection.y - center.y;
+  let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+  angle = (angle + 360) % 360;
+  const normalizedAngle = Math.round(angle);
+  const cx = Math.round(center.x * 100);
+  const cy = Math.round(center.y * 100);
+  const isCustomPosition = Math.abs(cx - 50) > 5 || Math.abs(cy - 50) > 5;
+  let baseClass = `bg-conic-${normalizedAngle}`;
+
+  if (isCustomPosition) {
+    baseClass = `bg-conic-[from_${normalizedAngle}deg_at_${cx}%_${cy}%]`;
+  }
+
+  if (fill.gradientStops.length === 1) {
+    const fromStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0, "deg", 360);
+    return [baseClass, fromStop].filter(Boolean).join(" ");
+  } else if (fill.gradientStops.length === 2) {
+    const firstStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0, "deg", 360);
+    const lastStop = generateGradientStop("to", fill.gradientStops[1], globalOpacity, 1, "deg", 360);
+    return [baseClass, firstStop, lastStop].filter(Boolean).join(" ");
+  } else {
+    const firstStop = generateGradientStop("from", fill.gradientStops[0], globalOpacity, 0, "deg", 360);
+    const viaStop = generateGradientStop("via", fill.gradientStops[1], globalOpacity, 0.5, "deg", 360);
+    const lastStop = generateGradientStop(
+      "to",
+      fill.gradientStops[fill.gradientStops.length - 1],
+      globalOpacity,
+      1,
+      "deg",
+      360
+    );
+    return [baseClass, firstStop, viaStop, lastStop].filter(Boolean).join(" ");
   }
 };

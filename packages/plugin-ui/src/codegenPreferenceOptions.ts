@@ -3,6 +3,14 @@ import { LocalCodegenPreferenceOptions, SelectPreferenceOptions } from "types";
 export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
   {
     itemType: "individual_select",
+    propertyName: "useTailwind4",
+    label: "Tailwind 4",
+    description: "Enable Tailwind CSS version 4 features and syntax.",
+    isDefault: false,
+    includedLanguages: ["Tailwind"],
+  },
+  {
+    itemType: "individual_select",
     propertyName: "showLayerNames",
     label: "Layer names",
     description: "Include Figma layer names in classes.",
@@ -32,7 +40,7 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     label: "Color Variables",
     description:
       "Export code using Figma variables as colors. Example: 'bg-background' instead of 'bg-white'.",
-    isDefault: false,
+    isDefault: true,
     includedLanguages: ["HTML", "Tailwind", "Flutter"],
   },
   {

@@ -109,8 +109,7 @@ const CodePanel = (props: CodePanelProps) => {
     // Define preference grouping based on property names
     const essentialPropertyNames = ["jsx"];
     const stylingPropertyNames = [
-      "styledComponents",
-      "exportCSS",
+      "useTailwind4",
       "roundTailwindValues",
       "roundTailwindColors",
       "useColorVariables",
