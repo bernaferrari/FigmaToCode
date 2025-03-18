@@ -74,10 +74,14 @@ export const flutterMain = (
     case "snippet":
       return result;
     case "stateless":
-      result = generateWidgetCode("Column", { children: [result] });
+      if (!result.startsWith("Column")) {
+        result = generateWidgetCode("Column", { children: [result] });
+      }
       return getStatelessTemplate(stringToClassName(sceneNode[0].name), result);
     case "fullApp":
-      result = generateWidgetCode("Column", { children: [result] });
+      if (!result.startsWith("Column")) {
+        result = generateWidgetCode("Column", { children: [result] });
+      }
       return getFullAppTemplate(stringToClassName(sceneNode[0].name), result);
   }
 
