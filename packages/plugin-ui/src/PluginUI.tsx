@@ -62,7 +62,7 @@ const FrameworkTabs = ({
           key={`tab ${tab}`}
           className={`w-full text-sm rounded-md transition-colors font-medium ${
             selectedFramework === tab && !showAbout
-              ? "bg-primary text-primary-foreground shadow-sm"
+              ? "bg-primary text-primary-foreground shadow-xs"
               : "bg-muted hover:bg-primary/90 hover:text-primary-foreground"
           }`}
           onClick={() => {
@@ -107,7 +107,7 @@ export const PluginUI = (props: PluginUIProps) => {
           <button
             className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
               showAbout
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-xs"
                 : "bg-muted hover:bg-primary/90 hover:text-primary-foreground"
             }`}
             onClick={() => setShowAbout(!showAbout)}

@@ -150,12 +150,12 @@ const FormField = React.memo(
     // Default preview transform for text prefixes
     const defaultPreviewTransform = (value: string, example: string) => (
       <div className="flex items-center gap-1.5">
-        <div className="py-0.5 px-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs font-mono">
+        <div className="py-0.5 px-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-sm text-xs font-mono">
           <span className="text-green-500 dark:text-green-400">{value}</span>
           <span className="text-blue-500 dark:text-blue-400">{example}</span>
         </div>
         <span className="text-xs text-gray-400 dark:text-gray-500">→</span>
-        <div className="py-0.5 px-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs font-mono text-blue-500 dark:text-blue-400">
+        <div className="py-0.5 px-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-sm text-xs font-mono text-blue-500 dark:text-blue-400">
           {example}
         </div>
       </div>
@@ -173,7 +173,7 @@ const FormField = React.memo(
           {helpText && (
             <div className="relative group">
               <HelpCircle className="w-3 h-3 text-gray-400" />
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 w-56 p-2 bg-white dark:bg-gray-800 shadow-lg rounded border border-gray-200 dark:border-gray-700 text-xs hidden group-hover:block z-10">
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1.5 w-56 p-2 bg-white dark:bg-gray-800 shadow-lg rounded-sm border border-gray-200 dark:border-gray-700 text-xs hidden group-hover:block z-10">
                 {helpText}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white dark:border-t-gray-800"></div>
               </div>

@@ -64,7 +64,7 @@ const Preview: React.FC<{
 
           <button
             onClick={() => setBgColor(bgColor === "white" ? "black" : "white")}
-            className="p-1.5 mr-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
+            className="p-1.5 mr-1 rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
             aria-label={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
             title={`Switch the preview to ${bgColor === "white" ? "black" : "white"} background.\nUseful to avoid black text on black background.`}
           >
@@ -77,7 +77,7 @@ const Preview: React.FC<{
               onClick={() => setViewMode("desktop")}
               className={`p-1 rounded text-xs ${
                 viewMode === "desktop"
-                  ? "bg-white dark:bg-neutral-600 shadow-xs text-neutral-800 dark:text-white"
+                  ? "bg-white dark:bg-neutral-600 shadow-2xs text-neutral-800 dark:text-white"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white"
               } transition-colors duration-200`}
               aria-label="Desktop view"
@@ -89,7 +89,7 @@ const Preview: React.FC<{
               onClick={() => setViewMode("mobile")}
               className={`p-1 rounded text-xs ${
                 viewMode === "mobile"
-                  ? "bg-white dark:bg-neutral-600 shadow-xs text-neutral-800 dark:text-white"
+                  ? "bg-white dark:bg-neutral-600 shadow-2xs text-neutral-800 dark:text-white"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white"
               } transition-colors duration-200`}
               aria-label="Mobile view"
@@ -101,7 +101,7 @@ const Preview: React.FC<{
               onClick={() => setViewMode("precision")}
               className={`p-1 rounded text-xs ${
                 viewMode === "precision"
-                  ? "bg-white dark:bg-neutral-600 shadow-xs text-neutral-800 dark:text-white"
+                  ? "bg-white dark:bg-neutral-600 shadow-2xs text-neutral-800 dark:text-white"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white"
               } transition-colors duration-200`}
               aria-label="Precision view (exact dimensions)"
@@ -114,7 +114,7 @@ const Preview: React.FC<{
           {/* Expand/Collapse Button */}
           <button
             onClick={() => setExpanded(!expanded)}
-            className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
+            className="p-1 rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 dark:text-neutral-400 transition-colors"
             aria-label={expanded ? "Minimize preview" : "Maximize preview"}
             title={expanded ? "Minimize preview" : "Maximize preview"}
           >
@@ -154,10 +154,10 @@ const Preview: React.FC<{
                 "w-full h-full flex justify-center items-center overflow-hidden",
                 bgColor === "white" ? "bg-white" : "bg-black",
                 viewMode === "desktop"
-                  ? "border border-neutral-300 dark:border-neutral-600 rounded shadow-xs"
+                  ? "border border-neutral-300 dark:border-neutral-600 rounded-sm shadow-2xs"
                   : viewMode === "mobile"
-                    ? "border-2 border-neutral-400 dark:border-neutral-500 rounded-xl shadow-xs"
-                    : "border border-indigo-400 dark:border-indigo-500 rounded shadow-xs",
+                    ? "border-2 border-neutral-400 dark:border-neutral-500 rounded-xl shadow-2xs"
+                    : "border border-indigo-400 dark:border-indigo-500 rounded-sm shadow-2xs",
                 `transition-all duration-300 ease-in-out`,
               )}
             >

@@ -32,7 +32,7 @@ const SelectableToggle = ({
         className={cn(
           `h-8 px-2 flex items-center justify-center rounded-md transition-all duration-200 border`,
           isSelected
-            ? `${buttonClass} text-white shadow-xs border-transparent`
+            ? `${buttonClass} text-white shadow-2xs border-transparent`
             : "bg-muted hover:bg-neutral-200 dark:hover:bg-neutral-700 text-muted-foreground border",
         )}
       >

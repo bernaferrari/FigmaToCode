@@ -96,7 +96,7 @@ const About = ({
       {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Privacy Policy Card */}
-        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-2xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
               <Lock size={20} className="text-blue-600 dark:text-blue-400" />
@@ -111,7 +111,7 @@ const About = ({
         </div>
 
         {/* Open Source Card */}
-        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-2xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-lg">
               <Github
@@ -137,7 +137,7 @@ const About = ({
         </div>
 
         {/* Features Card */}
-        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+        <div className="bg-white dark:bg-neutral-800 rounded-xl p-5 shadow-2xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
               <Zap size={20} className="text-amber-600 dark:text-amber-400" />
@@ -169,7 +169,7 @@ const About = ({
         </div>
 
         {/* Contact Card */}
-        <div className="bg-card rounded-xl p-5 shadow-xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+        <div className="bg-card rounded-xl p-5 shadow-2xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
               <MessageCircle
@@ -206,7 +206,7 @@ const About = ({
         </div>
 
         {/* Debug Helper Card */}
-        <div className="bg-card rounded-xl p-5 shadow-xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
+        <div className="bg-card rounded-xl p-5 shadow-2xs border border-neutral-200 dark:border-neutral-700 hover:border-green-300 dark:hover:border-green-700 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-rose-100 dark:bg-rose-900/40 rounded-lg">
               <Code size={20} className="text-rose-600 dark:text-rose-400" />
