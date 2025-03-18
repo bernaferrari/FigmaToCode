@@ -8,7 +8,7 @@ const Loading = (_props: LoadingProps) => (
     <div className="flex flex-col items-center max-w-sm">
       {/* Logo animation */}
       <div className="relative w-16 h-16 mb-5">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl opacity-20 animate-pulse"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-green-400 to-emerald-600 rounded-xl opacity-20 animate-pulse"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <Code size={32} className="text-green-500 dark:text-green-400" />
         </div>

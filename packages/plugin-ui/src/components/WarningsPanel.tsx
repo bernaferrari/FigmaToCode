@@ -44,7 +44,7 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
         : standard;
 
   return (
-    <div className="bg-white dark:bg-neutral-800 border border-amber-200 dark:border-amber-700 rounded-md shadow-sm overflow-hidden w-full">
+    <div className="bg-white dark:bg-neutral-800 border border-amber-200 dark:border-amber-700 rounded-md shadow-xs overflow-hidden w-full">
       {/* Header - medium size */}
       <div
         className="flex items-center justify-between py-2 px-3 border-b border-amber-100 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/20 cursor-pointer hover:bg-amber-100/70 dark:hover:bg-amber-900/30 transition-colors"
@@ -82,7 +82,7 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
               <button
                 className={`px-2 py-1 text-xs font-medium rounded transition-colors flex-1 ${
                   activeTab === "all"
-                    ? "bg-white dark:bg-neutral-700 shadow-sm"
+                    ? "bg-white dark:bg-neutral-700 shadow-xs"
                     : "text-neutral-600 dark:text-neutral-300 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
                 onClick={() => setActiveTab("all")}
@@ -92,7 +92,7 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
               <button
                 className={`px-2 py-1 text-xs font-medium rounded transition-colors flex-1 flex items-center justify-center gap-1 ${
                   activeTab === "critical"
-                    ? "bg-white dark:bg-neutral-700 shadow-sm text-red-600 dark:text-red-400"
+                    ? "bg-white dark:bg-neutral-700 shadow-xs text-red-600 dark:text-red-400"
                     : "text-neutral-600 dark:text-neutral-300 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
                 onClick={() => setActiveTab("critical")}
@@ -103,7 +103,7 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
               <button
                 className={`px-2 py-1 text-xs font-medium rounded transition-colors flex-1 flex items-center justify-center gap-1 ${
                   activeTab === "standard"
-                    ? "bg-white dark:bg-neutral-700 shadow-sm text-amber-600 dark:text-amber-400"
+                    ? "bg-white dark:bg-neutral-700 shadow-xs text-amber-600 dark:text-amber-400"
                     : "text-neutral-600 dark:text-neutral-300 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
                 onClick={() => setActiveTab("standard")}
@@ -135,7 +135,7 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
                     }`}
                   >
                     <div
-                      className={`mt-0.5 flex-shrink-0 ${
+                      className={`mt-0.5 shrink-0 ${
                         isCritical
                           ? "text-red-500 dark:text-red-400"
                           : "text-amber-500 dark:text-amber-400"
@@ -169,7 +169,7 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
                         href={getDocsLinkForWarning(message.toString())}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-shrink-0 flex items-center text-xs text-blue-600 dark:text-blue-400 hover:underline mt-0.5"
+                        className="shrink-0 flex items-center text-xs text-blue-600 dark:text-blue-400 hover:underline mt-0.5"
                       >
                         <span>Info</span>
                         <ExternalLink size={10} className="ml-0.5" />
@@ -184,7 +184,7 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
           {/* Help text - balanced size */}
           {displayedWarnings.length > 0 && (
             <div className="mt-2 py-1 px-1 text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/50 rounded border-neutral-200 dark:border-neutral-700 flex items-center gap-1.5">
-              {/* <Info size={10} className="flex-shrink-0" /> */}
+              {/* <Info size={10} className="shrink-0" /> */}
               <span>
                 Addressing warnings can improve the quality of the generated
                 code.

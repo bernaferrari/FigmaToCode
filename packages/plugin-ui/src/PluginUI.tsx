@@ -56,13 +56,13 @@ const FrameworkTabs = ({
   setShowAbout,
 }: FrameworkTabsProps) => {
   return (
-    <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1 flex-grow">
+    <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1 grow">
       {frameworks.map((tab) => (
         <button
           key={`tab ${tab}`}
           className={`w-full text-sm rounded-md transition-colors font-medium ${
             selectedFramework === tab && !showAbout
-              ? "bg-primary text-primary-foreground shadow"
+              ? "bg-primary text-primary-foreground shadow-sm"
               : "bg-muted hover:bg-primary/90 hover:text-primary-foreground"
           }`}
           onClick={() => {
@@ -107,7 +107,7 @@ export const PluginUI = (props: PluginUIProps) => {
           <button
             className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
               showAbout
-                ? "bg-primary text-primary-foreground shadow"
+                ? "bg-primary text-primary-foreground shadow-sm"
                 : "bg-muted hover:bg-primary/90 hover:text-primary-foreground"
             }`}
             onClick={() => setShowAbout(!showAbout)}

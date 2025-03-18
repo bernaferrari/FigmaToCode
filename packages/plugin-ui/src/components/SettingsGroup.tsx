@@ -45,9 +45,9 @@ const SettingsGroup: React.FC<SettingsGroupProps> = ({
           className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left"
         >
           {expanded ? (
-            <ChevronDownIcon className="w-3.5 h-3.5 flex-shrink-0" />
+            <ChevronDownIcon className="w-3.5 h-3.5 shrink-0" />
           ) : (
-            <ChevronRightIcon className="w-3.5 h-3.5 flex-shrink-0" />
+            <ChevronRightIcon className="w-3.5 h-3.5 shrink-0" />
           )}
           <span className="truncate">{title}</span>
         </button>

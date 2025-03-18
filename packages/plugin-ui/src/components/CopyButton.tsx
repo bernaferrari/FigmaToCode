@@ -49,10 +49,10 @@ export function CopyButton({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={cn(
-        `inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium border rounded-md transition-all duration-300`,
+        `inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-300`,
         isCopied
-          ? "bg-primary border-primary text-primary-foreground"
-          : "bg-neutral-100 dark:bg-neutral-700 dark:hover:bg-muted-foreground/30  border-border text-foreground",
+          ? "bg-primary text-primary-foreground"
+          : "bg-neutral-100 dark:bg-neutral-700 dark:hover:bg-muted-foreground/30 text-foreground",
         className,
         `relative`,
       )}

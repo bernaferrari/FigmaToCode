@@ -199,7 +199,7 @@ const FormField = React.memo(
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-none ${
+                className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-hidden ${
                   suffix ? "rounded-l-md" : "rounded-md"
                 } ${
                   hasError
