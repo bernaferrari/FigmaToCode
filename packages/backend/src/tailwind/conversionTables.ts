@@ -105,7 +105,10 @@ export const pxToFontSize = (value: number): string => {
 };
 
 export const pxToBorderRadius = (value: number): string => {
-  return pxToRemToTailwind(value, config.borderRadius);
+  const conversionMap = localTailwindSettings.useTailwind4
+  ? config.borderRadiusV4
+  : config.borderRadius;
+  return pxToRemToTailwind(value, conversionMap);
 };
 
 export const pxToBorderWidth = (value: number): string | null => {
@@ -117,7 +120,10 @@ export const pxToOutline = (value: number): string | null => {
 };
 
 export const pxToBlur = (value: number): string | null => {
-  return pxToTailwind(value, config.blur);
+  const conversionMap = localTailwindSettings.useTailwind4
+  ? config.blurV4
+  : config.blur;
+  return pxToTailwind(value, conversionMap);
 };
 
 export const pxToLayoutSize = (value: number): string => {

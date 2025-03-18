@@ -48,6 +48,19 @@ const borderRadius = {
   10: "full",
 };
 
+// Add a set of v4 mappings for the renamed utilities
+const borderRadiusV4 = {
+  0: "none",
+  0.125: "xs", // sm -> xs
+  0.25: "sm", // (default) -> sm
+  0.375: "md", // unchanged
+  0.5: "lg", // unchanged
+  0.75: "xl", // unchanged
+  1.0: "2xl", // unchanged
+  1.5: "3xl", // unchanged
+  10: "full", // unchanged
+};
+
 const fontSize = {
   0.75: "xs",
   0.875: "sm",
@@ -96,6 +109,18 @@ const blur = {
   24: "xl",
   40: "2xl",
   64: "3xl",
+};
+
+// Tailwind v4 blur mapping
+const blurV4 = {
+  0: "none",
+  4: "xs", // sm -> xs
+  8: "sm", // blur -> sm
+  12: "md", // unchanged
+  16: "lg", // unchanged
+  24: "xl", // unchanged
+  40: "2xl", // unchanged
+  64: "3xl", // unchanged
 };
 
 const opacity = [0, 5, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95];
@@ -405,13 +430,26 @@ const outline = {
   8: "8",
 };
 
+// Tailwind v4 shadow mapping
+const shadowV4 = {
+  sm: "xs", // sm -> xs
+  DEFAULT: "sm", // (default) -> sm
+  md: "md", // unchanged
+  lg: "lg", // unchanged
+  xl: "xl", // unchanged
+  "2xl": "2xl", // unchanged
+};
+
 export const config = {
   layoutSize,
   borderRadius,
+  borderRadiusV4,
   fontSize,
   lineHeight,
   letterSpacing,
   blur,
+  blurV4,
+  shadowV4,
   opacity,
   color,
   fontWeight,

@@ -154,7 +154,6 @@ export const tailwindBorderRadius = (node: SceneNode): string => {
       return `-${r}`;
     }
     return "";
-    // }
   };
 
   const radius = getCommonRadius(node);

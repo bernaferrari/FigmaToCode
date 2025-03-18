@@ -32,6 +32,7 @@ export const defaultPluginSettings: PluginSettings = {
   htmlGenerationMode: "html",
   tailwindGenerationMode: "jsx",
   baseFontSize: 16,
+  useTailwind4: false,
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type

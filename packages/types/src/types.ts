@@ -16,6 +16,7 @@ export interface TailwindSettings extends HTMLSettings {
   customTailwindPrefix?: string;
   embedVectors: boolean;
   baseFontSize: number;
+  useTailwind4: boolean;
 }
 export interface FlutterSettings {
   flutterGenerationMode: string;

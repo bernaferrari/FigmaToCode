@@ -1,3 +1,5 @@
+import { localTailwindSettings } from "../tailwindMain";
+
 /**
  * https://tailwindcss.com/docs/box-shadow/
  * example: shadow
@@ -19,7 +21,8 @@ export const tailwindShadow = (node: BlendMixin): string[] => {
           d.color?.b === 0 &&
           Math.abs(d.color?.a - 0.05) < EPSILON
         ) {
-          return "shadow-sm";
+          // shadow-sm → shadow-xs in v4
+          return localTailwindSettings.useTailwind4 ? "shadow-xs" : "shadow-sm";
         } else if (
           d.offset?.x === 0 &&
           d.offset?.y === 1 &&
@@ -30,7 +33,8 @@ export const tailwindShadow = (node: BlendMixin): string[] => {
           d.color?.b === 0 &&
           Math.abs(d.color?.a - 0.1) < EPSILON
         ) {
-          return "shadow";
+          // shadow → shadow-sm in v4
+          return localTailwindSettings.useTailwind4 ? "shadow-sm" : "shadow";
         } else if (
           d.offset?.x === 0 &&
           d.offset?.y === 4 &&
@@ -41,6 +45,7 @@ export const tailwindShadow = (node: BlendMixin): string[] => {
           d.color?.b === 0 &&
           Math.abs(d.color?.a - 0.1) < EPSILON
         ) {
+          // shadow-md stays the same
           return "shadow-md";
         } else if (
           d.offset?.x === 0 &&

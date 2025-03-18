@@ -13,6 +13,7 @@ import {
   htmlRadialGradient,
 } from "../../html/builderImpl/htmlColor";
 import { GradientPaint, Paint } from "../../api_types";
+import { localTailwindSettings } from "../tailwindMain";
 
 /**
  * Get a tailwind color value object
@@ -70,12 +71,23 @@ export const tailwindSolidColor = (
   const { colorName } = getColorInfo(fill);
   const effectiveOpacity = calculateEffectiveOpacity(fill);
 
-  // Only add opacity suffix if it's not 1.0
-  const opacity =
-    effectiveOpacity !== 1.0 ? `/${nearestOpacity(effectiveOpacity)}` : "";
-
-  // example: text-red-500, text-[#123abc], text-custom-color-700/25
-  return `${kind}-${colorName}${opacity}`;
+  // In Tailwind v4, we always use the slash syntax for opacity
+  // In Tailwind v3, we use opacity utilities for standard colors and slash syntax for arbitrary values
+  if (localTailwindSettings.useTailwind4 || colorName.startsWith('[')) {
+    // Only add opacity suffix if it's not 1.0
+    const opacity = effectiveOpacity !== 1.0 
+      ? `/${nearestOpacity(effectiveOpacity)}` 
+      : "";
+    
+    return `${kind}-${colorName}${opacity}`;
+  } else {
+    // Tailwind v3 - use separate opacity utilities for standard colors
+    if (effectiveOpacity !== 1.0) {
+      const opacityValue = nearestOpacity(effectiveOpacity);
+      return `${kind}-${colorName} ${kind}-opacity-${opacityValue}`;
+    }
+    return `${kind}-${colorName}`;
+  }
 };
 
 /**

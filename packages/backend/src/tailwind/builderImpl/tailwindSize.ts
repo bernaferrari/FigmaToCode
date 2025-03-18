@@ -2,6 +2,7 @@ import { pxToLayoutSize } from "../conversionTables";
 import { nodeSize } from "../../common/nodeWidthHeight";
 import { numberToFixedString } from "../../common/numToAutoFixed";
 import { TailwindSettings } from "types";
+import { localTailwindSettings } from "../tailwindMain";
 
 /**
  * Formats a size value into a Tailwind class
@@ -94,6 +95,16 @@ export const tailwindSizePartial = (
     constraints.push(
       formatTailwindSizeValue(node.minHeight, "min-h", settings),
     );
+  }
+
+  // Technically size exists since Tailwind 3.4 (December 2023), but to avoid confusion, restrict to 4,
+  if (localTailwindSettings.useTailwind4) {
+    const wValue = w.substring(2);
+    const hValue = h.substring(2);
+    if (wValue === hValue) {
+      w = `size-${wValue}`;
+      h = "";
+    }
   }
 
   return {
