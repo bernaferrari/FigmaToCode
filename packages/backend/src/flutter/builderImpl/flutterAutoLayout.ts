@@ -2,6 +2,7 @@ export const getMainAxisAlignment = (
   node: InferredAutoLayoutResult,
 ): string => {
   switch (node.primaryAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "MainAxisAlignment.start";
     case "CENTER":
@@ -17,6 +18,7 @@ export const getCrossAxisAlignment = (
   node: InferredAutoLayoutResult,
 ): string => {
   switch (node.counterAxisAlignItems) {
+    case undefined:
     case "MIN":
       return "CrossAxisAlignment.start";
     case "CENTER":
@@ -25,6 +27,40 @@ export const getCrossAxisAlignment = (
       return "CrossAxisAlignment.end";
     case "BASELINE":
       return "CrossAxisAlignment.baseline";
+  }
+};
+
+export const getWrapAlignment = (
+  node: InferredAutoLayoutResult,
+): string => {
+  switch (node.primaryAxisAlignItems) {
+    case undefined:
+    case "MIN":
+      return "WrapAlignment.start";
+    case "CENTER":
+      return "WrapAlignment.center";
+    case "MAX":
+      return "WrapAlignment.end";
+    case "SPACE_BETWEEN":
+      return "WrapAlignment.spaceBetween";
+  }
+};
+
+export const getWrapRunAlignment = (
+  node: InferredAutoLayoutResult,
+): string => {
+  if (node.counterAxisAlignContent == "SPACE_BETWEEN") {
+    return "WrapAlignment.spaceBetween";
+  }
+  switch (node.counterAxisAlignItems) {
+    case undefined:
+    case "MIN":
+      return "WrapAlignment.start";
+    case "CENTER":
+    case "BASELINE":
+      return "WrapAlignment.center";
+    case "MAX":
+      return "WrapAlignment.end";
   }
 };
 

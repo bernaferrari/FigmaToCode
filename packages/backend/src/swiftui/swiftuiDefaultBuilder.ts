@@ -4,7 +4,6 @@ import {
   swiftuiBorder,
   swiftuiCornerRadius,
 } from "./builderImpl/swiftuiBorder";
-import { swiftuiBackground } from "./builderImpl/swiftuiColor";
 import { swiftuiPadding } from "./builderImpl/swiftuiPadding";
 import { swiftuiSize } from "./builderImpl/swiftuiSize";
 
@@ -20,6 +19,7 @@ import {
 } from "../common/commonPosition";
 import { SwiftUIElement } from "./builderImpl/swiftuiParser";
 import { SwiftUIModifier } from "types";
+import { swiftuiSolidColor } from "./builderImpl/swiftuiColor";
 
 export class SwiftuiDefaultBuilder {
   element: SwiftUIElement;
@@ -36,8 +36,8 @@ export class SwiftuiDefaultBuilder {
     });
   }
 
-  commonPositionStyles(node: SceneNode, optimizeLayout: boolean): this {
-    this.position(node, optimizeLayout);
+  commonPositionStyles(node: SceneNode): this {
+    this.position(node);
     if ("layoutAlign" in node && "opacity" in node) {
       this.blend(node);
     }
@@ -75,8 +75,8 @@ export class SwiftuiDefaultBuilder {
     return { centerX: centerBasedX, centerY: centerBasedY };
   }
 
-  position(node: SceneNode, optimizeLayout: boolean): this {
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
+  position(node: SceneNode): this {
+    if (commonIsAbsolutePosition(node)) {
       const { x, y } = getCommonPositionValue(node);
       const { centerX, centerY } = this.topLeftToCenterOffset(
         x,
@@ -105,7 +105,7 @@ export class SwiftuiDefaultBuilder {
 
   shapeBackground(node: SceneNode): this {
     if ("fills" in node) {
-      const background = swiftuiBackground(node, node.fills);
+      const background = swiftuiSolidColor(node, "fills");
       if (background) {
         this.pushModifier([`background`, background]);
       }
@@ -138,23 +138,23 @@ export class SwiftuiDefaultBuilder {
     return this;
   }
 
-  size(node: SceneNode, optimize: boolean): this {
-    const { width, height } = swiftuiSize(node, optimize);
-    const sizes = [width, height].filter((d) => d);
-    if (sizes.length > 0) {
-      this.pushModifier([`frame`, sizes.join(", ")]);
+  size(node: SceneNode): this {
+    const { width, height, constraints } = swiftuiSize(node);
+    if (width || height) {
+      this.pushModifier([`frame`, [width, height].filter(Boolean).join(", ")]);
+    }
+
+    // Add constraints if any exist
+    if (constraints.length > 0) {
+      this.pushModifier([`frame`, constraints.join(", ")]);
     }
 
     return this;
   }
 
-  autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
+  autoLayoutPadding(node: SceneNode): this {
     if ("paddingLeft" in node) {
-      this.pushModifier(
-        swiftuiPadding(
-          (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
-        ),
-      );
+      this.pushModifier(swiftuiPadding(node));
     }
     return this;
   }

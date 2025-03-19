@@ -6,10 +6,10 @@ import {
 import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { swiftuiWeightMatcher } from "./builderImpl/swiftuiTextWeight";
 import { swiftuiSize } from "./builderImpl/swiftuiSize";
-import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { SwiftUIElement } from "./builderImpl/swiftuiParser";
 import { parseTextAsCode } from "../flutter/flutterTextBuilder";
-import { swiftuiSolidColor } from "./builderImpl/swiftuiColor";
+import { swiftuiSolidColorFromDirectFills } from "./builderImpl/swiftuiColor";
+import { StyledTextSegmentSubset } from "types";
 
 export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   node?: TextNode;
@@ -42,7 +42,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   }
 
   textColor(fills: Paint[]): string {
-    const fillColor = swiftuiSolidColor(fills);
+    const fillColor = swiftuiSolidColorFromDirectFills(fills);
     if (fillColor) {
       return fillColor;
     }
@@ -92,7 +92,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     //     alignHorizontal !== "left" ? `TextAlign.${alignHorizontal}` : "",
     // };
 
-    const segments = this.getTextSegments(node.id, node.characters);
+    const segments = this.getTextSegments(node, node.characters);
     if (segments) {
       this.element = segments;
     } else {
@@ -102,8 +102,9 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     return this;
   }
 
-  getTextSegments(id: string, characters: string): SwiftUIElement | null {
-    const segments = globalTextStyleSegments[id];
+  getTextSegments(node: TextNode, characters: string): SwiftUIElement | null {
+    const segments = (node as any)
+      .styledTextSegments as StyledTextSegmentSubset[];
     if (!segments) {
       return null;
     }
@@ -178,7 +179,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
   };
 
   wrapTextAutoResize = (node: TextNode): string => {
-    const { width, height } = swiftuiSize(node);
+    const { width, height, constraints } = swiftuiSize(node);
 
     let comp: string[] = [];
     switch (node.textAutoResize) {
@@ -192,6 +193,8 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
         comp.push(width, height);
         break;
     }
+
+    comp.push(...constraints);
 
     if (comp.length > 0) {
       const align = this.textAlignment(node);
@@ -261,9 +264,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
         const blurRadius = Math.round(ds.radius);
         return `.shadow(color: Color(red: ${ds.color.r.toFixed(
           2,
-        )}, green: ${ds.color.g.toFixed(
-          2,
-        )}, blue: ${ds.color.b.toFixed(
+        )}, green: ${ds.color.g.toFixed(2)}, blue: ${ds.color.b.toFixed(
           2,
         )}, opacity: ${ds.color.a.toFixed(
           2,

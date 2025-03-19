@@ -10,11 +10,13 @@ import { indentString } from "../common/indentString";
 import {
   getCrossAxisAlignment,
   getMainAxisAlignment,
+  getWrapAlignment,
+  getWrapRunAlignment,
 } from "./builderImpl/flutterAutoLayout";
-import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 import { getPlaceholderImage } from "../common/images";
+import { getVisibleNodes } from "../common/nodeVisibility";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -72,10 +74,14 @@ export const flutterMain = (
     case "snippet":
       return result;
     case "stateless":
-      result = generateWidgetCode("Column", { children: [result] });
+      if (!result.startsWith("Column")) {
+        result = generateWidgetCode("Column", { children: [result] });
+      }
       return getStatelessTemplate(stringToClassName(sceneNode[0].name), result);
     case "fullApp":
-      result = generateWidgetCode("Column", { children: [result] });
+      if (!result.startsWith("Column")) {
+        result = generateWidgetCode("Column", { children: [result] });
+      }
       return getFullAppTemplate(stringToClassName(sceneNode[0].name), result);
   }
 
@@ -88,10 +94,9 @@ const flutterWidgetGenerator = (
   let comp: string[] = [];
 
   // filter non visible nodes. This is necessary at this step because conversion already happened.
-  const visibleSceneNode = sceneNode.filter((d) => d.visible);
-  const sceneLen = visibleSceneNode.length;
+  const visibleSceneNode = getVisibleNodes(sceneNode);
 
-  visibleSceneNode.forEach((node, index) => {
+  visibleSceneNode.forEach((node) => {
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
@@ -118,15 +123,9 @@ const flutterWidgetGenerator = (
       case "VECTOR":
         addWarning("VectorNodes are not supported in Flutter");
         break;
+      case "SLICE":
       default:
       // do nothing
-    }
-
-    if (index !== sceneLen - 1) {
-      const spacing = addSpacingIfNeeded(node, localSettings.optimizeLayout);
-      if (spacing) {
-        comp.push(spacing);
-      }
     }
   });
 
@@ -146,10 +145,8 @@ const flutterGroup = (node: GroupNode): string => {
 const flutterContainer = (node: SceneNode, child: string): string => {
   let propChild = "";
 
-  let image = "";
   if ("fills" in node && retrieveTopFill(node.fills)?.type === "IMAGE") {
     addWarning("Image fills are replaced with placeholders");
-    image = `Image.network("${getPlaceholderImage(node.width, node.height)}")`;
   }
 
   if (child.length > 0) {
@@ -157,9 +154,9 @@ const flutterContainer = (node: SceneNode, child: string): string => {
   }
 
   const builder = new FlutterDefaultBuilder(propChild)
-    .createContainer(node, localSettings.optimizeLayout)
+    .createContainer(node)
     .blendAttr(node)
-    .position(node, localSettings.optimizeLayout);
+    .position(node);
 
   return builder.child;
 };
@@ -168,35 +165,53 @@ const flutterText = (node: TextNode): string => {
   const builder = new FlutterTextBuilder().createText(node);
   previousExecutionCache.push(builder.child);
 
-  return builder
-    .blendAttr(node)
-    .textAutoSize(node)
-    .position(node, localSettings.optimizeLayout).child;
+  return builder.blendAttr(node).textAutoSize(node).position(node).child;
 };
 
 const flutterFrame = (
   node: SceneNode & BaseFrameMixin & MinimalBlendMixin,
 ): string => {
-  const children = flutterWidgetGenerator(
-    commonSortChildrenWhenInferredAutoLayout(
-      node,
-      localSettings.optimizeLayout,
-    ),
+  // Check if any direct children need absolute positioning
+  const hasAbsoluteChildren = node.children.some(
+    (child: any) => (child as any).layoutPositioning === "ABSOLUTE",
   );
 
+  // Add warning if we need to use Stack due to absolute positioning
+  if (hasAbsoluteChildren && node.layoutMode !== "NONE") {
+    addWarning(
+      `Frame "${node.name}" has absolute positioned children. Using Stack instead of ${
+        node.layoutMode === "HORIZONTAL" ? "Row" : "Column"
+      }.`,
+    );
+  }
+
+  // Generate widget code for children
+  const children = flutterWidgetGenerator(node.children);
+
+  // Force Stack for any frame that has absolute positioned children
+  if (hasAbsoluteChildren) {
+    return flutterContainer(
+      node,
+      generateWidgetCode("Stack", {
+        children: children !== "" ? [children] : [],
+      }),
+    );
+  }
+
   if (node.layoutMode !== "NONE") {
-    const rowColumn = makeRowColumn(node, children);
-    return flutterContainer(node, rowColumn);
+    const rowColumnWrap = makeRowColumnWrap(node, children);
+    return flutterContainer(node, rowColumnWrap);
   } else {
-    if (localSettings.optimizeLayout && node.inferredAutoLayout) {
-      const rowColumn = makeRowColumn(node.inferredAutoLayout, children);
-      return flutterContainer(node, rowColumn);
+    if (node.inferredAutoLayout) {
+      const rowColumnWrap = makeRowColumnWrap(node.inferredAutoLayout, children);
+      return flutterContainer(node, rowColumnWrap);
     }
 
     if (node.isAsset) {
       return flutterContainer(node, generateWidgetCode("FlutterLogo", {}));
     }
 
+    // Default to Stack for frames without any layout
     return flutterContainer(
       node,
       generateWidgetCode("Stack", {
@@ -206,51 +221,43 @@ const flutterFrame = (
   }
 };
 
-const makeRowColumn = (
+const makeRowColumnWrap = (
   autoLayout: InferredAutoLayoutResult,
   children: string,
 ): string => {
-  const rowOrColumn = autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
+  const rowOrColumn = autoLayout.layoutWrap == "WRAP" && autoLayout.primaryAxisSizingMode == "FIXED" ?
+    "Wrap" : autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
 
-  const widgetProps = {
-    mainAxisSize: "MainAxisSize.min",
-    // mainAxisSize: getFlex(node, autoLayout),
-    mainAxisAlignment: getMainAxisAlignment(autoLayout),
-    crossAxisAlignment: getCrossAxisAlignment(autoLayout),
-    children: [children],
-  };
+  const widgetProps: Record<string, any> = autoLayout.layoutWrap == "WRAP"
+    ? {
+      alignment: getWrapAlignment(autoLayout),
+      runAlignment: getWrapRunAlignment(autoLayout),
+    } : 
+    {
+      mainAxisSize: "MainAxisSize.min",
+      // mainAxisSize: getFlex(node, autoLayout),
+      mainAxisAlignment: getMainAxisAlignment(autoLayout),
+      crossAxisAlignment: getCrossAxisAlignment(autoLayout),
+      
+    };
+
+  // Add spacing parameter if itemSpacing is set
+  if (autoLayout.layoutWrap == "WRAP") {
+    if (autoLayout.primaryAxisAlignItems != "SPACE_BETWEEN" && autoLayout.itemSpacing != undefined) {
+      widgetProps.spacing = autoLayout.itemSpacing;
+    }
+    if (autoLayout.counterAxisAlignContent != "SPACE_BETWEEN" && autoLayout.counterAxisSpacing != undefined) {
+      widgetProps.runSpacing = autoLayout.counterAxisSpacing;
+    }
+  } else if (autoLayout.itemSpacing > 0) {
+    widgetProps.spacing = autoLayout.itemSpacing;
+  } else if (autoLayout.itemSpacing < 0) {
+    addWarning("Flutter doesn't support negative itemSpacing");
+  }
+
+  widgetProps.children = [children];
 
   return generateWidgetCode(rowOrColumn, widgetProps);
-};
-
-const addSpacingIfNeeded = (
-  node: SceneNode,
-  optimizeLayout: boolean,
-): string => {
-  const nodeParentLayout =
-    optimizeLayout && node.parent && "itemSpacing" in node.parent
-      ? node.parent.inferredAutoLayout
-      : node.parent;
-
-  if (
-    nodeParentLayout &&
-    node.parent?.type === "FRAME" &&
-    "itemSpacing" in nodeParentLayout &&
-    nodeParentLayout.layoutMode !== "NONE"
-  ) {
-    if (nodeParentLayout.itemSpacing > 0) {
-      if (nodeParentLayout.layoutMode === "HORIZONTAL") {
-        return generateWidgetCode("const SizedBox", {
-          width: nodeParentLayout.itemSpacing,
-        });
-      } else if (nodeParentLayout.layoutMode === "VERTICAL") {
-        return generateWidgetCode("const SizedBox", {
-          height: nodeParentLayout.itemSpacing,
-        });
-      }
-    }
-  }
-  return "";
 };
 
 export const flutterCodeGenTextStyles = () => {

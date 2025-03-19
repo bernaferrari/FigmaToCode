@@ -10,6 +10,22 @@ export const nearestValue = (goal: number, array: Array<number>): number => {
   });
 };
 
+// New function to get nearest value only if it's within acceptable threshold
+export const nearestValueWithThreshold = (
+  goal: number,
+  array: Array<number>,
+  thresholdPercent: number = 15,
+): number | null => {
+  const nearest = nearestValue(goal, array);
+  const diff = Math.abs(nearest - goal);
+  const percentDiff = (diff / goal) * 100;
+
+  if (percentDiff <= thresholdPercent) {
+    return nearest;
+  }
+  return null;
+};
+
 export const exactValue = (
   goal: number,
   array: Array<number>,
@@ -28,7 +44,7 @@ export const exactValue = (
 /**
  * convert pixel values to Tailwind attributes.
  * by default, Tailwind uses rem, while Figma uses px.
- * Therefore, a conversion is necessary. Rem = Pixel / 16.abs
+ * Therefore, a conversion is necessary. Rem = Pixel / baseFontSize
  * Then, find in the corresponding table the closest value.
  */
 const pxToRemToTailwind = (
@@ -36,12 +52,20 @@ const pxToRemToTailwind = (
   conversionMap: Record<number, string>,
 ): string => {
   const keys = Object.keys(conversionMap).map((d) => +d);
-  const convertedValue = exactValue(value / 16, keys);
+  // Use the configured base font size or fall back to default 16px
+  const baseFontSize = localTailwindSettings.baseFontSize || 16;
+  const remValue = value / baseFontSize;
+  const convertedValue = exactValue(remValue, keys);
 
   if (convertedValue) {
     return conversionMap[convertedValue];
   } else if (localTailwindSettings.roundTailwindValues) {
-    return conversionMap[nearestValue(value / 16, keys)];
+    // Only round if the nearest value is within acceptable threshold
+    const thresholdValue = nearestValueWithThreshold(remValue, keys, 15);
+
+    if (thresholdValue !== null) {
+      return conversionMap[thresholdValue];
+    }
   }
 
   return `[${numberToFixedString(value)}px]`;
@@ -57,7 +81,12 @@ const pxToTailwind = (
   if (convertedValue) {
     return conversionMap[convertedValue];
   } else if (localTailwindSettings.roundTailwindValues) {
-    return conversionMap[nearestValue(value, keys)];
+    // Only round if the nearest value is within acceptable threshold
+    const thresholdValue = nearestValueWithThreshold(value, keys, 15);
+
+    if (thresholdValue !== null) {
+      return conversionMap[thresholdValue];
+    }
   }
 
   return `[${numberToFixedString(value)}px]`;
@@ -76,20 +105,38 @@ export const pxToFontSize = (value: number): string => {
 };
 
 export const pxToBorderRadius = (value: number): string => {
-  return pxToRemToTailwind(value, config.borderRadius);
+  const conversionMap = localTailwindSettings.useTailwind4
+  ? config.borderRadiusV4
+  : config.borderRadius;
+  return pxToRemToTailwind(value, conversionMap);
+};
+
+export const pxToBorderWidth = (value: number): string | null => {
+  return pxToTailwind(value, config.border);
+};
+
+export const pxToOutline = (value: number): string | null => {
+  return pxToTailwind(value, config.outline);
 };
 
 export const pxToBlur = (value: number): string | null => {
-  return pxToTailwind(value, config.blur);
+  const conversionMap = localTailwindSettings.useTailwind4
+  ? config.blurV4
+  : config.blur;
+  return pxToTailwind(value, conversionMap);
 };
 
 export const pxToLayoutSize = (value: number): string => {
-  const tailwindValue = pxToTailwind(value, config.layoutSize);
-  if (tailwindValue) {
-    return tailwindValue;
-  }
+  // Scale the input value according to the base font size ratio
+  const baseFontSize = localTailwindSettings.baseFontSize || 16;
+  // If baseFontSize is different than 16, we need to adjust the pixel value
+  // For example, with baseFontSize=14, 7px should match with the key for 8px (w-2)
+  const scaledValue = (value * 16) / baseFontSize;
 
-  return `[${numberToFixedString(value)}px]`;
+  // Use pxToTailwind directly with the scaled value, since the keys in config.layoutSize
+  // are likely in pixels based on a 16px base font size
+  const result = pxToTailwind(scaledValue, config.layoutSize);
+  return result !== null ? result : `[${numberToFixedString(value)}px]`;
 };
 
 export const nearestOpacity = (nodeOpacity: number): number => {
@@ -113,12 +160,11 @@ export const nearestColorFromRgb = (color: RGB) => {
   return { name, value };
 };
 
-export const variableToColorName = (alias: VariableAlias) => {
+export const variableToColorName = async (id: string) => {
   return (
-    figma.variables
-      .getVariableById(alias.id)
-      ?.name.replaceAll("/", "-")
-      .replaceAll(" ", "-") || alias.id.toLowerCase().replaceAll(":", "-")
+    (await figma.variables.getVariableByIdAsync(id))?.name
+      .replaceAll("/", "-")
+      .replaceAll(" ", "-") || id.toLowerCase().replaceAll(":", "-")
   );
 };
 
@@ -135,13 +181,18 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
   let meta: string = "";
 
   // variable
-  if (
-    localTailwindSettings.customTailwindColors &&
-    fill.boundVariables?.color
-  ) {
-    colorName = variableToColorName(fill.boundVariables.color);
+  if ((fill as any).variableColorName) {
+    // Use pre-computed variable name if available
+    colorName = (fill as any).variableColorName; // || variableToColorName(fill.boundVariables.color);
     colorType = "variable";
     meta = "custom";
+
+    return {
+      colorType,
+      colorName,
+      hex,
+      meta,
+    };
   }
 
   // Check for pure black/white first
@@ -152,19 +203,14 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
       hex: "#000000",
       meta: "",
     };
-  }
-
-  if (fill.color.r === 1 && fill.color.g === 1 && fill.color.b === 1) {
+  } else if (fill.color.r === 1 && fill.color.g === 1 && fill.color.b === 1) {
     return {
       colorType: "tailwind",
       colorName: "white",
       hex: "#ffffff",
       meta: "",
     };
-  }
-
-  // solid color
-  else {
+  } else {
     // get tailwind color as comparison
     const { name, value } = nearestColorFromRgb(fill.color);
 

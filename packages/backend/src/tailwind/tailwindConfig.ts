@@ -1,5 +1,5 @@
 const layoutSize = {
-  // '0: 0',
+  "0": "0",
   1: "px",
   2: "0.5",
   4: "1",
@@ -37,7 +37,7 @@ const layoutSize = {
 };
 
 const borderRadius = {
-  // 0: "none",
+  0: "none",
   0.125: "sm",
   0.25: "",
   0.375: "md",
@@ -46,6 +46,19 @@ const borderRadius = {
   1.0: "2xl",
   1.5: "3xl",
   10: "full",
+};
+
+// Add a set of v4 mappings for the renamed utilities
+const borderRadiusV4 = {
+  0: "none",
+  0.125: "xs", // sm -> xs
+  0.25: "sm", // (default) -> sm
+  0.375: "md", // unchanged
+  0.5: "lg", // unchanged
+  0.75: "xl", // unchanged
+  1.0: "2xl", // unchanged
+  1.5: "3xl", // unchanged
+  10: "full", // unchanged
 };
 
 const fontSize = {
@@ -96,6 +109,18 @@ const blur = {
   24: "xl",
   40: "2xl",
   64: "3xl",
+};
+
+// Tailwind v4 blur mapping
+const blurV4 = {
+  0: "none",
+  4: "xs", // sm -> xs
+  8: "sm", // blur -> sm
+  12: "md", // unchanged
+  16: "lg", // unchanged
+  24: "xl", // unchanged
+  40: "2xl", // unchanged
+  64: "3xl", // unchanged
 };
 
 const opacity = [0, 5, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95];
@@ -356,48 +381,79 @@ const fontWeight: Record<number, string> = {
   600: "semibold",
   700: "bold",
   800: "extrabold",
-  900: "black"
+  900: "black",
 };
 
 const fontFamily = {
   sans: [
-    'ui-sans-serif',
-    'system-ui',
-    'sans-serif',
-    'Apple Color Emoji',
-    'Segoe UI Emoji',
-    'Segoe UI Symbol',
-    'Noto Color Emoji'
+    "ui-sans-serif",
+    "system-ui",
+    "sans-serif",
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji",
   ],
   serif: [
-    'ui-serif',
-    'Georgia',
-    'Cambria',
-    'Times New Roman',
-    'Times',
-    'serif'
+    "ui-serif",
+    "Georgia",
+    "Cambria",
+    "Times New Roman",
+    "Times",
+    "serif",
   ],
   mono: [
-    'ui-monospace',
-    'SFMono-Regular',
-    'Menlo',
-    'Monaco',
-    'Consolas',
-    'Liberation Mono',
-    'Courier New',
-    'monospace'
-  ]
+    "ui-monospace",
+    "SFMono-Regular",
+    "Menlo",
+    "Monaco",
+    "Consolas",
+    "Liberation Mono",
+    "Courier New",
+    "monospace",
+  ],
+};
+
+const border = {
+  0: "0",
+  1: "1",
+  2: "2",
+  4: "4",
+  8: "8",
+};
+
+const outline = {
+  0: "0",
+  1: "1",
+  2: "2",
+  4: "4",
+  8: "8",
+};
+
+// Tailwind v4 shadow mapping
+const shadowV4 = {
+  sm: "xs", // sm -> xs
+  DEFAULT: "sm", // (default) -> sm
+  md: "md", // unchanged
+  lg: "lg", // unchanged
+  xl: "xl", // unchanged
+  "2xl": "2xl", // unchanged
 };
 
 export const config = {
   layoutSize,
   borderRadius,
+  borderRadiusV4,
   fontSize,
   lineHeight,
   letterSpacing,
   blur,
+  blurV4,
+  shadowV4,
   opacity,
   color,
   fontWeight,
   fontFamily,
+  border,
+  outline,
 };

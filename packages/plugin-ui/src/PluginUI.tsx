@@ -3,7 +3,8 @@ import Preview from "./components/Preview";
 import GradientsPanel from "./components/GradientsPanel";
 import ColorsPanel from "./components/ColorsPanel";
 import CodePanel from "./components/CodePanel";
-import WarningIcon from "./components/WarningIcon";
+import About from "./components/About";
+import WarningsPanel from "./components/WarningsPanel";
 import {
   Framework,
   HTMLPreview,
@@ -17,6 +18,9 @@ import {
   selectPreferenceOptions,
 } from "./codegenPreferenceOptions";
 import Loading from "./components/Loading";
+import { useState } from "react";
+import { InfoIcon } from "lucide-react";
+import React from "react";
 
 type PluginUIProps = {
   code: string;
@@ -27,7 +31,7 @@ type PluginUIProps = {
   settings: PluginSettings | null;
   onPreferenceChanged: (
     key: keyof PluginSettings,
-    value: boolean | string,
+    value: boolean | string | number,
   ) => void;
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
@@ -36,31 +40,82 @@ type PluginUIProps = {
 
 const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
 
+type FrameworkTabsProps = {
+  frameworks: Framework[];
+  selectedFramework: Framework;
+  setSelectedFramework: (framework: Framework) => void;
+  showAbout: boolean;
+  setShowAbout: (show: boolean) => void;
+};
+
+const FrameworkTabs = ({
+  frameworks,
+  selectedFramework,
+  setSelectedFramework,
+  showAbout,
+  setShowAbout,
+}: FrameworkTabsProps) => {
+  return (
+    <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1 grow">
+      {frameworks.map((tab) => (
+        <button
+          key={`tab ${tab}`}
+          className={`w-full text-sm rounded-md transition-colors font-medium ${
+            selectedFramework === tab && !showAbout
+              ? "bg-primary text-primary-foreground shadow-xs"
+              : "bg-muted hover:bg-primary/90 hover:text-primary-foreground"
+          }`}
+          onClick={() => {
+            setSelectedFramework(tab as Framework);
+            setShowAbout(false);
+          }}
+        >
+          {tab}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 export const PluginUI = (props: PluginUIProps) => {
+  const [showAbout, setShowAbout] = useState(false);
+
+  const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [previewViewMode, setPreviewViewMode] = useState<
+    "desktop" | "mobile" | "precision"
+  >("precision");
+  const [previewBgColor, setPreviewBgColor] = useState<"white" | "black">(
+    "white",
+  );
+
   if (props.isLoading) return <Loading />;
 
   const isEmpty = props.code === "";
-
   const warnings = props.warnings ?? [];
 
   return (
     <div className="flex flex-col h-full dark:text-white">
-      <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
-        {frameworks.map((tab) => (
+      <div className="p-2 dark:bg-card">
+        <div className="flex gap-1 bg-muted dark:bg-card rounded-lg p-1">
+          <FrameworkTabs
+            frameworks={frameworks}
+            selectedFramework={props.selectedFramework}
+            setSelectedFramework={props.setSelectedFramework}
+            showAbout={showAbout}
+            setShowAbout={setShowAbout}
+          />
           <button
-            key={`tab ${tab}`}
-            className={`w-full p-1 text-sm ${
-              props.selectedFramework === tab
-                ? "bg-green-500 dark:bg-green-600 text-white rounded-md font-semibold shadow-sm"
-                : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border focus:border-0 border-neutral-300 dark:border-neutral-600 rounded-md hover:bg-green-600 dark:hover:bg-green-800 dark:hover:border-green-800 hover:text-white dark:hover:text-white font-semibold shadow-sm"
+            className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${
+              showAbout
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "bg-muted hover:bg-primary/90 hover:text-primary-foreground"
             }`}
-            onClick={() => {
-              props.setSelectedFramework(tab as Framework);
-            }}
+            onClick={() => setShowAbout(!showAbout)}
+            aria-label="About"
           >
-            {tab}
+            <InfoIcon size={16} />
           </button>
-        ))}
+        </div>
       </div>
       <div
         style={{
@@ -70,54 +125,55 @@ export const PluginUI = (props: PluginUIProps) => {
         }}
       ></div>
       <div className="flex flex-col h-full overflow-y-auto">
-        <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
-          {isEmpty === false && props.htmlPreview && (
-            <Preview htmlPreview={props.htmlPreview} />
-          )}
-          {warnings.length > 0 && (
-            <div className="flex flex-col bg-yellow-400 text-black  dark:bg-yellow-500 dark:text-black p-3 w-full">
-              <div className="flex flex-row gap-1">
-                <div style={{ transform: "translate(2px, 0px) scale(80%)" }}>
-                  <WarningIcon />
-                </div>
-                <h3 className="text-base font-bold">Warnings:</h3>
-              </div>
-              <ul className="list-disc pl-6">
-                {warnings.map((message: string) => (
-                  <li className="list-item">
-                    <em className="italic text-sm">{message}</em>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <CodePanel
-            code={props.code}
-            selectedFramework={props.selectedFramework}
-            preferenceOptions={preferenceOptions}
-            selectPreferenceOptions={selectPreferenceOptions}
-            settings={props.settings}
+        {showAbout ? (
+          <About
+            useOldPluginVersion={props.settings?.useOldPluginVersion2025}
             onPreferenceChanged={props.onPreferenceChanged}
           />
+        ) : (
+          <div className="flex flex-col items-center px-4 py-2 gap-2 dark:bg-transparent">
+            {isEmpty === false && props.htmlPreview && (
+              <Preview
+                htmlPreview={props.htmlPreview}
+                expanded={previewExpanded}
+                setExpanded={setPreviewExpanded}
+                viewMode={previewViewMode}
+                setViewMode={setPreviewViewMode}
+                bgColor={previewBgColor}
+                setBgColor={setPreviewBgColor}
+              />
+            )}
 
-          {props.colors.length > 0 && (
-            <ColorsPanel
-              colors={props.colors}
-              onColorClick={(value) => {
-                copy(value);
-              }}
-            />
-          )}
+            {warnings.length > 0 && <WarningsPanel warnings={warnings} />}
 
-          {props.gradients.length > 0 && (
-            <GradientsPanel
-              gradients={props.gradients}
-              onColorClick={(value) => {
-                copy(value);
-              }}
+            <CodePanel
+              code={props.code}
+              selectedFramework={props.selectedFramework}
+              preferenceOptions={preferenceOptions}
+              selectPreferenceOptions={selectPreferenceOptions}
+              settings={props.settings}
+              onPreferenceChanged={props.onPreferenceChanged}
             />
-          )}
-        </div>
+
+            {props.colors.length > 0 && (
+              <ColorsPanel
+                colors={props.colors}
+                onColorClick={(value) => {
+                  copy(value);
+                }}
+              />
+            )}
+
+            {props.gradients.length > 0 && (
+              <GradientsPanel
+                gradients={props.gradients}
+                onColorClick={(value) => {
+                  copy(value);
+                }}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -5,20 +5,17 @@ import { isPreviewGlobal } from "../htmlMain";
 export const htmlSizePartial = (
   node: SceneNode,
   isJsx: boolean,
-  optimizeLayout: boolean,
-): { width: string; height: string } => {
+): { width: string; height: string; constraints: string[] } => {
   if (isPreviewGlobal && node.parent === undefined) {
     return {
       width: formatWithJSX("width", isJsx, "100%"),
       height: formatWithJSX("height", isJsx, "100%"),
+      constraints: [],
     };
   }
 
-  const size = nodeSize(node, optimizeLayout);
-  const nodeParent =
-    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
-      ? node.parent.inferredAutoLayout
-      : null) ?? node.parent;
+  const size = nodeSize(node);
+  const nodeParent = node.parent;
 
   let w = "";
   if (typeof size.width === "number") {
@@ -31,7 +28,11 @@ export const htmlSizePartial = (
     ) {
       w = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
-      w = formatWithJSX("align-self", isJsx, "stretch");
+      if (node.maxWidth) {
+        w = formatWithJSX("width", isJsx, "100%");
+      } else {
+        w = formatWithJSX("align-self", isJsx, "stretch");
+      }
     }
   }
 
@@ -46,9 +47,37 @@ export const htmlSizePartial = (
     ) {
       h = formatWithJSX("flex", isJsx, "1 1 0");
     } else {
-      h = formatWithJSX("align-self", isJsx, "stretch");
+      if (node.maxHeight) {
+        h = formatWithJSX("height", isJsx, "100%");
+      } else {
+        h = formatWithJSX("align-self", isJsx, "stretch");
+      }
     }
   }
 
-  return { width: w, height: h };
+  // Handle min/max width/height constraints
+  const constraints = [];
+
+  if (node.maxWidth !== undefined && node.maxWidth !== null) {
+    constraints.push(formatWithJSX("max-width", isJsx, node.maxWidth));
+  }
+
+  if (node.minWidth !== undefined && node.minWidth !== null) {
+    constraints.push(formatWithJSX("min-width", isJsx, node.minWidth));
+  }
+
+  if (node.maxHeight !== undefined && node.maxHeight !== null) {
+    constraints.push(formatWithJSX("max-height", isJsx, node.maxHeight));
+  }
+
+  if (node.minHeight !== undefined && node.minHeight !== null) {
+    constraints.push(formatWithJSX("min-height", isJsx, node.minHeight));
+  }
+
+  // Return constraints separately instead of appending to width/height
+  return {
+    width: w,
+    height: h,
+    constraints: constraints,
+  };
 };

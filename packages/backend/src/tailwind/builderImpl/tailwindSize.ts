@@ -1,62 +1,115 @@
 import { pxToLayoutSize } from "../conversionTables";
 import { nodeSize } from "../../common/nodeWidthHeight";
-import { formatWithJSX } from "../../common/parseJSX";
+import { numberToFixedString } from "../../common/numToAutoFixed";
+import { TailwindSettings } from "types";
+import { localTailwindSettings } from "../tailwindMain";
+
+/**
+ * Formats a size value into a Tailwind class
+ * Uses Tailwind's standard classes if there's a good match, otherwise uses arbitrary values
+ */
+const formatTailwindSizeValue = (
+  size: number,
+  prefix: string,
+  settings?: TailwindSettings,
+): string => {
+  const tailwindSize = pxToLayoutSize(size);
+
+  // If we found a matching Tailwind class, use it
+  if (!tailwindSize.startsWith("[")) {
+    return `${prefix}-${tailwindSize}`;
+  }
+
+  // No matching class or rounding disabled, use arbitrary value
+  const sizeFixed = numberToFixedString(size);
+  if (sizeFixed === "0") {
+    return `${prefix}-0`;
+  } else {
+    return `${prefix}-[${sizeFixed}px]`;
+  }
+};
 
 export const tailwindSizePartial = (
   node: SceneNode,
-  optimizeLayout: boolean,
-): { width: string; height: string } => {
-  const size = nodeSize(node, optimizeLayout);
-
-  const nodeParent =
-    (node.parent && optimizeLayout && "inferredAutoLayout" in node.parent
-      ? node.parent.inferredAutoLayout
-      : null) ?? node.parent;
+  settings?: TailwindSettings,
+): { width: string; height: string; constraints: string } => {
+  const size = nodeSize(node);
+  const nodeParent = node.parent;
 
   let w = "";
-  if (
-    typeof size.width === "number" &&
-    "layoutSizingHorizontal" in node &&
-    node.layoutSizingHorizontal === "FIXED"
-  ) {
-    w = `w-${pxToLayoutSize(size.width)}`;
+  if (typeof size.width === "number") {
+    w = formatTailwindSizeValue(size.width, "w", settings);
   } else if (size.width === "fill") {
     if (
       nodeParent &&
       "layoutMode" in nodeParent &&
       nodeParent.layoutMode === "HORIZONTAL"
     ) {
-      w = `grow shrink basis-0`;
+      w = "flex-1";
     } else {
-      w = `self-stretch`;
+      if (node.maxWidth) {
+        w = "w-full";
+      } else {
+        w = "self-stretch";
+      }
     }
   }
 
   let h = "";
   if (typeof size.height === "number") {
-    h = `h-${pxToLayoutSize(size.height)}`;
+    h = formatTailwindSizeValue(size.height, "h", settings);
   } else if (size.height === "fill") {
     if (
-      size.height === "fill" &&
       nodeParent &&
       "layoutMode" in nodeParent &&
       nodeParent.layoutMode === "VERTICAL"
     ) {
-      h = `grow shrink basis-0`;
+      h = "flex-1";
     } else {
-      h = `self-stretch`;
+      if (node.maxHeight) {
+        h = "h-full";
+      } else {
+        h = "self-stretch";
+      }
     }
   }
 
-  return { width: w, height: h };
-};
+  // Handle min/max constraints in tailwind
+  const constraints = [];
 
-export const htmlSizePartialForTailwind = (
-  node: SceneNode,
-  isJSX: boolean,
-): [string, string] => {
-  return [
-    formatWithJSX("width", isJSX, node.width),
-    formatWithJSX("height", isJSX, node.height),
-  ];
+  if (node.maxWidth !== undefined && node.maxWidth !== null) {
+    constraints.push(formatTailwindSizeValue(node.maxWidth, "max-w", settings));
+  }
+
+  if (node.minWidth !== undefined && node.minWidth !== null) {
+    constraints.push(formatTailwindSizeValue(node.minWidth, "min-w", settings));
+  }
+
+  if (node.maxHeight !== undefined && node.maxHeight !== null) {
+    constraints.push(
+      formatTailwindSizeValue(node.maxHeight, "max-h", settings),
+    );
+  }
+
+  if (node.minHeight !== undefined && node.minHeight !== null) {
+    constraints.push(
+      formatTailwindSizeValue(node.minHeight, "min-h", settings),
+    );
+  }
+
+  // Technically size exists since Tailwind 3.4 (December 2023), but to avoid confusion, restrict to 4,
+  if (localTailwindSettings.useTailwind4) {
+    const wValue = w.substring(2);
+    const hValue = h.substring(2);
+    if (wValue === hValue) {
+      w = `size-${wValue}`;
+      h = "";
+    }
+  }
+
+  return {
+    width: w,
+    height: h,
+    constraints: constraints.join(" "),
+  };
 };

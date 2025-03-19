@@ -4,8 +4,29 @@ import {
   isNotEmpty,
   assignRectangleType,
   assignChildren,
-  isTypeOrGroupOfTypes,
 } from "./altNodeUtils";
+import { curry } from "../common/curry";
+
+export const isTypeOrGroupOfTypes = curry(
+  (matchTypes: NodeType[], node: SceneNode): boolean => {
+    if (node.visible === false || matchTypes.includes(node.type)) return true;
+
+    if ("children" in node) {
+      for (let i = 0; i < node.children.length; i++) {
+        const childNode = node.children[i];
+        const result = isTypeOrGroupOfTypes(matchTypes, childNode);
+        if (result) continue;
+        // child is false
+        return false;
+      }
+      // all children are true
+      return true;
+    }
+
+    // not group or vector
+    return false;
+  },
+);
 
 export let globalTextStyleSegments: Record<string, StyledTextSegmentSubset[]> =
   {};
@@ -51,7 +72,7 @@ export const convertNodeToAltNode =
 
       case "SECTION":
         const group = cloneNode(node, parent);
-        const groupChildren = convertNodesToAltNodes(node.children, group);
+        const groupChildren = oldConvertNodesToAltNodes(node.children, group);
         return assignChildren(groupChildren, group);
 
       // Text Nodes
@@ -71,7 +92,7 @@ export const convertNodeToAltNode =
     }
   };
 
-export const convertNodesToAltNodes = (
+export const oldConvertNodesToAltNodes = (
   sceneNode: ReadonlyArray<SceneNode>,
   parent: ParentNode | null,
 ): Array<SceneNode> =>
@@ -96,6 +117,7 @@ export const cloneNode = <T extends BaseNode>(
       prop !== "get_annotations" &&
       prop !== "componentPropertyDefinitions" &&
       prop !== "exposedInstances" &&
+      prop !== "instances" &&
       prop !== "componentProperties" &&
       prop !== "componenPropertyReferences" &&
       prop !== "constrainProportions"
@@ -103,13 +125,26 @@ export const cloneNode = <T extends BaseNode>(
       cloned[prop as keyof T] = node[prop as keyof T];
     }
   }
+
+  // Set parent explicitly in addition to using assignParent
   assignParent(parent, cloned);
+  //   if (parent) {
+  //     (cloned as any).parent = parent;
+  //   }
 
   const altNode = {
     ...cloned,
+    parent: cloned.parent,
     originalNode: node,
     canBeFlattened: canBeFlattened(node),
   } as AltNode<T>;
+
+  if (globalTextStyleSegments[node.id]) {
+    altNode.styledTextSegments = globalTextStyleSegments[node.id];
+  }
+
+  console.log("altnode:", altNode.parent, cloned.parent);
+
   return altNode;
 };
 

@@ -7,12 +7,15 @@
   "editorType": ["figma", "dev"],
   "capabilities": ["inspect", "codegen", "vscode"],
   "permissions": [],
+  "documentAccess": "dynamic-page",
   "networkAccess": {
     "allowedDomains": ["https://placehold.co"]
   },
   "codegenLanguages": [
     { "label": "HTML", "value": "html" },
     { "label": "React (JSX)", "value": "html_jsx" },
+    { "label": "Svelte", "value": "html_svelte" },
+    { "label": "Styled Components", "value": "html_styled_components" },
     { "label": "Tailwind", "value": "tailwind" },
     { "label": "Tailwind (JSX)", "value": "tailwind_jsx" },
     { "label": "Flutter", "value": "flutter" },

@@ -13,12 +13,9 @@ import {
 import { numberToFixedString } from "../common/numToAutoFixed";
 import { getCommonRadius } from "../common/commonRadius";
 import { commonStroke } from "../common/commonStroke";
+import { generateRotationMatrix } from "./builderImpl/flutterBlend";
 
-export const flutterContainer = (
-  node: SceneNode,
-  child: string,
-  optimizeLayout: boolean,
-): string => {
+export const flutterContainer = (node: SceneNode, child: string): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -28,7 +25,7 @@ export const flutterContainer = (
 
   // ignore for Groups
   const propBoxDecoration = getDecoration(node);
-  const { width, height, isExpanded } = flutterSize(node, optimizeLayout);
+  const { width, height, isExpanded, constraints } = flutterSize(node);
 
   const clipBehavior =
     "clipsContent" in node && node.clipsContent === true
@@ -40,25 +37,43 @@ export const flutterContainer = (
   // [propPadding] will be "padding: const EdgeInsets.symmetric(...)" or ""
   let propPadding = "";
   if ("paddingLeft" in node) {
-    propPadding = flutterPadding(
-      (optimizeLayout ? node.inferredAutoLayout : null) ?? node,
-    );
+    propPadding = flutterPadding(node);
   }
 
   let result: string;
+  const hasConstraints = constraints && Object.keys(constraints).length > 0;
+
+  const properties: Record<string, string> = {};
+
+  // If node has rotation, get the matrix for the transform property
+  if ("rotation" in node) {
+    const matrix = generateRotationMatrix(node);
+    if (matrix) {
+      properties.transform = matrix;
+    }
+  }
+
   if (width || height || propBoxDecoration || clipBehavior) {
+    properties.width = skipDefaultProperty(width, "0");
+    properties.height = skipDefaultProperty(height, "0");
+    properties.padding = propPadding;
+    properties.clipBehavior = clipBehavior;
+
     const parsedDecoration = skipDefaultProperty(
       propBoxDecoration,
       "BoxDecoration()",
     );
-    result = generateWidgetCode("Container", {
-      width: skipDefaultProperty(width, "0"),
-      height: skipDefaultProperty(height, "0"),
-      padding: propPadding,
-      clipBehavior: clipBehavior,
-      decoration: clipBehavior ? propBoxDecoration : parsedDecoration,
-      child: child,
-    });
+    properties.decoration = clipBehavior ? propBoxDecoration : parsedDecoration;
+    
+    const isEmptyProps = hasEmptyProps(properties);
+    if (isEmptyProps) {
+      result = child;
+    } else {
+      properties.child = child;
+      result = generateWidgetCode("Container", {
+        ...properties,
+      });
+    }
   } else if (propPadding) {
     // if there is just a padding, add Padding
     result = generateWidgetCode("Padding", {
@@ -67,6 +82,14 @@ export const flutterContainer = (
     });
   } else {
     result = child;
+  }
+
+  // Apply constraints if any exist
+  if (hasConstraints) {
+    result = generateWidgetCode("ConstrainedBox", {
+      constraints: generateWidgetCode("BoxConstraints", constraints),
+      child: result,
+    });
   }
 
   // Add Expanded() when parent is a Row/Column and width is full.
@@ -79,13 +102,23 @@ export const flutterContainer = (
   return result;
 };
 
+const hasEmptyProps = (props: Record<string, string>): boolean => {
+  let isEmpty = true;
+  for (const key in props) {
+    const value = props[key];
+    const defValue = value.length > 0 ? "0" : "";
+    isEmpty = isEmpty && skipDefaultProperty(value, defValue).length == 0;
+  }
+  return isEmpty;
+}
+
 const getDecoration = (node: SceneNode): string => {
   if (!("fills" in node)) {
     return "";
   }
 
   const propBoxShadow = flutterShadow(node);
-  const decorationBackground = flutterBoxDecorationColor(node, node.fills);
+  const decorationBackground = flutterBoxDecorationColor(node, "fills");
 
   let shapeDecorationBorder = "";
   if (node.type === "STAR") {
@@ -139,7 +172,7 @@ const generateBorderSideCode = (
         "BorderSide.strokeAlignInside",
       ),
       color: skipDefaultProperty(
-        flutterColorFromFills(node.strokes),
+        flutterColorFromFills(node, "strokes"),
         "Colors.black",
       ),
     }),

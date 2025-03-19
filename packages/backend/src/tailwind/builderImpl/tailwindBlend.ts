@@ -1,5 +1,6 @@
+import { Paint } from "../../api_types";
 import { numberToFixedString } from "../../common/numToAutoFixed";
-import { exactValue, nearestOpacity, nearestValue } from "../conversionTables";
+import { exactValue, nearestOpacity } from "../conversionTables";
 
 /**
  * https://tailwindcss.com/docs/opacity/
@@ -53,6 +54,35 @@ export const tailwindBlendMode = (node: MinimalBlendMixin): string => {
     return "";
   }
   return "";
+};
+
+/**
+ * Convert a Figma background blend mode to a Tailwind bg-blend-* class
+ *
+ * @param paintArray The array of paint fills that may have blend modes
+ * @returns Tailwind background blend mode class if applicable
+ */
+export const tailwindBackgroundBlendMode = (
+  paintArray: ReadonlyArray<Paint>,
+): string => {
+  if (
+    paintArray.length === 0 ||
+    paintArray.every(
+      (d) => d.blendMode === "NORMAL" || d.blendMode === "PASS_THROUGH",
+    )
+  ) {
+    return "";
+  }
+
+  // Get the top fill's blend mode (in Figma, the last item is the top one)
+  const topFill = paintArray[paintArray.length - 1];
+  if (topFill.blendMode === "NORMAL" || topFill.blendMode === "PASS_THROUGH") {
+    return "";
+  }
+
+  const blendMode =
+    topFill.blendMode?.toLowerCase()?.replaceAll("_", "-") || "normal";
+  return `bg-blend-${blendMode}`;
 };
 
 /**

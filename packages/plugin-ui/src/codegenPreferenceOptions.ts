@@ -3,33 +3,17 @@ import { LocalCodegenPreferenceOptions, SelectPreferenceOptions } from "types";
 export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
   {
     itemType: "individual_select",
-    propertyName: "embedImages",
-    label: "Embed Images",
-    description: "Convert images to Base64 and embed them in the code.",
+    propertyName: "useTailwind4",
+    label: "Tailwind 4",
+    description: "Enable Tailwind CSS version 4 features and syntax.",
     isDefault: false,
-    includedLanguages: ["HTML"],
-  },
-  {
-    itemType: "individual_select",
-    propertyName: "jsx",
-    label: "React (JSX)",
-    description: 'Render "class" attributes as "className"',
-    isDefault: false,
-    includedLanguages: ["HTML", "Tailwind"],
-  },
-  {
-    itemType: "individual_select",
-    propertyName: "optimizeLayout",
-    label: "Optimize layout",
-    description: "Attempt to auto-layout suitable element groups",
-    isDefault: true,
-    includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
+    includedLanguages: ["Tailwind"],
   },
   {
     itemType: "individual_select",
     propertyName: "showLayerNames",
     label: "Layer names",
-    description: "Include layer names in classes",
+    description: "Include Figma layer names in classes.",
     isDefault: false,
     includedLanguages: ["HTML", "Tailwind"],
   },
@@ -37,7 +21,8 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "roundTailwindValues",
     label: "Round values",
-    description: "Round pixel values to nearest Tailwind sizes",
+    description:
+      "Round pixel values to nearest Tailwind sizes (within a 15% range).",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
@@ -45,22 +30,62 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     itemType: "individual_select",
     propertyName: "roundTailwindColors",
     label: "Round colors",
-    description: "Round color values to nearest Tailwind colors",
+    description: "Round Figma color values to nearest Tailwind colors.",
     isDefault: false,
     includedLanguages: ["Tailwind"],
   },
   {
     itemType: "individual_select",
-    propertyName: "customTailwindColors",
-    label: "Custom colors",
-    description: "Use color variable names as custom color names",
-    isDefault: false,
-    includedLanguages: ["Tailwind"],
+    propertyName: "useColorVariables",
+    label: "Color Variables",
+    description:
+      "Export code using Figma variables as colors. Example: 'bg-background' instead of 'bg-white'.",
+    isDefault: true,
+    includedLanguages: ["HTML", "Tailwind", "Flutter"],
   },
-  // Add your preferences data here
+  {
+    itemType: "individual_select",
+    propertyName: "embedImages",
+    label: "Embed Images",
+    description:
+      "Convert Figma images to Base64 and embed them in the code. This may be slow. If there are too many images, it could freeze Figma.",
+    isDefault: false,
+    includedLanguages: ["HTML"],
+  },
+  {
+    itemType: "individual_select",
+    propertyName: "embedVectors",
+    label: "Embed Vectors",
+    description:
+      "Enable this to convert vector shapes to SVGs and embed them in the design. This can be a slow operation. If unchecked, shapes will be converted into rectangles.",
+    isDefault: false,
+    includedLanguages: ["HTML", "Tailwind"],
+  },
 ];
 
 export const selectPreferenceOptions: SelectPreferenceOptions[] = [
+  {
+    itemType: "select",
+    propertyName: "htmlGenerationMode",
+    label: "Mode",
+    options: [
+      { label: "HTML", value: "html" },
+      { label: "React (JSX)", value: "jsx" },
+      { label: "Svelte", value: "svelte" },
+      { label: "styled-components", value: "styled-components" },
+    ],
+    includedLanguages: ["HTML"],
+  },
+  {
+    itemType: "select",
+    propertyName: "tailwindGenerationMode",
+    label: "Mode",
+    options: [
+      { label: "HTML", value: "html" },
+      { label: "React (JSX)", value: "jsx" },
+    ],
+    includedLanguages: ["Tailwind"],
+  },
   {
     itemType: "select",
     propertyName: "flutterGenerationMode",
