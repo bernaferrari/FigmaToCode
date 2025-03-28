@@ -10,7 +10,7 @@
     "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
-    "@types/react": "^19.0.11",
+    "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "@types/react-syntax-highlighter": "15.5.13",
     "clsx": "^2.1.1",
@@ -19,10 +19,10 @@
     "react": "^19.0.0",
     "react-syntax-highlighter": "^15.6.1",
     "tailwind-merge": "^3.0.2",
-    "tailwindcss": "^4.0.14"
+    "tailwindcss": "^4.0.17"
   },
   "devDependencies": {
-    "eslint": "^9.22.0",
+    "eslint": "^9.23.0",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
     "types": "workspace:*",

@@ -14,12 +14,12 @@
   },
   "dependencies": {
     "@figma/plugin-typings": "^1.109.0",
-    "@types/react": "^19.0.11",
+    "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "tsconfig": "workspace:*"
   },
   "devDependencies": {
-    "eslint": "^9.22.0",
+    "eslint": "^9.23.0",
     "eslint-config-custom": "workspace:*",
     "typescript": "^5.8.2"
   }

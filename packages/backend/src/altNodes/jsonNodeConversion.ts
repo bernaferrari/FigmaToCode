@@ -161,6 +161,14 @@ const canBeFlattened = (node: Node): boolean => {
     "BOOLEAN_OPERATION",
     "REGULAR_POLYGON",
   ];
+  if ("children" in node && node.children) {
+    return node.children.every((child) => {
+      if (child.type === "GROUP" && "children" in child && child.children) {
+        return child.children.every((d) => canBeFlattened(d));
+      }
+      return flattenableTypes.includes(child.type);
+    });
+  }
 
   // Handle special case for Rectangle nodes with zero or near-zero height
   if (node.type === "RECTANGLE") {

@@ -15,7 +15,7 @@
     "clsx": "^2.1.1",
     "copy-to-clipboard": "^3.3.3",
     "lucide-react": "^0.483.0",
-    "motion": "^12.5.0",
+    "motion": "^12.6.2",
     "nanoid": "^5.1.5",
     "plugin-ui": "workspace:*",
     "react": "^19.0.0",
@@ -23,14 +23,14 @@
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.0.14",
-    "@types/node": "^22.13.10",
-    "@types/react": "^19.0.11",
+    "@tailwindcss/postcss": "^4.0.17",
+    "@types/node": "^22.13.14",
+    "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.26.1",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
     "@vitejs/plugin-react": "^4.3.4",
-    "@vitejs/plugin-react-swc": "^3.8.0",
+    "@vitejs/plugin-react-swc": "^3.8.1",
     "concurrently": "^9.1.2",
     "esbuild": "^0.25.1",
     "eslint-config-custom": "workspace:*",
@@ -41,7 +41,7 @@
     "tsconfig": "workspace:*",
     "types": "workspace:*",
     "typescript": "^5.8.2",
-    "vite": "^5.4.14",
+    "vite": "^5.4.15",
     "vite-plugin-singlefile": "^2.2.0"
   }
 }
