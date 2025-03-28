@@ -22,6 +22,7 @@ import {
   processColorVariablesTime,
   resetPerformanceCounters,
 } from "./altNodes/jsonNodeConversion";
+import { bench } from "./log";
 
 export const run = async (settings: PluginSettings) => {
   resetPerformanceCounters();
@@ -44,7 +45,7 @@ export const run = async (settings: PluginSettings) => {
     console.log("convertedSelection", convertedSelection);
   } else {
     convertedSelection = await nodesToJSON(selection, settings);
-    console.log(`[benchmark] nodesToJSON: ${Date.now() - nodeToJSONStart}ms`);
+    bench(`[benchmark] nodesToJSON: ${Date.now() - nodeToJSONStart}ms`);
     console.log("nodeJson", convertedSelection);
   }
 
@@ -59,38 +60,38 @@ export const run = async (settings: PluginSettings) => {
 
   const convertToCodeStart = Date.now();
   const code = await convertToCode(convertedSelection, settings);
-  console.log(
+  bench(
     `[benchmark] convertToCode: ${Date.now() - convertToCodeStart}ms`,
   );
 
   const generatePreviewStart = Date.now();
   const htmlPreview = await generateHTMLPreview(convertedSelection, settings);
-  console.log(
+  bench(
     `[benchmark] generateHTMLPreview: ${Date.now() - generatePreviewStart}ms`,
   );
 
   const colorPanelStart = Date.now();
   const colors = retrieveGenericSolidUIColors(framework);
   const gradients = retrieveGenericLinearGradients(framework);
-  console.log(
+  bench(
     `[benchmark] color and gradient panel: ${Date.now() - colorPanelStart}ms`,
   );
-  console.log(
+  bench(
     `[benchmark] total generation time: ${Date.now() - nodeToJSONStart}ms`,
   );
 
   // Log performance statistics
-  console.log(
+  bench(
     `[benchmark] getNodeByIdAsync: ${getNodeByIdAsyncTime}ms (${getNodeByIdAsyncCalls} calls, avg: ${(getNodeByIdAsyncTime / getNodeByIdAsyncCalls || 1).toFixed(2)}ms)`,
   );
-  console.log(
+  bench(
     `[benchmark] getStyledTextSegments: ${getStyledTextSegmentsTime}ms (${getStyledTextSegmentsCalls} calls, avg: ${
       getStyledTextSegmentsCalls > 0
         ? (getStyledTextSegmentsTime / getStyledTextSegmentsCalls).toFixed(2)
         : 0
     }ms)`,
   );
-  console.log(
+  bench(
     `[benchmark] processColorVariables: ${processColorVariablesTime}ms (${processColorVariablesCalls} calls, avg: ${
       processColorVariablesCalls > 0
         ? (processColorVariablesTime / processColorVariablesCalls).toFixed(2)
