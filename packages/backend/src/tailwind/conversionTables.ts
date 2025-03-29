@@ -74,7 +74,7 @@ const pxToRemToTailwind = (
 const pxToTailwind = (
   value: number,
   conversionMap: Record<number, string>,
-): string | null => {
+): string => {
   const keys = Object.keys(conversionMap).map((d) => +d);
   const convertedValue = exactValue(value, keys);
 
