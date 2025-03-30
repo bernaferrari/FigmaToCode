@@ -3,6 +3,7 @@ import { PluginSettings } from "types";
 import { variableToColorName } from "../tailwind/conversionTables";
 import { HasGeometryTrait, Node, Paint } from "../api_types";
 import { calculateRectangleFromBoundingBox } from "../common/commonPosition";
+import { bench } from "../log";
 
 // Performance tracking counters
 export let getNodeByIdAsyncTime = 0;
@@ -555,7 +556,7 @@ export const nodesToJSON = async (
 
   console.log("[debug] initial nodeJson", { ...nodes[0] });
 
-  console.log(
+  bench(
     `[benchmark][inside nodesToJSON] JSON_REST_V1 export: ${Date.now() - exportJsonStart}ms`,
   );
 
@@ -582,7 +583,7 @@ export const nodesToJSON = async (
     }
   }
 
-  console.log(
+  bench(
     `[benchmark][inside nodesToJSON] Process node pairs: ${Date.now() - processNodesStart}ms`,
   );
 
