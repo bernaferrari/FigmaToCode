@@ -70,8 +70,8 @@ export const run = async (settings: PluginSettings) => {
   );
 
   const colorPanelStart = Date.now();
-  const colors = retrieveGenericSolidUIColors(framework);
-  const gradients = retrieveGenericLinearGradients(framework);
+  const colors = await retrieveGenericSolidUIColors(framework);
+  const gradients = await retrieveGenericLinearGradients(framework);
   console.log(
     `[benchmark] color and gradient panel: ${Date.now() - colorPanelStart}ms`,
   );

@@ -5,7 +5,7 @@ import { GradientPaint, Paint } from "../../api_types";
 /**
  * Helper to process a color with variable binding if present
  */
-const processColorWithVariable = (fill: {
+export const processColorWithVariable = (fill: {
   color: RGB;
   opacity?: number;
   variableColorName?: string;
@@ -65,6 +65,13 @@ export const htmlColorFromFills = (
     return processColorWithVariable(colorInfo);
   }
   return "";
+};
+
+/**
+ * Convert fills to an HTML color string
+ */
+export const htmlColorFromFill = (fill: Paint): string => {
+  return processColorWithVariable(fill as any);
 };
 
 /**

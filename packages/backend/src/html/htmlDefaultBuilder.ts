@@ -437,18 +437,28 @@ export class HtmlDefaultBuilder {
     if (this.name) {
       this.addData("layer", this.name.trim());
 
-      if (mode !== "svelte" && mode !== "styled-components") {
-        const layerNameClass = stringToClassName(this.name.trim());
-        if (layerNameClass !== "") {
-          classNames.push(layerNameClass);
-        }
-      }
+      // if (mode !== "svelte" && mode !== "styled-components") {
+      //   const layerNameClass = stringToClassName(this.name.trim());
+      //   if (layerNameClass !== "") {
+      //     classNames.push(layerNameClass);
+      //   }
+      // }
     }
 
-    if ("variantProperties" in this.node && this.node.variantProperties) {
-      // console.log("this.node.variantProperties", this.node.variantProperties);
-      Object.entries(this.node.variantProperties)
-        ?.map((prop) => formatDataAttribute(prop[0], prop[1]))
+    if ("componentProperties" in this.node && this.node.componentProperties) {
+      Object.entries(this.node.componentProperties)
+        ?.map((prop) => {
+          if (prop[1].type === "VARIANT" || prop[1].type === "BOOLEAN") {
+            const cleanName = prop[0]
+              .split("#")[0]
+              .replace(/\s+/g, "-")
+              .toLowerCase();
+
+            return formatDataAttribute(cleanName, String(prop[1].value));
+          }
+          return "";
+        })
+        .filter(Boolean)
         .sort()
         .forEach((d) => this.data.push(d));
     }

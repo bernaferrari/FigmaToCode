@@ -32,7 +32,7 @@ export default function App() {
   const [state, setState] = useState<AppState>({
     code: "",
     selectedFramework: "HTML",
-    isLoading: true,
+    isLoading: false,
     htmlPreview: emptyPreview,
     settings: null,
     colors: [],

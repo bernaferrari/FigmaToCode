@@ -44,7 +44,7 @@ const memoizedVariableToColorName = async (
  * Process color variables in a paint style and add pre-computed variable names
  * @param paint The paint style to process (fill or stroke)
  */
-const processColorVariables = async (paint: Paint) => {
+export const processColorVariables = async (paint: Paint) => {
   const start = Date.now();
   processColorVariablesCalls++;
 
@@ -241,19 +241,29 @@ const processNodePair = async (
     if (
       Array.isArray(jsonNode.children) &&
       figmaNode &&
-      "children" in figmaNode &&
-      figmaNode.children.length === jsonNode.children.length
+      "children" in figmaNode
     ) {
-      for (let i = 0; i < jsonNode.children.length; i++) {
-        const child = jsonNode.children[i];
-        const figmaChild = figmaNode.children[i];
-        if (!figmaChild) continue;
+      // Get visible JSON children (filters out nodes with visible: false)
+      const visibleJsonChildren = jsonNode.children.filter(
+        (child) => child.visible !== false,
+      );
+
+      // Map figma children to their IDs for matching
+      const figmaChildrenById = new Map();
+      figmaNode.children.forEach((child) => {
+        figmaChildrenById.set(child.id, child);
+      });
+
+      // Process all visible JSON children that have matching Figma nodes
+      for (const child of visibleJsonChildren) {
+        const figmaChild = figmaChildrenById.get(child.id);
+        if (!figmaChild) continue; // Skip if no matching Figma node found
 
         const processedChild = await processNodePair(
           child,
           figmaChild,
           settings,
-          parentNode, // The group’s parent
+          parentNode, // The group's parent
           parentCumulativeRotation + (jsonNode.rotation || 0),
         );
 
@@ -268,7 +278,7 @@ const processNodePair = async (
       }
     }
 
-    // Simply return the processed children; skip splicing parent’s children
+    // Simply return the processed children; skip splicing parent's children
     return processedChildren;
   }
 
@@ -365,11 +375,6 @@ const processNodePair = async (
     }
   }
 
-  // Extract component metadata from instances
-  if ("variantProperties" in figmaNode && figmaNode.variantProperties) {
-    jsonNode.variantProperties = figmaNode.variantProperties;
-  }
-
   // Always copy size and position
   if ("absoluteBoundingBox" in jsonNode && jsonNode.absoluteBoundingBox) {
     if (jsonNode.parent) {
@@ -457,19 +462,34 @@ const processNodePair = async (
     "children" in jsonNode &&
     jsonNode.children &&
     Array.isArray(jsonNode.children) &&
-    "children" in figmaNode &&
-    figmaNode.children.length === jsonNode.children.length
+    "children" in figmaNode
   ) {
+    // Get only visible JSON children
+    const visibleJsonChildren = jsonNode.children.filter(
+      (child) => child.visible !== false,
+    );
+
+    // Create a map of figma children by ID for easier matching
+    const figmaChildrenById = new Map();
+    figmaNode.children.forEach((child) => {
+      figmaChildrenById.set(child.id, child);
+    });
+
     const cumulative =
       parentCumulativeRotation +
       (jsonNode.type === "GROUP" ? jsonNode.rotation || 0 : 0);
 
     // Process children and handle potential null returns
     const processedChildren = [];
-    for (let i = 0; i < jsonNode.children.length; i++) {
+
+    // Process all visible JSON children that have matching Figma nodes
+    for (const child of visibleJsonChildren) {
+      const figmaChild = figmaChildrenById.get(child.id);
+      if (!figmaChild) continue; // Skip if no matching Figma node found
+
       const processedChild = await processNodePair(
-        jsonNode.children[i],
-        figmaNode.children[i],
+        child,
+        figmaChild,
         settings,
         jsonNode,
         cumulative,
@@ -498,13 +518,6 @@ const processNodePair = async (
     }
 
     adjustChildrenOrder(jsonNode);
-  } else if (
-    "children" in figmaNode &&
-    figmaNode.children.length !== jsonNode.children.length
-  ) {
-    addWarning(
-      "Error: JSON and Figma nodes have different child counts. Please report this issue.",
-    );
   }
 
   return jsonNode;

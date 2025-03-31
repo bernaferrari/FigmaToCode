@@ -18,10 +18,11 @@ import { localTailwindSettings } from "../tailwindMain";
 /**
  * Get a tailwind color value object
  * @param fill
+ * @param useVarSyntax Whether to use CSS variable syntax for variables
  */
-export function tailwindColor(fill: SolidPaint) {
+export function tailwindColor(fill: SolidPaint, useVarSyntax: boolean = false) {
   const { hex, colorType, colorName, meta } = getColorInfo(fill);
-  const exportValue = tailwindSolidColor(fill, "bg");
+  const exportValue = tailwindSolidColor(fill, "bg", useVarSyntax);
   return {
     exportValue,
     colorName,
@@ -62,31 +63,30 @@ function calculateEffectiveOpacity(
  *
  * @param fill The color fill to process
  * @param kind Parameter specifying how the color will be used (e.g., 'text', 'bg')
+ * @param useVarSyntax Whether to use CSS variable syntax for variables
  * @returns Tailwind color string with prefix (e.g., text-red-500)
  */
 export const tailwindSolidColor = (
   fill: SolidPaint | ColorStop,
   kind: TailwindColorType,
+  useVarSyntax: boolean = false,
 ): string => {
+  // Check if we should use var syntax and the fill has a variable color name
+  if (useVarSyntax && (fill as any).variableColorName) {
+    const varName = (fill as any).variableColorName;
+    // Create the fallback color using existing color info
+    const { hex } = getColorInfo(fill);
+    // Return arbitrary value syntax with CSS variable
+    return `${kind}-[var(--${varName},${hex})]`;
+  }
+
+  // Original implementation for non-variable colors or when not using var syntax
   const { colorName } = getColorInfo(fill);
   const effectiveOpacity = calculateEffectiveOpacity(fill);
+  const opacity =
+    effectiveOpacity !== 1.0 ? `/${nearestOpacity(effectiveOpacity)}` : "";
 
-  // In Tailwind v4, we always use the slash syntax for opacity
-  // In Tailwind v3, we use opacity utilities for standard colors and slash syntax for arbitrary values
-  if (localTailwindSettings.useTailwind4 || colorName.startsWith("[")) {
-    // Only add opacity suffix if it's not 1.0
-    const opacity =
-      effectiveOpacity !== 1.0 ? `/${nearestOpacity(effectiveOpacity)}` : "";
-
-    return `${kind}-${colorName}${opacity}`;
-  } else {
-    // Tailwind v3 - use separate opacity utilities for standard colors
-    if (effectiveOpacity !== 1.0) {
-      const opacityValue = nearestOpacity(effectiveOpacity);
-      return `${kind}-${colorName} ${kind}-opacity-${opacityValue}`;
-    }
-    return `${kind}-${colorName}`;
-  }
+  return `${kind}-${colorName}${opacity}`;
 };
 
 /**
@@ -94,6 +94,7 @@ export const tailwindSolidColor = (
  *
  * @param stop The gradient color stop
  * @param parentOpacity The opacity of the parent gradient
+ * @param useVarSyntax Whether to use CSS variable syntax for variables
  * @returns Color name with optional opacity suffix
  */
 export const tailwindGradientStop = (
@@ -102,8 +103,6 @@ export const tailwindGradientStop = (
 ): string => {
   const { colorName } = getColorInfo(stop);
   const effectiveOpacity = calculateEffectiveOpacity(stop, parentOpacity);
-
-  // Only add opacity suffix if it's not 1.0
   const opacity =
     effectiveOpacity !== 1.0 ? `/${nearestOpacity(effectiveOpacity)}` : "";
 

@@ -601,7 +601,6 @@ const htmlContainer = async (
     let src = "";
 
     if (nodeHasImageFill(node)) {
-      // ...existing image handling code...
       const altNode = node as AltNode<ExportableNode>;
       const hasChildren = "children" in node && node.children.length > 0;
       let imgUrl = "";

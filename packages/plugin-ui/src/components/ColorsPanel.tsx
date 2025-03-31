@@ -13,6 +13,16 @@ const ColorsPanel = (props: {
     props.onColorClick(value);
   };
 
+  // Helper function to format complex color values
+  const formatColorValue = (value: string) => {
+    // Extract CSS variable name if present
+    if (value.includes("var(--")) {
+      const varMatch = value.match(/var\(--([\w-]+)/);
+      return varMatch ? `--${varMatch[1]}` : value;
+    }
+    return value;
+  };
+
   return (
     <div className="bg-card border w-full rounded-lg p-4 flex flex-col gap-2">
       <div className="p-0 pb-2">
@@ -39,6 +49,7 @@ const ColorsPanel = (props: {
             onClick={() => {
               handleButtonClick(color.exportValue, idx);
             }}
+            title={color.exportValue} // Show full value on hover
           >
             <div className="flex flex-col h-full justify-center items-center">
               <span
@@ -50,6 +61,17 @@ const ColorsPanel = (props: {
               >
                 {color.colorName ? color.colorName : `#${color.hex}`}
               </span>
+              {color.exportValue !== `#${color.hex}` && (
+                <span
+                  className={`text-[10px] opacity-70 max-w-full truncate px-1 ${
+                    color.contrastWhite > color.contrastBlack
+                      ? "text-white"
+                      : "text-black"
+                  }`}
+                >
+                  {formatColorValue(color.exportValue)}
+                </span>
+              )}
             </div>
           </button>
         ))}

@@ -262,16 +262,27 @@ export class TailwindDefaultBuilder {
       this.addAttributes(additionalAttr);
     }
 
-    if (this.name !== "") {
-      this.prependAttributes(stringToClassName(this.name));
-    }
+    // if (this.name !== "") {
+    //   this.prependAttributes(stringToClassName(this.name));
+    // }
     if (this.name) {
       this.addData("layer", this.name.trim());
     }
 
-    if ("variantProperties" in this.node && this.node.variantProperties) {
-      Object.entries(this.node.variantProperties)
-        ?.map((prop) => formatDataAttribute(prop[0], prop[1]))
+    if ("componentProperties" in this.node && this.node.componentProperties) {
+      Object.entries(this.node.componentProperties)
+        ?.map((prop) => {
+          if (prop[1].type === "VARIANT" || prop[1].type === "BOOLEAN") {
+            const cleanName = prop[0]
+              .split("#")[0]
+              .replace(/\s+/g, "-")
+              .toLowerCase();
+
+            return formatDataAttribute(cleanName, String(prop[1].value));
+          }
+          return "";
+        })
+        .filter(Boolean)
         .sort()
         .forEach((d) => this.data.push(d));
     }

@@ -341,7 +341,7 @@ const codegenMode = async () => {
             // },
             {
               title: "Tailwind Colors",
-              code: retrieveGenericSolidUIColors("Tailwind")
+              code: (await retrieveGenericSolidUIColors("Tailwind"))
                 .map((d) => {
                   let str = `${d.hex};`;
                   if (d.colorName !== d.hex) {
