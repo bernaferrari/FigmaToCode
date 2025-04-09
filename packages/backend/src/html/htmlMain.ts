@@ -439,9 +439,15 @@ const htmlWrapSVG = (
   settings: HTMLSettings,
 ): string => {
   if (node.svg === "") return "";
+  
   const builder = new HtmlDefaultBuilder(node, settings)
     .addData("svg-wrapper")
     .position();
+  
+  // The SVG content already has the var() references, so we don't need
+  // to add inline CSS variables in most cases. The browser will use the fallbacks
+  // if the variables aren't defined in the CSS.
+  
   return `\n<div${builder.build()}>\n${node.svg ?? ""}</div>`;
 };
 

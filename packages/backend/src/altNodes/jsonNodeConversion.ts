@@ -27,6 +27,9 @@ const nodeNameCounters: Map<string, number> = new Map();
 
 const variableCache = new Map<string, string>();
 
+/**
+ * Maps variable IDs to color names and caches the result
+ */
 const memoizedVariableToColorName = async (
   variableId: string,
 ): Promise<string> => {
@@ -39,6 +42,98 @@ const memoizedVariableToColorName = async (
     return colorName;
   }
   return variableCache.get(variableId)!;
+};
+
+/**
+ * Maps a color hex value to its variable name using node-specific color mappings
+ */
+export const getVariableNameFromColor = (
+  hexColor: string,
+  colorMappings?: Map<string, { variableId: string; variableName: string }>,
+): string | undefined => {
+  if (!colorMappings) return undefined;
+
+  const normalizedColor = hexColor.toLowerCase();
+  const mapping = colorMappings.get(normalizedColor);
+
+  if (mapping) {
+    return mapping.variableName;
+  }
+
+  return undefined;
+};
+
+/**
+ * Collects all color variables used in a node and its descendants
+ */
+const collectNodeColorVariables = async (
+  node: any,
+): Promise<Map<string, { variableId: string; variableName: string }>> => {
+  const colorMappings = new Map<
+    string,
+    { variableId: string; variableName: string }
+  >();
+
+  // Helper function to add a mapping from a paint object
+  const addMappingFromPaint = (paint: any) => {
+    // Ensure we have a solid paint, a resolved variable name, and color data
+    if (
+      paint.type === "SOLID" &&
+      paint.variableColorName &&
+      paint.color &&
+      paint.boundVariables?.color
+    ) {
+      // Prefer the actual variable name from the bound variable if available
+      const variableName = paint.boundVariables.color.name || paint.variableColorName;
+      
+      if (variableName) {
+        const colorInfo = {
+          variableId: paint.boundVariables.color.id,
+          variableName: variableName.replace(/[^a-zA-Z0-9_-]/g, '-'), // Sanitize variable name for CSS
+        };
+        
+        // Create hex representation of the color
+        const r = Math.round(paint.color.r * 255);
+        const g = Math.round(paint.color.g * 255);
+        const b = Math.round(paint.color.b * 255);
+        
+        // Standard hex format for the color mapping
+        const hexColor = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toLowerCase();
+        colorMappings.set(hexColor, colorInfo);
+        
+        // Also add named color equivalent if it matches standard colors
+        if (r === 255 && g === 255 && b === 255) {
+          colorMappings.set('white', colorInfo); // Add "white" mapping
+        } 
+        else if (r === 0 && g === 0 && b === 0) {
+          colorMappings.set('black', colorInfo); // Add "black" mapping
+        }
+      }
+    }
+  };
+
+  // Process fills
+  if (node.fills && Array.isArray(node.fills)) {
+    node.fills.forEach(addMappingFromPaint);
+  }
+
+  // Process strokes
+  if (node.strokes && Array.isArray(node.strokes)) {
+    node.strokes.forEach(addMappingFromPaint);
+  }
+
+  // Process children recursively
+  if (node.children && Array.isArray(node.children)) {
+    for (const child of node.children) {
+      const childMappings = await collectNodeColorVariables(child);
+      // Merge child mappings with this node's mappings
+      childMappings.forEach((value, key) => {
+        colorMappings.set(key, value);
+      });
+    }
+  }
+
+  return colorMappings;
 };
 
 /**
@@ -376,7 +471,14 @@ const processNodePair = async (
 
   // Add canBeFlattened property
   if (settings.embedVectors && !parentNode?.canBeFlattened) {
-    (jsonNode as any).canBeFlattened = isLikelyIcon(jsonNode as any);
+    const isIcon = isLikelyIcon(jsonNode as any);
+    (jsonNode as any).canBeFlattened = isIcon;
+
+    // If this node will be flattened to SVG, collect its color variables
+    if (isIcon && settings.useColorVariables) {
+      // Schedule color mapping collection after variable processing
+      (jsonNode as any)._collectColorMappings = true;
+    }
   } else {
     (jsonNode as any).canBeFlattened = false;
   }
@@ -494,6 +596,13 @@ const processNodePair = async (
     }
 
     adjustChildrenOrder(jsonNode);
+  }
+
+  // Collect color variables for SVG nodes after all processing is done
+  if ((jsonNode as any)._collectColorMappings) {
+    (jsonNode as any).colorVariableMappings =
+      await collectNodeColorVariables(jsonNode);
+    delete (jsonNode as any)._collectColorMappings;
   }
 
   return jsonNode;

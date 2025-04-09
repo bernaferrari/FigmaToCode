@@ -437,12 +437,12 @@ export class HtmlDefaultBuilder {
     if (this.name) {
       this.addData("layer", this.name.trim());
 
-      // if (mode !== "svelte" && mode !== "styled-components") {
-      //   const layerNameClass = stringToClassName(this.name.trim());
-      //   if (layerNameClass !== "") {
-      //     classNames.push(layerNameClass);
-      //   }
-      // }
+      if (mode !== "svelte" && mode !== "styled-components") {
+        const layerNameClass = stringToClassName(this.name.trim());
+        if (layerNameClass !== "") {
+          classNames.push(layerNameClass);
+        }
+      }
     }
 
     if ("componentProperties" in this.node && this.node.componentProperties) {

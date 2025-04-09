@@ -30,7 +30,7 @@ import {
   getClassLabel,
 } from "../common/commonFormatAttributes";
 import { TailwindColorType, TailwindSettings } from "types";
-import { MinimalFillsTrait, Paint } from "../api_types";
+import { MinimalFillsTrait, MinimalStrokesTrait, Paint } from "../api_types";
 
 const isNotEmpty = (s: string) => s !== "" && s !== null && s !== undefined;
 const dropEmptyStrings = (strings: string[]) => strings.filter(isNotEmpty);
@@ -262,9 +262,9 @@ export class TailwindDefaultBuilder {
       this.addAttributes(additionalAttr);
     }
 
-    // if (this.name !== "") {
-    //   this.prependAttributes(stringToClassName(this.name));
-    // }
+    if (this.name !== "") {
+      this.prependAttributes(stringToClassName(this.name));
+    }
     if (this.name) {
       this.addData("layer", this.name.trim());
     }
