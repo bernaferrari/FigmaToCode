@@ -3,6 +3,7 @@ import { PluginSettings } from "types";
 import { variableToColorName } from "../tailwind/conversionTables";
 import { HasGeometryTrait, Node, Paint } from "../api_types";
 import { calculateRectangleFromBoundingBox } from "../common/commonPosition";
+import { isLikelyIcon } from "./iconDetection";
 
 // Performance tracking counters
 export let getNodeByIdAsyncTime = 0;
@@ -150,35 +151,6 @@ function adjustChildrenOrder(node: any) {
 }
 
 /**
- * Checks if a node can be flattened into SVG
- */
-const canBeFlattened = (node: Node): boolean => {
-  // These node types should be directly flattened
-  const flattenableTypes: string[] = [
-    "VECTOR",
-    "STAR",
-    "POLYGON",
-    "BOOLEAN_OPERATION",
-    "REGULAR_POLYGON",
-  ];
-  if ("children" in node && node.children) {
-    return node.children.every((child) => {
-      if (child.type === "GROUP" && "children" in child && child.children) {
-        return child.children.every((d) => canBeFlattened(d));
-      }
-      return flattenableTypes.includes(child.type);
-    });
-  }
-
-  // Handle special case for Rectangle nodes with zero or near-zero height
-  if (node.type === "RECTANGLE") {
-    return false; // Rectangles should not be flattened by default
-  }
-
-  return flattenableTypes.includes(node.type);
-};
-
-/**
  * Recursively process both JSON node and Figma node to update with data not available in JSON
  * This now includes the functionality from convertNodeToAltNode
  * @param jsonNode The JSON node to process
@@ -197,9 +169,6 @@ const processNodePair = async (
 ): Promise<Node | Node[] | null> => {
   if (!jsonNode.id) return null;
   if (jsonNode.visible === false) return null;
-
-  // Add canBeFlattened property
-  (jsonNode as any).canBeFlattened = canBeFlattened(jsonNode);
 
   // Handle node type-specific conversions (from convertNodeToAltNode)
   const nodeType = jsonNode.type;
@@ -403,6 +372,13 @@ const processNodePair = async (
       jsonNode.x = 0;
       jsonNode.y = 0;
     }
+  }
+
+  // Add canBeFlattened property
+  if (settings.embedVectors && !parentNode?.canBeFlattened) {
+    (jsonNode as any).canBeFlattened = isLikelyIcon(jsonNode as any);
+  } else {
+    (jsonNode as any).canBeFlattened = false;
   }
 
   if ("individualStrokeWeights" in jsonNode) {
