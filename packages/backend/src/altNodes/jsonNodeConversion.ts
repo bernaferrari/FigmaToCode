@@ -320,7 +320,7 @@ const processNodePair = async (
       // Get visible JSON children (filters out nodes with visible: false)
       const visibleJsonChildren = jsonNode.children.filter(
         (child) => child.visible !== false,
-      );
+      ) as AltNode[];
 
       // Map figma children to their IDs for matching
       const figmaChildrenById = new Map();
