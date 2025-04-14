@@ -46,6 +46,21 @@ export const run = async (settings: PluginSettings) => {
     convertedSelection = await nodesToJSON(selection, settings);
     console.log(`[benchmark] nodesToJSON: ${Date.now() - nodeToJSONStart}ms`);
     console.log("nodeJson", convertedSelection);
+    // const removeParentRecursive = (obj: any): any => {
+    //   if (Array.isArray(obj)) {
+    //     return obj.map(removeParentRecursive);
+    //   }
+    //   if (obj && typeof obj === 'object') {
+    //     const newObj = { ...obj };
+    //     delete newObj.parent;
+    //     for (const key in newObj) {
+    //       newObj[key] = removeParentRecursive(newObj[key]);
+    //     }
+    //     return newObj;
+    //   }
+    //   return obj;
+    // };
+    // console.log("nodeJson without parent refs:", removeParentRecursive(convertedSelection));
   }
 
   console.log("[debug] convertedSelection", { ...convertedSelection[0] });

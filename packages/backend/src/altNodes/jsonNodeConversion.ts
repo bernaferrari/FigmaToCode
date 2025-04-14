@@ -84,30 +84,39 @@ const collectNodeColorVariables = async (
       paint.boundVariables?.color
     ) {
       // Prefer the actual variable name from the bound variable if available
-      const variableName = paint.boundVariables.color.name || paint.variableColorName;
-      
+      const variableName =
+        paint.boundVariables.color.name || paint.variableColorName;
+
       if (variableName) {
+        // Sanitize the variable name for CSS
+        const sanitizedVarName = variableName.replace(/[^a-zA-Z0-9_-]/g, "-");
+
         const colorInfo = {
           variableId: paint.boundVariables.color.id,
-          variableName: variableName.replace(/[^a-zA-Z0-9_-]/g, '-'), // Sanitize variable name for CSS
+          variableName: sanitizedVarName,
         };
-        
+
         // Create hex representation of the color
         const r = Math.round(paint.color.r * 255);
         const g = Math.round(paint.color.g * 255);
         const b = Math.round(paint.color.b * 255);
-        
-        // Standard hex format for the color mapping
-        const hexColor = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toLowerCase();
+
+        // Standard hex format (lowercase for consistent mapping)
+        const hexColor =
+          `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`.toLowerCase();
         colorMappings.set(hexColor, colorInfo);
-        
-        // Also add named color equivalent if it matches standard colors
+
+        // Add common named colors that the SVG might use
+        // When htmlColor() in builderImpl/htmlColor.ts converts colors to strings,
+        // it returns "white" for RGB(1,1,1) and "black" for RGB(0,0,0)
         if (r === 255 && g === 255 && b === 255) {
-          colorMappings.set('white', colorInfo); // Add "white" mapping
-        } 
-        else if (r === 0 && g === 0 && b === 0) {
-          colorMappings.set('black', colorInfo); // Add "black" mapping
+          colorMappings.set("white", colorInfo); // Classic CSS color name
+          colorMappings.set("rgb(255,255,255)", colorInfo); // RGB format
+        } else if (r === 0 && g === 0 && b === 0) {
+          colorMappings.set("black", colorInfo);
+          colorMappings.set("rgb(0,0,0)", colorInfo);
         }
+        // Add other frequently used named colors if needed
       }
     }
   };
