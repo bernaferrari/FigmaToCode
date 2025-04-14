@@ -151,7 +151,7 @@ function checkChildrenRecursively(children: ReadonlyArray<SceneNode>): {
  * @param logDetails Set to true to print debug information to the console.
  * @returns True if the node is likely an icon, false otherwise.
  */
-export function isLikelyIcon(node: SceneNode, logDetails = true): boolean {
+export function isLikelyIcon(node: SceneNode, logDetails = false): boolean {
   const info: string[] = [`Node: ${node.name} (${node.type}, ID: ${node.id})`];
   let result = false;
   let reason = "";

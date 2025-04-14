@@ -1,7 +1,6 @@
-import { roundToNearestHundreth } from "./../../common/numToAutoFixed";
-import { addWarning } from "../../common/commonConversionWarnings";
 import { numberToFixedString } from "../../common/numToAutoFixed";
 import { formatWithJSX } from "../../common/parseJSX";
+import { AltNode } from "../../alt_api_types";
 
 /**
  * https://tailwindcss.com/docs/opacity/
@@ -110,7 +109,7 @@ export const htmlVisibility = (
  * default is [-180, -90, -45, 0, 45, 90, 180], but '0' will be ignored:
  * if rotation was changed, let it be perceived. Therefore, 1 => 45
  */
-export const htmlRotation = (node: LayoutMixin, isJsx: boolean): string[] => {
+export const htmlRotation = (node: AltNode, isJsx: boolean): string[] => {
   const rotation =
     -Math.round((node.rotation || 0) + (node.cumulativeRotation || 0)) || 0;
 

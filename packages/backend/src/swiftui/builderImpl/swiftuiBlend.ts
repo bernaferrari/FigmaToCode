@@ -1,5 +1,6 @@
 import { SwiftUIModifier } from "types";
 import { numberToFixedString } from "../../common/numToAutoFixed";
+import { AltNode } from "../../alt_api_types";
 
 /**
  * https://developer.apple.com/documentation/swiftui/view/opacity(_:)
@@ -29,7 +30,7 @@ export const swiftuiVisibility = (
 /**
  * https://developer.apple.com/documentation/swiftui/modifiedcontent/rotationeffect(_:anchor:)
  */
-export const swiftuiRotation = (node: LayoutMixin): SwiftUIModifier | null => {
+export const swiftuiRotation = (node: AltNode): SwiftUIModifier | null => {
   const rotation = (node.rotation || 0) + (node.cumulativeRotation || 0);
   if (Math.round(rotation) !== 0) {
     return ["rotationEffect", `.degrees(${numberToFixedString(rotation)})`];

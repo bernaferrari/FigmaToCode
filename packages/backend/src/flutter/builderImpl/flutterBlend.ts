@@ -1,3 +1,4 @@
+import { AltNode } from "../../alt_api_types";
 import {
   generateWidgetCode,
   numberToFixedString,
@@ -38,7 +39,7 @@ export const flutterVisibility = (node: SceneNode, child: string): string => {
  * https://api.flutter.dev/flutter/widgets/Transform-class.html
  * that's how you convert angles to clockwise radians: angle * -pi/180
  */
-export const flutterRotation = (node: LayoutMixin, child: string): string => {
+export const flutterRotation = (node: AltNode, child: string): string => {
   if (
     node.rotation !== undefined &&
     child !== "" &&
@@ -58,7 +59,7 @@ export const flutterRotation = (node: LayoutMixin, child: string): string => {
 /**
  * Generates a rotation matrix string for Flutter transforms
  */
-export const generateRotationMatrix = (node: LayoutMixin): string => {
+export const generateRotationMatrix = (node: AltNode): string => {
   const rotation = (node.rotation || 0) + (node.cumulativeRotation || 0);
 
   if (Math.round(rotation) === 0) {

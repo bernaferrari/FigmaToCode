@@ -4,6 +4,7 @@ import { variableToColorName } from "../tailwind/conversionTables";
 import { HasGeometryTrait, Node, Paint } from "../api_types";
 import { calculateRectangleFromBoundingBox } from "../common/commonPosition";
 import { isLikelyIcon } from "./iconDetection";
+import { AltNode } from "../alt_api_types";
 
 // Performance tracking counters
 export let getNodeByIdAsyncTime = 0;
@@ -265,10 +266,10 @@ function adjustChildrenOrder(node: any) {
  * @returns Potentially modified jsonNode, array of nodes (for inlined groups), or null
  */
 const processNodePair = async (
-  jsonNode: Node,
+  jsonNode: AltNode,
   figmaNode: SceneNode,
   settings: PluginSettings,
-  parentNode?: Node,
+  parentNode?: AltNode,
   parentCumulativeRotation: number = 0,
 ): Promise<Node | Node[] | null> => {
   if (!jsonNode.id) return null;
@@ -303,7 +304,7 @@ const processNodePair = async (
     );
   }
 
-  if ("rotation" in jsonNode) {
+  if ("rotation" in jsonNode && jsonNode.rotation) {
     jsonNode.rotation = -jsonNode.rotation * (180 / Math.PI);
   }
 
@@ -442,6 +443,7 @@ const processNodePair = async (
       jsonNode.styledTextSegments = styledTextSegments;
     }
 
+    // Inline text style.
     Object.assign(jsonNode, jsonNode.style);
     if (!jsonNode.textAutoResize) {
       jsonNode.textAutoResize = "NONE";
@@ -492,11 +494,16 @@ const processNodePair = async (
     (jsonNode as any).canBeFlattened = false;
   }
 
-  if ("individualStrokeWeights" in jsonNode) {
-    jsonNode.strokeTopWeight = jsonNode.individualStrokeWeights.top;
-    jsonNode.strokeBottomWeight = jsonNode.individualStrokeWeights.bottom;
-    jsonNode.strokeLeftWeight = jsonNode.individualStrokeWeights.left;
-    jsonNode.strokeRightWeight = jsonNode.individualStrokeWeights.right;
+  if (
+    "individualStrokeWeights" in jsonNode &&
+    jsonNode.individualStrokeWeights
+  ) {
+    (jsonNode as any).strokeTopWeight = jsonNode.individualStrokeWeights.top;
+    (jsonNode as any).strokeBottomWeight =
+      jsonNode.individualStrokeWeights.bottom;
+    (jsonNode as any).strokeLeftWeight = jsonNode.individualStrokeWeights.left;
+    (jsonNode as any).strokeRightWeight =
+      jsonNode.individualStrokeWeights.right;
   }
 
   await getColorVariables(jsonNode, settings);
@@ -554,7 +561,7 @@ const processNodePair = async (
     // Get only visible JSON children
     const visibleJsonChildren = jsonNode.children.filter(
       (child) => child.visible !== false,
-    );
+    ) as AltNode[];
 
     // Create a map of figma children by ID for easier matching
     const figmaChildrenById = new Map();
