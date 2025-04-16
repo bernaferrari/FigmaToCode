@@ -19,6 +19,14 @@ const ICON_COMPLEX_VECTOR_TYPES: ReadonlySet<NodeType> = new Set([
   "BOOLEAN_OPERATION",
 ]);
 
+// Types that are considered icons regardless of size if they are top-level
+const ICON_TYPES_IGNORE_SIZE: ReadonlySet<NodeType> = new Set([
+  "VECTOR",
+  "BOOLEAN_OPERATION",
+  "POLYGON",
+  "STAR",
+]);
+
 const ICON_CONTAINER_TYPES: ReadonlySet<NodeType> = new Set([
   "FRAME",
   "GROUP",
@@ -58,32 +66,20 @@ const DISALLOWED_CHILD_TYPES: ReadonlySet<NodeType> = new Set([
 // ========================================================================
 
 /**
- * Checks if a node's dimensions fall within a typical size range for icons.
+ * Checks if a node's dimensions fall within a typical *maximum* size for icons.
+ * Simplified to only check max size.
  */
 function isTypicalIconSize(
   node: SceneNode,
-  minSize = 8,
   maxSize = 64, // Standard max size
-  aspectRatioTolerance = 0.5, // Allow slightly non-square icons
 ): boolean {
   if (
     !("width" in node && "height" in node && node.width > 0 && node.height > 0)
   ) {
     return false; // Needs dimensions
   }
-  if (
-    node.width < minSize ||
-    node.height < minSize ||
-    node.width > maxSize ||
-    node.height > maxSize
-  ) {
-    return false; // Outside size limits
-  }
-  const aspectRatio = node.width / node.height;
-  return (
-    aspectRatio >= 1 - aspectRatioTolerance &&
-    aspectRatio <= 1 + aspectRatioTolerance // Check aspect ratio
-  );
+  // Only check if dimensions exceed the maximum allowed size
+  return node.width <= maxSize && node.height <= maxSize;
 }
 
 /**
@@ -146,6 +142,9 @@ function checkChildrenRecursively(children: ReadonlyArray<SceneNode>): {
 /**
  * Analyzes a Figma SceneNode using simplified structural rules to determine if it's likely an icon.
  * v5.1: Added rule to always consider nodes with SVG export settings as icons.
+ * v5.2: Always consider VECTOR nodes as icons, regardless of size.
+ * v5.3: Always consider VECTOR, BOOLEAN_OPERATION, POLYGON, STAR as icons regardless of size. Simplified size check to max dimension only.
+ * v5.4: Check for disallowed types *before* checking SVG export settings.
  *
  * @param node The Figma SceneNode to evaluate.
  * @param logDetails Set to true to print debug information to the console.
@@ -156,41 +155,50 @@ export function isLikelyIcon(node: SceneNode, logDetails = false): boolean {
   let result = false;
   let reason = "";
 
-  // --- 1. Check for SVG Export Settings ---
-  if (hasSvgExportSettings(node)) {
+  // --- 1. Initial Filtering (Disallowed Types First) ---
+  if (DISALLOWED_ICON_TYPES.has(node.type)) {
+    reason = `Disallowed Type: ${node.type}`;
+    result = false;
+  }
+  // --- 2. Check for SVG Export Settings (Only if not disallowed) ---
+  else if (hasSvgExportSettings(node)) {
     reason = "Has SVG export settings";
     result = true;
   }
-  // --- 2. Initial Filtering ---
-  else if (node.visible === false) {
-    reason = "Invisible";
-    result = false;
-  } else if (DISALLOWED_ICON_TYPES.has(node.type)) {
-    reason = `Disallowed Type: ${node.type}`;
-    result = false;
-  } else if (
+  // --- 3. Dimension Check ---
+  else if (
     !("width" in node && "height" in node && node.width > 0 && node.height > 0)
   ) {
-    reason = "No dimensions";
-    result = false;
+    // Exception: Allow specific types even without dimensions initially.
+    if (ICON_TYPES_IGNORE_SIZE.has(node.type)) {
+      reason = `Direct ${node.type} type (no dimensions check needed)`;
+      result = true;
+    } else {
+      reason = "No dimensions";
+      result = false;
+    }
   } else {
-    // --- 3. Direct Vector/Boolean/Primitive ---
-    if (
-      ICON_COMPLEX_VECTOR_TYPES.has(node.type) ||
-      ICON_PRIMITIVE_TYPES.has(node.type)
-    ) {
+    // --- 4. Direct Vector/Boolean/Primitive ---
+    // Special case: VECTOR, BOOLEAN_OPERATION, POLYGON, STAR are always icons
+    if (ICON_TYPES_IGNORE_SIZE.has(node.type)) {
+      reason = `Direct ${node.type} type (size ignored)`;
+      result = true;
+    }
+    // Check other primitives (ELLIPSE, RECTANGLE, LINE) with size constraint
+    else if (ICON_PRIMITIVE_TYPES.has(node.type)) {
       if (isTypicalIconSize(node)) {
         reason = `Direct ${node.type} with typical size`;
         result = true;
       } else {
-        reason = `Direct ${node.type} but wrong size (${Math.round(node.width)}x${Math.round(node.height)})`;
+        reason = `Direct ${node.type} but too large (${Math.round(node.width)}x${Math.round(node.height)})`;
         result = false;
       }
     }
-    // --- 4. Container Logic ---
+    // --- 5. Container Logic ---
     else if (ICON_CONTAINER_TYPES.has(node.type) && "children" in node) {
+      // Container size check still uses the simplified isTypicalIconSize
       if (!isTypicalIconSize(node)) {
-        reason = `Container but wrong size (${Math.round(node.width)}x${Math.round(node.height)})`;
+        reason = `Container but too large (${Math.round(node.width)}x${Math.round(node.height)})`;
         result = false;
       } else {
         const visibleChildren = node.children.filter(
@@ -198,7 +206,7 @@ export function isLikelyIcon(node: SceneNode, logDetails = false): boolean {
         );
 
         if (visibleChildren.length === 0) {
-          // Check for styling on empty containers
+          // Check for styling on empty containers (size already checked)
           const hasVisibleFill =
             "fills" in node &&
             Array.isArray(node.fills) &&
@@ -215,14 +223,15 @@ export function isLikelyIcon(node: SceneNode, logDetails = false): boolean {
             node.strokes.some((s) => s.visible !== false);
 
           if (hasVisibleFill || hasVisibleStroke) {
-            reason = "Empty container with visible fill/stroke";
+            reason =
+              "Empty container with visible fill/stroke and typical size";
             result = true;
           } else {
             reason = "Empty container with no visible style";
-            result = false;
+            result = false; // Size is okay, but no content or style
           }
         } else {
-          // Check content of non-empty containers
+          // Check content of non-empty containers (size already checked)
           const checkResult = checkChildrenRecursively(visibleChildren);
 
           if (checkResult.hasDisallowedChild) {
@@ -230,6 +239,9 @@ export function isLikelyIcon(node: SceneNode, logDetails = false): boolean {
               "Container has disallowed child type (Text, Frame, Component, Instance, etc.)";
             result = false;
           } else if (!checkResult.hasValidContent) {
+            // Allow containers if they *only* contain other groups,
+            // as long as those groups eventually contain valid content.
+            // The checkResult.hasValidContent handles this.
             reason = "Container has no vector or primitive content";
             result = false;
           } else {
@@ -239,7 +251,7 @@ export function isLikelyIcon(node: SceneNode, logDetails = false): boolean {
         }
       }
     }
-    // --- 5. Default ---
+    // --- 6. Default ---
     else {
       reason =
         "Not a recognized icon structure (Vector, Primitive, or valid Container)";
