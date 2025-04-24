@@ -75,7 +75,7 @@ The plugin is organized as a monorepo. There are several packages:
 
 ### Development Workflow
 
-The project uses [Turborepo](https://turbo.build/) for managing the monorepo, and each package is compiled using [esbuild](https://esbuild.github.io/) for fast development cycles. Only modified files are recompiled when changes are made, making the development process more efficient.
+The project uses [Turborepo](https://turborepo.com/) for managing the monorepo, and each package is compiled using [esbuild](https://esbuild.github.io/) for fast development cycles. Only modified files are recompiled when changes are made, making the development process more efficient.
 
 #### Running the Project
 
