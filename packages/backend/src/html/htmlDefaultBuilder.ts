@@ -179,12 +179,14 @@ export class HtmlDefaultBuilder {
       }
       const weight = commonBorder.all;
 
+      // Check if the node has auto layout
+      const hasAutoLayout = "layoutMode" in node && node.layoutMode !== "NONE";
+
       if (
-        strokeAlign === "CENTER" ||
-        strokeAlign === "OUTSIDE" ||
-        node.type === "FRAME" ||
-        node.type === "INSTANCE" ||
-        node.type === "COMPONENT"
+        (strokeAlign === "CENTER" || strokeAlign === "OUTSIDE") || 
+        // Only use outline for frames/instances/components when they DON'T have auto layout
+        ((node.type === "FRAME" || node.type === "INSTANCE" || node.type === "COMPONENT") && 
+         !hasAutoLayout)
       ) {
         this.addStyles(
           formatWithJSX("outline", this.isJSX, consolidateBorders(weight)),
@@ -207,7 +209,7 @@ export class HtmlDefaultBuilder {
           );
         }
       } else {
-        // Default: use regular border on autolayout + strokeAlign: inside
+        // Use regular border when auto layout is present or for other node types with inside stroke
         this.addStyles(
           formatWithJSX("border", this.isJSX, consolidateBorders(weight)),
         );

@@ -78,14 +78,16 @@ export const tailwindBorderWidth = (
 
     const weight = commonBorder.all;
 
+    // Check if the node has auto layout
+    const hasAutoLayout = "layoutMode" in node && node.layoutMode !== "NONE";
+
     if (
-      strokeAlign === "CENTER" ||
-      strokeAlign === "OUTSIDE" ||
-      node.type === "FRAME" ||
-      node.type === "INSTANCE" ||
-      node.type === "COMPONENT"
+      (strokeAlign === "CENTER" || strokeAlign === "OUTSIDE") || 
+      // Only use outline for frames/instances/components when they DON'T have auto layout
+      ((node.type === "FRAME" || node.type === "INSTANCE" || node.type === "COMPONENT") && 
+       !hasAutoLayout)
     ) {
-      // For CENTER, OUTSIDE, or INSIDE+Frame, use outline
+      // For CENTER, OUTSIDE, or INSIDE+Frame without auto layout, use outline
       const property = getBorder(weight, "", true);
       let offsetProperty = "";
 
@@ -100,7 +102,7 @@ export const tailwindBorderWidth = (
         property: offsetProperty ? `${property} ${offsetProperty}` : property,
       };
     } else {
-      // Default case: use normal border (for INSIDE + AUTO_LAYOUT)
+      // Default case: use normal border (for INSIDE + AUTO_LAYOUT or other node types)
       return {
         isOutline: false,
         property: getBorder(weight, "", false),
