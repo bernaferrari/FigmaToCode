@@ -97,7 +97,7 @@ const tailwindWrapSVG = (
     .addData("svg-wrapper")
     .position();
 
-  return `\n<div${builder.build()}>\n${node.svg}</div>`;
+  return `\n<div${builder.build()}>\n${indentString(node.svg ?? "")}</div>`;
 };
 
 const tailwindGroup = async (

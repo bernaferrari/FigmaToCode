@@ -9,7 +9,7 @@
   "permissions": [],
   "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": ["https://placehold.co"]
+    "allowedDomains": ["none"]
   },
   "codegenLanguages": [
     { "label": "HTML", "value": "html" },

@@ -10,10 +10,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,css,md}\""
   },
   "devDependencies": {
-    "eslint": "^9.23.0",
+    "eslint": "^9.29.0",
     "eslint-config-custom": "workspace:*",
     "prettier": "^3.5.3",
-    "turbo": "^2.4.4",
-    "typescript": "^5.8.2"
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
   }
 }
