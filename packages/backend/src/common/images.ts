@@ -3,25 +3,21 @@ import { btoa } from "js-base64";
 import { addWarning } from "./commonConversionWarnings";
 import { exportAsyncProxy } from "./exportAsyncProxy";
 
-export const PLACEHOLDER_IMAGE_DOMAIN = "https://placehold.co";
+import { createCanvas } from 'canvas';
 
 const createCanvasImageUrl = (width: number, height: number): string => {
+  let canvas;
   // Check if we're in a browser environment
   if (typeof document === 'undefined' || typeof window === 'undefined') {
     // Fallback for non-browser environments
-    return `${PLACEHOLDER_IMAGE_DOMAIN}/${width}x${height}`;
+    canvas = createCanvas(width, height);
+  } else {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
   }
-
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
 
   const ctx = canvas.getContext('2d');
-  if (!ctx) {
-    // Fallback if canvas context is not available
-    return `${PLACEHOLDER_IMAGE_DOMAIN}/${width}x${height}`;
-  }
-
   const fontSize = Math.max(12, Math.floor(width * 0.15));
   ctx.font = `bold ${fontSize}px Inter, Arial, Helvetica, sans-serif`;
   ctx.fillStyle = '#888888';
@@ -47,15 +43,10 @@ const createCanvasImageUrl = (width: number, height: number): string => {
   return URL.createObjectURL(file);
 };
 
-export const getPlaceholderImage = (w: number, h = -1, useCanvas = false) => {
+export const getPlaceholderImage = (w: number, h = -1) => {
   const _w = w.toFixed(0);
   const _h = (h < 0 ? w : h).toFixed(0);
-  
-  if (useCanvas) {
-    return createCanvasImageUrl(parseInt(_w), parseInt(_h));
-  }
-  
-  return `${PLACEHOLDER_IMAGE_DOMAIN}/${_w}x${_h}`;
+  return createCanvasImageUrl(parseInt(_w), parseInt(_h));
 };
 
 const fillIsImage = ({ type }: Paint) => type === "IMAGE";
