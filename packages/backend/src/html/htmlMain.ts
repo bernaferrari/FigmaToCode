@@ -617,7 +617,9 @@ const htmlContainer = async (
       ) {
         imgUrl = (await exportNodeAsBase64PNG(altNode, hasChildren)) ?? "";
       } else {
+        console.log("isPreviewGlobal", isPreviewGlobal);
         imgUrl = getPlaceholderImage(node.width, node.height, isPreviewGlobal);
+        console.log("imgUrl", imgUrl);
       }
 
       if (hasChildren) {

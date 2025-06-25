@@ -23,6 +23,7 @@ export const defaultPluginSettings: PluginSettings = {
   responsiveRoot: false,
   flutterGenerationMode: "snippet",
   swiftUIGenerationMode: "snippet",
+  composeGenerationMode: "snippet",
   roundTailwindValues: true,
   roundTailwindColors: true,
   useColorVariables: true,

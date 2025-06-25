@@ -38,7 +38,7 @@ type PluginUIProps = {
   isLoading: boolean;
 };
 
-const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
+const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI", "Compose"];
 
 type FrameworkTabsProps = {
   frameworks: Framework[];

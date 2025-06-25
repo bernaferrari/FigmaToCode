@@ -108,4 +108,15 @@ export const selectPreferenceOptions: SelectPreferenceOptions[] = [
     ],
     includedLanguages: ["SwiftUI"],
   },
+  {
+    itemType: "select",
+    propertyName: "composeGenerationMode",
+    label: "Mode",
+    options: [
+      { label: "Snippet", value: "snippet" },
+      { label: "Composable", value: "composable" },
+      { label: "Full Screen", value: "screen" },
+    ],
+    includedLanguages: ["Compose"],
+  },
 ];

@@ -1,4 +1,5 @@
 import { PluginSettings } from "types";
+import { composeMain } from "../../compose/composeMain";
 import { flutterMain } from "../../flutter/flutterMain";
 import { htmlMain } from "../../html/htmlMain";
 import { swiftuiMain } from "../../swiftui/swiftuiMain";
@@ -15,6 +16,8 @@ export const convertToCode = async (
       return await flutterMain(nodes, settings);
     case "SwiftUI":
       return await swiftuiMain(nodes, settings);
+    case "Compose":
+      return composeMain(nodes, settings);
     case "HTML":
     default:
       return (await htmlMain(nodes, settings)).html;

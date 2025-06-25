@@ -7,16 +7,17 @@ export const PLACEHOLDER_IMAGE_DOMAIN = "https://placehold.co";
 
 const createCanvasImageUrl = (width: number, height: number): string => {
   // Check if we're in a browser environment
-  if (typeof document === 'undefined' || typeof window === 'undefined') {
+  console.log("typeof document", typeof document);
+  if (typeof document === "undefined" || typeof window === "undefined") {
     // Fallback for non-browser environments
     return `${PLACEHOLDER_IMAGE_DOMAIN}/${width}x${height}`;
   }
 
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   if (!ctx) {
     // Fallback if canvas context is not available
     return `${PLACEHOLDER_IMAGE_DOMAIN}/${width}x${height}`;
@@ -24,7 +25,7 @@ const createCanvasImageUrl = (width: number, height: number): string => {
 
   const fontSize = Math.max(12, Math.floor(width * 0.15));
   ctx.font = `bold ${fontSize}px Inter, Arial, Helvetica, sans-serif`;
-  ctx.fillStyle = '#888888';
+  ctx.fillStyle = "#888888";
 
   const text = `${width} x ${height}`;
   const textWidth = ctx.measureText(text).width;
@@ -42,7 +43,7 @@ const createCanvasImageUrl = (width: number, height: number): string => {
   }
   const byteArray = new Uint8Array(byteNumbers);
   const file = new Blob([byteArray], {
-    type: 'image/png;base64',
+    type: "image/png;base64",
   });
   return URL.createObjectURL(file);
 };
@@ -50,11 +51,12 @@ const createCanvasImageUrl = (width: number, height: number): string => {
 export const getPlaceholderImage = (w: number, h = -1, useCanvas = false) => {
   const _w = w.toFixed(0);
   const _h = (h < 0 ? w : h).toFixed(0);
-  
+
+  console.log("useCanvas", useCanvas);
   if (useCanvas) {
     return createCanvasImageUrl(parseInt(_w), parseInt(_h));
   }
-  
+
   return `${PLACEHOLDER_IMAGE_DOMAIN}/${_w}x${_h}`;
 };
 

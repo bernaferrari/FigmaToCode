@@ -1,6 +1,6 @@
 import "@figma/plugin-typings";
 // Settings
-export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
+export type Framework = "Flutter" | "SwiftUI" | "HTML" | "Tailwind" | "Compose";
 export interface HTMLSettings {
   showLayerNames: boolean;
   embedImages: boolean;
@@ -24,11 +24,15 @@ export interface FlutterSettings {
 export interface SwiftUISettings {
   swiftUIGenerationMode: string;
 }
+export interface ComposeSettings {
+  composeGenerationMode: string;
+}
 export interface PluginSettings
   extends HTMLSettings,
     TailwindSettings,
     FlutterSettings,
-    SwiftUISettings {
+    SwiftUISettings,
+    ComposeSettings {
   framework: Framework;
   useOldPluginVersion2025: boolean;
   responsiveRoot: boolean;
