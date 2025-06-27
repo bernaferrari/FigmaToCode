@@ -19,13 +19,13 @@ export interface TailwindSettings extends HTMLSettings {
   useTailwind4: boolean;
 }
 export interface FlutterSettings {
-  flutterGenerationMode: string;
+  flutterGenerationMode: "fullApp" | "stateless" | "snippet";
 }
 export interface SwiftUISettings {
-  swiftUIGenerationMode: string;
+  swiftUIGenerationMode: "preview" | "struct" | "snippet";
 }
 export interface ComposeSettings {
-  composeGenerationMode: string;
+  composeGenerationMode: "snippet" | "composable" | "screen";
 }
 export interface PluginSettings
   extends HTMLSettings,

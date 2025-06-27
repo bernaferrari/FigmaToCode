@@ -5,6 +5,7 @@ import {
   tailwindMain,
   swiftuiMain,
   htmlMain,
+  composeMain,
   postSettingsChanged,
 } from "backend";
 import { nodesToJSON } from "backend/src/altNodes/jsonNodeConversion";
@@ -12,6 +13,7 @@ import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retr
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
 import { htmlCodeGenTextStyles } from "backend/src/html/htmlMain";
 import { swiftUICodeGenTextStyles } from "backend/src/swiftui/swiftuiMain";
+import { composeCodeGenTextStyles } from "backend/src/compose/composeMain";
 import { PluginSettings, SettingWillChangeMessage } from "types";
 
 let userPluginSettings: PluginSettings;
@@ -394,6 +396,22 @@ const codegenMode = async () => {
               language: "SWIFT",
             },
           ];
+        // case "compose":
+        //   return [
+        //     {
+        //       title: "Jetpack Compose",
+        //       code: composeMain(convertedSelection, {
+        //         ...userPluginSettings,
+        //         composeGenerationMode: "snippet",
+        //       }),
+        //       language: "KOTLIN",
+        //     },
+        //     {
+        //       title: "Text Styles",
+        //       code: composeCodeGenTextStyles(),
+        //       language: "KOTLIN",
+        //     },
+        //   ];
         default:
           break;
       }

@@ -222,7 +222,9 @@ const CodePanel = (props: CodePanelProps) => {
                     ? "dart"
                     : selectedFramework === "SwiftUI"
                       ? "swift"
-                      : "html"
+                      : selectedFramework === "Compose"
+                        ? "kotlin"
+                        : "html"
               }
               style={theme}
               customStyle={{

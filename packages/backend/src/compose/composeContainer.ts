@@ -1,4 +1,3 @@
-import { numberToFixedString } from "../common/numToAutoFixed";
 import { retrieveTopFill } from "../common/retrieveFill";
 import { getCommonRadius } from "../common/commonRadius";
 import { composeSize } from "./builderImpl/composeSize";
@@ -11,6 +10,13 @@ export const composeContainer = (
   node: SceneNode & MinimalBlendMixin,
   child: string,
 ): string => {
+  // Safety check for node dimensions
+  if ("width" in node && "height" in node) {
+    if ((node.width <= 0 || node.height <= 0) && !child) {
+      return "// Invalid node dimensions";
+    }
+  }
+
   const modifiers: string[] = [];
   let containerType = "Box";
 
@@ -33,23 +39,26 @@ export const composeContainer = (
   }
 
   // Border radius
+  let shape = null;
   if ("cornerRadius" in node || "topLeftRadius" in node) {
     const radius = getCommonRadius(node);
     if ("all" in radius && radius.all > 0) {
-      modifiers.push(`clip(RoundedCornerShape(${radius.all}.dp))`);
+      shape = `RoundedCornerShape(${radius.all}.dp)`;
+      modifiers.push(`clip(${shape})`);
     } else if ("topLeft" in radius) {
-      modifiers.push(`clip(RoundedCornerShape(
+      shape = `RoundedCornerShape(
         topStart = ${radius.topLeft}.dp,
         topEnd = ${radius.topRight}.dp,
         bottomEnd = ${radius.bottomRight}.dp,
         bottomStart = ${radius.bottomLeft}.dp
-    ))`);
+    )`;
+      modifiers.push(`clip(${shape})`);
     }
   }
 
   // Border
   if ("strokes" in node && node.strokes.length > 0) {
-    const borderModifier = composeBorder(node);
+    const borderModifier = composeBorder(node, shape);
     if (borderModifier) {
       modifiers.push(borderModifier);
     }
@@ -73,7 +82,7 @@ export const composeContainer = (
 
   // Build modifier chain
   const modifierChain = modifiers.length > 0 
-    ? `modifier = Modifier.${modifiers.join(".")}`
+    ? `modifier = Modifier${modifiers.map(m => `.${m}`).join("")}`
     : "";
 
   // Generate container

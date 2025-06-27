@@ -23,7 +23,7 @@ export const composePadding = (node: InferredAutoLayoutResult): string => {
     if (padding.all === 0) {
       return "";
     }
-    return `padding(all = ${numberToFixedString(padding.all)}.dp)`;
+    return `padding(${numberToFixedString(padding.all)}.dp)`;
   }
 
   if ("horizontal" in padding) {

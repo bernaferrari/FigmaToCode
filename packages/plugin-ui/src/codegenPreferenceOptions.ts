@@ -41,7 +41,7 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
     description:
       "Export code using Figma variables as colors. Example: 'bg-background' instead of 'bg-white'.",
     isDefault: true,
-    includedLanguages: ["HTML", "Tailwind", "Flutter"],
+    includedLanguages: ["HTML", "Tailwind", "Flutter", "Compose"],
   },
   {
     itemType: "individual_select",

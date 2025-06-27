@@ -37,7 +37,7 @@ export const composeShadow = (effects: readonly Effect[]): string => {
       if (effect.spread === 0 && effect.radius <= 8 && effect.offset.x === 0) {
         const elevation = Math.abs(effect.offset.y);
         if (elevation > 0 && elevation <= 24) {
-          shadowModifiers.push(`shadow(elevation = ${numberToFixedString(elevation)}.dp)`);
+          shadowModifiers.push(`shadow(${numberToFixedString(elevation)}.dp)`);
           return;
         }
       }
@@ -57,11 +57,7 @@ export const composeShadow = (effects: readonly Effect[]): string => {
 }`);
       } else {
         // Simple shadow with custom color
-        shadowModifiers.push(`shadow(
-    elevation = ${blurRadius}.dp,
-    ambientColor = Color(0x${color.toUpperCase()}),
-    spotColor = Color(0x${color.toUpperCase()})
-)`);
+        shadowModifiers.push(`shadow(${blurRadius}.dp, shape = RectangleShape)`);
       }
     } else if (effect.type === "INNER_SHADOW") {
       // Inner shadows in Compose require custom drawing

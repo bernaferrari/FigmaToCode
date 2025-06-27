@@ -11,6 +11,8 @@ export const getMainAxisAlignment = (
       return "Arrangement.End";
     case "SPACE_BETWEEN":
       return "Arrangement.SpaceBetween";
+    default:
+      return "Arrangement.Start";
   }
 };
 
@@ -30,6 +32,8 @@ export const getCrossAxisAlignment = (
         return "Alignment.Bottom";
       case "BASELINE":
         return "Alignment.CenterVertically"; // Compose doesn't have baseline alignment for Row
+      default:
+        return "Alignment.Top";
     }
   } else {
     // VERTICAL layout mode
@@ -43,6 +47,8 @@ export const getCrossAxisAlignment = (
         return "Alignment.End";
       case "BASELINE":
         return "Alignment.CenterHorizontally"; // Baseline not applicable for Column
+      default:
+        return "Alignment.Start";
     }
   }
 };
@@ -60,6 +66,8 @@ export const getWrapAlignment = (
       return "Arrangement.End";
     case "SPACE_BETWEEN":
       return "Arrangement.SpaceBetween";
+    default:
+      return "Arrangement.Start";
   }
 };
 
@@ -82,6 +90,8 @@ export const getWrapRunAlignment = (
         return "Arrangement.Center";
       case "MAX":
         return "Arrangement.Bottom";
+      default:
+        return "Arrangement.Top";
     }
   } else {
     // FlowColumn - horizontal alignment
@@ -94,6 +104,8 @@ export const getWrapRunAlignment = (
         return "Arrangement.Center";
       case "MAX":
         return "Arrangement.End";
+      default:
+        return "Arrangement.Start";
     }
   }
 };

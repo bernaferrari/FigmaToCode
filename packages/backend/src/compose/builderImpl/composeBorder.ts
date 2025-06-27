@@ -39,7 +39,7 @@ const getStrokeAlignment = (node: SceneNode): "inside" | "center" | "outside" =>
  * @param node - The scene node with stroke properties
  * @returns Compose border modifier string
  */
-export const composeBorder = (node: SceneNode): string => {
+export const composeBorder = (node: SceneNode, shape?: string | null): string => {
   if (!("strokes" in node)) {
     return "";
   }
@@ -62,7 +62,7 @@ export const composeBorder = (node: SceneNode): string => {
       return "";
     }
 
-    return generateBorderModifier(stroke.all, strokeFill, strokeAlignment);
+    return generateBorderModifier(stroke.all, strokeFill, strokeAlignment, shape);
   } else {
     // Handle non-uniform borders
     // Compose doesn't have direct support for different border widths per side
@@ -80,7 +80,7 @@ export const composeBorder = (node: SceneNode): string => {
 
     // For now, use uniform border with max width
     // TODO: Consider using Canvas or custom drawing for true non-uniform borders
-    return generateBorderModifier(maxWidth, strokeFill, strokeAlignment);
+    return generateBorderModifier(maxWidth, strokeFill, strokeAlignment, shape);
   }
 };
 
@@ -90,7 +90,8 @@ export const composeBorder = (node: SceneNode): string => {
 const generateBorderModifier = (
   width: number,
   fill: Paint,
-  alignment: "inside" | "center" | "outside"
+  alignment: "inside" | "center" | "outside",
+  shape?: string | null
 ): string => {
   const widthDp = `${numberToFixedString(width)}.dp`;
 
@@ -109,11 +110,12 @@ const generateBorderModifier = (
     // For alignment, we note that Compose doesn't have built-in stroke alignment
     // All borders are essentially "inside" by default
     // For outside borders, we might need custom drawing or padding adjustments
+    const shapeParam = shape ? `, shape = ${shape}` : "";
     if (alignment === "outside") {
       // Add comment about limitation
-      return `.border(width = ${widthDp}, color = ${colorValue}) // Note: Compose borders are always inside`;
+      return `border(width = ${widthDp}, color = ${colorValue}${shapeParam}) // Note: Compose borders are always inside`;
     } else {
-      return `.border(width = ${widthDp}, color = ${colorValue})`;
+      return `border(width = ${widthDp}, color = ${colorValue}${shapeParam})`;
     }
   } else if (fill.type === "GRADIENT_LINEAR") {
     // Convert gradient to Compose Brush
@@ -133,13 +135,14 @@ const generateBorderModifier = (
     }).join(", ");
 
     const brush = `Brush.linearGradient(
-        colorStops = arrayOf(${stops})
+        listOf(${stops})
     )`;
 
+    const shapeParam = shape ? `, shape = ${shape}` : "";
     if (alignment === "outside") {
-      return `.border(width = ${widthDp}, brush = ${brush}) // Note: Compose borders are always inside`;
+      return `border(width = ${widthDp}, brush = ${brush}${shapeParam}) // Note: Compose borders are always inside`;
     } else {
-      return `.border(width = ${widthDp}, brush = ${brush})`;
+      return `border(width = ${widthDp}, brush = ${brush}${shapeParam})`;
     }
   } else if (fill.type === "GRADIENT_RADIAL") {
     // Convert radial gradient to Compose Brush
@@ -159,13 +162,14 @@ const generateBorderModifier = (
     }).join(", ");
 
     const brush = `Brush.radialGradient(
-        colorStops = arrayOf(${stops})
+        listOf(${stops})
     )`;
 
+    const shapeParam = shape ? `, shape = ${shape}` : "";
     if (alignment === "outside") {
-      return `.border(width = ${widthDp}, brush = ${brush}) // Note: Compose borders are always inside`;
+      return `border(width = ${widthDp}, brush = ${brush}${shapeParam}) // Note: Compose borders are always inside`;
     } else {
-      return `.border(width = ${widthDp}, brush = ${brush})`;
+      return `border(width = ${widthDp}, brush = ${brush}${shapeParam})`;
     }
   }
 

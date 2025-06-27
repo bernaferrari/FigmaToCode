@@ -5,6 +5,36 @@ import { rgbTo6hex } from "../common/color";
 import { getCommonRadius } from "../common/commonRadius";
 import { retrieveTopFill } from "../common/retrieveFill";
 
+// Cache static mappings for performance
+const FONT_WEIGHT_MAP: Record<number, string> = {
+  100: "Thin",
+  200: "ExtraLight",
+  300: "Light",
+  400: "Normal",
+  500: "Medium",
+  600: "SemiBold",
+  700: "Bold",
+  800: "ExtraBold",
+  900: "Black",
+};
+
+const TEXT_ALIGN_MAP: Record<string, string> = {
+  "LEFT": "Left",
+  "CENTER": "Center",
+  "RIGHT": "Right",
+  "JUSTIFIED": "Justify",
+};
+
+const TEXT_ESCAPE_MAP: Record<string, string> = {
+  '\\': '\\\\',
+  '"': '\\"',
+  '\n': '\\n',
+  '\r': '\\r',
+  '\t': '\\t'
+};
+
+const TEXT_ESCAPE_REGEX = /[\\"\n\r\t]/g;
+
 export class ComposeTextBuilder extends ComposeDefaultBuilder {
   constructor() {
     super("");
@@ -16,11 +46,22 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
   }
 
   private getText(node: TextNode): string {
-    const text = node.characters;
+    const text = node.characters || "";
     const textStyles = this.getTextStyles(node);
     
+    // Escape text content properly (single pass for performance)
+    const escapedText = text.replace(TEXT_ESCAPE_REGEX, (char) => TEXT_ESCAPE_MAP[char]);
+    
+    // Handle multiline text differently
+    if (text.includes('\n')) {
+      return `Text(
+    text = """${text}""",
+    ${textStyles}
+)`;
+    }
+    
     return `Text(
-    text = "${text.replace(/"/g, '\\"')}",
+    text = "${escapedText}",
     ${textStyles}
 )`;
   }
@@ -29,12 +70,12 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
     const styles: string[] = [];
 
     // Font size
-    if (node.fontSize !== figma.mixed) {
-      styles.push(`fontSize = ${node.fontSize}.sp`);
+    if (node.fontSize !== figma.mixed && typeof node.fontSize === "number" && node.fontSize > 0) {
+      styles.push(`fontSize = ${numberToFixedString(node.fontSize)}.sp`);
     }
 
     // Font weight
-    if (node.fontWeight !== figma.mixed) {
+    if (node.fontWeight !== figma.mixed && typeof node.fontWeight === "number") {
       const weight = this.mapFontWeight(node.fontWeight);
       if (weight) {
         styles.push(`fontWeight = FontWeight.${weight}`);
@@ -45,7 +86,7 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
     const fill = retrieveTopFill(node.fills);
     if (fill?.type === "SOLID") {
       const color = rgbTo6hex(fill.color);
-      styles.push(`color = Color(0xFF${color})`);
+      styles.push(`color = Color(0xFF${color.toUpperCase()})`);
     }
 
     // Letter spacing
@@ -78,28 +119,11 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
   }
 
   private mapFontWeight(weight: number): string | null {
-    const weightMap: Record<number, string> = {
-      100: "Thin",
-      200: "ExtraLight",
-      300: "Light",
-      400: "Normal",
-      500: "Medium",
-      600: "SemiBold",
-      700: "Bold",
-      800: "ExtraBold",
-      900: "Black",
-    };
-    return weightMap[weight] || null;
+    return FONT_WEIGHT_MAP[weight] || null;
   }
 
   private mapTextAlign(align: string): string | null {
-    const alignMap: Record<string, string> = {
-      "LEFT": "Left",
-      "CENTER": "Center",
-      "RIGHT": "Right",
-      "JUSTIFIED": "Justify",
-    };
-    return alignMap[align] || null;
+    return TEXT_ALIGN_MAP[align] || null;
   }
 
   textAutoSize(node: TextNode): this {
