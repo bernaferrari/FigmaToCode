@@ -17,8 +17,8 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.10",
-    "@types/node": "^22.15.32",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^24.0.4",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "eslint-config-custom": "workspace:*",

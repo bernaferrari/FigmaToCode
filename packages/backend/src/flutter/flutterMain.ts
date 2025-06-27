@@ -15,7 +15,6 @@ import {
 } from "./builderImpl/flutterAutoLayout";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
-import { getPlaceholderImage } from "../common/images";
 import { getVisibleNodes } from "../common/nodeVisibility";
 
 let localSettings: PluginSettings;

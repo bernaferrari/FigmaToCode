@@ -214,8 +214,8 @@ export const flutterAngularGradient = (fill: GradientPaint): string => {
 /**
  * Convert opacity (0-1) to alpha (0-255)
  */
-const opacityToAlpha = (opacity: number): number => {
-  return Math.round(opacity * 255);
+const opacityToAlpha = (opacity: number) => {
+  return numberToFixedString(opacity);
 };
 
 export const flutterColor = (

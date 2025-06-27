@@ -48,14 +48,9 @@ const createCanvasImageUrl = (width: number, height: number): string => {
   return URL.createObjectURL(file);
 };
 
-export const getPlaceholderImage = (w: number, h = -1, useCanvas = false) => {
+export const getPlaceholderImage = (w: number, h = -1) => {
   const _w = w.toFixed(0);
   const _h = (h < 0 ? w : h).toFixed(0);
-
-  console.log("useCanvas", useCanvas);
-  if (useCanvas) {
-    return createCanvasImageUrl(parseInt(_w), parseInt(_h));
-  }
 
   return `${PLACEHOLDER_IMAGE_DOMAIN}/${_w}x${_h}`;
 };
