@@ -12,6 +12,7 @@ import {
 import { TailwindDefaultBuilder } from "./tailwindDefaultBuilder";
 import { config } from "./tailwindConfig";
 import { StyledTextSegmentSubset } from "types";
+import { localTailwindSettings } from "./tailwindMain";
 
 export class TailwindTextBuilder extends TailwindDefaultBuilder {
   getTextSegments(node: TextNode): {
@@ -93,6 +94,15 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   };
 
   fontFamily = (fontName: FontName): string => {
+    // Check if the font matches the base font family setting
+    const baseFontFamily = localTailwindSettings.baseFontFamily;
+    
+    // If the font matches exactly the base font, don't add a class
+    if (baseFontFamily && fontName.family.toLowerCase() === baseFontFamily.toLowerCase()) {
+      return "";
+    }
+    
+    // Check if the font is in one of the Tailwind default font stacks
     if (config.fontFamily.sans.includes(fontName.family)) {
       return "font-sans";
     }
