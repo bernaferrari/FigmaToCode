@@ -78,16 +78,14 @@ const fontSize = {
 };
 
 const lineHeight = {
-  0.75: "3",
-  1: "none",
-  1.25: "tight",
-  1.375: "snug",
-  1.5: "normal",
-  1.625: "relaxed",
-  2: "loose",
-  1.75: "7",
-  2.25: "9",
-  2.5: "10",
+  0.75: "3",    // 0.75rem
+  1: "4",       // 1rem  
+  1.25: "5",    // 1.25rem
+  1.5: "6",     // 1.5rem
+  1.75: "7",    // 1.75rem
+  2: "8",       // 2rem
+  2.25: "9",    // 2.25rem
+  2.5: "10",    // 2.5rem
 };
 
 const letterSpacing = {
