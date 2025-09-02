@@ -14,7 +14,7 @@ export const nearestValue = (goal: number, array: Array<number>): number => {
 export const nearestValueWithThreshold = (
   goal: number,
   array: Array<number>,
-  thresholdPercent: number = 15,
+  thresholdPercent: number = localTailwindSettings.thresholdPercent,
 ): number | null => {
   const nearest = nearestValue(goal, array);
   const diff = Math.abs(nearest - goal);
@@ -61,7 +61,7 @@ const pxToRemToTailwind = (
     return conversionMap[convertedValue];
   } else if (localTailwindSettings.roundTailwindValues) {
     // Only round if the nearest value is within acceptable threshold
-    const thresholdValue = nearestValueWithThreshold(remValue, keys, 15);
+    const thresholdValue = nearestValueWithThreshold(remValue, keys);
 
     if (thresholdValue !== null) {
       return conversionMap[thresholdValue];
@@ -82,7 +82,7 @@ const pxToTailwind = (
     return conversionMap[convertedValue];
   } else if (localTailwindSettings.roundTailwindValues) {
     // Only round if the nearest value is within acceptable threshold
-    const thresholdValue = nearestValueWithThreshold(value, keys, 15);
+    const thresholdValue = nearestValueWithThreshold(value, keys);
 
     if (thresholdValue !== null) {
       return conversionMap[thresholdValue];
@@ -106,8 +106,8 @@ export const pxToFontSize = (value: number): string => {
 
 export const pxToBorderRadius = (value: number): string => {
   const conversionMap = localTailwindSettings.useTailwind4
-  ? config.borderRadiusV4
-  : config.borderRadius;
+    ? config.borderRadiusV4
+    : config.borderRadius;
   return pxToRemToTailwind(value, conversionMap);
 };
 
@@ -121,8 +121,8 @@ export const pxToOutline = (value: number): string | null => {
 
 export const pxToBlur = (value: number): string | null => {
   const conversionMap = localTailwindSettings.useTailwind4
-  ? config.blurV4
-  : config.blur;
+    ? config.blurV4
+    : config.blur;
   return pxToTailwind(value, conversionMap);
 };
 
