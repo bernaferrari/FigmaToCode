@@ -36,6 +36,8 @@ export const defaultPluginSettings: PluginSettings = {
   tailwindGenerationMode: "jsx",
   baseFontSize: 16,
   useTailwind4: false,
+  thresholdPercent: 15,
+  baseFontFamily: "",
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
