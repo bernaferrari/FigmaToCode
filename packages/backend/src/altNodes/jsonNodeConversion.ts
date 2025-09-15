@@ -274,7 +274,10 @@ const processNodePair = async (
 ): Promise<Node | Node[] | null> => {
   if (!jsonNode.id) return null;
   if (jsonNode.visible === false) return null;
-
+  // filter invisible fills
+  if ('fills' in figmaNode && figmaNode.fills != figma.mixed) {
+    figmaNode.fills = figmaNode.fills.filter(bg=>bg.visible)
+  }
   // Handle node type-specific conversions (from convertNodeToAltNode)
   const nodeType = jsonNode.type;
 
