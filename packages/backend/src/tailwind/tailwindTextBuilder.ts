@@ -55,6 +55,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         // textIndentStyle,
         blurStyle,
         shadowStyle,
+        this.truncateText(node),
       ]
         .filter(Boolean)
         .join(" ");
@@ -67,6 +68,19 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       };
     });
   }
+
+  truncateText = (
+    node: TextNode, 
+  ) => {
+    if (node.textTruncation !== "DISABLED" && node.maxLines) {
+      if (node.maxLines > 0 && node.maxLines < 7) {
+        return `line-clamp-${node.maxLines}`
+      } else {
+        return `line-clamp-[${node.maxLines}]`
+      }
+    }
+    return "";
+  };
 
   getTailwindColorFromFills = (
     fills: ReadonlyArray<Paint> | PluginAPI["mixed"],
@@ -111,6 +125,9 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     }
     if (config.fontFamily.mono.includes(fontName.family)) {
       return "font-mono";
+    }
+    if (config.fontFamily.display.includes(fontName.family)) {
+      return "font-display";
     }
     const underscoreFontName = fontName.family.replace(/\s/g, "_");
 
