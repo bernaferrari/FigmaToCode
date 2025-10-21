@@ -126,9 +126,6 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     if (config.fontFamily.mono.includes(fontName.family)) {
       return "font-mono";
     }
-    if (config.fontFamily.display.includes(fontName.family)) {
-      return "font-display";
-    }
     const underscoreFontName = fontName.family.replace(/\s/g, "_");
 
     return "font-['" + underscoreFontName + "']";
