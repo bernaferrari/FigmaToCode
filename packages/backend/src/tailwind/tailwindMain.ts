@@ -174,7 +174,7 @@ const tailwindFrame = async (
 ): Promise<string> => {
   // Check if this is an instance and should be rendered as a Twig component
   if (node.type === "INSTANCE" && settings.tailwindGenerationMode === "twig") {
-    return tailwindComponentInstance(node, settings);
+    return tailwindTwigComponentInstance(node, settings);
   }
 
   const childrenStr = await tailwindWidgetGenerator(node.children, settings);
@@ -199,7 +199,7 @@ const tailwindFrame = async (
 
 
 // Helper function to generate Twig component syntax for component instances
-const tailwindComponentInstance = async (
+const tailwindTwigComponentInstance = async (
   node: InstanceNode,
   settings: TailwindSettings,
 ): Promise<string> => {
@@ -212,7 +212,7 @@ const tailwindComponentInstance = async (
     // .commonShapeStyles()
   ;
 
-  const attrs: string[] = [''];
+  const twigComponentProperties: string[] = [''];
 
   for (const prop in node.componentProperties) {
     const cleanName = prop
@@ -220,22 +220,34 @@ const tailwindComponentInstance = async (
             .replace(/\s+/g, "-")
             .toLowerCase()
     const attr = `${cleanName}="${node.componentProperties[prop]?.value}"`;
-    attrs.push(attr);
+    twigComponentProperties.push(attr);
   }
 
 
-  const attributes = builder.build();
+  const attributes = builder.build() + twigComponentProperties.join(' ');
 
   // If we have children, process them
   let childrenStr = "";
-  if (node.children && node.children.length > 0) {
-    childrenStr = await tailwindWidgetGenerator(node.children.filter((n) => n.type === "INSTANCE"), settings);
-    return `\n<twig:${componentName}${attributes}${attrs.join(' ')}>${indentString(childrenStr)}\n</twig:${componentName}>`;
+
+  const embeddableChildren = node.children ? node.children.filter((n) => isVisibleComponent(n) || isTwigContentFrame(n)) : [];
+
+  if (embeddableChildren.length > 0) {
+    // We keep embedded components and Frame named "TwigContent"
+    childrenStr = await tailwindWidgetGenerator(embeddableChildren, settings);
+    return `\n<twig:${componentName}${attributes}>${indentString(childrenStr)}\n</twig:${componentName}>`;
   } else {
     // Self-closing tag if no children
-    return `\n<twig:${componentName}${attributes}${attrs.join(' ')} />`;
+    return `\n<twig:${componentName}${attributes} />`;
   }
 };
+
+const isVisibleComponent = (node: SceneNode): boolean => {
+  return node.type === "INSTANCE" && (node.name[0] !== '.' && node.name[0] !== '_');
+}
+
+const isTwigContentFrame = (node: SceneNode): boolean => {
+  return node.type === "FRAME" && node.name === "TwigContent";
+}
 
 // Helper function to extract component name from an instance
 const extractComponentName = (node: InstanceNode): string => {
