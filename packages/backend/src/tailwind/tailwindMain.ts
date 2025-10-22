@@ -172,6 +172,11 @@ const tailwindFrame = async (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   settings: TailwindSettings,
 ): Promise<string> => {
+  // Check if this is an instance and should be rendered as a Twig component
+  if (node.type === "INSTANCE" && settings.tailwindGenerationMode === "twig") {
+    return tailwindComponentInstance(node, settings);
+  }
+
   const childrenStr = await tailwindWidgetGenerator(node.children, settings);
 
   const clipsContentClass =
@@ -190,6 +195,69 @@ const tailwindFrame = async (
     .join(" ");
 
   return tailwindContainer(node, childrenStr, combinedProps, settings);
+};
+
+
+// Helper function to generate Twig component syntax for component instances
+const tailwindComponentInstance = async (
+  node: InstanceNode,
+  settings: TailwindSettings,
+): Promise<string> => {
+  // Extract component name from the instance
+  const componentName = extractComponentName(node);
+
+  // Get component properties if needed
+  const builder = new TailwindDefaultBuilder(node, settings)
+    // .commonPositionStyles()
+    // .commonShapeStyles()
+  ;
+
+  const attrs: string[] = [''];
+
+  for (const prop in node.componentProperties) {
+    const cleanName = prop
+            .split("#")[0]
+            .replace(/\s+/g, "-")
+            .toLowerCase()
+    const attr = `${cleanName}="${node.componentProperties[prop]?.value}"`;
+    attrs.push(attr);
+  }
+
+
+  const attributes = builder.build();
+
+  // If we have children, process them
+  let childrenStr = "";
+  if (node.children && node.children.length > 0) {
+    childrenStr = await tailwindWidgetGenerator(node.children.filter((n) => n.type === "INSTANCE"), settings);
+    return `\n<twig:${componentName}${attributes}${attrs.join(' ')}>${indentString(childrenStr)}\n</twig:${componentName}>`;
+  } else {
+    // Self-closing tag if no children
+    return `\n<twig:${componentName}${attributes}${attrs.join(' ')} />`;
+  }
+};
+
+// Helper function to extract component name from an instance
+const extractComponentName = (node: InstanceNode): string => {
+  // Try to get name from mainComponent if available
+  if (node.mainComponent) {
+    const name = node.mainComponent.name;
+    // Convert component name to PascalCase for Twig component naming convention
+    return toPascalCase(name);
+  }
+
+  // Fallback to node name if mainComponent is not available
+  return toPascalCase(node.name);
+};
+
+// Helper function to convert string to PascalCase
+const toPascalCase = (str: string): string => {
+  // Remove any non-alphanumeric characters and split by spaces, underscores, or dashes
+  return str
+    .replace(/[^\w\s-]/g, '')
+    .split(/[\s_-]+/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
 };
 
 export const tailwindContainer = (
