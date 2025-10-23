@@ -5,7 +5,7 @@ interface TailwindSettingsProps {
   settings: PluginSettings | null;
   onPreferenceChanged: (
     key: keyof PluginSettings,
-    value: boolean | string | number,
+    value: boolean | string | number | Record<string, string[]>,
   ) => void;
 }
 
@@ -27,6 +27,23 @@ export const TailwindSettings: React.FC<TailwindSettingsProps> = ({
   const handleBaseFontFamilyChange = (newValue: string) => {
     onPreferenceChanged("baseFontFamily", newValue);
   };
+  const handleFontFamilyCustomConfigChange = (newValue: string) => {
+  try {
+    // Check if the string is empty, use default empty object
+    if (!newValue.trim()) {
+      onPreferenceChanged("fontFamilyCustomConfig", {});
+      return;
+    }
+
+    // parse the JSON
+    const config = JSON.parse(newValue);
+
+    onPreferenceChanged("fontFamilyCustomConfig", config);
+  } catch (error) {
+    // Handle parsing errors
+    console.error("Invalid JSON configuration:", error);
+  }
+};
 
   return (
     <div className="mt-2">
@@ -106,6 +123,28 @@ export const TailwindSettings: React.FC<TailwindSettingsProps> = ({
           />
           <p className="text-xs text-neutral-500 mt-1">
             {`Elements with this font won't have "font-[<value>]" class added`}
+          </p>
+        </div>
+        <div className="mb-3">
+          <FormField
+            type="json"
+            label="Font Family Custom Config"
+            initialValue={settings.fontFamilyCustomConfig ? JSON.stringify(settings.fontFamilyCustomConfig) : ''}
+            onValueChange={(d) => {
+              handleFontFamilyCustomConfigChange(String(d));
+            }}
+            placeholder="Your custom config"
+            helpText="Paste your tailwind custom font family config"
+          />
+          <p className="text-xs text-neutral-500 mt-1">
+            {`This allow to override the custom font handling e.g. "font-comic"`}
+            <pre>
+              {`{
+  "sans":["Arial","verdana"],
+  "display":["Times","Roboto"],
+  "comic":["Comic Sans MS"]
+}`}
+            </pre>
           </p>
         </div>
       </div>

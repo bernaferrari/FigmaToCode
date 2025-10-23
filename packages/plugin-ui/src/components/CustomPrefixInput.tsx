@@ -10,7 +10,7 @@ interface FormFieldProps {
   helpText?: string;
 
   // Validation props
-  type?: "text" | "number";
+  type?: "text" | "number"| "json";
   min?: number;
   max?: number;
   suffix?: string;
@@ -50,6 +50,7 @@ const FormField = React.memo(
     const [hasError, setHasError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Update internal state when initialValue changes (from parent)
     useEffect(() => {
@@ -106,10 +107,63 @@ const FormField = React.memo(
         return true;
       }
 
+      if (type === "json") {
+        // Check if the string is empty skip validation
+        if (!value.trim()) {
+          setHasError(false);
+          setErrorMessage("");
+          return true;
+        }
+
+        try {
+            // Try to parse the JSON
+            const config = JSON.parse(value);
+
+            // Validate that the config is an object
+            if (typeof config !== 'object' || Array.isArray(config) || config === null) {
+              throw new Error("Configuration must be a valid JSON object");
+            }
+
+            for (const item in config) {
+              if (!Array.isArray(config[item])) {
+                throw new Error(`Key ${item} is not valid and should be an array`);
+              }
+              config[item].forEach((val) => {
+                if (typeof val !== 'string') {
+                  throw new Error(`Values from Key ${item} should be string`);
+                }
+              });
+            }
+
+            // Additional validation could be added here based on expected structure
+            // For example, checking specific properties or types
+
+            // If valid, update the preference
+            setHasError(false);
+            setErrorMessage("");
+            return true
+          } catch (error) {
+            // Handle parsing errors
+            console.error("Invalid JSON configuration:", error);
+            setHasError(true);
+            setErrorMessage(`Invalid JSON configuration: ${error}`)
+            // You could show an error message to the user here
+            // Or reset to default/previous value
+            return false
+          }
+      }
+
       return true;
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      setInputValue(newValue);
+      validateInput(newValue);
+      setHasChanges(newValue !== String(initialValue));
+    };
+
+    const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newValue = e.target.value;
       setInputValue(newValue);
       validateInput(newValue);
@@ -144,6 +198,15 @@ const FormField = React.memo(
         e.preventDefault();
         applyChanges();
         inputRef.current?.blur();
+      }
+    };
+
+    const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      // Only apply changes on Ctrl+Enter or Command+Enter for textarea
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        applyChanges();
+        textareaRef.current?.blur();
       }
     };
 
@@ -190,25 +253,46 @@ const FormField = React.memo(
         <div className="flex w-full items-start gap-2">
           <div className="flex-1 flex flex-col">
             <div className="flex items-center">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={handleChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                placeholder={placeholder}
-                className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-hidden ${
-                  suffix ? "rounded-l-md" : "rounded-md"
-                } ${
-                  hasError
-                    ? "border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
-                    : isFocused
-                      ? "border border-green-400 dark:border-green-600 ring-1 ring-green-300 dark:ring-green-800 bg-white dark:bg-neutral-800"
-                      : "border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 hover:border-gray-400 dark:hover:border-gray-500"
-                }`}
-              />
+              {type === "json" ? (
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={handleTextareaChange}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={handleBlur}
+                  onKeyDown={handleTextareaKeyDown}
+                  placeholder={placeholder}
+                  rows={5}
+                  className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-hidden rounded-md font-mono resize-y
+                    ${
+                      hasError
+                        ? "border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+                        : isFocused
+                          ? "border border-green-400 dark:border-green-600 ring-1 ring-green-300 dark:ring-green-800 bg-white dark:bg-neutral-800"
+                          : "border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 hover:border-gray-400 dark:hover:border-gray-500"
+                    }`}
+                />
+              ) : (
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={handleChange}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
+                  placeholder={placeholder}
+                  className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-hidden ${
+                    suffix ? "rounded-l-md" : "rounded-md"
+                  } ${
+                    hasError
+                      ? "border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+                      : isFocused
+                        ? "border border-green-400 dark:border-green-600 ring-1 ring-green-300 dark:ring-green-800 bg-white dark:bg-neutral-800"
+                        : "border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 hover:border-gray-400 dark:hover:border-gray-500"
+                  }`}
+                />
+              )}
 
               {suffix && (
                 <span

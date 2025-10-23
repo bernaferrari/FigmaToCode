@@ -115,17 +115,29 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     if (baseFontFamily && fontName.family.toLowerCase() === baseFontFamily.toLowerCase()) {
       return "";
     }
-    
-    // Check if the font is in one of the Tailwind default font stacks
-    if (config.fontFamily.sans.includes(fontName.family)) {
-      return "font-sans";
+
+    const fontFamilyCustomConfig = localTailwindSettings.fontFamilyCustomConfig;
+
+    if (fontFamilyCustomConfig) {
+      // Check if current font is part of custom tailwind config
+      for (const family in fontFamilyCustomConfig) {
+        if (fontFamilyCustomConfig[family].includes(fontName.family)) {
+          return `font-${family}`
+        }
+      }
+    } else {
+      // Check if the font is in one of the Tailwind default font stacks
+      if (config.fontFamily.sans.includes(fontName.family)) {
+        return "font-sans";
+      }
+      if (config.fontFamily.serif.includes(fontName.family)) {
+        return "font-serif";
+      }
+      if (config.fontFamily.mono.includes(fontName.family)) {
+        return "font-mono";
+      }
     }
-    if (config.fontFamily.serif.includes(fontName.family)) {
-      return "font-serif";
-    }
-    if (config.fontFamily.mono.includes(fontName.family)) {
-      return "font-mono";
-    }
+
     const underscoreFontName = fontName.family.replace(/\s/g, "_");
 
     return "font-['" + underscoreFontName + "']";
