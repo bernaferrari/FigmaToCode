@@ -173,7 +173,7 @@ const tailwindFrame = async (
   settings: TailwindSettings,
 ): Promise<string> => {
   // Check if this is an instance and should be rendered as a Twig component
-  if (node.type === "INSTANCE" && settings.tailwindGenerationMode === "twig" && !node.name.startsWith("TwigContent")) {
+  if (settings.tailwindGenerationMode === "twig" && node.type === "INSTANCE" && !isTwigContentNode(node)) {
     return tailwindTwigComponentInstance(node, settings);
   }
 
@@ -212,24 +212,12 @@ const tailwindTwigComponentInstance = async (
     // .commonShapeStyles()
   ;
 
-  const twigComponentProperties: string[] = [''];
-
-  for (const prop in node.componentProperties) {
-    const cleanName = prop
-            .split("#")[0]
-            .replace(/\s+/g, "-")
-            .toLowerCase()
-    const attr = `${cleanName}="${node.componentProperties[prop]?.value}"`;
-    twigComponentProperties.push(attr);
-  }
-
-
-  const attributes = builder.build() + twigComponentProperties.join(' ');
+  const attributes = builder.build();
 
   // If we have children, process them
   let childrenStr = "";
 
-  const embeddableChildren = node.children ? node.children.filter((n) => isTwigContentFrame(n)) : [];
+  const embeddableChildren = node.children ? node.children.filter((n) => isTwigContentNode(n)) : [];
 
   if (embeddableChildren.length > 0) {
     // We keep embedded components and Frame named "TwigContent"
@@ -241,11 +229,7 @@ const tailwindTwigComponentInstance = async (
   }
 };
 
-const isVisibleComponent = (node: SceneNode): boolean => {
-  return node.type === "INSTANCE" && (node.name[0] !== '.' && node.name[0] !== '_');
-}
-
-const isTwigContentFrame = (node: SceneNode): boolean => {
+const isTwigContentNode = (node: SceneNode): boolean => {
   return node.type === "INSTANCE" && node.name.startsWith("TwigContent");
 }
 

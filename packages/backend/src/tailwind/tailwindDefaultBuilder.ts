@@ -27,6 +27,7 @@ import {
 import { pxToBlur } from "./conversionTables";
 import {
   formatDataAttribute,
+  formatTwigAttribute,
   getClassLabel,
 } from "../common/commonFormatAttributes";
 import { TailwindColorType, TailwindSettings } from "types";
@@ -51,6 +52,10 @@ export class TailwindDefaultBuilder {
   }
   get isJSX() {
     return this.settings.tailwindGenerationMode === "jsx";
+  }
+
+  get isTwig() {
+    return this.settings.tailwindGenerationMode === "twig"
   }
 
   constructor(node: SceneNode, settings: TailwindSettings) {
@@ -272,13 +277,15 @@ export class TailwindDefaultBuilder {
     if ("componentProperties" in this.node && this.node.componentProperties) {
       Object.entries(this.node.componentProperties)
         ?.map((prop) => {
-          if (prop[1].type === "VARIANT" || prop[1].type === "BOOLEAN") {
+          if (prop[1].type === "VARIANT" || prop[1].type === "BOOLEAN" || (this.isTwig && prop[1].type === "TEXT")) {
             const cleanName = prop[0]
               .split("#")[0]
               .replace(/\s+/g, "-")
               .toLowerCase();
 
-            return formatDataAttribute(cleanName, String(prop[1].value));
+            return this.isTwig
+              ? formatTwigAttribute(cleanName, String(prop[1].value))
+              : formatDataAttribute(cleanName, String(prop[1].value));
           }
           return "";
         })
