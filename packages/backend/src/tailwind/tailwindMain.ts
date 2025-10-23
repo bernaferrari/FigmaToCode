@@ -173,7 +173,7 @@ const tailwindFrame = async (
   settings: TailwindSettings,
 ): Promise<string> => {
   // Check if this is an instance and should be rendered as a Twig component
-  if (node.type === "INSTANCE" && settings.tailwindGenerationMode === "twig") {
+  if (node.type === "INSTANCE" && settings.tailwindGenerationMode === "twig" && !node.name.startsWith("TwigContent")) {
     return tailwindTwigComponentInstance(node, settings);
   }
 
@@ -229,7 +229,7 @@ const tailwindTwigComponentInstance = async (
   // If we have children, process them
   let childrenStr = "";
 
-  const embeddableChildren = node.children ? node.children.filter((n) => isVisibleComponent(n) || isTwigContentFrame(n)) : [];
+  const embeddableChildren = node.children ? node.children.filter((n) => isTwigContentFrame(n)) : [];
 
   if (embeddableChildren.length > 0) {
     // We keep embedded components and Frame named "TwigContent"
@@ -246,7 +246,7 @@ const isVisibleComponent = (node: SceneNode): boolean => {
 }
 
 const isTwigContentFrame = (node: SceneNode): boolean => {
-  return node.type === "FRAME" && node.name === "TwigContent";
+  return node.type === "INSTANCE" && node.name.startsWith("TwigContent");
 }
 
 // Helper function to extract component name from an instance
