@@ -10,7 +10,7 @@ interface FormFieldProps {
   helpText?: string;
 
   // Validation props
-  type?: "text" | "number";
+  type?: "text" | "number"| "json";
   min?: number;
   max?: number;
   suffix?: string;
@@ -104,6 +104,52 @@ const FormField = React.memo(
         setHasError(false);
         setErrorMessage("");
         return true;
+      }
+
+      if (type === "json") {
+        // Check if the string is empty skip validation
+        if (!value.trim()) {
+          setHasError(false);
+          setErrorMessage("");
+          return true;
+        }
+
+        try {
+            // Try to parse the JSON
+            const config = JSON.parse(value);
+
+            // Validate that the config is an object
+            if (typeof config !== 'object' || Array.isArray(config) || config === null) {
+              throw new Error("Configuration must be a valid JSON object");
+            }
+
+            for (const item in config) {
+              if (!Array.isArray(config[item])) {
+                throw new Error(`Key ${item} is not valid and should be an array`);
+              }
+              config[item].forEach((val) => {
+                if (typeof val !== 'string') {
+                  throw new Error(`Values from Key ${item} should be string`);
+                }
+              });
+            }
+
+            // Additional validation could be added here based on expected structure
+            // For example, checking specific properties or types
+
+            // If valid, update the preference
+            setHasError(false);
+            setErrorMessage("");
+            return true
+          } catch (error) {
+            // Handle parsing errors
+            console.error("Invalid JSON configuration:", error);
+            setHasError(true);
+            setErrorMessage(`Invalid JSON configuration: ${error}`)
+            // You could show an error message to the user here
+            // Or reset to default/previous value
+            return false
+          }
       }
 
       return true;

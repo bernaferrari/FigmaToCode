@@ -19,6 +19,7 @@ export interface TailwindSettings extends HTMLSettings {
   useTailwind4: boolean;
   thresholdPercent: number;
   baseFontFamily: string;
+  fontFamilyCustomConfig: Record<string, string[]>
 }
 export interface FlutterSettings {
   flutterGenerationMode: "fullApp" | "stateless" | "snippet";
