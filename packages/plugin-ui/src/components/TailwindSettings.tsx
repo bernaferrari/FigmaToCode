@@ -27,8 +27,6 @@ export const TailwindSettings: React.FC<TailwindSettingsProps> = ({
   const handleBaseFontFamilyChange = (newValue: string) => {
     onPreferenceChanged("baseFontFamily", newValue);
   };
-
-
   const handleFontFamilyCustomConfigChange = (newValue: string) => {
   try {
     // Check if the string is empty, use default empty object
@@ -141,8 +139,11 @@ export const TailwindSettings: React.FC<TailwindSettingsProps> = ({
           <p className="text-xs text-neutral-500 mt-1">
             {`This allow to override the custom font handling e.g. "font-comic"`}
             <pre>
-              {`
-              {"sans":["Arial","verdana"],"display":["Times","Roboto"],"comic":["Comic Sans MS"]}`}
+              {`{
+  "sans":["Arial","verdana"],
+  "display":["Times","Roboto"],
+  "comic":["Comic Sans MS"]
+}`}
             </pre>
           </p>
         </div>

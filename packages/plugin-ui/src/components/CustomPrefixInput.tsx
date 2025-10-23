@@ -50,6 +50,7 @@ const FormField = React.memo(
     const [hasError, setHasError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Update internal state when initialValue changes (from parent)
     useEffect(() => {
@@ -162,6 +163,13 @@ const FormField = React.memo(
       setHasChanges(newValue !== String(initialValue));
     };
 
+    const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const newValue = e.target.value;
+      setInputValue(newValue);
+      validateInput(newValue);
+      setHasChanges(newValue !== String(initialValue));
+    };
+
     const applyChanges = () => {
       if (hasError) return;
 
@@ -190,6 +198,15 @@ const FormField = React.memo(
         e.preventDefault();
         applyChanges();
         inputRef.current?.blur();
+      }
+    };
+
+    const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      // Only apply changes on Ctrl+Enter or Command+Enter for textarea
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        applyChanges();
+        textareaRef.current?.blur();
       }
     };
 
@@ -236,25 +253,46 @@ const FormField = React.memo(
         <div className="flex w-full items-start gap-2">
           <div className="flex-1 flex flex-col">
             <div className="flex items-center">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={handleChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                placeholder={placeholder}
-                className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-hidden ${
-                  suffix ? "rounded-l-md" : "rounded-md"
-                } ${
-                  hasError
-                    ? "border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
-                    : isFocused
-                      ? "border border-green-400 dark:border-green-600 ring-1 ring-green-300 dark:ring-green-800 bg-white dark:bg-neutral-800"
-                      : "border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 hover:border-gray-400 dark:hover:border-gray-500"
-                }`}
-              />
+              {type === "json" ? (
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={handleTextareaChange}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={handleBlur}
+                  onKeyDown={handleTextareaKeyDown}
+                  placeholder={placeholder}
+                  rows={5}
+                  className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-hidden rounded-md font-mono resize-y
+                    ${
+                      hasError
+                        ? "border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+                        : isFocused
+                          ? "border border-green-400 dark:border-green-600 ring-1 ring-green-300 dark:ring-green-800 bg-white dark:bg-neutral-800"
+                          : "border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 hover:border-gray-400 dark:hover:border-gray-500"
+                    }`}
+                />
+              ) : (
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputValue}
+                  onChange={handleChange}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
+                  placeholder={placeholder}
+                  className={`p-1.5 px-2.5 text-sm w-full transition-all focus:outline-hidden ${
+                    suffix ? "rounded-l-md" : "rounded-md"
+                  } ${
+                    hasError
+                      ? "border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+                      : isFocused
+                        ? "border border-green-400 dark:border-green-600 ring-1 ring-green-300 dark:ring-green-800 bg-white dark:bg-neutral-800"
+                        : "border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 hover:border-gray-400 dark:hover:border-gray-500"
+                  }`}
+                />
+              )}
 
               {suffix && (
                 <span
