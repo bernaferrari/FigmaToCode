@@ -253,23 +253,11 @@ const isTwigContentFrame = (node: SceneNode): boolean => {
 const extractComponentName = (node: InstanceNode): string => {
   // Try to get name from mainComponent if available
   if (node.mainComponent) {
-    const name = node.mainComponent.name;
-    // Convert component name to PascalCase for Twig component naming convention
-    return toPascalCase(name);
+    return node.mainComponent.name;
   }
 
   // Fallback to node name if mainComponent is not available
-  return toPascalCase(node.name);
-};
-
-// Helper function to convert string to PascalCase
-const toPascalCase = (str: string): string => {
-  // Remove any non-alphanumeric characters and split by spaces, underscores, or dashes
-  return str
-    .replace(/[^\w\s-]/g, '')
-    .split(/[\s_-]+/)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('');
+  return node.name;
 };
 
 export const tailwindContainer = (
