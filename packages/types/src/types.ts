@@ -9,7 +9,7 @@ export interface HTMLSettings {
   htmlGenerationMode: "html" | "jsx" | "styled-components" | "svelte";
 }
 export interface TailwindSettings extends HTMLSettings {
-  tailwindGenerationMode: "html" | "jsx";
+  tailwindGenerationMode: "html" | "jsx" | "twig";
   roundTailwindValues: boolean;
   roundTailwindColors: boolean;
   useColorVariables: boolean;

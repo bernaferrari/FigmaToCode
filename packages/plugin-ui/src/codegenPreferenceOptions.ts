@@ -83,6 +83,7 @@ export const selectPreferenceOptions: SelectPreferenceOptions[] = [
     options: [
       { label: "HTML", value: "html" },
       { label: "React (JSX)", value: "jsx" },
+      { label: "Twig (Experimental)", value: "twig" },
     ],
     includedLanguages: ["Tailwind"],
   },

@@ -172,6 +172,11 @@ const tailwindFrame = async (
   node: FrameNode | InstanceNode | ComponentNode | ComponentSetNode,
   settings: TailwindSettings,
 ): Promise<string> => {
+  // Check if this is an instance and should be rendered as a Twig component
+  if (node.type === "INSTANCE" && isTwigComponentNode(node)) {
+    return tailwindTwigComponentInstance(node, settings);
+  }
+
   const childrenStr = await tailwindWidgetGenerator(node.children, settings);
 
   const clipsContentClass =
@@ -190,6 +195,57 @@ const tailwindFrame = async (
     .join(" ");
 
   return tailwindContainer(node, childrenStr, combinedProps, settings);
+};
+
+
+// Helper function to generate Twig component syntax for component instances
+const tailwindTwigComponentInstance = async (
+  node: InstanceNode,
+  settings: TailwindSettings,
+): Promise<string> => {
+  // Extract component name from the instance
+  const componentName = extractComponentName(node);
+
+  // Get component properties if needed
+  const builder = new TailwindDefaultBuilder(node, settings)
+    // .commonPositionStyles()
+    // .commonShapeStyles()
+  ;
+
+  const attributes = builder.build();
+
+  // If we have children, process them
+  let childrenStr = "";
+
+  const embeddableChildren = node.children ? node.children.filter((n) => isTwigContentNode(n)) : [];
+
+  if (embeddableChildren.length > 0) {
+    // We keep embedded components and Frame named "TwigContent"
+    childrenStr = await tailwindWidgetGenerator(embeddableChildren, settings);
+    return `\n<twig:${componentName}${attributes}>${indentString(childrenStr)}\n</twig:${componentName}>`;
+  } else {
+    // Self-closing tag if no children
+    return `\n<twig:${componentName}${attributes} />`;
+  }
+};
+
+const isTwigComponentNode = (node: SceneNode): boolean => {
+  return localTailwindSettings.tailwindGenerationMode === "twig" && node.type === "INSTANCE" && !extractComponentName(node).startsWith("HTML:") && !isTwigContentNode(node);
+}
+
+const isTwigContentNode = (node: SceneNode): boolean => {
+  return node.type === "INSTANCE" && node.name.startsWith("TwigContent");
+}
+
+// Helper function to extract component name from an instance
+const extractComponentName = (node: InstanceNode): string => {
+  // Try to get name from mainComponent if available
+  if (node.mainComponent) {
+    return node.mainComponent.name;
+  }
+
+  // Fallback to node name if mainComponent is not available
+  return node.name;
 };
 
 export const tailwindContainer = (
