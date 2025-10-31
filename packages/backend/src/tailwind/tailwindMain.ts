@@ -173,7 +173,7 @@ const tailwindFrame = async (
   settings: TailwindSettings,
 ): Promise<string> => {
   // Check if this is an instance and should be rendered as a Twig component
-  if (settings.tailwindGenerationMode === "twig" && node.type === "INSTANCE" && !isTwigContentNode(node)) {
+  if (node.type === "INSTANCE" && isTwigComponentNode(node)) {
     return tailwindTwigComponentInstance(node, settings);
   }
 
@@ -228,6 +228,10 @@ const tailwindTwigComponentInstance = async (
     return `\n<twig:${componentName}${attributes} />`;
   }
 };
+
+const isTwigComponentNode = (node: SceneNode): boolean => {
+  return localTailwindSettings.tailwindGenerationMode === "twig" && node.type === "INSTANCE" && !extractComponentName(node).startsWith("HTML:") && !isTwigContentNode(node);
+}
 
 const isTwigContentNode = (node: SceneNode): boolean => {
   return node.type === "INSTANCE" && node.name.startsWith("TwigContent");
