@@ -38,6 +38,7 @@ export const defaultPluginSettings: PluginSettings = {
   useTailwind4: false,
   thresholdPercent: 15,
   baseFontFamily: "",
+  fontFamilyCustomConfig: {},
 };
 
 // A helper type guard to ensure the key belongs to the PluginSettings type
