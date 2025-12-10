@@ -13,20 +13,20 @@
     "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
-    "@figma/plugin-typings": "^1.114.0",
-    "js-base64": "^3.7.7",
-    "nanoid": "^5.1.5",
+    "@figma/plugin-typings": "^1.121.0",
+    "js-base64": "^3.7.8",
+    "nanoid": "^5.1.6",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "types": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "eslint": "^9.29.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.1",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3"
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
   }
 }

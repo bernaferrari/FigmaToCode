@@ -10,22 +10,22 @@
     "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@types/react-syntax-highlighter": "15.5.13",
     "clsx": "^2.1.1",
     "copy-to-clipboard": "^3.3.3",
     "lucide-react": "^0.483.0",
-    "react": "^19.1.0",
-    "react-syntax-highlighter": "^15.6.1",
-    "tailwind-merge": "^3.3.1",
-    "tailwindcss": "^4.1.11"
+    "react": "^19.2.1",
+    "react-syntax-highlighter": "^15.6.6",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
-    "eslint": "^9.29.0",
+    "eslint": "^9.39.1",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
     "types": "workspace:*",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }
