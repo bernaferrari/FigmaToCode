@@ -2,6 +2,7 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
+import { escapeJSXText } from "../common/parseJSX";
 import { tailwindColorFromFills } from "./builderImpl/tailwindColor";
 import {
   pxToFontSize,
@@ -60,7 +61,11 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
         .filter(Boolean)
         .join(" ");
 
-      const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
+      let chars = segment.characters;
+      if (this.needsJSXTextEscaping) {
+        chars = escapeJSXText(chars);
+      }
+      const charsWithLineBreak = chars.split("\n").join("<br/>");
       return {
         style: styleClasses,
         text: charsWithLineBreak,

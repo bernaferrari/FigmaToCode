@@ -1,4 +1,4 @@
-import { formatMultipleJSX, formatWithJSX } from "../common/parseJSX";
+import { formatMultipleJSX, formatWithJSX, escapeJSXText } from "../common/parseJSX";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlColorFromFills } from "./builderImpl/htmlColor";
 import {
@@ -70,7 +70,11 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
         this.isJSX,
       );
 
-      const charsWithLineBreak = segment.characters.split("\n").join("<br/>");
+      let chars = segment.characters;
+      if (this.needsJSXTextEscaping) {
+        chars = escapeJSXText(chars);
+      }
+      const charsWithLineBreak = chars.split("\n").join("<br/>");
       const result: any = {
         style: styleAttributes,
         text: charsWithLineBreak,
