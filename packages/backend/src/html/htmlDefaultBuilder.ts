@@ -62,6 +62,11 @@ export class HtmlDefaultBuilder {
     return this.settings.htmlGenerationMode === "svelte";
   }
 
+  get needsJSXTextEscaping() {
+    const mode = this.settings.htmlGenerationMode;
+    return mode === "jsx" || mode === "styled-components" || mode === "svelte";
+  }
+
   get useStyledComponents() {
     return this.settings.htmlGenerationMode === "styled-components";
   }

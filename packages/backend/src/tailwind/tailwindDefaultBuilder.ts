@@ -54,6 +54,10 @@ export class TailwindDefaultBuilder {
     return this.settings.tailwindGenerationMode === "jsx";
   }
 
+  get needsJSXTextEscaping() {
+    return this.isJSX;
+  }
+
   get isTwigComponent() {
     return this.settings.tailwindGenerationMode === "twig" && this.node.type === "INSTANCE"
   }

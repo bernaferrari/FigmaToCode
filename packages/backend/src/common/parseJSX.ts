@@ -1,3 +1,4 @@
+import { encode } from "html-entities";
 import { numberToFixedString } from "./numToAutoFixed";
 
 export const formatWithJSX = (
@@ -40,3 +41,10 @@ export const formatMultipleJSX = (
     .filter(([key, value]) => value)
     .map(([key, value]) => formatWithJSX(key, isJsx, value!))
     .join(isJsx ? ", " : "; ");
+
+export const escapeJSXText = (text: string): string => {
+  return encode(text, { level: "html5" })
+    // process JSX curly braces
+    .replace(/\{/g, "&#123;")
+    .replace(/\}/g, "&#125;");
+};
