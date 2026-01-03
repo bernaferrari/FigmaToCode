@@ -137,8 +137,6 @@ export function getComponentName(
   return name;
 }
 
-// Retrieve the stored element type from cssCollection for a given className
-// Falls back to default element types if not found
 function getElementFromCollection(
   cssClassName: string | null,
   nodeType?: string
@@ -146,8 +144,6 @@ function getElementFromCollection(
   if (cssClassName && cssCollection[cssClassName]?.element) {
     return cssCollection[cssClassName].element;
   }
-
-  // Default fallback
   return nodeType === "TEXT" ? "p" : "div";
 }
 
@@ -503,33 +499,30 @@ const htmlText = (node: TextNode, settings: HTMLSettings): string => {
 
   // For styled-components mode
   if (mode === "styled-components") {
-    // Retrieve stored element type to ensure definition and usage match
+    layoutBuilder.build();
+
     const element = getElementFromCollection(layoutBuilder.cssClassName, node.type);
-    const componentName = layoutBuilder.cssClassName
+    const wrapperComponentName = layoutBuilder.cssClassName
       ? getComponentName(node, layoutBuilder.cssClassName, element)
       : getComponentName(node, undefined, element);
 
-    if (styledHtml.length === 1) {
-      return `\n<${componentName}>${styledHtml[0].text}</${componentName}>`;
-    } else {
-      const content = styledHtml
-        .map((style) => {
-          const tag =
-            style.openTypeFeatures.SUBS === true
-              ? "sub"
-              : style.openTypeFeatures.SUPS === true
-                ? "sup"
-                : "span";
+    const content = styledHtml
+      .map((style) => {
+        const tag =
+          style.openTypeFeatures.SUBS === true
+            ? "sub"
+            : style.openTypeFeatures.SUPS === true
+              ? "sup"
+              : "span";
 
-          if (style.componentName) {
-            return `<${style.componentName}>${style.text}</${style.componentName}>`;
-          }
-          return `<${tag}>${style.text}</${tag}>`;
-        })
-        .join("");
+        if (style.componentName) {
+          return `<${style.componentName}>${style.text}</${style.componentName}>`;
+        }
+        return `<${tag}>${style.text}</${tag}>`;
+      })
+      .join("");
 
-      return `\n<${componentName}>${content}</${componentName}>`;
-    }
+    return `\n<${wrapperComponentName}>${content}</${wrapperComponentName}>`;
   }
 
   // Standard HTML/CSS approach for HTML, React or Svelte
@@ -656,7 +649,6 @@ const htmlContainer = async (
 
     // For styled-components mode
     if (mode === "styled-components" && builder.cssClassName) {
-      // Retrieve stored element type to ensure definition and usage match
       const element = getElementFromCollection(builder.cssClassName, node.type);
       const componentName = getComponentName(node, builder.cssClassName, element);
 
