@@ -115,7 +115,7 @@ export function getComponentName(
       .replace(/[^a-zA-Z0-9]/g, "")
       .replace(/^[a-z]/, (match) => match.toUpperCase());
 
-    name += cleanName;
+    name += cleanName || nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
   }
   // Fall back to className if provided
   else {
