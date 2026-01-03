@@ -42,9 +42,9 @@ export type HtmlGenerationMode =
 interface CSSCollection {
   [className: string]: {
     styles: string[];
-    nodeName?: string;
     nodeType?: string;
     element?: string; // Base HTML element to use
+    componentName: string; // Required for type safety, only used in styled-components mode
   };
 }
 
@@ -101,15 +101,12 @@ export function stylesToCSS(styles: string[], isJSX: boolean): string[] {
 
 // Get proper component name from node info
 export function getComponentName(
-  node: any,
-  className?: string,
-  nodeType = "div",
+  nodeName: string | undefined,
+  className: string,
+  nodeType: string,
 ): string {
   // Start with Styled prefix
   let name = "Styled";
-
-  // Use uniqueName if available, otherwise use name
-  const nodeName: string = node.uniqueName || node.name;
 
   // Try to use node name first
   if (nodeName && nodeName.length > 0) {
@@ -157,17 +154,12 @@ export function generateStyledComponents(): string {
   const components: string[] = [];
 
   Object.entries(cssCollection).forEach(
-    ([className, { styles, nodeName, nodeType, element }]) => {
+    ([className, { styles, componentName, element, nodeType }]) => {
       // Skip if no styles
       if (!styles.length) return;
 
       // Determine base HTML element - defaults to div
       const baseElement = element || (nodeType === "TEXT" ? "p" : "div");
-      const componentName = getComponentName(
-        { name: nodeName },
-        className,
-        baseElement,
-      );
 
       const styledComponent = `const ${componentName} = styled.${baseElement}\`
   ${styles.join(";\n  ")}${styles.length ? ";" : ""}
@@ -489,31 +481,29 @@ const htmlText = (node: TextNode, settings: HTMLSettings): string => {
 
   // For styled-components mode
   if (mode === "styled-components") {
-    const componentName = layoutBuilder.cssClassName
-      ? getComponentName(node, layoutBuilder.cssClassName, "p")
-      : getComponentName(node, undefined, "p");
+    // Build wrapper to store in cssCollection
+    layoutBuilder.build();
 
-    if (styledHtml.length === 1) {
-      return `\n<${componentName}>${styledHtml[0].text}</${componentName}>`;
-    } else {
-      const content = styledHtml
-        .map((style) => {
-          const tag =
-            style.openTypeFeatures.SUBS === true
-              ? "sub"
-              : style.openTypeFeatures.SUPS === true
-                ? "sup"
-                : "span";
+    const wrapperComponentName =
+      cssCollection[layoutBuilder.cssClassName!]?.componentName || "div";
 
-          if (style.componentName) {
-            return `<${style.componentName}>${style.text}</${style.componentName}>`;
-          }
-          return `<${tag}>${style.text}</${tag}>`;
-        })
-        .join("");
+    const content = styledHtml
+      .map((style) => {
+        const tag =
+          style.openTypeFeatures.SUBS === true
+            ? "sub"
+            : style.openTypeFeatures.SUPS === true
+              ? "sup"
+              : "span";
 
-      return `\n<${componentName}>${content}</${componentName}>`;
-    }
+        if (style.componentName) {
+          return `<${style.componentName}>${style.text}</${style.componentName}>`;
+        }
+        return `<${tag}>${style.text}</${tag}>`;
+      })
+      .join("");
+
+    return `\n<${wrapperComponentName}>${content}</${wrapperComponentName}>`;
   }
 
   // Standard HTML/CSS approach for HTML, React or Svelte
@@ -640,13 +630,16 @@ const htmlContainer = async (
 
     // For styled-components mode
     if (mode === "styled-components" && builder.cssClassName) {
-      const componentName = getComponentName(node, builder.cssClassName);
+      const componentName = cssCollection[builder.cssClassName].componentName;
 
-      if (children) {
-        return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
-      } else {
-        return `\n<${componentName} ${src}/>`;
+      if (componentName) {
+        if (children) {
+          return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
+        } else {
+          return `\n<${componentName} ${src}/>`;
+        }
       }
+      // fallback to standard HTML if no component was created
     }
 
     // Standard HTML approach for HTML, React, or Svelte

@@ -108,20 +108,18 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
         // In both modes, use span for text segments to avoid selector conflicts
         const elementTag = "span";
 
+        const componentName = getComponentName(segmentName, className, elementTag);
+
         // Store in cssCollection with consistent metadata
         cssCollection[className] = {
           styles: cssStyles,
-          nodeName: segmentName,
           nodeType: "TEXT",
           element: elementTag,
+          componentName: componentName,
         };
 
         if (mode === "styled-components") {
-          result.componentName = getComponentName(
-            { name: segmentName },
-            className,
-            elementTag,
-          );
+          result.componentName = componentName;
         }
       }
 

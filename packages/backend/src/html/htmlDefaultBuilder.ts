@@ -32,6 +32,7 @@ import {
   cssCollection,
   generateUniqueClassName,
   stylesToCSS,
+  getComponentName,
 } from "./htmlMain";
 
 export class HtmlDefaultBuilder {
@@ -523,14 +524,15 @@ export class HtmlDefaultBuilder {
       element = "img";
     }
 
+    const nodeName = (this.node as any).uniqueName || this.node.name;
+
+    const componentName = getComponentName(nodeName, this.cssClassName, element);
+
     cssCollection[this.cssClassName] = {
       styles: cssStyles,
-      nodeName:
-        (this.node as any).uniqueName ||
-        this.node.name?.replace(/[^a-zA-Z0-9]/g, "") ||
-        undefined,
       nodeType: this.node.type,
       element: element,
+      componentName: componentName,
     };
   }
 }
