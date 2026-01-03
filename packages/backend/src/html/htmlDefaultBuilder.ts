@@ -524,20 +524,12 @@ export class HtmlDefaultBuilder {
       element = "img";
     }
 
-    const nodeName =
-      (this.node as any).uniqueName ||
-      this.node.name?.replace(/[^a-zA-Z0-9]/g, "") ||
-      undefined;
+    const nodeName = (this.node as any).uniqueName || this.node.name;
 
-    const componentName = getComponentName(
-      { name: nodeName },
-      this.cssClassName,
-      element,
-    );
+    const componentName = getComponentName(nodeName, this.cssClassName, element);
 
     cssCollection[this.cssClassName] = {
       styles: cssStyles,
-      nodeName: nodeName,
       nodeType: this.node.type,
       element: element,
       componentName: componentName,

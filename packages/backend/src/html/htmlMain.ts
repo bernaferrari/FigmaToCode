@@ -42,7 +42,6 @@ export type HtmlGenerationMode =
 interface CSSCollection {
   [className: string]: {
     styles: string[];
-    nodeName?: string;
     nodeType?: string;
     element?: string; // Base HTML element to use
     componentName: string; // Required for type safety, only used in styled-components mode
@@ -102,15 +101,12 @@ export function stylesToCSS(styles: string[], isJSX: boolean): string[] {
 
 // Get proper component name from node info
 export function getComponentName(
-  node: any,
-  className?: string,
-  nodeType = "div",
+  nodeName: string | undefined,
+  className: string,
+  nodeType: string,
 ): string {
   // Start with Styled prefix
   let name = "Styled";
-
-  // Use uniqueName if available, otherwise use name
-  const nodeName: string = node.uniqueName || node.name;
 
   // Try to use node name first
   if (nodeName && nodeName.length > 0) {
@@ -119,10 +115,10 @@ export function getComponentName(
       .replace(/[^a-zA-Z0-9]/g, "")
       .replace(/^[a-z]/, (match) => match.toUpperCase());
 
-    name += cleanName || nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
+    name += cleanName;
   }
   // Fall back to className if provided
-  else if (className) {
+  else {
     const parts = className.split("-");
     if (parts.length > 0 && parts[0]) {
       name += parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
@@ -130,11 +126,6 @@ export function getComponentName(
       name += nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
     }
   }
-  // Last resort
-  else {
-    name += nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
-  }
-
   return name;
 }
 
