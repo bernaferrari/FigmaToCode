@@ -118,7 +118,7 @@ export function getComponentName(
     name += cleanName || nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
   }
   // Fall back to className if provided
-  else {
+  else if (className) {
     const parts = className.split("-");
     if (parts.length > 0 && parts[0]) {
       name += parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
@@ -126,6 +126,11 @@ export function getComponentName(
       name += nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
     }
   }
+  // Last resort
+  else {
+    name += nodeType.charAt(0).toUpperCase() + nodeType.slice(1);
+  }
+
   return name;
 }
 
