@@ -137,6 +137,20 @@ export function getComponentName(
   return name;
 }
 
+// Retrieve the stored element type from cssCollection for a given className
+// Falls back to default element types if not found
+function getElementFromCollection(
+  cssClassName: string | null,
+  nodeType?: string
+): string {
+  if (cssClassName && cssCollection[cssClassName]?.element) {
+    return cssCollection[cssClassName].element;
+  }
+
+  // Default fallback
+  return nodeType === "TEXT" ? "p" : "div";
+}
+
 // Get the collected CSS as a string with improved formatting
 export function getCollectedCSS(): string {
   if (Object.keys(cssCollection).length === 0) {
@@ -489,9 +503,11 @@ const htmlText = (node: TextNode, settings: HTMLSettings): string => {
 
   // For styled-components mode
   if (mode === "styled-components") {
+    // Retrieve stored element type to ensure definition and usage match
+    const element = getElementFromCollection(layoutBuilder.cssClassName, node.type);
     const componentName = layoutBuilder.cssClassName
-      ? getComponentName(node, layoutBuilder.cssClassName, "p")
-      : getComponentName(node, undefined, "p");
+      ? getComponentName(node, layoutBuilder.cssClassName, element)
+      : getComponentName(node, undefined, element);
 
     if (styledHtml.length === 1) {
       return `\n<${componentName}>${styledHtml[0].text}</${componentName}>`;
@@ -640,7 +656,9 @@ const htmlContainer = async (
 
     // For styled-components mode
     if (mode === "styled-components" && builder.cssClassName) {
-      const componentName = getComponentName(node, builder.cssClassName);
+      // Retrieve stored element type to ensure definition and usage match
+      const element = getElementFromCollection(builder.cssClassName, node.type);
+      const componentName = getComponentName(node, builder.cssClassName, element);
 
       if (children) {
         return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
