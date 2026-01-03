@@ -16,29 +16,34 @@ export const htmlShadow = (node: BlendMixin): string => {
     );
     // simple shadow from tailwind
     if (shadowEffects.length > 0) {
-      const shadow = shadowEffects[0];
-      let x = 0;
-      let y = 0;
-      let blur = 0;
-      let spread = "";
-      let inner = "";
-      let color = "";
+      const shadows: string[] = [];
 
-      if (shadow.type === "DROP_SHADOW" || shadow.type === "INNER_SHADOW") {
-        x = shadow.offset.x;
-        y = shadow.offset.y;
-        blur = shadow.radius;
-        spread = shadow.spread ? `${shadow.spread}px ` : "";
-        inner = shadow.type === "INNER_SHADOW" ? " inset" : "";
-        color = htmlColor(shadow.color, shadow.color.a);
-      } else if (shadow.type === "LAYER_BLUR") {
-        x = shadow.radius;
-        y = shadow.radius;
-        blur = shadow.radius;
-      }
+      shadowEffects.forEach((shadow) => {
+        let x = 0;
+        let y = 0;
+        let blur = 0;
+        let spread = "";
+        let inner = "";
+        let color = "";
+
+        if (shadow.type === "DROP_SHADOW" || shadow.type === "INNER_SHADOW") {
+          x = shadow.offset.x;
+          y = shadow.offset.y;
+          blur = shadow.radius;
+          spread = shadow.spread ? `${shadow.spread}px ` : "";
+          inner = shadow.type === "INNER_SHADOW" ? " inset" : "";
+          color = htmlColor(shadow.color, shadow.color.a);
+        } else if (shadow.type === "LAYER_BLUR") {
+          x = shadow.radius;
+          y = shadow.radius;
+          blur = shadow.radius;
+        }
+
+        shadows.push(`${x}px ${y}px ${blur}px ${spread}${color}${inner}`);
+      });
 
       // Return box-shadow in the desired format
-      return `${x}px ${y}px ${blur}px ${spread}${color}${inner}`;
+      return shadows.join(", ");
     }
   }
   return "";
