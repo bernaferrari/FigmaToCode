@@ -485,7 +485,7 @@ const htmlText = (node: TextNode, settings: HTMLSettings): string => {
     layoutBuilder.build();
 
     const wrapperComponentName =
-      cssCollection[layoutBuilder.cssClassName!]!.componentName;
+      cssCollection[layoutBuilder.cssClassName!]?.componentName || "div";
 
     const content = styledHtml
       .map((style) => {
