@@ -488,17 +488,9 @@ const htmlText = (node: TextNode, settings: HTMLSettings): string => {
     // Build wrapper to store in cssCollection
     layoutBuilder.build();
 
-    // Get wrapper component name from cssCollection
     const wrapperComponentName =
-      layoutBuilder.cssClassName &&
-      cssCollection[layoutBuilder.cssClassName]?.componentName;
+      cssCollection[layoutBuilder.cssClassName].componentName;
 
-    if (!wrapperComponentName) {
-      // Fallback to standard mode if component name not found
-      return `\n<div${layoutBuilder.build()}>${styledHtml.map((s) => s.text).join("")}</div>`;
-    }
-
-    // Build content (same logic for single or multi segments)
     const content = styledHtml
       .map((style) => {
         const tag =
@@ -642,18 +634,13 @@ const htmlContainer = async (
 
     // For styled-components mode
     if (mode === "styled-components" && builder.cssClassName) {
-      // Get component name from cssCollection
-      const componentName =
-        cssCollection[builder.cssClassName]?.componentName;
+      const componentName = cssCollection[builder.cssClassName].componentName;
 
-      if (componentName) {
-        if (children) {
-          return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
-        } else {
-          return `\n<${componentName} ${src}/>`;
-        }
+      if (children) {
+        return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
+      } else {
+        return `\n<${componentName} ${src}/>`;
       }
-      // If no component name, fall through to standard mode
     }
 
     // Standard HTML approach for HTML, React, or Svelte
