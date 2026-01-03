@@ -632,11 +632,14 @@ const htmlContainer = async (
     if (mode === "styled-components" && builder.cssClassName) {
       const componentName = cssCollection[builder.cssClassName].componentName;
 
-      if (children) {
-        return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
-      } else {
-        return `\n<${componentName} ${src}/>`;
+      if (componentName) {
+        if (children) {
+          return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
+        } else {
+          return `\n<${componentName} ${src}/>`;
+        }
       }
+      // fallback to standard HTML if no component was created
     }
 
     // Standard HTML approach for HTML, React, or Svelte
