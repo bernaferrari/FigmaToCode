@@ -45,6 +45,7 @@ interface CSSCollection {
     nodeName?: string;
     nodeType?: string;
     element?: string; // Base HTML element to use
+    componentName: string; // Required for type safety, only used in styled-components mode
   };
 }
 
@@ -137,16 +138,6 @@ export function getComponentName(
   return name;
 }
 
-function getElementFromCollection(
-  cssClassName: string | null,
-  nodeType?: string
-): string {
-  if (cssClassName && cssCollection[cssClassName]?.element) {
-    return cssCollection[cssClassName].element;
-  }
-  return nodeType === "TEXT" ? "p" : "div";
-}
-
 // Get the collected CSS as a string with improved formatting
 export function getCollectedCSS(): string {
   if (Object.keys(cssCollection).length === 0) {
@@ -167,17 +158,12 @@ export function generateStyledComponents(): string {
   const components: string[] = [];
 
   Object.entries(cssCollection).forEach(
-    ([className, { styles, nodeName, nodeType, element }]) => {
+    ([className, { styles, componentName, element, nodeType }]) => {
       // Skip if no styles
       if (!styles.length) return;
 
       // Determine base HTML element - defaults to div
       const baseElement = element || (nodeType === "TEXT" ? "p" : "div");
-      const componentName = getComponentName(
-        { name: nodeName },
-        className,
-        baseElement,
-      );
 
       const styledComponent = `const ${componentName} = styled.${baseElement}\`
   ${styles.join(";\n  ")}${styles.length ? ";" : ""}
@@ -499,13 +485,20 @@ const htmlText = (node: TextNode, settings: HTMLSettings): string => {
 
   // For styled-components mode
   if (mode === "styled-components") {
+    // Build wrapper to store in cssCollection
     layoutBuilder.build();
 
-    const element = getElementFromCollection(layoutBuilder.cssClassName, node.type);
-    const wrapperComponentName = layoutBuilder.cssClassName
-      ? getComponentName(node, layoutBuilder.cssClassName, element)
-      : getComponentName(node, undefined, element);
+    // Get wrapper component name from cssCollection
+    const wrapperComponentName =
+      layoutBuilder.cssClassName &&
+      cssCollection[layoutBuilder.cssClassName]?.componentName;
 
+    if (!wrapperComponentName) {
+      // Fallback to standard mode if component name not found
+      return `\n<div${layoutBuilder.build()}>${styledHtml.map((s) => s.text).join("")}</div>`;
+    }
+
+    // Build content (same logic for single or multi segments)
     const content = styledHtml
       .map((style) => {
         const tag =
@@ -649,14 +642,18 @@ const htmlContainer = async (
 
     // For styled-components mode
     if (mode === "styled-components" && builder.cssClassName) {
-      const element = getElementFromCollection(builder.cssClassName, node.type);
-      const componentName = getComponentName(node, builder.cssClassName, element);
+      // Get component name from cssCollection
+      const componentName =
+        cssCollection[builder.cssClassName]?.componentName;
 
-      if (children) {
-        return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
-      } else {
-        return `\n<${componentName} ${src}/>`;
+      if (componentName) {
+        if (children) {
+          return `\n<${componentName}>${indentString(children)}\n</${componentName}>`;
+        } else {
+          return `\n<${componentName} ${src}/>`;
+        }
       }
+      // If no component name, fall through to standard mode
     }
 
     // Standard HTML approach for HTML, React, or Svelte
