@@ -39,8 +39,8 @@ pnpm --filter backend test:watch
 2. Create Fixture File
    - Extract the first element from the `newConversion` array in the copied JSON
    - Save as `__tests__/fixtures/{name}.json`
-   - Naming convention: `{parent-type}-{modifier}-{child-type}.json`
-   - Examples: `frame-autolayout-text.json`, `text-simple.json`
+   - Naming convention: `{parent-type}-{parent-modifier}-{child-type}-{child-modifier}.json`
+   - Examples: `frame-autolayout-text-simple.json`, `frame-vertical-text-mixed-style.json`
 
 3. Run Tests to Generate Snapshots
    ```bash
