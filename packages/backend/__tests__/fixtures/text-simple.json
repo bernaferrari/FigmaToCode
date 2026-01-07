@@ -1,0 +1,138 @@
+{
+  "id": "5042:17",
+  "name": "Description",
+  "type": "TEXT",
+  "scrollBehavior": "SCROLLS",
+  "blendMode": "PASS_THROUGH",
+  "fills": [
+    {
+      "blendMode": "NORMAL",
+      "type": "SOLID",
+      "color": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 1
+      }
+    }
+  ],
+  "strokes": [],
+  "strokeWeight": 0,
+  "strokeAlign": "CENTER",
+  "absoluteBoundingBox": {
+    "x": 984,
+    "y": 227,
+    "width": 102,
+    "height": 56
+  },
+  "absoluteRenderBounds": {
+    "x": 984.2160034179688,
+    "y": 234.3199920654297,
+    "width": 53.74359130859375,
+    "height": 41.93199157714844
+  },
+  "constraints": {
+    "vertical": "TOP",
+    "horizontal": "LEFT"
+  },
+  "layoutAlign": "INHERIT",
+  "layoutGrow": 0,
+  "layoutSizingHorizontal": "FIXED",
+  "layoutSizingVertical": "FIXED",
+  "characters": "Hello, World!\n",
+  "characterStyleOverrides": [],
+  "styleOverrideTable": {},
+  "lineTypes": [
+    "NONE",
+    "NONE"
+  ],
+  "lineIndentations": [
+    0,
+    0
+  ],
+  "style": {
+    "fontFamily": "Noto Sans",
+    "fontPostScriptName": "NotoSans-Regular",
+    "fontStyle": "Regular",
+    "fontWeight": 400,
+    "fontSize": 18,
+    "textAlignHorizontal": "LEFT",
+    "textAlignVertical": "TOP",
+    "letterSpacing": 0,
+    "lineHeightPx": 28,
+    "lineHeightPercent": 114.21112823486328,
+    "lineHeightPercentFontSize": 155.55555725097656,
+    "lineHeightUnit": "PIXELS"
+  },
+  "layoutVersion": 5,
+  "effects": [],
+  "interactions": [],
+  "uniqueName": "Description",
+  "styledTextSegments": [
+    {
+      "characters": "Hello, World!",
+      "start": 0,
+      "end": 14,
+      "fontSize": 18,
+      "fontName": {
+        "family": "Noto Sans",
+        "style": "Regular"
+      },
+      "fontWeight": 400,
+      "textDecoration": "NONE",
+      "textCase": "ORIGINAL",
+      "lineHeight": {
+        "unit": "PIXELS",
+        "value": 28
+      },
+      "letterSpacing": {
+        "unit": "PIXELS",
+        "value": 0
+      },
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 0,
+            "g": 0,
+            "b": 0
+          },
+          "boundVariables": {}
+        }
+      ],
+      "textStyleId": "",
+      "fillStyleId": "",
+      "listOptions": {
+        "type": "NONE"
+      },
+      "indentation": 0,
+      "hyperlink": null,
+      "openTypeFeatures": {},
+      "uniqueId": "description_span"
+    }
+  ],
+  "fontFamily": "Noto Sans",
+  "fontPostScriptName": "NotoSans-Regular",
+  "fontStyle": "Regular",
+  "fontWeight": 400,
+  "fontSize": 18,
+  "textAlignHorizontal": "LEFT",
+  "textAlignVertical": "TOP",
+  "letterSpacing": 0,
+  "lineHeightPx": 28,
+  "lineHeightPercent": 114.21112823486328,
+  "lineHeightPercentFontSize": 155.55555725097656,
+  "lineHeightUnit": "PIXELS",
+  "textAutoResize": "NONE",
+  "width": 102,
+  "height": 56,
+  "x": 0,
+  "y": 0,
+  "canBeFlattened": false,
+  "layoutMode": "NONE",
+  "primaryAxisAlignItems": "MIN",
+  "counterAxisAlignItems": "MIN"
+}
