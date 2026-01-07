@@ -10,7 +10,9 @@
     "dist/**"
   ],
   "scripts": {
-    "lint": "eslint \"src/**/*.ts*\""
+    "lint": "eslint \"src/**/*.ts*\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@figma/plugin-typings": "^1.121.0",
@@ -28,6 +30,7 @@
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.8"
   }
 }
