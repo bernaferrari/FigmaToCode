@@ -81,7 +81,15 @@ export const tailwindSolidColor = (
   }
 
   // Original implementation for non-variable colors or when not using var syntax
-  const { colorName } = getColorInfo(fill);
+  const { colorName, colorType } = getColorInfo(fill);
+
+  // Don't add opacity modifier for variable colors - the alpha is already baked
+  // into the variable definition. Adding /50 to a variable that's already
+  // defined with alpha would incorrectly compound the opacity.
+  if (colorType === "variable") {
+    return `${kind}-${colorName}`;
+  }
+
   const effectiveOpacity = calculateEffectiveOpacity(fill);
   const opacity =
     effectiveOpacity !== 1.0 ? `/${nearestOpacity(effectiveOpacity)}` : "";
@@ -101,7 +109,14 @@ export const tailwindGradientStop = (
   stop: ColorStop,
   parentOpacity: number = 1.0,
 ): string => {
-  const { colorName } = getColorInfo(stop);
+  const { colorName, colorType } = getColorInfo(stop);
+
+  // Don't add opacity modifier for variable colors - the alpha is already baked
+  // into the variable definition
+  if (colorType === "variable") {
+    return colorName;
+  }
+
   const effectiveOpacity = calculateEffectiveOpacity(stop, parentOpacity);
   const opacity =
     effectiveOpacity !== 1.0 ? `/${nearestOpacity(effectiveOpacity)}` : "";
