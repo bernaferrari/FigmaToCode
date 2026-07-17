@@ -160,12 +160,20 @@ export const nearestColorFromRgb = (color: RGB) => {
   return { name, value };
 };
 
+const normalizeVariableColorName = (value: string): string => {
+  return value
+    .replaceAll(",", "")
+    .replaceAll("/", "-")
+    .replaceAll(" ", "-")
+    .toLowerCase();
+};
+
 export const variableToColorName = async (id: string) => {
-  return (
-    (await figma.variables.getVariableByIdAsync(id))?.name
-      .replaceAll("/", "-")
-      .replaceAll(" ", "-") || id.toLowerCase().replaceAll(":", "-")
-  );
+  const resolvedName = (await figma.variables.getVariableByIdAsync(id))?.name;
+
+  return resolvedName
+    ? normalizeVariableColorName(resolvedName)
+    : normalizeVariableColorName(id.replaceAll(":", "-"));
 };
 
 /**
@@ -183,7 +191,7 @@ export function getColorInfo(fill: SolidPaint | ColorStop) {
   // variable
   if ((fill as any).variableColorName) {
     // Use pre-computed variable name if available
-    colorName = (fill as any).variableColorName; // || variableToColorName(fill.boundVariables.color);
+    colorName = normalizeVariableColorName((fill as any).variableColorName); // || variableToColorName(fill.boundVariables.color);
     colorType = "variable";
     meta = "custom";
 

@@ -64,60 +64,60 @@ export const preferenceOptions: LocalCodegenPreferenceOptions[] = [
 ];
 
 export const selectPreferenceOptions: SelectPreferenceOptions[] = [
-  {
-    itemType: "select",
-    propertyName: "htmlGenerationMode",
-    label: "Mode",
-    options: [
-      { label: "HTML", value: "html" },
-      { label: "React (JSX)", value: "jsx" },
-      { label: "Svelte", value: "svelte" },
-      { label: "styled-components", value: "styled-components" },
-    ],
-    includedLanguages: ["HTML"],
-  },
+  // {
+  //   itemType: "select",
+  //   propertyName: "htmlGenerationMode",
+  //   label: "Mode",
+  //   options: [
+  //     { label: "HTML", value: "html" },
+  //     { label: "React (JSX)", value: "jsx" },
+  //     { label: "Svelte", value: "svelte" },
+  //     { label: "styled-components", value: "styled-components" },
+  //   ],
+  //   includedLanguages: ["HTML"],
+  // },
   {
     itemType: "select",
     propertyName: "tailwindGenerationMode",
     label: "Mode",
     options: [
+      { label: "Angular", value: "twig" },
       { label: "HTML", value: "html" },
-      { label: "React (JSX)", value: "jsx" },
-      { label: "Twig", value: "twig" },
+      // { label: "React (JSX)", value: "jsx" },
     ],
     includedLanguages: ["Tailwind"],
   },
-  {
-    itemType: "select",
-    propertyName: "flutterGenerationMode",
-    label: "Mode",
-    options: [
-      { label: "Full App", value: "fullApp" },
-      { label: "Widget", value: "stateless" },
-      { label: "Snippet", value: "snippet" },
-    ],
-    includedLanguages: ["Flutter"],
-  },
-  {
-    itemType: "select",
-    propertyName: "swiftUIGenerationMode",
-    label: "Mode",
-    options: [
-      { label: "Preview", value: "preview" },
-      { label: "Struct", value: "struct" },
-      { label: "Snippet", value: "snippet" },
-    ],
-    includedLanguages: ["SwiftUI"],
-  },
-  {
-    itemType: "select",
-    propertyName: "composeGenerationMode",
-    label: "Mode",
-    options: [
-      { label: "Snippet", value: "snippet" },
-      { label: "Composable", value: "composable" },
-      { label: "Full Screen", value: "screen" },
-    ],
-    includedLanguages: ["Compose"],
-  },
+  // {
+  //   itemType: "select",
+  //   propertyName: "flutterGenerationMode",
+  //   label: "Mode",
+  //   options: [
+  //     { label: "Full App", value: "fullApp" },
+  //     { label: "Widget", value: "stateless" },
+  //     { label: "Snippet", value: "snippet" },
+  //   ],
+  //   includedLanguages: ["Flutter"],
+  // },
+  // {
+  //   itemType: "select",
+  //   propertyName: "swiftUIGenerationMode",
+  //   label: "Mode",
+  //   options: [
+  //     { label: "Preview", value: "preview" },
+  //     { label: "Struct", value: "struct" },
+  //     { label: "Snippet", value: "snippet" },
+  //   ],
+  //   includedLanguages: ["SwiftUI"],
+  // },
+  // {
+  //   itemType: "select",
+  //   propertyName: "composeGenerationMode",
+  //   label: "Mode",
+  //   options: [
+  //     { label: "Snippet", value: "snippet" },
+  //     { label: "Composable", value: "composable" },
+  //     { label: "Full Screen", value: "screen" },
+  //   ],
+  //   includedLanguages: ["Compose"],
+  // },
 ];

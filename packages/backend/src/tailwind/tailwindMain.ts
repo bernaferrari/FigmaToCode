@@ -16,6 +16,13 @@ let previousExecutionCache: {
   openTypeFeatures: Record<string, boolean>;
 }[] = [];
 const SELF_CLOSING_TAGS = ["img"];
+const ANGULAR_COMPONENT_MAP: Record<string, string> = {
+  "sg-text-field": "sg-text-field",
+  "sg-button": "sg-button",
+  "sg-dropdown-combo": "sg-dropdown-combo",
+  "sg-icon": "sg-icon",
+  "sg-search-bar-dialog": "sg-search-bar-dialog",
+};
 
 export const tailwindMain = async (
   sceneNode: Array<SceneNode>,
@@ -204,31 +211,184 @@ const tailwindTwigComponentInstance = async (
   node: InstanceNode,
   settings: TailwindSettings,
 ): Promise<string> => {
-  // Extract component name from the instance
   const componentName = extractComponentName(node);
 
-  // Get component properties if needed
-  const builder = new TailwindDefaultBuilder(node, settings)
-    // .commonPositionStyles()
-    // .commonShapeStyles()
-  ;
+  if (settings.tailwindGenerationMode === "twig") {
+    const mainComponent = await getInstanceMainComponent(node);
+    const selector = resolveAngularSelector(node, componentName, mainComponent);
+    const defaults = getDefaultPropertyDefinitions(mainComponent);
+    const props = await angularProps(node.componentProperties || {}, defaults);
+    const attributes = props ? ` ${props}` : "";
 
+    const embeddableChildren = node.children
+      ? node.children.filter((n) => isTwigContentNode(n))
+      : [];
+
+    if (embeddableChildren.length > 0) {
+      const childrenStr = await tailwindWidgetGenerator(embeddableChildren, settings);
+      return `\n<${selector}${attributes}>${indentString(childrenStr)}\n</${selector}>`;
+    }
+
+    return `\n<${selector}${attributes}></${selector}>`;
+  }
+
+  const builder = new TailwindDefaultBuilder(node, settings);
   const attributes = builder.build();
 
-  // If we have children, process them
   let childrenStr = "";
-
   const embeddableChildren = node.children ? node.children.filter((n) => isTwigContentNode(n)) : [];
 
   if (embeddableChildren.length > 0) {
-    // We keep embedded components and Frame named "TwigContent"
     childrenStr = await tailwindWidgetGenerator(embeddableChildren, settings);
-    return `\n<twig:${componentName}${attributes}>${indentString(childrenStr)}\n</twig:${componentName}>`;
-  } else {
-    // Self-closing tag if no children
-    return `\n<twig:${componentName}${attributes} />`;
+    return `\n<${componentName}${attributes}>${indentString(childrenStr)}\n</${componentName}>`;
   }
+
+  return `\n<${componentName}${attributes} />`;
 };
+
+const getInstanceMainComponent = async (
+  node: InstanceNode,
+): Promise<ComponentNode | null> => {
+  const candidate = node as InstanceNode & {
+    mainComponent?: ComponentNode | null;
+    componentId?: string;
+    getMainComponentAsync?: () => Promise<ComponentNode | null>;
+  };
+
+  if (candidate.mainComponent) {
+    return candidate.mainComponent;
+  }
+
+  if (typeof candidate.getMainComponentAsync === "function") {
+    try {
+      return await candidate.getMainComponentAsync.call(node);
+    } catch {
+      return null;
+    }
+  }
+
+  if (candidate.componentId) {
+    try {
+      const resolved = await figma.getNodeByIdAsync(candidate.componentId);
+      if (resolved?.type === "COMPONENT") {
+        return resolved as ComponentNode;
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
+};
+
+const resolveAngularSelector = (
+  node: InstanceNode,
+  fallbackName: string,
+  mainComponent?: ComponentNode | null,
+): string => {
+  const componentName = extractComponentName(node);
+  const namesToTry = [componentName];
+
+  if (mainComponent?.name) {
+    namesToTry.push(mainComponent.name);
+  }
+
+  if (mainComponent?.parent?.name) {
+    namesToTry.push(mainComponent.parent.name);
+  }
+
+  for (const name of namesToTry) {
+    const mappedName = ANGULAR_COMPONENT_MAP[name];
+    if (mappedName) {
+      return mappedName;
+    }
+
+    if (name && name.startsWith("sg-")) {
+      return name;
+    }
+  }
+
+  return fallbackName;
+};
+
+const getDefaultPropertyDefinitions = (
+  mainComponent: ComponentNode | null,
+): Record<string, any> => {
+  const parent = mainComponent?.parent;
+  if (parent?.type === "COMPONENT_SET") {
+    return parent.componentPropertyDefinitions ?? {};
+  }
+  return mainComponent?.componentPropertyDefinitions ?? {};
+};
+
+async function resolveIconName(nodeId: string): Promise<string | null> {
+  try {
+    const swappedNode = await figma.getNodeByIdAsync(nodeId);
+    if (!swappedNode) return null;
+
+    if ("children" in swappedNode && swappedNode.children.length > 1) {
+      return swappedNode.children[1].name;
+    }
+
+    if ("children" in swappedNode && swappedNode.children.length > 0) {
+      return swappedNode.children[0].name;
+    }
+
+    return swappedNode.name;
+  } catch (error) {
+    console.log(`No se pudo resolver el icono para el id ${nodeId}: ${error}`);
+    return null;
+  }
+}
+
+async function angularProps(
+  properties: Record<string, any>,
+  defaults: Record<string, any> = {},
+): Promise<string> {
+  const parts: string[] = [];
+
+  console.log("PROPERTIES", properties);
+  console.log("DEFAULTS", defaults);
+
+  for (const [key, propData] of Object.entries(properties)) {
+    const rawValue = propData?.value !== undefined ? propData.value : propData;
+    const propType = propData?.type ?? defaults[key]?.type;
+    const propName = key.split("#")[0];
+    const defaultValue = defaults[key]?.defaultValue;
+
+    let outputValue: any = rawValue;
+
+    if (
+      propType === "INSTANCE_SWAP" &&
+      typeof rawValue === "string" &&
+      propName.toLowerCase().includes("icon") &&
+      !propName.toLowerCase().includes("class") &&
+      !propName.toLowerCase().includes("filled")
+    ) {
+      const [iconName, defaultIconName] = await Promise.all([
+        resolveIconName(rawValue),
+        typeof defaultValue === "string"
+          ? resolveIconName(defaultValue)
+          : Promise.resolve(null),
+      ]);
+
+      if (iconName && iconName === defaultIconName) {
+        continue;
+      }
+      outputValue = iconName ?? rawValue;
+    } else if (outputValue === defaultValue) {
+      continue;
+    }
+
+    if (typeof outputValue === "boolean" || typeof outputValue === "number") {
+      parts.push(`[${propName}]="${outputValue}"`);
+    } else {
+      parts.push(`[${propName}]="'${String(outputValue).replace(/"/g, '\\"')}"`);
+    }
+  }
+
+  return parts.join(" ");
+}
 
 const isTwigComponentNode = (node: SceneNode): boolean => {
   return localTailwindSettings.tailwindGenerationMode === "twig" && node.type === "INSTANCE" && !extractComponentName(node).startsWith("HTML:") && !isTwigContentNode(node);

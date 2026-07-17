@@ -1,5 +1,5 @@
 {
-  "name": "Figma to Code [HTML, Tailwind, Flutter, SwiftUI]",
+  "name": "Figma to Code [HTML, Angular/Tailwind]",
   "id": "842128343887142055",
   "api": "1.0.0",
   "main": "apps/plugin/dist/code.js",
@@ -12,13 +12,10 @@
     "allowedDomains": ["none"]
   },
   "codegenLanguages": [
+    { "label": "Angular/Tailwind", "value": "tailwind" },
     { "label": "HTML", "value": "html" },
     { "label": "React (JSX)", "value": "html_jsx" },
     { "label": "Svelte", "value": "html_svelte" },
-    { "label": "Styled Components", "value": "html_styled_components" },
-    { "label": "Tailwind", "value": "tailwind" },
-    { "label": "Tailwind (JSX)", "value": "tailwind_jsx" },
-    { "label": "Flutter", "value": "flutter" },
-    { "label": "SwiftUI", "value": "swiftUI" }
+    { "label": "Styled Components", "value": "html_styled_components" }
   ]
 }
