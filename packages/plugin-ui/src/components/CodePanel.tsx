@@ -1,5 +1,6 @@
 import {
   Framework,
+  DownloadProjectFormat,
   LocalCodegenPreferenceOptions,
   PluginSettings,
   SelectPreferenceOptions,
@@ -12,6 +13,7 @@ import EmptyState from "./EmptyState";
 import SettingsGroup from "./SettingsGroup";
 import FrameworkTabs from "./FrameworkTabs";
 import { TailwindSettings } from "./TailwindSettings";
+import DownloadMenu from "./DownloadMenu";
 
 interface CodePanelProps {
   code: string;
@@ -23,6 +25,9 @@ interface CodePanelProps {
     key: keyof PluginSettings,
     value: PluginSettings[keyof PluginSettings],
   ) => void;
+  onDownloadProject?: (format: DownloadProjectFormat) => void;
+  isDownloadingProject?: boolean;
+  projectDownloadError?: string | null;
 }
 
 const CodePanel = (props: CodePanelProps) => {
@@ -36,6 +41,9 @@ const CodePanel = (props: CodePanelProps) => {
     selectedFramework,
     settings,
     onPreferenceChanged,
+    onDownloadProject,
+    isDownloadingProject = false,
+    projectDownloadError,
   } = props;
   const isCodeEmpty = code === "";
 
@@ -92,6 +100,11 @@ const CodePanel = (props: CodePanelProps) => {
     : prefixedCode;
   const showMoreButton = lineCount > initialLinesToShow;
   const showCodeCopyButton = lineCount > 5;
+  const canDownloadProject =
+    selectedFramework === "Flutter" ||
+    selectedFramework === "HTML" ||
+    selectedFramework === "SwiftUI" ||
+    selectedFramework === "Tailwind";
 
   const handleButtonHover = () => setSyntaxHovered(true);
   const handleButtonLeave = () => setSyntaxHovered(false);
@@ -143,13 +156,28 @@ const CodePanel = (props: CodePanelProps) => {
           Code
         </p>
         {!isCodeEmpty && (
-          <CopyButton
-            value={prefixedCode}
-            onMouseEnter={handleButtonHover}
-            onMouseLeave={handleButtonLeave}
-          />
+          <div className="flex items-center gap-1.5">
+            {onDownloadProject && canDownloadProject && (
+              <DownloadMenu
+                framework={selectedFramework}
+                onDownload={onDownloadProject}
+                isDownloading={isDownloadingProject}
+              />
+            )}
+            <CopyButton
+              value={prefixedCode}
+              onMouseEnter={handleButtonHover}
+              onMouseLeave={handleButtonLeave}
+            />
+          </div>
         )}
       </div>
+
+      {projectDownloadError && (
+        <p className="text-sm text-destructive" role="alert">
+          {projectDownloadError}
+        </p>
+      )}
 
       {!isCodeEmpty && (
         <div className="flex flex-col p-3 bg-card border rounded-lg text-sm">
@@ -172,6 +200,7 @@ const CodePanel = (props: CodePanelProps) => {
                 // Regular toggle buttons for other options
                 return (
                   <FrameworkTabs
+                    key={preference.propertyName}
                     options={preference.options}
                     selectedValue={
                       (settings?.[preference.propertyName] ??

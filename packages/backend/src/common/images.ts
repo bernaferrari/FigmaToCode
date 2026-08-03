@@ -47,9 +47,18 @@ const createCanvasImageUrl = (width: number, height: number): string => {
   return URL.createObjectURL(file);
 };
 
-export const getPlaceholderImage = (w: number, h = -1) => {
+export const getPlaceholderImage = (
+  w: number,
+  h = -1,
+  nodeId?: string,
+  mode: "remote" | "asset" = "remote",
+) => {
   const _w = w.toFixed(0);
   const _h = (h < 0 ? w : h).toFixed(0);
+
+  if (mode === "asset" && nodeId) {
+    return `__FIGMA_IMAGE_${encodeURIComponent(nodeId)}__`;
+  }
 
   return `${PLACEHOLDER_IMAGE_DOMAIN}/${_w}x${_h}`;
 };
@@ -82,6 +91,32 @@ const imageBytesToBase64 = (bytes: Uint8Array): string => {
   return `data:image/png;base64,${b64}`;
 };
 
+const exportWithHiddenChildren = async <T>(
+  node: SceneNode,
+  excludeChildren: boolean,
+  exportNode: () => Promise<T>,
+): Promise<T> => {
+  const parent = node as SceneNode & Partial<ChildrenMixin>;
+  const children =
+    excludeChildren && "children" in parent && parent.children
+      ? [...parent.children]
+      : [];
+  const originalVisibility = new Map(
+    children.map((child) => [child, child.visible]),
+  );
+
+  try {
+    for (const child of children) {
+      child.visible = false;
+    }
+    return await exportNode();
+  } finally {
+    for (const child of children) {
+      child.visible = originalVisibility.get(child) ?? false;
+    }
+  }
+};
+
 export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
   node: AltNode<T>,
   excludeChildren: boolean,
@@ -93,35 +128,14 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
 
   const n: ExportableNode = node;
 
-  const temporarilyHideChildren =
-    excludeChildren && "children" in n && n.children.length > 0;
-  const parent = n as ChildrenMixin;
-  const originalVisibility = new Map<SceneNode, boolean>();
-
-  if (temporarilyHideChildren) {
-    // Store the original visible state of children
-    parent.children.map((child: SceneNode) =>
-      originalVisibility.set(child, child.visible),
-    ),
-      // Temporarily hide all children
-      parent.children.forEach((child) => {
-        child.visible = false;
-      });
-  }
-
   // export the image as bytes
   const exportSettings: ExportSettingsImage = {
     format: "PNG",
     constraint: { type: "SCALE", value: 1 },
   };
-  const bytes = await exportAsyncProxy(n, exportSettings);
-
-  if (temporarilyHideChildren) {
-    // After export, restore visibility
-    parent.children.forEach((child) => {
-      child.visible = originalVisibility.get(child) ?? false;
-    });
-  }
+  const bytes = await exportWithHiddenChildren(n, excludeChildren, () =>
+    exportAsyncProxy(n, exportSettings),
+  );
 
   addWarning("Some images exported as Base64 PNG");
 
@@ -130,4 +144,16 @@ export const exportNodeAsBase64PNG = async <T extends ExportableNode>(
   // Save the value so it's only calculated once.
   node.base64 = base64;
   return base64;
+};
+
+export const exportNodeAsPNG = async (
+  node: SceneNode & ExportMixin,
+  excludeChildren: boolean,
+): Promise<Uint8Array> => {
+  return exportWithHiddenChildren(node, excludeChildren, () =>
+    node.exportAsync({
+      format: "PNG",
+      constraint: { type: "SCALE", value: 1 },
+    }),
+  );
 };

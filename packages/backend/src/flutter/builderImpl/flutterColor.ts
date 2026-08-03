@@ -64,6 +64,7 @@ export const flutterColorFromDirectFills = (
 export const flutterBoxDecorationColor = (
   node: SceneNode,
   propertyPath: string,
+  imagePlaceholderMode: "remote" | "asset" = "remote",
 ): Record<string, string> => {
   let fills: ReadonlyArray<Paint>;
   fills = node[propertyPath as keyof SceneNode] as ReadonlyArray<Paint>;
@@ -82,16 +83,27 @@ export const flutterBoxDecorationColor = (
   ) {
     return { gradient: flutterGradient(fill) };
   } else if (fill?.type === "IMAGE") {
-    return { image: flutterDecorationImage(node, fill) };
+    return {
+      image: flutterDecorationImage(node, fill, imagePlaceholderMode),
+    };
   }
 
   return {};
 };
 
-export const flutterDecorationImage = (node: SceneNode, fill: ImagePaint) => {
+export const flutterDecorationImage = (
+  node: SceneNode,
+  fill: ImagePaint,
+  imagePlaceholderMode: "remote" | "asset" = "remote",
+) => {
   addWarning("Image fills are replaced with placeholders");
   return generateWidgetCode("DecorationImage", {
-    image: `NetworkImage("${getPlaceholderImage(node.width, node.height)}")`,
+    image: `NetworkImage("${getPlaceholderImage(
+      node.width,
+      node.height,
+      node.id,
+      imagePlaceholderMode,
+    )}")`,
     fit: fitToBoxFit(fill),
   });
 };

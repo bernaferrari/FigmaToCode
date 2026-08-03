@@ -35,9 +35,7 @@ function nearestColor(needle: RGB | string, colors: Array<ColorSpec>): string {
 
   let distanceSq;
   let minDistanceSq = Infinity;
-  // eslint-disable-next-line one-var
   let rgb;
-  // eslint-disable-next-line one-var
   let value: ColorSpec;
 
   for (let i = 0; i < colors.length; ++i) {

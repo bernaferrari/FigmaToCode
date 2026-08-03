@@ -7,6 +7,7 @@ export interface HTMLSettings {
   embedVectors: boolean;
   useColorVariables: boolean;
   htmlGenerationMode: "html" | "jsx" | "styled-components" | "svelte";
+  imagePlaceholderMode?: "remote" | "asset";
 }
 export interface TailwindSettings extends HTMLSettings {
   tailwindGenerationMode: "html" | "jsx" | "twig";
@@ -75,6 +76,26 @@ export type SettingsChangedMessage = Message & {
 };
 export type ErrorMessage = Message & {
   type: "error";
+  error: string;
+};
+export type DownloadProjectFormat =
+  | "flutter"
+  | "html"
+  | "nextjs"
+  | "swiftui"
+  | "vite";
+export type DownloadProjectMessage = Message & {
+  type: "download-project";
+  format: DownloadProjectFormat;
+};
+export type ProjectZipMessage = Message & {
+  type: "project-zip";
+  zip: ArrayBuffer;
+  format: DownloadProjectFormat;
+  fileName: string;
+};
+export type ProjectDownloadErrorMessage = Message & {
+  type: "project-download-error";
   error: string;
 };
 

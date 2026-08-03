@@ -11,6 +11,9 @@ import {
   ErrorMessage,
   SettingsChangedMessage,
   Warning,
+  DownloadProjectFormat,
+  ProjectDownloadErrorMessage,
+  ProjectZipMessage,
 } from "types";
 import { postUISettingsChangingMessage } from "./messaging";
 import copy from "copy-to-clipboard";
@@ -24,6 +27,8 @@ interface AppState {
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
   warnings: Warning[];
+  isDownloadingProject: boolean;
+  projectDownloadError: string | null;
 }
 
 const emptyPreview = { size: { width: 0, height: 0 }, content: "" };
@@ -49,6 +54,8 @@ export default function App() {
     colors: [],
     gradients: [],
     warnings: [],
+    isDownloadingProject: false,
+    projectDownloadError: null,
   });
 
   const rootStyles = getComputedStyle(document.documentElement);
@@ -117,6 +124,38 @@ export default function App() {
         case "selection-json":
           const json = event.data.pluginMessage.data;
           copy(JSON.stringify(json, null, 2));
+          break;
+
+        case "project-zip": {
+          const zipMessage = untypedMessage as ProjectZipMessage;
+          const blob = new Blob([zipMessage.zip], {
+            type: "application/zip",
+          });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = zipMessage.fileName;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+          setState((prevState) => ({
+            ...prevState,
+            isDownloadingProject: false,
+            projectDownloadError: null,
+          }));
+          break;
+        }
+
+        case "project-download-error": {
+          const downloadError = untypedMessage as ProjectDownloadErrorMessage;
+          setState((prevState) => ({
+            ...prevState,
+            isDownloadingProject: false,
+            projectDownloadError: downloadError.error,
+          }));
+          break;
+        }
 
         default:
           break;
@@ -154,8 +193,31 @@ export default function App() {
       postUISettingsChangingMessage(key, value, { targetOrigin: "*" });
     }
   };
+  const handleDownloadProject = (format: DownloadProjectFormat) => {
+    if (state.isDownloadingProject) {
+      return;
+    }
+
+    setState((prevState) => ({
+      ...prevState,
+      isDownloadingProject: true,
+      projectDownloadError: null,
+    }));
+    parent.postMessage(
+      { pluginMessage: { type: "download-project", format } },
+      "*",
+    );
+  };
 
   const darkMode = isDarkFigmaBackground(figmaColorBgValue);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+
+    return () => {
+      document.documentElement.classList.remove("dark");
+    };
+  }, [darkMode]);
 
   return (
     <div
@@ -172,6 +234,9 @@ export default function App() {
         settings={state.settings}
         colors={state.colors}
         gradients={state.gradients}
+        onDownloadProject={handleDownloadProject}
+        isDownloadingProject={state.isDownloadingProject}
+        projectDownloadError={state.projectDownloadError}
       />
     </div>
   );

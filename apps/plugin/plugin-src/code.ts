@@ -6,15 +6,24 @@ import {
   swiftuiMain,
   htmlMain,
   composeMain,
+  extractProjectImageNodeIds,
+  generateProjectZip,
   postSettingsChanged,
+  replaceProjectImagePlaceholders,
 } from "backend";
 import { nodesToJSON } from "backend/src/altNodes/jsonNodeConversion";
+import { oldConvertNodesToAltNodes } from "backend/src/altNodes/oldAltConversion";
+import { exportNodeAsPNG } from "backend/src/common/images";
 import { retrieveGenericSolidUIColors } from "backend/src/common/retrieveUI/retrieveColors";
 import { flutterCodeGenTextStyles } from "backend/src/flutter/flutterMain";
 import { htmlCodeGenTextStyles } from "backend/src/html/htmlMain";
 import { swiftUICodeGenTextStyles } from "backend/src/swiftui/swiftuiMain";
 import { composeCodeGenTextStyles } from "backend/src/compose/composeMain";
-import { PluginSettings, SettingWillChangeMessage } from "types";
+import {
+  DownloadProjectFormat,
+  PluginSettings,
+  SettingWillChangeMessage,
+} from "types";
 
 let userPluginSettings: PluginSettings;
 
@@ -85,6 +94,8 @@ const initSettings = async () => {
 
 // Used to prevent running from happening again.
 let isLoading = false;
+let isDownloadingProject = false;
+let rerunAfterDownload = false;
 const safeRun = async (settings: PluginSettings) => {
   console.log(
     "[DEBUG] safeRun - Called with isLoading =",
@@ -92,6 +103,11 @@ const safeRun = async (settings: PluginSettings) => {
     "selectionCount =",
     figma.currentPage.selection.length,
   );
+  if (isDownloadingProject) {
+    rerunAfterDownload = true;
+    return;
+  }
+
   if (isLoading === false) {
     try {
       isLoading = true;
@@ -129,6 +145,241 @@ const safeRun = async (settings: PluginSettings) => {
       isLoading,
     );
   }
+};
+
+type ExportedProjectImage = {
+  name: string;
+  bytes: Uint8Array;
+  nodeId: string;
+};
+
+const allowedFormatsByFramework: Record<
+  "Flutter" | "HTML" | "SwiftUI" | "Tailwind",
+  DownloadProjectFormat[]
+> = {
+  Flutter: ["flutter"],
+  HTML: ["html", "nextjs", "vite"],
+  SwiftUI: ["swiftui"],
+  Tailwind: ["html", "nextjs", "vite"],
+};
+
+const toKebab = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+const getRootSelectionName = (selection: readonly SceneNode[]) => {
+  if (selection.length === 0) {
+    return "figma-export";
+  }
+
+  if (selection.length === 1) {
+    return toKebab(selection[0].name) || "figma-export";
+  }
+
+  return (
+    toKebab(selection[0].parent?.name ?? "figma-selection") || "figma-selection"
+  );
+};
+
+const createImageName = (nodeId: string, nodeName: string) => {
+  const cleanName = toKebab(nodeName);
+  const suffix = nodeId.replace(/[^a-z0-9]+/gi, "-").replace(/(^-|-$)/g, "");
+  return `${cleanName || "image"}-${suffix}.png`;
+};
+
+const isImageNode = (node: SceneNode): boolean => {
+  if ("fills" in node) {
+    const fills = node.fills;
+    if (fills && fills !== figma.mixed && Array.isArray(fills)) {
+      return fills.some((fill) => fill.type === "IMAGE");
+    }
+  }
+
+  return false;
+};
+
+const exportProjectImages = async (
+  selection: readonly SceneNode[],
+  requiredNodeIds: ReadonlySet<string>,
+): Promise<ExportedProjectImage[]> => {
+  const images: ExportedProjectImage[] = [];
+  const missingNodeIds = new Set(requiredNodeIds);
+
+  const visit = async (node: SceneNode) => {
+    if (node.visible === false) {
+      return;
+    }
+
+    if (missingNodeIds.has(node.id)) {
+      if (!isImageNode(node) || !("exportAsync" in node)) {
+        throw new Error(
+          `Node ${node.name || node.id} cannot be exported as an image.`,
+        );
+      }
+
+      const hasChildren = "children" in node && node.children.length > 0;
+      const bytes = await exportNodeAsPNG(node, hasChildren);
+      images.push({
+        bytes,
+        name: createImageName(node.id, node.name),
+        nodeId: node.id,
+      });
+      missingNodeIds.delete(node.id);
+    }
+
+    if ("children" in node) {
+      for (const child of node.children) {
+        await visit(child);
+      }
+    }
+  };
+
+  for (const node of selection) {
+    await visit(node);
+  }
+
+  if (missingNodeIds.size > 0) {
+    throw new Error(
+      `Could not find ${missingNodeIds.size} image layer${
+        missingNodeIds.size === 1 ? "" : "s"
+      } in the selected content.`,
+    );
+  }
+
+  return images;
+};
+
+const getConvertedSelectionForDownload = async (
+  nodes: readonly SceneNode[],
+  pluginSettings: PluginSettings,
+): Promise<SceneNode[]> => {
+  if (nodes.length === 0) {
+    return [];
+  }
+
+  const convertedSelection = pluginSettings.useOldPluginVersion2025
+    ? oldConvertNodesToAltNodes(nodes, null)
+    : await nodesToJSON(nodes, pluginSettings);
+  return convertedSelection as unknown as SceneNode[];
+};
+
+const generateDownloadCode = async (
+  nodes: readonly SceneNode[],
+  format: DownloadProjectFormat,
+  pluginSettings: PluginSettings,
+) => {
+  const convertedSelection = await getConvertedSelectionForDownload(
+    nodes,
+    pluginSettings,
+  );
+
+  if (convertedSelection.length === 0) {
+    return "<div>No content to export</div>";
+  }
+
+  const settings = {
+    ...pluginSettings,
+    embedImages: false,
+    imagePlaceholderMode: "asset" as const,
+  };
+  const isReactProject = format === "nextjs" || format === "vite";
+
+  if (pluginSettings.framework === "Flutter") {
+    return flutterMain(convertedSelection, {
+      ...settings,
+      flutterGenerationMode: "fullApp",
+    });
+  }
+
+  if (pluginSettings.framework === "SwiftUI") {
+    return swiftuiMain(convertedSelection, {
+      ...settings,
+      swiftUIGenerationMode: "preview",
+    });
+  }
+
+  if (pluginSettings.framework === "Tailwind") {
+    const result = await tailwindMain(convertedSelection, {
+      ...settings,
+      tailwindGenerationMode: isReactProject ? "jsx" : "html",
+    });
+    return result || "<div>Failed to generate Tailwind</div>";
+  }
+
+  const result = await htmlMain(
+    convertedSelection,
+    {
+      ...settings,
+      htmlGenerationMode: isReactProject ? "jsx" : "html",
+    },
+    true,
+  );
+  return result?.html || "<div>Failed to generate HTML</div>";
+};
+
+const downloadProject = async (format: DownloadProjectFormat) => {
+  if (!["flutter", "html", "nextjs", "swiftui", "vite"].includes(format)) {
+    throw new Error(`Invalid download format: ${format}.`);
+  }
+
+  const pluginSettings = { ...userPluginSettings };
+  if (
+    pluginSettings.framework === "Compose" ||
+    !allowedFormatsByFramework[pluginSettings.framework].includes(format)
+  ) {
+    throw new Error(
+      `${format} export is not available for ${pluginSettings.framework}.`,
+    );
+  }
+
+  const selection = [...figma.currentPage.selection];
+  if (selection.length === 0) {
+    throw new Error("Please select at least one layer to export.");
+  }
+
+  const rawCode = await generateDownloadCode(selection, format, pluginSettings);
+  const requiredImageNodeIds = extractProjectImageNodeIds(rawCode);
+  const images = await exportProjectImages(selection, requiredImageNodeIds);
+  const code = replaceProjectImagePlaceholders(rawCode, images, format);
+  const rootName = getRootSelectionName(selection);
+  const rawAssetSize = images.reduce(
+    (sum, image) => sum + image.bytes.byteLength,
+    0,
+  );
+  const maxRawAssetSizeBytes = 25 * 1024 * 1024;
+  if (rawAssetSize > maxRawAssetSizeBytes) {
+    throw new Error(
+      `Images are too large (${Math.round(rawAssetSize / 1024 / 1024)}MB). Try selecting fewer images or smaller components.`,
+    );
+  }
+  const zipData = generateProjectZip(
+    code,
+    pluginSettings.framework,
+    images,
+    format,
+    rootName,
+  );
+
+  const maxMessageSizeBytes = 10 * 1024 * 1024;
+  if (zipData.byteLength > maxMessageSizeBytes) {
+    throw new Error(
+      `Project too large (${Math.round(zipData.byteLength / 1024 / 1024)}MB). Try selecting fewer images or smaller components.`,
+    );
+  }
+
+  const zip = zipData.buffer.slice(
+    zipData.byteOffset,
+    zipData.byteOffset + zipData.byteLength,
+  );
+
+  figma.ui.postMessage({
+    type: "project-zip",
+    zip,
+    format,
+    fileName: `${rootName}-${format}.zip`,
+  });
 };
 
 const standardMode = async () => {
@@ -171,6 +422,41 @@ const standardMode = async () => {
 
     if (msg.type === "ui-ready") {
       await initializeOnce();
+    } else if (msg.type === "download-project") {
+      if (isLoading) {
+        figma.ui.postMessage({
+          type: "project-download-error",
+          error: "Please wait for the current conversion to finish.",
+        });
+        return;
+      }
+
+      if (isDownloadingProject) {
+        figma.ui.postMessage({
+          type: "project-download-error",
+          error: "A project download is already in progress.",
+        });
+        return;
+      }
+
+      isDownloadingProject = true;
+      try {
+        await downloadProject(msg.format as DownloadProjectFormat);
+      } catch (error) {
+        console.error("Download project failed:", error);
+        figma.ui.postMessage({
+          type: "project-download-error",
+          error: `Failed to create project: ${
+            error instanceof Error ? error.message : "Unknown error occurred"
+          }`,
+        });
+      } finally {
+        isDownloadingProject = false;
+        if (rerunAfterDownload) {
+          rerunAfterDownload = false;
+          void safeRun(userPluginSettings);
+        }
+      }
     } else if (msg.type === "pluginSettingWillChange") {
       const { key, value } = msg as SettingWillChangeMessage<unknown>;
       console.log(`[DEBUG] Setting changed: ${key} = ${value}`);

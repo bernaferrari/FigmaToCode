@@ -10,10 +10,12 @@
     "dist/**"
   ],
   "scripts": {
-    "lint": "eslint \"src/**/*.ts*\""
+    "lint": "eslint \"src/**/*.ts*\"",
+    "test": "vitest run"
   },
   "dependencies": {
     "@figma/plugin-typings": "^1.125.0",
+    "fflate": "^0.8.2",
     "html-entities": "^2.6.0",
     "js-base64": "^3.7.8",
     "nanoid": "^5.1.11",
@@ -24,10 +26,11 @@
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^10.3.0",
+    "eslint": "^9.39.2",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
   }
 }

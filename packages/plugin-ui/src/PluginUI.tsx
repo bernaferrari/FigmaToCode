@@ -8,6 +8,7 @@ import About from "./components/About";
 import WarningsPanel from "./components/WarningsPanel";
 import {
   Framework,
+  DownloadProjectFormat,
   HTMLPreview,
   LinearGradientConversion,
   PluginSettings,
@@ -40,10 +41,27 @@ type PluginUIProps = {
   colors: SolidColorConversion[];
   gradients: LinearGradientConversion[];
   isLoading: boolean;
+  onDownloadProject?: (format: DownloadProjectFormat) => void;
+  isDownloadingProject?: boolean;
+  projectDownloadError?: string | null;
 };
 
 const frameworks: Framework[] = ["HTML", "Tailwind", "Flutter", "SwiftUI"];
 const LOADING_INDICATOR_DELAY_MS = 250;
+
+const DelayedLoading = () => {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(
+      () => setVisible(true),
+      LOADING_INDICATOR_DELAY_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return visible ? <Loading /> : null;
+};
 
 type FrameworkTabsProps = {
   frameworks: Framework[];
@@ -86,8 +104,6 @@ const FrameworkTabs = ({
 
 export const PluginUI = (props: PluginUIProps) => {
   const [showAbout, setShowAbout] = useState(false);
-  const [showLoading, setShowLoading] = useState(false);
-  const [hasHandledInitialLoad, setHasHandledInitialLoad] = useState(false);
 
   const [previewExpanded, setPreviewExpanded] = useState(false);
   const [previewViewMode, setPreviewViewMode] = useState<
@@ -97,28 +113,9 @@ export const PluginUI = (props: PluginUIProps) => {
     "white",
   );
 
-  useEffect(() => {
-    if (!props.isLoading) {
-      setShowLoading(false);
-      setHasHandledInitialLoad(true);
-      return;
-    }
-
-    if (hasHandledInitialLoad) {
-      setShowLoading(true);
-      return;
-    }
-
-    // On plugin startup, the UI waits for a ready handshake before the first conversion.
-    // Delay the loader only for that initial pass to avoid a one-frame loading flash.
-    const timer = window.setTimeout(() => {
-      setShowLoading(true);
-    }, LOADING_INDICATOR_DELAY_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [props.isLoading]);
-
-  if (props.isLoading) return showLoading ? <Loading /> : null;
+  if (props.isLoading) {
+    return <DelayedLoading />;
+  }
 
   const isEmpty = props.code === "";
   const warnings = props.warnings ?? [];
@@ -192,6 +189,9 @@ export const PluginUI = (props: PluginUIProps) => {
                 selectPreferenceOptions={selectPreferenceOptions}
                 settings={props.settings}
                 onPreferenceChanged={props.onPreferenceChanged}
+                onDownloadProject={props.onDownloadProject}
+                isDownloadingProject={props.isDownloadingProject}
+                projectDownloadError={props.projectDownloadError}
               />
 
               {props.colors.length > 0 && (

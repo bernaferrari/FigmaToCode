@@ -128,6 +128,11 @@ export class SwiftuiDefaultBuilder {
     return this;
   }
 
+  clipContent(): this {
+    this.pushModifier(["clipped", ""]);
+    return this;
+  }
+
   effects(node: SceneNode): this {
     if (node.type === "GROUP") {
       return this;

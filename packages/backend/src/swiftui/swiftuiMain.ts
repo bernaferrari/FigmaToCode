@@ -8,6 +8,7 @@ import { SwiftuiDefaultBuilder } from "./swiftuiDefaultBuilder";
 import { PluginSettings } from "types";
 import { addWarning } from "../common/commonConversionWarnings";
 import { getVisibleNodes } from "../common/nodeVisibility";
+import { getPlaceholderImage } from "../common/images";
 
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
@@ -115,8 +116,13 @@ export const swiftuiContainer = (
     return stack;
   }
 
+  const image = getSwiftUIImage(node);
   let kind = "";
-  if (node.type === "RECTANGLE" || node.type === "LINE") {
+  if (image && stack) {
+    kind = generateSwiftViewCode("ZStack", {}, `${image}\n${stack}`);
+  } else if (image) {
+    kind = image;
+  } else if (node.type === "RECTANGLE" || node.type === "LINE") {
     kind = "Rectangle()";
   } else if (node.type === "ELLIPSE") {
     kind = "Ellipse()";
@@ -124,11 +130,20 @@ export const swiftuiContainer = (
     kind = stack;
   }
 
-  const result = new SwiftuiDefaultBuilder(kind)
-    .shapeForeground(node)
-    .autoLayoutPadding(node)
-    .size(node)
-    .shapeBackground(node)
+  const builder = new SwiftuiDefaultBuilder(kind);
+  if (!image) {
+    builder.shapeForeground(node);
+  }
+
+  builder.autoLayoutPadding(node).size(node);
+
+  if (image) {
+    builder.clipContent();
+  } else {
+    builder.shapeBackground(node);
+  }
+
+  const result = builder
     .cornerRadius(node)
     .shapeBorder(node)
     .commonPositionStyles(node)
@@ -136,6 +151,39 @@ export const swiftuiContainer = (
     .build(kind === stack ? -2 : 0);
 
   return result;
+};
+
+const getSwiftUIImage = (node: SceneNode): string => {
+  if (localSettings.imagePlaceholderMode !== "asset" || !("fills" in node)) {
+    return "";
+  }
+
+  const fills = node.fills;
+  const fill =
+    fills !== figma.mixed && Array.isArray(fills)
+      ? [...fills].reverse().find((candidate) => candidate.visible !== false)
+      : undefined;
+  if (!fill || fill.type !== "IMAGE") {
+    return "";
+  }
+
+  addWarning("Image fills are exported as project assets");
+  const imageName = getPlaceholderImage(
+    node.width,
+    node.height,
+    node.id,
+    "asset",
+  );
+  const scaling =
+    fill.scaleMode === "FIT"
+      ? ".scaledToFit()"
+      : fill.scaleMode === "STRETCH"
+        ? ""
+        : ".scaledToFill()";
+
+  return [`Image("${imageName}")`, ".resizable()", scaling]
+    .filter(Boolean)
+    .join("\n  ");
 };
 
 const swiftuiGroup = (

@@ -24,7 +24,7 @@
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
-    "eslint": "^10.3.0",
+    "eslint": "^9.39.2",
     "eslint-config-custom": "workspace:*",
     "tsconfig": "workspace:*",
     "types": "workspace:*",

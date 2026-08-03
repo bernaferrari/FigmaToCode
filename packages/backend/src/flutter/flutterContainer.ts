@@ -15,7 +15,11 @@ import { getCommonRadius } from "../common/commonRadius";
 import { commonStroke } from "../common/commonStroke";
 import { generateRotationMatrix } from "./builderImpl/flutterBlend";
 
-export const flutterContainer = (node: SceneNode, child: string): string => {
+export const flutterContainer = (
+  node: SceneNode,
+  child: string,
+  imagePlaceholderMode: "remote" | "asset" = "remote",
+): string => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
@@ -24,7 +28,7 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
   }
 
   // ignore for Groups
-  const propBoxDecoration = getDecoration(node);
+  const propBoxDecoration = getDecoration(node, imagePlaceholderMode);
   const { width, height, isExpanded, constraints } = flutterSize(node);
 
   const clipBehavior =
@@ -64,7 +68,7 @@ export const flutterContainer = (node: SceneNode, child: string): string => {
       "BoxDecoration()",
     );
     properties.decoration = clipBehavior ? propBoxDecoration : parsedDecoration;
-    
+
     const isEmptyProps = hasEmptyProps(properties);
     if (isEmptyProps) {
       result = child;
@@ -112,13 +116,20 @@ const hasEmptyProps = (props: Record<string, string>): boolean => {
   return isEmpty;
 }
 
-const getDecoration = (node: SceneNode): string => {
+const getDecoration = (
+  node: SceneNode,
+  imagePlaceholderMode: "remote" | "asset",
+): string => {
   if (!("fills" in node)) {
     return "";
   }
 
   const propBoxShadow = flutterShadow(node);
-  const decorationBackground = flutterBoxDecorationColor(node, "fills");
+  const decorationBackground = flutterBoxDecorationColor(
+    node,
+    "fills",
+    imagePlaceholderMode,
+  );
 
   let shapeDecorationBorder = "";
   if (node.type === "STAR") {

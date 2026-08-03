@@ -153,7 +153,10 @@ const flutterContainer = (node: SceneNode, child: string): string => {
     propChild = child;
   }
 
-  const builder = new FlutterDefaultBuilder(propChild)
+  const builder = new FlutterDefaultBuilder(
+    propChild,
+    localSettings.imagePlaceholderMode,
+  )
     .createContainer(node)
     .blendAttr(node)
     .position(node);

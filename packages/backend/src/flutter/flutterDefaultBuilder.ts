@@ -14,13 +14,18 @@ import { generateWidgetCode } from "../common/numToAutoFixed";
 export class FlutterDefaultBuilder {
   child: string;
   rotationApplied: boolean = false;
+  imagePlaceholderMode: "remote" | "asset";
 
-  constructor(optChild: string) {
+  constructor(
+    optChild: string,
+    imagePlaceholderMode: "remote" | "asset" = "remote",
+  ) {
     this.child = optChild;
+    this.imagePlaceholderMode = imagePlaceholderMode;
   }
 
   createContainer(node: SceneNode): this {
-    this.child = flutterContainer(node, this.child);
+    this.child = flutterContainer(node, this.child, this.imagePlaceholderMode);
     this.rotationApplied = true;
 
     return this;

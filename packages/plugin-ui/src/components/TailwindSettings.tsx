@@ -67,7 +67,7 @@ export const TailwindSettings: React.FC<TailwindSettingsProps> = ({
             showPreview={true}
           />
           <p className="text-xs text-neutral-500 mt-1">
-            Add a custom prefix to all Tailwind classes (e.g. "tw-")
+            Add a custom prefix to all Tailwind classes (e.g. &quot;tw-&quot;)
           </p>
         </div>
 

@@ -11,7 +11,18 @@
     "lint": {
       "outputs": [],
       "dependsOn": ["^build"],
-      "inputs": ["src/**/*.tsx", "src/**/*.ts", "test/**/*.ts", "test/**/*.tsx", ".eslintrc.js"]
+      "inputs": [
+        "src/**/*.tsx",
+        "src/**/*.ts",
+        "test/**/*.ts",
+        "test/**/*.tsx",
+        ".eslintrc.js"
+      ]
+    },
+    "test": {
+      "outputs": [],
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.ts", "src/**/*.tsx"]
     },
     "type-check": {}
   }

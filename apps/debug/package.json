@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "build:watch": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "backend": "workspace:*",
