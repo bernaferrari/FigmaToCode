@@ -8,6 +8,6 @@
 **/.turbo
 **/node_modules
 coverage
-web
+/web/
 apps/plugin/dist
 dist
