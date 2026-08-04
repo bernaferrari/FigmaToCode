@@ -8,7 +8,7 @@ export function ThemeToggle() {
 
   return (
     <button
-      className="relative grid size-11 shrink-0 place-items-center rounded-[0.65rem] border-0 bg-transparent p-0 text-site-muted transition-[background-color,color,transform] duration-150 hover:bg-site-ink/5 hover:text-site-ink active:scale-[0.96] dark:hover:bg-white/7"
+      className="relative grid size-11 shrink-0 place-items-center rounded-[0.65rem] border-0 bg-transparent p-0 text-muted-foreground transition-[background-color,color,transform] duration-150 hover:bg-site-ink/5 hover:text-site-ink active:scale-[0.96] dark:hover:bg-white/7"
       type="button"
       aria-label="Toggle color theme"
       title="Toggle color theme"

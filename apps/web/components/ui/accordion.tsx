@@ -40,7 +40,7 @@ function AccordionTrigger({
         {...props}
       >
         {children}
-        <span className="grid size-[1.85rem] shrink-0 place-items-center rounded-full border border-[var(--site-border)] text-[var(--site-muted)] transition-[color,background-color,border-color,transform] duration-200 ease-out group-hover/accordion-trigger:border-[color:oklch(0.18_0.02_154/18%)] group-hover/accordion-trigger:bg-[color:oklch(0.18_0.02_154/4%)] group-hover/accordion-trigger:text-[var(--site-ink)] group-aria-expanded/accordion-trigger:rotate-45 group-aria-expanded/accordion-trigger:border-[color:oklch(0.58_0.16_151/28%)] group-aria-expanded/accordion-trigger:bg-[color:oklch(0.75_0.12_151/15%)] group-aria-expanded/accordion-trigger:text-[var(--site-green-dark)]">
+        <span className="grid size-[1.85rem] shrink-0 place-items-center rounded-full border border-border text-muted-foreground transition-[color,background-color,border-color,transform] duration-200 ease-out group-hover/accordion-trigger:border-foreground/20 group-hover/accordion-trigger:bg-foreground/5 group-hover/accordion-trigger:text-foreground group-aria-expanded/accordion-trigger:rotate-45 group-aria-expanded/accordion-trigger:border-[color:oklch(0.58_0.16_151/28%)] group-aria-expanded/accordion-trigger:bg-[color:oklch(0.75_0.12_151/15%)] group-aria-expanded/accordion-trigger:text-[var(--site-green-dark)]">
           <PlusIcon className="size-4" strokeWidth={1.7} aria-hidden="true" />
         </span>
       </AccordionPrimitive.Trigger>

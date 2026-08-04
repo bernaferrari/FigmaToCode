@@ -235,7 +235,6 @@ const samplePreview: HTMLPreview = {
 };
 
 type PreviewState = "ready" | "warning" | "empty";
-type PreviewTheme = "light" | "dark";
 
 const previewStates: { value: PreviewState; label: string }[] = [
   { value: "ready", label: "Generated" },
@@ -243,15 +242,9 @@ const previewStates: { value: PreviewState; label: string }[] = [
   { value: "empty", label: "Empty" },
 ];
 
-const previewThemes: { value: PreviewTheme; label: string }[] = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-];
-
 export default function PreviewLab() {
   const [selectedFramework, setSelectedFramework] = useState<Framework>("HTML");
   const [previewState, setPreviewState] = useState<PreviewState>("ready");
-  const [previewTheme, setPreviewTheme] = useState<PreviewTheme>("light");
   const [settings, setSettings] = useState<PluginSettings>(defaultSettings);
 
   const code =
@@ -295,54 +288,7 @@ export default function PreviewLab() {
           </p>
         </div>
 
-        <div className="mt-7 grid flex-1 grid-cols-1 gap-4 md:mt-0 md:grid-cols-2 min-[68rem]:mt-9 min-[68rem]:flex min-[68rem]:flex-col min-[68rem]:gap-6">
-          <section
-            className="flex flex-col gap-3"
-            aria-labelledby="theme-control-label"
-          >
-            <div className="flex items-center gap-2.5">
-              <span
-                className="grid size-8 shrink-0 place-items-center rounded-[0.6rem] border border-[oklch(0.35_0.015_154)] bg-[oklch(0.2_0.018_154)] text-[oklch(0.78_0.08_151)] [&_svg]:size-4 [&_svg]:stroke-current [&_svg]:stroke-[1.55]"
-                aria-hidden="true"
-              >
-                <AppearanceIcon />
-              </span>
-              <div>
-                <h4
-                  className="text-[0.78rem] font-[640] text-[oklch(0.94_0.008_154)]"
-                  id="theme-control-label"
-                >
-                  Appearance
-                </h4>
-                <p className="mt-0.5 text-[0.66rem] text-[oklch(0.63_0.012_154)]">
-                  Interface theme
-                </p>
-              </div>
-            </div>
-            <div
-              className="flex gap-1 rounded-xl border border-[oklch(0.3_0.015_154)] bg-[oklch(0.125_0.014_154)] p-1"
-              aria-label="Choose a preview theme"
-            >
-              {previewThemes.map((theme) => (
-                <button
-                  className={cn(
-                    "flex min-h-10.5 min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 text-[0.74rem] font-[610] transition-[background-color,color,transform] duration-150 active:scale-[0.96]",
-                    previewTheme === theme.value
-                      ? "bg-[oklch(0.28_0.025_154)] text-white shadow-[0_1px_1px_oklch(0_0_0/20%),inset_0_0_0_1px_oklch(1_0_0/4%)]"
-                      : "bg-transparent text-[oklch(0.69_0.015_154)] hover:bg-[oklch(0.2_0.018_154)] hover:text-[oklch(0.94_0.008_154)]",
-                  )}
-                  data-active={previewTheme === theme.value}
-                  type="button"
-                  key={theme.value}
-                  onClick={() => setPreviewTheme(theme.value)}
-                  aria-pressed={previewTheme === theme.value}
-                >
-                  {theme.label}
-                </button>
-              ))}
-            </div>
-          </section>
-
+        <div className="mt-7 flex flex-1 flex-col gap-4 md:mt-0 min-[68rem]:mt-9 min-[68rem]:gap-6">
           <section
             className="flex flex-col gap-3"
             aria-labelledby="state-control-label"
@@ -405,10 +351,10 @@ export default function PreviewLab() {
       </aside>
 
       <div className="min-w-0 bg-[oklch(0.95_0.007_154)] dark:bg-[oklch(0.13_0.014_154)]">
-        <div className="flex min-h-15 items-center justify-between gap-4 border-b border-site-border bg-[oklch(0.985_0.004_154)] px-[clamp(1rem,2vw,1.4rem)] dark:bg-[oklch(0.17_0.016_154)]">
+        <div className="flex min-h-15 items-center justify-between gap-4 border-b border-border bg-[oklch(0.985_0.004_154)] px-[clamp(1rem,2vw,1.4rem)] dark:bg-[oklch(0.17_0.016_154)]">
           <div className="flex items-center gap-3">
             <span
-              className="grid size-8 shrink-0 place-items-center rounded-[0.58rem] border border-site-border bg-white text-site-muted shadow-sm dark:bg-[oklch(0.21_0.016_154)] [&_svg]:size-4 [&_svg]:stroke-current [&_svg]:stroke-[1.55]"
+              className="grid size-8 shrink-0 place-items-center rounded-[0.58rem] border border-border bg-white text-muted-foreground shadow-sm dark:bg-[oklch(0.21_0.016_154)] [&_svg]:size-4 [&_svg]:stroke-current [&_svg]:stroke-[1.55]"
               aria-hidden="true"
             >
               <PreviewIcon />
@@ -417,14 +363,13 @@ export default function PreviewLab() {
               Plugin preview
             </strong>
           </div>
-          <span className="rounded-full border border-site-border bg-white px-2.5 py-1.5 text-[0.66rem] font-[590] text-site-muted tabular-nums dark:bg-[oklch(0.21_0.016_154)]">
+          <span className="rounded-full border border-border bg-white px-2.5 py-1.5 text-[0.66rem] font-[590] text-muted-foreground tabular-nums dark:bg-[oklch(0.21_0.016_154)]">
             760 × 656
           </span>
         </div>
 
-        <div className="grid min-h-0 place-items-center bg-[linear-gradient(var(--site-border)_1px,transparent_1px),linear-gradient(90deg,var(--site-border)_1px,transparent_1px)] bg-size-[1.1rem_1.1rem] p-2.5 md:min-h-180 md:bg-size-[1.5rem_1.5rem] md:p-[clamp(1rem,2.5vw,2rem)]">
+        <div className="grid min-h-0 place-items-center bg-[linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] bg-size-[1.1rem_1.1rem] p-2.5 md:min-h-180 md:bg-size-[1.5rem_1.5rem] md:p-[clamp(1rem,2.5vw,2rem)]">
           <PluginPreview
-            theme={previewTheme}
             code={code}
             warnings={warnings}
             settings={settings}
@@ -439,7 +384,6 @@ export default function PreviewLab() {
 }
 
 type PluginPreviewProps = {
-  theme: "light" | "dark";
   code: string;
   warnings: string[];
   settings: PluginSettings;
@@ -452,7 +396,6 @@ type PluginPreviewProps = {
 };
 
 function PluginPreview({
-  theme,
   code,
   warnings,
   settings,
@@ -460,24 +403,9 @@ function PluginPreview({
   setSelectedFramework,
   onPreferenceChanged,
 }: PluginPreviewProps) {
-  const isDark = theme === "dark";
-
   return (
-    <article
-      className={cn(
-        "min-w-0 w-full max-w-190 overflow-hidden rounded-2xl shadow-[0_1px_2px_oklch(0_0_0/8%),0_12px_32px_oklch(0.18_0.03_154/12%),0_30px_60px_oklch(0.18_0.03_154/7%)]",
-        isDark
-          ? "border border-[oklch(0.1_0.01_154)] bg-[oklch(0.205_0.015_154)]"
-          : "border border-[oklch(0.18_0.02_154/11%)] bg-[oklch(0.965_0.006_145)]",
-      )}
-      data-theme={theme}
-    >
-      <div
-        className={cn(
-          "overflow-hidden bg-white",
-          isDark && "bg-[oklch(0.12_0.04_266.7)]",
-        )}
-      >
+    <article className="min-w-0 w-full max-w-190 overflow-hidden rounded-2xl border bg-[oklch(0.965_0.006_145)] shadow-[0_1px_2px_oklch(0_0_0/8%),0_12px_32px_oklch(0.18_0.03_154/12%),0_30px_60px_oklch(0.18_0.03_154/7%)] dark:bg-[oklch(0.205_0.015_154)]">
+      <div className="overflow-hidden bg-white dark:bg-[oklch(0.12_0.04_266.7)]">
         <div className="flex h-10 items-center gap-2 bg-[oklch(0.19_0.008_154)] px-3 text-[0.7rem] font-[630] text-[oklch(0.97_0.005_154)]">
           <span
             className="grid size-6 shrink-0 place-items-center"
@@ -509,15 +437,6 @@ function PluginPreview({
         </div>
       </div>
     </article>
-  );
-}
-
-function AppearanceIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none">
-      <path d="M10 2.5v2M10 15.5v2M17.5 10h-2M4.5 10h-2M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4M15.3 15.3l-1.4-1.4M6.1 6.1 4.7 4.7" />
-      <circle cx="10" cy="10" r="3.25" />
-    </svg>
   );
 }
 

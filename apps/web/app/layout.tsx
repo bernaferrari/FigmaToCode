@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import gitPreview from "../../../assets/git_preview.png";
 import "../styles/globals.css";
 import { SITE_DESCRIPTION, getSiteUrl } from "./site";
 import { ThemeProvider } from "./ThemeProvider";
@@ -42,13 +43,25 @@ export const metadata: Metadata = {
     siteName: "Figma to Code",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [
+      {
+        url: gitPreview.src,
+        width: gitPreview.width,
+        height: gitPreview.height,
+        alt: "Figma to Code converting a Figma selection into multiple code targets",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Figma to Code — Fast, flexible and private",
     description: SITE_DESCRIPTION,
-    images: ["/opengraph-image"],
+    images: [
+      {
+        url: gitPreview.src,
+        alt: "Figma to Code converting a Figma selection into multiple code targets",
+      },
+    ],
   },
   robots: {
     index: true,

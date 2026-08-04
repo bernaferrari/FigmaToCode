@@ -105,7 +105,7 @@ export default function Web() {
     <MarketingShell>
       <main id="main-content">
         <section className={home.hero} aria-labelledby="hero-title">
-          <div className={home.heroCopy}>
+          <div className="max-w-3xl">
             <p className={home.heroKicker}>
               <span aria-hidden="true" /> Free · open source · runs inside Figma
             </p>
@@ -242,11 +242,11 @@ export default function Web() {
         </section>
 
         <section
-          className={home.previewSection}
+          className="mx-auto w-[min(calc(100%_-_1.5rem),90rem)] pt-24 pb-28 sm:w-[min(calc(100%_-_2.5rem),90rem)] sm:pt-40"
           id="preview"
           aria-labelledby="preview-title"
         >
-          <div className={home.sectionHeading}>
+          <div className="mb-8 grid grid-cols-1 items-end gap-5 md:grid-cols-[1fr_minmax(17rem,28rem)] md:gap-12 [&>p]:m-0 [&>p]:text-pretty [&>p]:leading-[1.65] [&>p]:text-muted-foreground">
             <div>
               <p className={sectionKicker}>Interactive example</p>
               <h2 className={sectionHeading} id="preview-title">
@@ -254,9 +254,9 @@ export default function Web() {
               </h2>
             </div>
             <p>
-              Switch frameworks, output modes, themes and edge cases. The demo
-              uses the real shared plugin interface—not a polished video of a
-              different product.
+              Switch frameworks, output modes and edge cases. This is the real
+              plugin interface running here on the website, outside Figma; only
+              the sample selection is simulated.
             </p>
           </div>
           <PreviewLab />
@@ -322,11 +322,11 @@ export default function Web() {
         </section>
 
         <section
-          className={home.largeSection}
+          className="mx-auto w-[min(calc(100%_-_1.5rem),88rem)] py-24 sm:w-[min(calc(100%_-_2.5rem),88rem)] sm:py-36"
           id="outputs"
           aria-labelledby="outputs-title"
         >
-          <div className={home.centeredHeading}>
+          <div className="mx-auto max-w-4xl text-center [&>p:last-child]:mx-auto [&>p:last-child]:mt-5 [&>p:last-child]:max-w-3xl [&>p:last-child]:leading-[1.7] [&>p:last-child]:text-muted-foreground">
             <p className={sectionKicker}>One selection, several targets</p>
             <h2 className={sectionHeading} id="outputs-title">
               Web and native code from the same plugin.
@@ -336,13 +336,13 @@ export default function Web() {
               a starter project with local assets and setup instructions.
             </p>
           </div>
-          <div className={home.outputGrid}>
+          <div className="mt-16 grid grid-cols-1 gap-3.5 lg:grid-cols-12">
             <article className={outputCardClass("web")}>
               <div className="flex items-center justify-between gap-4">
                 <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-site-green-dark uppercase">
                   01
                 </span>
-                <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-site-muted uppercase">
+                <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-muted-foreground uppercase">
                   Web standards
                 </span>
               </div>
@@ -351,7 +351,7 @@ export default function Web() {
                 Generate plain HTML, React JSX, Svelte or styled-components.
                 Preserve layout relationships without forcing a hosted runtime.
               </p>
-              <div className="mt-6 flex flex-wrap gap-2 [&_span]:rounded-full [&_span]:bg-white/65 [&_span]:px-2.5 [&_span]:py-1.5 [&_span]:text-[0.68rem] [&_span]:font-[590] [&_span]:text-site-ink [&_span]:shadow-[0_0_0_1px_var(--site-border)] dark:[&_span]:bg-white/6">
+              <div className="mt-6 flex flex-wrap gap-2 [&_span]:rounded-full [&_span]:bg-white/65 [&_span]:px-2.5 [&_span]:py-1.5 [&_span]:text-[0.68rem] [&_span]:font-[590] [&_span]:text-site-ink [&_span]:shadow-[0_0_0_1px_var(--border)] dark:[&_span]:bg-white/6">
                 <span>HTML</span>
                 <span>React JSX</span>
                 <span>Svelte</span>
@@ -384,7 +384,7 @@ export default function Web() {
                 <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-site-green-dark uppercase">
                   03
                 </span>
-                <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-site-muted uppercase">
+                <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-muted-foreground uppercase">
                   Flutter
                 </span>
               </div>
@@ -408,7 +408,7 @@ export default function Web() {
                 <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-site-green-dark uppercase">
                   04
                 </span>
-                <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-site-muted uppercase">
+                <span className="font-mono text-[0.68rem] font-[690] tracking-[0.08em] text-muted-foreground uppercase">
                   SwiftUI
                 </span>
               </div>
@@ -430,8 +430,11 @@ export default function Web() {
           </div>
         </section>
 
-        <section className={home.process} aria-labelledby="process-title">
-          <div className={home.processIntro}>
+        <section
+          className="mx-auto grid w-[min(calc(100%_-_1.5rem),88rem)] grid-cols-1 gap-12 border-t border-border py-24 sm:w-[min(calc(100%_-_2.5rem),88rem)] sm:py-36 min-[68rem]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[68rem]:gap-[clamp(4rem,10vw,10rem)]"
+          aria-labelledby="process-title"
+        >
+          <div className="[&>p:last-child]:mt-5 [&>p:last-child]:max-w-lg [&>p:last-child]:leading-[1.7] [&>p:last-child]:text-muted-foreground">
             <p className={sectionKicker}>How it works</p>
             <h2 className={sectionHeading} id="process-title">
               A compiler-shaped pipeline, not a screenshot guess.
@@ -487,11 +490,11 @@ export default function Web() {
         </section>
 
         <section
-          className={home.limitations}
+          className="mx-auto w-[min(calc(100%_-_1.5rem),88rem)] border-t border-border py-24 sm:w-[min(calc(100%_-_2.5rem),88rem)] sm:py-36"
           id="limitations"
           aria-labelledby="limitations-title"
         >
-          <div className="max-w-5xl text-left [&>p:last-child]:mt-5 [&>p:last-child]:max-w-3xl [&>p:last-child]:leading-[1.7] [&>p:last-child]:text-site-muted">
+          <div className="max-w-5xl text-left [&>p:last-child]:mt-5 [&>p:last-child]:max-w-3xl [&>p:last-child]:leading-[1.7] [&>p:last-child]:text-muted-foreground">
             <p className={sectionKicker}>Clear boundaries</p>
             <h2 className={sectionHeading} id="limitations-title">
               What it handles. What it cannot know.
@@ -502,7 +505,7 @@ export default function Web() {
               result.
             </p>
           </div>
-          <div className={home.capabilityGrid}>
+          <div className="mt-16 grid grid-cols-1 gap-3 min-[68rem]:grid-cols-3">
             <article className={capabilityCardClass("supported")}>
               <span className="inline-flex items-center gap-1.5 font-mono text-[0.68rem] font-[680] tracking-[0.03em] text-site-green-dark [&_svg]:size-3.5 [&_svg]:stroke-current [&_svg]:stroke-2">
                 <CheckIcon /> Strong support
@@ -536,7 +539,7 @@ export default function Web() {
               </ul>
             </article>
             <article className={capabilityCardClass("absent")}>
-              <span className="inline-flex items-center gap-1.5 font-mono text-[0.68rem] font-[680] tracking-[0.03em] text-site-muted [&_svg]:size-3.5 [&_svg]:stroke-current [&_svg]:stroke-2">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[0.68rem] font-[680] tracking-[0.03em] text-muted-foreground [&_svg]:size-3.5 [&_svg]:stroke-current [&_svg]:stroke-2">
                 <MinusIcon /> Intentionally absent
               </span>
               <h3>Meaning that is not present in the file</h3>
@@ -585,14 +588,17 @@ export default function Web() {
           </div>
         </section>
 
-        <section className={home.decision} aria-labelledby="decision-title">
+        <section
+          className="mx-auto grid w-[min(calc(100%_-_1.5rem),88rem)] grid-cols-1 gap-12 border-t border-border py-24 sm:w-[min(calc(100%_-_2.5rem),88rem)] sm:py-36 min-[68rem]:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] min-[68rem]:gap-[clamp(4rem,9vw,9rem)]"
+          aria-labelledby="decision-title"
+        >
           <div>
             <p className={sectionKicker}>Choose by constraint</p>
             <h2 className={sectionHeading} id="decision-title">
               The best tool depends on what cannot move.
             </h2>
           </div>
-          <div className={home.decisionColumns}>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 [&>article]:grid [&>article]:grid-cols-[2.8rem_minmax(0,1fr)] [&>article]:content-start [&>article]:items-start [&>article]:gap-x-4 [&>article]:gap-y-3 [&>article]:border-t [&>article]:border-border [&>article]:pt-6 [&_h3]:col-start-2 [&_h3]:m-0 [&_h3]:mt-1 [&_h3]:text-[1.35rem] [&_h3]:leading-[1.12] [&_h3]:font-[640] [&_h3]:tracking-[-0.035em] [&_h3]:text-site-ink [&_p]:col-start-2 [&_p]:m-0 [&_p]:text-[0.8rem] [&_p]:leading-[1.65] [&_p]:text-muted-foreground">
             <article>
               <span className={home.decisionIcon}>
                 <LockIcon />
@@ -621,7 +627,10 @@ export default function Web() {
           </div>
         </section>
 
-        <section className={home.faq} aria-labelledby="faq-title">
+        <section
+          className="mx-auto grid w-[min(calc(100%_-_1.5rem),88rem)] grid-cols-1 gap-12 border-t border-border py-24 sm:w-[min(calc(100%_-_2.5rem),88rem)] sm:py-36 min-[68rem]:grid-cols-[minmax(0,0.65fr)_minmax(0,1.35fr)] min-[68rem]:gap-[clamp(4rem,10vw,10rem)]"
+          aria-labelledby="faq-title"
+        >
           <div>
             <p className={sectionKicker}>Frequently asked</p>
             <h2 className={sectionHeading} id="faq-title">

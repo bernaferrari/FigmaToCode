@@ -147,7 +147,7 @@ export default async function ComparisonPage({ params }: PageProps) {
                   <tr>
                     <th scope="row">
                       Pricing
-                      <span className="mt-0.5 block text-[0.64rem] font-[480] text-site-muted">
+                      <span className="mt-0.5 block text-[0.64rem] font-[480] text-muted-foreground">
                         Relative
                       </span>
                     </th>

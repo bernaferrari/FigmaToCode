@@ -33,7 +33,7 @@ export function SiteHeader() {
           <strong className="text-[0.94rem] tracking-[-0.015em]">
             Figma to Code
           </strong>
-          <small className="hidden text-[0.62rem] text-site-muted sm:block">
+          <small className="hidden text-[0.62rem] text-muted-foreground sm:block">
             Free · Private · Open source
           </small>
         </span>
@@ -41,19 +41,19 @@ export function SiteHeader() {
 
       <nav className="flex items-center gap-1.5" aria-label="Site links">
         <SectionLink
-          className="hidden min-h-11 items-center rounded-[0.65rem] px-3.5 text-sm font-[560] text-site-muted no-underline transition-colors duration-150 hover:bg-site-ink/5 hover:text-site-ink md:inline-flex dark:hover:bg-white/7"
+          className="hidden min-h-11 items-center rounded-[0.65rem] px-3.5 text-sm font-[560] text-muted-foreground no-underline transition-colors duration-150 hover:bg-site-ink/5 hover:text-site-ink md:inline-flex dark:hover:bg-white/7"
           section="privacy"
         >
           Privacy
         </SectionLink>
         <SectionLink
-          className="hidden min-h-11 items-center rounded-[0.65rem] px-3.5 text-sm font-[560] text-site-muted no-underline transition-colors duration-150 hover:bg-site-ink/5 hover:text-site-ink md:inline-flex dark:hover:bg-white/7"
+          className="hidden min-h-11 items-center rounded-[0.65rem] px-3.5 text-sm font-[560] text-muted-foreground no-underline transition-colors duration-150 hover:bg-site-ink/5 hover:text-site-ink md:inline-flex dark:hover:bg-white/7"
           section="outputs"
         >
           Outputs
         </SectionLink>
         <SectionLink
-          className="hidden min-h-11 items-center rounded-[0.65rem] px-3.5 text-sm font-[560] text-site-muted no-underline transition-colors duration-150 hover:bg-site-ink/5 hover:text-site-ink md:inline-flex dark:hover:bg-white/7"
+          className="hidden min-h-11 items-center rounded-[0.65rem] px-3.5 text-sm font-[560] text-muted-foreground no-underline transition-colors duration-150 hover:bg-site-ink/5 hover:text-site-ink md:inline-flex dark:hover:bg-white/7"
           section="compare"
         >
           Compare
@@ -79,7 +79,7 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer
-      className={`${pageWidth} mt-14 grid grid-cols-1 items-start gap-8 border-t border-site-border py-9 text-[0.82rem] text-site-muted sm:mt-20 sm:py-12 min-[68rem]:mt-28 min-[68rem]:grid-cols-[minmax(15rem,0.72fr)_minmax(0,1.28fr)] min-[68rem]:gap-16 min-[68rem]:pt-16 min-[68rem]:pb-8`}
+      className={`${pageWidth} mt-14 grid grid-cols-1 items-start gap-8 border-t border-border py-9 text-[0.82rem] text-muted-foreground sm:mt-20 sm:py-12 min-[68rem]:mt-28 min-[68rem]:grid-cols-[minmax(15rem,0.72fr)_minmax(0,1.28fr)] min-[68rem]:gap-16 min-[68rem]:pt-16 min-[68rem]:pb-8`}
     >
       <div className="flex items-center gap-3">
         <span
@@ -96,12 +96,12 @@ export function SiteFooter() {
         </span>
         <div className="flex flex-col gap-0.5">
           <strong className="text-site-ink">Figma to Code</strong>
-          <p className="m-0 text-xs text-site-muted">
+          <p className="m-0 text-xs text-muted-foreground">
             Fast, flexible conversion. Private by design.
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-[minmax(8rem,0.7fr)_minmax(0,1.3fr)] sm:gap-x-16 sm:gap-y-9 [&_a]:inline-flex [&_a]:min-h-8 [&_a]:items-center [&_a]:gap-1 [&_a]:text-[0.72rem] [&_a]:font-[540] [&_a]:text-site-muted [&_a]:no-underline [&_a]:transition-colors [&_a]:duration-150 hover:[&_a]:text-site-ink [&_svg]:size-3.5 [&_svg]:stroke-current [&_svg]:stroke-[1.7]">
+      <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-[minmax(8rem,0.7fr)_minmax(0,1.3fr)] sm:gap-x-16 sm:gap-y-9 [&_a]:inline-flex [&_a]:min-h-8 [&_a]:items-center [&_a]:gap-1 [&_a]:text-[0.72rem] [&_a]:font-[540] [&_a]:text-muted-foreground [&_a]:no-underline [&_a]:transition-colors [&_a]:duration-150 hover:[&_a]:text-site-ink [&_svg]:size-3.5 [&_svg]:stroke-current [&_svg]:stroke-[1.7]">
         <div className="flex flex-col items-start gap-2">
           <strong className="text-[0.68rem] font-[680] tracking-[0.06em] text-site-ink uppercase">
             Product
@@ -156,7 +156,7 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
-      <div className="col-span-full flex flex-col items-start justify-between gap-1.5 border-t border-site-border pt-5 text-[0.68rem] sm:flex-row sm:items-center sm:gap-4 sm:pt-6">
+      <div className="col-span-full flex flex-col items-start justify-between gap-1.5 border-t border-border pt-5 text-[0.68rem] sm:flex-row sm:items-center sm:gap-4 sm:pt-6">
         <span>Made in the open for designers and developers.</span>
         <span>No account. No telemetry. No design uploads.</span>
       </div>

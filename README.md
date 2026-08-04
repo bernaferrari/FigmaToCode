@@ -1,136 +1,179 @@
-<!-- <p align="center"><img src="assets/icon_256.png" alt="Figma to Code" height="128px"></p> -->
+[![Figma to Code converting a Figma selection into multiple code targets](assets/git_preview.png)](https://figma-to-code-plugin.vercel.app/)
 
-[![Figma to Code](assets/git_preview.png)](https://www.figma.com/community/plugin/842128343887142055)
-
-# Figma to Code
+<h1 align="center">Figma to Code</h1>
 
 <p align="center">
-<a href="https://github.com/bernaferrari/FigmaToCode/actions/"><img src="https://github.com/bernaferrari/FigmaToCode/workflows/CI/badge.svg"/></a>
-<a href="https://codecov.io/gh/bernaferrari/FigmaToCode"><img src="https://codecov.io/gh/bernaferrari/FigmaToCode/branch/main/graph/badge.svg" /></a>
-<a href="http://twitter.com/bernaferrari">
-<img src="https://img.shields.io/badge/Twitter-@bernaferrari-brightgreen.svg?style=flat" alt="Twitter"/></a>
-</p><p align="center">
-<a href="https://www.figma.com/community/plugin/842128343887142055"><img src="assets/badge.png" height="60"/></a>
+  <strong>Fast, flexible Figma-to-code conversion. Private by design.</strong>
 </p>
 
-Converting Figma designs into usable code can be a challenge, often requiring time-consuming manual work. Figma to Code simplifies that process. This plugin generates responsive layouts in `HTML`, `React (JSX)`, `Svelte`, `styled-components`, `Tailwind`, `Flutter`, and `SwiftUI` directly from your designs. Supported targets can also be downloaded as complete starter projects with local image assets and setup instructions. Your feedback and ideas are always welcome.
+<p align="center">
+  Generate editable HTML, React, Svelte, Tailwind, Flutter, and SwiftUI from a Figma selection—without an account, generation credits, or design uploads.
+</p>
 
-![Gif showing the conversion](assets/lossy_gif.gif)
+<p align="center">
+  <a href="https://www.figma.com/community/plugin/842128343887142055"><strong>Install the free plugin</strong></a>
+  ·
+  <a href="https://figma-to-code-plugin.vercel.app"><strong>Explore the website</strong></a>
+</p>
 
-## How it works
+## Why this plugin exists
 
-The plugin uses a sophisticated multi-step process to transform your Figma designs into clean, optimized code:
+Figma to Code is for the moment between a visual design and a real implementation. Select a frame, component, or smaller group of layers and get a readable visual scaffold that you can copy, refine, or download as a starter project.
 
-1. **Node Conversion**: First, the plugin converts Figma's native nodes into JSON representations, preserving all necessary properties while adding optimizations and parent references.
+The generator is deterministic and runs inside Figma's plugin sandbox. It does not call an AI model, inspect a repository, or send the selection to another service. That makes it useful for quick handoffs as well as teams where external design processing is not allowed.
 
-2. **Intermediate Representation**: The JSON nodes are then transformed into `AltNodes` - a custom virtual representation that can be manipulated without affecting your original design.
+- **Free and open source** — no account, trial, credits, or generation limits.
+- **Private by architecture** — the published plugin configuration allows no network domains and requests no permissions.
+- **Works in Design and Dev Mode** — run the regular plugin or use it as a Dev Mode code generator.
+- **Web and native targets** — generate several output shapes from the same selection.
+- **Flexible, inspectable output** — tune framework-specific settings, preview the result, copy the code, or download a starter project.
+- **Warnings instead of silent guesses** — target-specific gaps are surfaced in the interface.
 
-3. **Layout Optimization**: The plugin analyzes and optimizes layouts, detecting patterns like auto-layouts, responsive constraints and color variables.
+## Output targets
 
-4. **Code Generation**: Finally, the optimized structure is transformed into the target framework's code, with special handling for each framework's unique patterns and best practices. If a feature is unsupported, the plugin will provide a warning.
+| Target       | Available output modes                                      |
+| ------------ | ----------------------------------------------------------- |
+| HTML         | HTML, React (JSX), Svelte, styled-components                |
+| Tailwind CSS | HTML, React (JSX), Twig; supports Tailwind 3 and Tailwind 4 |
+| Flutter      | Full app, stateless widget, or snippet                      |
+| SwiftUI      | Preview, `View` struct, or snippet                          |
 
-![Conversion Workflow](assets/workflow.png)
+The plugin can also package generated code and local image assets into downloadable starters:
 
-This intermediate representation approach allows for sophisticated transformations and optimizations before any code is generated, resulting in cleaner, more maintainable output.
+- Web: Vite, Next.js, or static HTML
+- Flutter: source, `pubspec.yaml`, assets, and setup instructions
+- SwiftUI: source, asset catalog, and setup instructions
 
-## Hard cases
+These exports are deliberately small and dependency-light. They are starting points, not generated production applications.
 
-Converting visual designs to code inevitably encounters complex edge cases. Here are some challenges the plugin handles:
+## What you can tune
 
-1. **Complex Layouts**: When working with mixed positioning (absolute + auto-layout), the plugin has to make intelligent decisions about how to structure the resulting code. It detects parent-child relationships and z-index ordering to produce the most accurate representation.
+Options appear only when they apply to the selected target:
 
-2. **Color Variables**: The plugin detects and processes color variables, allowing for theme-consistent output.
+- Include Figma layer names in generated classes.
+- Keep exact values or round spacing and colors to nearby Tailwind tokens.
+- Generate Tailwind 4 syntax and add a custom class prefix.
+- Use Figma color variables in supported output.
+- Embed images as Base64 in HTML.
+- Embed supported vector shapes as SVG for web output.
+- Switch between framework-specific file, component, and snippet modes.
 
-3. **Gradients and Effects**: Different frameworks handle gradients and effects in unique ways, requiring specialized conversion logic.
+The interface also includes a visual preview, light and dark preview backgrounds, conversion warnings, extracted colors and gradients, code copying, and project downloads.
 
-![Conversion Workflow](assets/examples.png)
+## How to use it
 
-**Tip**: Instead of selecting the whole page, you can also select individual items. This can be useful for both debugging and componentization. For example: you can use the plugin to generate the code of a single element and then replicate it using a for-loop.
+1. [Install Figma to Code from the Figma Community](https://www.figma.com/community/plugin/842128343887142055).
+2. Select a frame, component, group, or individual layer.
+3. Run the plugin in Figma Design, or choose one of its codegen outputs in Dev Mode.
+4. Pick a target and adjust the relevant options.
+5. Review the preview and warnings, then copy the code or download a starter project.
 
-### Todo
+Smaller selections usually create better component boundaries. Instead of converting an entire page at once, try generating one reusable section or control and integrate it into your application yourself.
 
-- Vectors (possible to enable in HTML and Tailwind)
-- Line/Star/Polygon
+## Privacy model
 
-## How to build the project
+The repository-level [`manifest.json`](manifest.json) is the configuration Figma uses for the published plugin. It contains the following enforceable boundary:
 
-### Package Manager
+```json
+{
+  "permissions": [],
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  }
+}
+```
 
-Development requires Node.js `>=24` and pnpm `^11`. Install pnpm using the [official installation instructions](https://pnpm.io/installation), then install the workspace from the repository root:
+The selected nodes are read through Figma's Plugin API, normalized in memory, converted by framework-specific TypeScript code, and returned to the plugin interface. There is no telemetry, design upload, external model, or separate user account.
 
-```bash
+This claim is intentionally narrow: Figma itself is a connected product and handles your files according to your Figma plan and policies. This plugin does not add another network destination for the selected design data. See the [privacy architecture](https://figma-to-code-plugin.vercel.app/privacy) for more detail.
+
+## What it handles well
+
+- Auto Layout, nested frames, groups, alignment, sizing, and stacking
+- Mixed flow and absolute positioning
+- Typography, fills, borders, corner radii, and many effects
+- Color variables and several gradient types
+- Images and local asset export
+- Responsive visual scaffolds across web and native targets
+
+## Deliberate limitations
+
+A Figma document describes visual structure; it does not contain the full intent of an application. Treat the result as editable starter code and review it before shipping.
+
+- **No AI inference.** The plugin does not invent semantics, interactions, or prompt-based redesigns.
+- **No codebase connection.** It cannot inspect a repository, map existing components, import an application into Figma, synchronize generated files, or push later design changes into your code.
+- **No application logic.** It cannot infer state management, data loading, navigation, backend behavior, or business rules.
+- **No invented accessibility.** Semantics, labels, keyboard behavior, dynamic type, and responsive breakpoints still need human review.
+- **Some details are target-dependent.** Vector support is optional for web and limited in native targets; stars, polygons, lines, gradients, and effects do not always have equivalent APIs.
+- **Large selections cost more memory.** Images and complex layer trees take longer to process; focused selections are more reliable.
+
+When a detail cannot translate cleanly, the plugin reports a warning rather than pretending the result is exact.
+
+## How conversion works
+
+The generator behaves more like a small compiler than a screenshot-to-code service:
+
+1. **Read** — inspect the selected Figma nodes and their layout and style metadata.
+2. **Normalize** — convert them into an internal tree that can be transformed without modifying the source document.
+3. **Optimize** — resolve parent-child relationships, Auto Layout, alignment, sizing, and positioning.
+4. **Generate** — send the normalized tree to the selected HTML, Tailwind, Flutter, or SwiftUI backend.
+5. **Explain** — return the code, preview data, extracted assets, and conversion warnings to the UI.
+
+Because the rules are public TypeScript, the conversion can be inspected, tested, and improved without depending on a hosted API.
+
+## Local development
+
+### Requirements
+
+- Node.js 24 or newer
+- pnpm 11
+
+Install the workspace from the repository root:
+
+```sh
 pnpm install
 ```
 
-### Monorepo
+Run the plugin watchers and the product website together:
 
-The plugin is organized as a monorepo. There are several packages:
+```sh
+pnpm dev
+```
 
-- `packages/backend` - Contains the business logic that reads the Figma API and converts nodes
-- `packages/plugin-ui` - Contains the common UI for the plugin
-- `packages/tsconfig` - Collection of TSConfig files used throughout the project
+The website will be available at <http://localhost:3000>. To work only on the Figma plugin:
 
-- `apps/plugin` - This is the actual plugin assembled from the parts in `backend` & `plugin-ui`. Within this folder it's divided between:
-  - `plugin-src` - loads from `backend` and compiles to `code.js`
-  - `ui-src` - loads the common `plugin-ui` and compiles to `index.html`
-- `apps/web` - The public product website and an interactive browser preview of the shared plugin UI.
+```sh
+pnpm --filter plugin dev
+```
 
-### Development Workflow
+Then open Figma and use **Plugins → Development → Import plugin from manifest**, selecting this repository's `manifest.json`.
 
-The project uses [Turborepo](https://turborepo.com/) for managing the monorepo, and each package is compiled using [esbuild](https://esbuild.github.io/) for fast development cycles. Only modified files are recompiled when changes are made, making the development process more efficient.
+### Useful commands
 
-#### Running the Project
+```sh
+pnpm build          # Build every package and app
+pnpm lint           # Run Oxlint
+pnpm test           # Run the automated tests
+pnpm format         # Format with Oxfmt
+pnpm format:check   # Check formatting without writing
+```
 
-You have two main options for development:
+### Repository structure
 
-1. **Root development mode** (includes the website):
+| Path                 | Purpose                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------- |
+| `packages/backend`   | Figma node processing, intermediate representation, code generators, and project exports |
+| `packages/plugin-ui` | Shared React interface used by the plugin and interactive website demo                   |
+| `packages/types`     | Shared settings, message, preview, and output types                                      |
+| `packages/tsconfig`  | Shared TypeScript configuration                                                          |
+| `apps/plugin`        | Figma controller and UI entry points; builds `code.js` and `index.html`                  |
+| `apps/web`           | Public website, interactive preview, privacy page, and comparison guides                 |
 
-   ```bash
-   pnpm dev
-   ```
+## Contributing and support
 
-   This runs the plugin in dev mode and starts the Next.js website at `http://localhost:3000`.
+Focused pull requests, new fixtures, and improvements to existing generators are welcome.
 
-2. **Plugin-only development mode**:
+- [Try the interactive preview](https://figma-to-code-plugin.vercel.app/#preview)
+- [Review the GPL-3.0 license](LICENSE)
 
-   ```bash
-   cd apps/plugin
-   pnpm dev
-   ```
-
-   This focuses only on the plugin without the Next.js website. Use this when you're making changes specifically to the plugin.
-
-#### Where to Make Changes
-
-Most of your development work will happen in these directories:
-
-- `packages/backend` - For plugin backend
-- `packages/plugin-ui` - For plugin UI
-- `apps/plugin/` - The main plugin result that combines the backend and UI and is called by Figma.
-- `apps/web/` - The public website, comparison pages, SEO metadata, and interactive plugin preview.
-
-The two app directories contain their platform-specific entry points and build configuration; shared behavior belongs in `packages/`.
-
-#### Commands
-
-`pnpm run ...`
-
-- `dev` - runs the app in dev mode. This can be run in the Figma editor.
-- `build` - builds the project for production
-- `build:watch` - builds and watches for changes
-- `lint` - runs Oxlint
-- `test` - runs the automated test suite
-- `format` - formats the repository with Oxfmt
-- `format:check` - checks formatting without changing files
-
-#### Website
-
-When running the `dev` task, open `http://localhost:3000` to view the product website and interactive plugin preview.
-
-<img width="600" alt="Screenshot 2024-12-13 at 16 26 43" src="https://github.com/user-attachments/assets/427fb066-70e1-47bd-8718-51f7f4d83e35" />
-
-## Issues
-
-The Figma file for this README and icon is also open and welcome to changes! [Check it here.](https://www.figma.com/file/8buWpm6Mpq4yK9MhbkcdJB/Figma-to-Code)
-
-I took decisions thinking about how it would benefit the majority of people, but I can (and probably will!) be wrong many times. Found a bug? Have an idea for an improvement? Feel free to [add an issue](../../issues) or email me. Pull requests are also more than welcome.
+If generated output is incorrect, a small reproducible Figma selection and the target/options used are especially helpful.

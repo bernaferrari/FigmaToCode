@@ -17,21 +17,18 @@
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.93 0.01 266.23);
   --secondary-foreground: oklch(0.14 0.01 266.4);
-  --muted: oklch(0.97 0 266.23);
-  --muted-foreground: oklch(0.5 0.01 266.33);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.93 0.01 266.23);
   --accent-foreground: oklch(0.14 0.01 266.4);
   --destructive: oklch(0.53 0.31 24.65);
-  --border: oklch(0.89 0.01 266.3);
-  --input: oklch(0.89 0.01 266.3);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
   --ring: oklch(0.14 0.01 266.4);
   --site-ink: oklch(0.18 0.02 154);
-  --site-muted: oklch(0.48 0.02 154);
   --site-green: oklch(0.66 0.18 151);
   --site-green-dark: oklch(0.48 0.15 151);
   --site-surface: oklch(0.995 0.002 145);
-  --site-border: oklch(0.18 0.02 154 / 10%);
-  --site-border-strong: oklch(0.18 0.02 154 / 16%);
 }
 
 @media only screen and (min-device-pixel-ratio: 2),
@@ -52,21 +49,18 @@
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.18 0.01 266.3);
   --secondary-foreground: oklch(0.97 0 0);
-  --muted: oklch(0.18 0.01 266.3);
-  --muted-foreground: oklch(0.67 0.01 266.38);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.18 0.01 266.3);
   --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.34 0.24 24.48);
-  --border: oklch(0.237 0 0);
-  --input: oklch(0.18 0.01 266.3);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.82 0.01 266.4);
   --site-ink: oklch(0.94 0.01 154);
-  --site-muted: oklch(0.72 0.015 154);
   --site-green: oklch(0.72 0.17 151);
   --site-green-dark: oklch(0.76 0.14 151);
   --site-surface: oklch(0.17 0.016 154);
-  --site-border: oklch(0.94 0.01 154 / 11%);
-  --site-border-strong: oklch(0.94 0.01 154 / 17%);
 }
 
 @theme inline {
@@ -93,12 +87,9 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-site-ink: var(--site-ink);
-  --color-site-muted: var(--site-muted);
   --color-site-green: var(--site-green);
   --color-site-green-dark: var(--site-green-dark);
   --color-site-surface: var(--site-surface);
-  --color-site-border: var(--site-border);
-  --color-site-border-strong: var(--site-border-strong);
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
