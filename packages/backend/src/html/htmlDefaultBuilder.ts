@@ -134,7 +134,7 @@ export class HtmlDefaultBuilder {
       );
     }
     this.shadow();
-    this.border(this.settings);
+    this.border();
     this.blur();
     return this;
   }
@@ -154,7 +154,7 @@ export class HtmlDefaultBuilder {
     return this;
   }
 
-  border(settings: HTMLSettings): this {
+  border(): this {
     const { node } = this;
     this.addStyles(...htmlBorderRadius(node, this.isJSX));
 
@@ -526,7 +526,11 @@ export class HtmlDefaultBuilder {
 
     const nodeName = (this.node as any).uniqueName || this.node.name;
 
-    const componentName = getComponentName(nodeName, this.cssClassName, element);
+    const componentName = getComponentName(
+      nodeName,
+      this.cssClassName,
+      element,
+    );
 
     cssCollection[this.cssClassName] = {
       styles: cssStyles,

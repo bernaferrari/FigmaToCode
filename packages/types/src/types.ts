@@ -20,7 +20,7 @@ export interface TailwindSettings extends HTMLSettings {
   useTailwind4: boolean;
   thresholdPercent: number;
   baseFontFamily: string;
-  fontFamilyCustomConfig: Record<string, string[]>
+  fontFamilyCustomConfig: Record<string, string[]>;
 }
 export interface FlutterSettings {
   flutterGenerationMode: "fullApp" | "stateless" | "snippet";
@@ -32,7 +32,8 @@ export interface ComposeSettings {
   composeGenerationMode: "snippet" | "composable" | "screen";
 }
 export interface PluginSettings
-  extends HTMLSettings,
+  extends
+    HTMLSettings,
     TailwindSettings,
     FlutterSettings,
     SwiftUISettings,

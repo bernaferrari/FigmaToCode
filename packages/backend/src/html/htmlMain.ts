@@ -154,7 +154,7 @@ export function generateStyledComponents(): string {
   const components: string[] = [];
 
   Object.entries(cssCollection).forEach(
-    ([className, { styles, componentName, element, nodeType }]) => {
+    ([, { styles, componentName, element, nodeType }]) => {
       // Skip if no styles
       if (!styles.length) return;
 

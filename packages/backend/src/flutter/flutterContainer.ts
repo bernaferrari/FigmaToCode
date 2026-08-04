@@ -114,7 +114,7 @@ const hasEmptyProps = (props: Record<string, string>): boolean => {
     isEmpty = isEmpty && skipDefaultProperty(value, defValue).length == 0;
   }
   return isEmpty;
-}
+};
 
 const getDecoration = (
   node: SceneNode,

@@ -4,15 +4,8 @@ import {
   numberToFixedString,
 } from "./../common/numToAutoFixed";
 import { FlutterDefaultBuilder } from "./flutterDefaultBuilder";
-import {
-  flutterColorFromDirectFills,
-  flutterColorFromFills,
-} from "./builderImpl/flutterColor";
-import { flutterSize } from "./builderImpl/flutterSize";
-import {
-  commonLetterSpacing,
-  commonLineHeight,
-} from "../common/commonTextHeightSpacing";
+import { flutterColorFromDirectFills } from "./builderImpl/flutterColor";
+import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
 import { StyledTextSegmentSubset } from "types/src/types";
 
 export class FlutterTextBuilder extends FlutterDefaultBuilder {

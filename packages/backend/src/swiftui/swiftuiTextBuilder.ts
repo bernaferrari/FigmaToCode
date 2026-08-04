@@ -82,16 +82,6 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
 
   createText(node: TextNode): this {
     this.node = node;
-    let alignHorizontal =
-      node.textAlignHorizontal?.toString()?.toLowerCase() ?? "left";
-    alignHorizontal =
-      alignHorizontal === "justified" ? "justify" : alignHorizontal;
-
-    // const basicTextStyle = {
-    //   textAlign:
-    //     alignHorizontal !== "left" ? `TextAlign.${alignHorizontal}` : "",
-    // };
-
     const segments = this.getTextSegments(node, node.characters);
     if (segments) {
       this.element = segments;
@@ -121,7 +111,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
       segment.fontSize,
     );
 
-    let updatedText = parseTextAsCode(characters); //segment.characters); swiftUI only supports a single text.
+    let updatedText = characters;
     if (segment.textCase === "LOWER") {
       updatedText = characters.toLowerCase();
     } else if (segment.textCase === "UPPER") {
@@ -129,7 +119,7 @@ export class SwiftuiTextBuilder extends SwiftuiDefaultBuilder {
     }
 
     const element = new SwiftUIElement(
-      `Text(${parseTextAsCode(`"${characters}"`)})`,
+      `Text(${parseTextAsCode(`"${updatedText}"`)})`,
     )
       .addModifier([
         "font",

@@ -49,7 +49,10 @@ const SettingsGroup: React.FC<SettingsGroupProps> = ({
       ) : (
         <CollapsibleTrigger
           render={
-            <button className="flex items-center justify-start gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left h-auto p-0" />
+            <button
+              className="flex items-center justify-start gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors w-full text-left h-auto p-0"
+              aria-label={`${expanded ? "Collapse" : "Expand"} ${title}`}
+            />
           }
         >
           {expanded ? (

@@ -7,7 +7,11 @@ import {
   clearWarnings,
   warnings,
 } from "./common/commonConversionWarnings";
-import { postConversionComplete, postEmptyMessage, postError } from "./messaging";
+import {
+  postConversionComplete,
+  postEmptyMessage,
+  postError,
+} from "./messaging";
 import { PluginSettings } from "types";
 import { convertToCode } from "./common/retrieveUI/convertToCode";
 import { generateHTMLPreview } from "./html/htmlMain";
@@ -79,10 +83,7 @@ export const run = async (settings: PluginSettings) => {
   } else {
     convertedSelection = await nodesToJSON(selection, settings);
     console.log(`[benchmark] nodesToJSON: ${Date.now() - nodeToJSONStart}ms`);
-    console.log(
-      "[debug] convertedSelection count:",
-      convertedSelection.length,
-    );
+    console.log("[debug] convertedSelection count:", convertedSelection.length);
     // const removeParentRecursive = (obj: any): any => {
     //   if (Array.isArray(obj)) {
     //     return obj.map(removeParentRecursive);
@@ -124,7 +125,8 @@ export const run = async (settings: PluginSettings) => {
 
   let htmlPreview = { size: { width: 0, height: 0 }, content: "" };
   let colors: Awaited<ReturnType<typeof retrieveGenericSolidUIColors>> = [];
-  let gradients: Awaited<ReturnType<typeof retrieveGenericLinearGradients>> = [];
+  let gradients: Awaited<ReturnType<typeof retrieveGenericLinearGradients>> =
+    [];
 
   if (!skipHeavyUI) {
     const generatePreviewStart = Date.now();

@@ -30,7 +30,7 @@ export const formatMultipleJSXArray = (
   isJsx: boolean,
 ): string[] =>
   Object.entries(styles)
-    .filter(([key, value]) => value !== "")
+    .filter(([, value]) => value !== "")
     .map(([key, value]) => formatWithJSX(key, isJsx, value));
 
 export const formatMultipleJSX = (
@@ -38,13 +38,15 @@ export const formatMultipleJSX = (
   isJsx: boolean,
 ): string =>
   Object.entries(styles)
-    .filter(([key, value]) => value)
+    .filter(([, value]) => value)
     .map(([key, value]) => formatWithJSX(key, isJsx, value!))
     .join(isJsx ? ", " : "; ");
 
 export const escapeJSXText = (text: string): string => {
-  return encode(text, { level: "html5" })
-    // process JSX curly braces
-    .replace(/\{/g, "&#123;")
-    .replace(/\}/g, "&#125;");
+  return (
+    encode(text, { level: "html5" })
+      // process JSX curly braces
+      .replace(/\{/g, "&#123;")
+      .replace(/\}/g, "&#125;")
+  );
 };

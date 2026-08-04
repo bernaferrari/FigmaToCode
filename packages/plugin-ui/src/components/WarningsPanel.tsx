@@ -46,32 +46,31 @@ const WarningsPanel: React.FC<WarningsPanelProps> = ({ warnings }) => {
   return (
     <div className="bg-white dark:bg-neutral-800 border border-amber-200 dark:border-amber-700 rounded-md shadow-2xs overflow-hidden w-full">
       {/* Header - medium size */}
-      <div
-        className="flex items-center justify-between py-2 px-3 border-b border-amber-100 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/20 cursor-pointer hover:bg-amber-100/70 dark:hover:bg-amber-900/30 transition-colors"
+      <button
+        type="button"
+        className="flex w-full items-center justify-between py-2 px-3 border-b border-amber-100 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/20 cursor-pointer hover:bg-amber-100/70 dark:hover:bg-amber-900/30 transition-colors"
         onClick={() => setIsCollapsed(!isCollapsed)}
+        aria-expanded={!isCollapsed}
       >
-        <div className="flex items-center gap-2">
-          <div className="text-amber-500 dark:text-amber-400">
+        <span className="flex items-center gap-2">
+          <span className="text-amber-500 dark:text-amber-400">
             <AlertTriangle size={16} />
-          </div>
-          <div className="flex items-center gap-2">
-            <h3 className="font-medium text-amber-900 dark:text-amber-200 text-sm">
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="font-medium text-amber-900 dark:text-amber-200 text-sm">
               {warnings.length} {warnings.length === 1 ? "Warning" : "Warnings"}
-            </h3>
+            </span>
             {critical.length > 0 && (
               <span className="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-xs">
                 {critical.length} critical
               </span>
             )}
-          </div>
-        </div>
-        <button
-          className="p-1 hover:bg-amber-200/70 dark:hover:bg-amber-800/50 rounded-sm text-amber-700 dark:text-amber-300 transition-colors"
-          aria-label={isCollapsed ? "Expand warnings" : "Collapse warnings"}
-        >
+          </span>
+        </span>
+        <span className="p-1 hover:bg-amber-200/70 dark:hover:bg-amber-800/50 rounded-sm text-amber-700 dark:text-amber-300 transition-colors">
           {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-        </button>
-      </div>
+        </span>
+      </button>
 
       {/* Warning content - balanced size */}
       {!isCollapsed && (

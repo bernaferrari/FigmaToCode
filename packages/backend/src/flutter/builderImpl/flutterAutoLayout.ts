@@ -30,9 +30,7 @@ export const getCrossAxisAlignment = (
   }
 };
 
-export const getWrapAlignment = (
-  node: InferredAutoLayoutResult,
-): string => {
+export const getWrapAlignment = (node: InferredAutoLayoutResult): string => {
   switch (node.primaryAxisAlignItems) {
     case undefined:
     case "MIN":
@@ -46,9 +44,7 @@ export const getWrapAlignment = (
   }
 };
 
-export const getWrapRunAlignment = (
-  node: InferredAutoLayoutResult,
-): string => {
+export const getWrapRunAlignment = (node: InferredAutoLayoutResult): string => {
   if (node.counterAxisAlignContent == "SPACE_BETWEEN") {
     return "WrapAlignment.spaceBetween";
   }
@@ -63,13 +59,3 @@ export const getWrapRunAlignment = (
       return "WrapAlignment.end";
   }
 };
-
-const getFlex = (
-  node: SceneNode,
-  autoLayout: InferredAutoLayoutResult,
-): string =>
-  node.parent &&
-  "layoutMode" in node.parent &&
-  node.parent.layoutMode === autoLayout.layoutMode
-    ? "MainAxisSize.max"
-    : "MainAxisSize.min";

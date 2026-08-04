@@ -2,6 +2,7 @@
 dist
 .next
 out/
+*.tsbuildinfo
 
 # dependencies
 node_modules
@@ -29,3 +30,4 @@ test/**/next-env.d.ts
 
 build
 .turbo
+.vercel

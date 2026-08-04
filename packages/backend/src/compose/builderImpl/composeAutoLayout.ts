@@ -53,9 +53,7 @@ export const getCrossAxisAlignment = (
   }
 };
 
-export const getWrapAlignment = (
-  node: InferredAutoLayoutResult,
-): string => {
+export const getWrapAlignment = (node: InferredAutoLayoutResult): string => {
   switch (node.primaryAxisAlignItems) {
     case undefined:
     case "MIN":
@@ -71,13 +69,11 @@ export const getWrapAlignment = (
   }
 };
 
-export const getWrapRunAlignment = (
-  node: InferredAutoLayoutResult,
-): string => {
+export const getWrapRunAlignment = (node: InferredAutoLayoutResult): string => {
   if (node.counterAxisAlignContent === "SPACE_BETWEEN") {
     return "Arrangement.SpaceBetween";
   }
-  
+
   // For FlowRow/FlowColumn, the cross axis alignment depends on layout mode
   if (node.layoutMode === "HORIZONTAL") {
     // FlowRow - vertical alignment

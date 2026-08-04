@@ -2,7 +2,6 @@ import { commonLetterSpacing } from "../common/commonTextHeightSpacing";
 import { numberToFixedString } from "../common/numToAutoFixed";
 import { ComposeDefaultBuilder } from "./composeDefaultBuilder";
 import { rgbTo6hex } from "../common/color";
-import { getCommonRadius } from "../common/commonRadius";
 import { retrieveTopFill } from "../common/retrieveFill";
 
 // Cache static mappings for performance
@@ -19,18 +18,18 @@ const FONT_WEIGHT_MAP: Record<number, string> = {
 };
 
 const TEXT_ALIGN_MAP: Record<string, string> = {
-  "LEFT": "Left",
-  "CENTER": "Center",
-  "RIGHT": "Right",
-  "JUSTIFIED": "Justify",
+  LEFT: "Left",
+  CENTER: "Center",
+  RIGHT: "Right",
+  JUSTIFIED: "Justify",
 };
 
 const TEXT_ESCAPE_MAP: Record<string, string> = {
-  '\\': '\\\\',
+  "\\": "\\\\",
   '"': '\\"',
-  '\n': '\\n',
-  '\r': '\\r',
-  '\t': '\\t'
+  "\n": "\\n",
+  "\r": "\\r",
+  "\t": "\\t",
 };
 
 const TEXT_ESCAPE_REGEX = /[\\"\n\r\t]/g;
@@ -48,18 +47,21 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
   private getText(node: TextNode): string {
     const text = node.characters || "";
     const textStyles = this.getTextStyles(node);
-    
+
     // Escape text content properly (single pass for performance)
-    const escapedText = text.replace(TEXT_ESCAPE_REGEX, (char) => TEXT_ESCAPE_MAP[char]);
-    
+    const escapedText = text.replace(
+      TEXT_ESCAPE_REGEX,
+      (char) => TEXT_ESCAPE_MAP[char],
+    );
+
     // Handle multiline text differently
-    if (text.includes('\n')) {
+    if (text.includes("\n")) {
       return `Text(
     text = """${text}""",
     ${textStyles}
 )`;
     }
-    
+
     return `Text(
     text = "${escapedText}",
     ${textStyles}
@@ -70,12 +72,19 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
     const styles: string[] = [];
 
     // Font size
-    if (node.fontSize !== figma.mixed && typeof node.fontSize === "number" && node.fontSize > 0) {
+    if (
+      node.fontSize !== figma.mixed &&
+      typeof node.fontSize === "number" &&
+      node.fontSize > 0
+    ) {
       styles.push(`fontSize = ${numberToFixedString(node.fontSize)}.sp`);
     }
 
     // Font weight
-    if (node.fontWeight !== figma.mixed && typeof node.fontWeight === "number") {
+    if (
+      node.fontWeight !== figma.mixed &&
+      typeof node.fontWeight === "number"
+    ) {
       const weight = this.mapFontWeight(node.fontWeight);
       if (weight) {
         styles.push(`fontWeight = FontWeight.${weight}`);
@@ -91,12 +100,19 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
 
     // Letter spacing
     if (node.letterSpacing !== figma.mixed && node.letterSpacing !== 0) {
-      const spacing = commonLetterSpacing(node.letterSpacing, node.fontSize as number);
+      const spacing = commonLetterSpacing(
+        node.letterSpacing,
+        node.fontSize as number,
+      );
       styles.push(`letterSpacing = ${spacing}.sp`);
     }
 
     // Line height
-    if (node.lineHeight !== figma.mixed && typeof node.lineHeight === "object" && node.lineHeight.unit === "PIXELS") {
+    if (
+      node.lineHeight !== figma.mixed &&
+      typeof node.lineHeight === "object" &&
+      node.lineHeight.unit === "PIXELS"
+    ) {
       styles.push(`lineHeight = ${node.lineHeight.value}.sp`);
     }
 
@@ -135,7 +151,7 @@ export class ComposeTextBuilder extends ComposeDefaultBuilder {
         /Text\(/,
         `Text(
     maxLines = 1,
-    overflow = TextOverflow.Ellipsis,`
+    overflow = TextOverflow.Ellipsis,`,
       );
     }
     return this;

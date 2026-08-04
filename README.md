@@ -6,14 +6,14 @@
 
 <p align="center">
 <a href="https://github.com/bernaferrari/FigmaToCode/actions/"><img src="https://github.com/bernaferrari/FigmaToCode/workflows/CI/badge.svg"/></a>
-<a href="https://codecov.io/gh/bernaferrari/FigmaToCode"><img src="https://codecov.io/gh/bernaferrari/FigmaToCode/branch/master/graph/badge.svg" /></a>
+<a href="https://codecov.io/gh/bernaferrari/FigmaToCode"><img src="https://codecov.io/gh/bernaferrari/FigmaToCode/branch/main/graph/badge.svg" /></a>
 <a href="http://twitter.com/bernaferrari">
 <img src="https://img.shields.io/badge/Twitter-@bernaferrari-brightgreen.svg?style=flat" alt="Twitter"/></a>
 </p><p align="center">
 <a href="https://www.figma.com/community/plugin/842128343887142055"><img src="assets/badge.png" height="60"/></a>
 </p>
 
-Converting Figma designs into usable code can be a challenge, often requiring time-consuming manual work. Figma to Code simplifies that process. This plugin generates responsive layouts in `HTML`, `React (JSX)`, `Svelte`, `styled-components`, `Tailwind`, `Flutter`, and `SwiftUI` directly from your designs. Your feedback and ideas are always welcome.
+Converting Figma designs into usable code can be a challenge, often requiring time-consuming manual work. Figma to Code simplifies that process. This plugin generates responsive layouts in `HTML`, `React (JSX)`, `Svelte`, `styled-components`, `Tailwind`, `Flutter`, and `SwiftUI` directly from your designs. Supported targets can also be downloaded as complete starter projects with local image assets and setup instructions. Your feedback and ideas are always welcome.
 
 ![Gif showing the conversion](assets/lossy_gif.gif)
 
@@ -50,14 +50,17 @@ Converting visual designs to code inevitably encounters complex edge cases. Here
 ### Todo
 
 - Vectors (possible to enable in HTML and Tailwind)
-- Images (possible to enable to inline them in HTML and Tailwind)
 - Line/Star/Polygon
 
 ## How to build the project
 
 ### Package Manager
 
-The project is configured for [pnpm](https://pnpm.io/). To install, see the [installation notes for pnpm](https://pnpm.io/installation).
+Development requires Node.js `>=24` and pnpm `^11`. Install pnpm using the [official installation instructions](https://pnpm.io/installation), then install the workspace from the repository root:
+
+```bash
+pnpm install
+```
 
 ### Monorepo
 
@@ -65,13 +68,12 @@ The plugin is organized as a monorepo. There are several packages:
 
 - `packages/backend` - Contains the business logic that reads the Figma API and converts nodes
 - `packages/plugin-ui` - Contains the common UI for the plugin
-- `packages/eslint-config-custom` - Config file for ESLint
 - `packages/tsconfig` - Collection of TSConfig files used throughout the project
 
 - `apps/plugin` - This is the actual plugin assembled from the parts in `backend` & `plugin-ui`. Within this folder it's divided between:
   - `plugin-src` - loads from `backend` and compiles to `code.js`
   - `ui-src` - loads the common `plugin-ui` and compiles to `index.html`
-- `apps/debug` - This is a debug mode plugin that is a more convenient way to see all the UI elements.
+- `apps/web` - The public product website and an interactive browser preview of the shared plugin UI.
 
 ### Development Workflow
 
@@ -81,13 +83,13 @@ The project uses [Turborepo](https://turborepo.com/) for managing the monorepo, 
 
 You have two main options for development:
 
-1. **Root development mode** (includes debug UI):
+1. **Root development mode** (includes the website):
 
    ```bash
    pnpm dev
    ```
 
-   This runs the plugin in dev mode and also starts a Next.js server for the debug UI. You can access the debug UI at `http://localhost:3000`.
+   This runs the plugin in dev mode and starts the Next.js website at `http://localhost:3000`.
 
 2. **Plugin-only development mode**:
 
@@ -96,7 +98,7 @@ You have two main options for development:
    pnpm dev
    ```
 
-   This focuses only on the plugin without the Next.js debug UI. Use this when you're making changes specifically to the plugin.
+   This focuses only on the plugin without the Next.js website. Use this when you're making changes specifically to the plugin.
 
 #### Where to Make Changes
 
@@ -105,8 +107,9 @@ Most of your development work will happen in these directories:
 - `packages/backend` - For plugin backend
 - `packages/plugin-ui` - For plugin UI
 - `apps/plugin/` - The main plugin result that combines the backend and UI and is called by Figma.
+- `apps/web/` - The public website, comparison pages, SEO metadata, and interactive plugin preview.
 
-You'll rarely need to modify files directly in the `apps/` directory, as they mostly contain build configuration.
+The two app directories contain their platform-specific entry points and build configuration; shared behavior belongs in `packages/`.
 
 #### Commands
 
@@ -115,12 +118,14 @@ You'll rarely need to modify files directly in the `apps/` directory, as they mo
 - `dev` - runs the app in dev mode. This can be run in the Figma editor.
 - `build` - builds the project for production
 - `build:watch` - builds and watches for changes
-- `lint` - runs ESLint
-- `format` - formats with prettier (warning: may edit files!)
+- `lint` - runs Oxlint
+- `test` - runs the automated test suite
+- `format` - formats the repository with Oxfmt
+- `format:check` - checks formatting without changing files
 
-#### Debug mode
+#### Website
 
-When running the `dev` task, you can open `http://localhost:3000` to see the debug version of the UI.
+When running the `dev` task, open `http://localhost:3000` to view the product website and interactive plugin preview.
 
 <img width="600" alt="Screenshot 2024-12-13 at 16 26 43" src="https://github.com/user-attachments/assets/427fb066-70e1-47bd-8718-51f7f4d83e35" />
 

@@ -5,7 +5,7 @@
     { "path": "./packages/backend" },
     { "path": "./packages/plugin-ui" },
     { "path": "./apps/plugin" },
-    { "path": "./apps/debug" }
+    { "path": "./apps/web" }
   ],
   "exclude": ["./../node_modules"]
 }

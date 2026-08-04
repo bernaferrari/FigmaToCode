@@ -1,4 +1,3 @@
-import { StarNode } from "./../../api_types";
 import { rgbTo8hex } from "../../common/color";
 import { addWarning } from "../../common/commonConversionWarnings";
 import {

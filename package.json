@@ -1,20 +1,31 @@
 {
   "name": "figma-to-code",
   "private": true,
-  "packageManager": "pnpm@9.14.4",
   "scripts": {
     "build": "turbo run build",
     "build:watch": "turbo run build:watch",
     "dev": "turbo run dev --concurrency 20",
-    "lint": "turbo run lint",
+    "lint": "oxlint .",
     "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,css,md}\""
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
   },
   "devDependencies": {
-    "eslint": "^9.39.2",
-    "eslint-config-custom": "workspace:*",
-    "prettier": "^3.8.3",
-    "turbo": "^2.9.12",
-    "typescript": "^6.0.3"
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "oxfmt": "^0.62.0",
+    "oxlint": "^1.77.0",
+    "turbo": "^2.10.8",
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11",
+      "onFail": "ignore"
+    }
+  },
+  "engines": {
+    "node": ">=24",
+    "pnpm": "^11"
   }
 }

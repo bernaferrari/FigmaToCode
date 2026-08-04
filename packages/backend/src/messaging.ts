@@ -12,7 +12,7 @@ const safePostMessage = (message: unknown) => {
     figma.ui.postMessage(message);
   } catch (error) {
     // Avoid crashing in codegen/no-UI environments.
-    console.warn("[backend] postMessage failed (no UI?)");
+    console.warn("[backend] postMessage failed (no UI?)", error);
   }
 };
 

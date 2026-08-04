@@ -1,18 +1,13 @@
 import { pxToLayoutSize } from "../conversionTables";
 import { nodeSize } from "../../common/nodeWidthHeight";
 import { numberToFixedString } from "../../common/numToAutoFixed";
-import { TailwindSettings } from "types";
 import { localTailwindSettings } from "../tailwindMain";
 
 /**
  * Formats a size value into a Tailwind class
  * Uses Tailwind's standard classes if there's a good match, otherwise uses arbitrary values
  */
-const formatTailwindSizeValue = (
-  size: number,
-  prefix: string,
-  settings?: TailwindSettings,
-): string => {
+const formatTailwindSizeValue = (size: number, prefix: string): string => {
   const tailwindSize = pxToLayoutSize(size);
 
   // If we found a matching Tailwind class, use it
@@ -31,14 +26,13 @@ const formatTailwindSizeValue = (
 
 export const tailwindSizePartial = (
   node: SceneNode,
-  settings?: TailwindSettings,
 ): { width: string; height: string; constraints: string } => {
   const size = nodeSize(node);
   const nodeParent = node.parent;
 
   let w = "";
   if (typeof size.width === "number") {
-    w = formatTailwindSizeValue(size.width, "w", settings);
+    w = formatTailwindSizeValue(size.width, "w");
   } else if (size.width === "fill") {
     if (
       nodeParent &&
@@ -57,7 +51,7 @@ export const tailwindSizePartial = (
 
   let h = "";
   if (typeof size.height === "number") {
-    h = formatTailwindSizeValue(size.height, "h", settings);
+    h = formatTailwindSizeValue(size.height, "h");
   } else if (size.height === "fill") {
     if (
       nodeParent &&
@@ -78,23 +72,19 @@ export const tailwindSizePartial = (
   const constraints = [];
 
   if (node.maxWidth !== undefined && node.maxWidth !== null) {
-    constraints.push(formatTailwindSizeValue(node.maxWidth, "max-w", settings));
+    constraints.push(formatTailwindSizeValue(node.maxWidth, "max-w"));
   }
 
   if (node.minWidth !== undefined && node.minWidth !== null) {
-    constraints.push(formatTailwindSizeValue(node.minWidth, "min-w", settings));
+    constraints.push(formatTailwindSizeValue(node.minWidth, "min-w"));
   }
 
   if (node.maxHeight !== undefined && node.maxHeight !== null) {
-    constraints.push(
-      formatTailwindSizeValue(node.maxHeight, "max-h", settings),
-    );
+    constraints.push(formatTailwindSizeValue(node.maxHeight, "max-h"));
   }
 
   if (node.minHeight !== undefined && node.minHeight !== null) {
-    constraints.push(
-      formatTailwindSizeValue(node.minHeight, "min-h", settings),
-    );
+    constraints.push(formatTailwindSizeValue(node.minHeight, "min-h"));
   }
 
   // Technically size exists since Tailwind 3.4 (December 2023), but to avoid confusion, restrict to 4,

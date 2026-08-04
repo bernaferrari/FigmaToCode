@@ -206,7 +206,10 @@ const flutterFrame = (
     return flutterContainer(node, rowColumnWrap);
   } else {
     if (node.inferredAutoLayout) {
-      const rowColumnWrap = makeRowColumnWrap(node.inferredAutoLayout, children);
+      const rowColumnWrap = makeRowColumnWrap(
+        node.inferredAutoLayout,
+        children,
+      );
       return flutterContainer(node, rowColumnWrap);
     }
 
@@ -228,28 +231,39 @@ const makeRowColumnWrap = (
   autoLayout: InferredAutoLayoutResult,
   children: string,
 ): string => {
-  const rowOrColumn = autoLayout.layoutWrap == "WRAP" && autoLayout.primaryAxisSizingMode == "FIXED" ?
-    "Wrap" : autoLayout.layoutMode === "HORIZONTAL" ? "Row" : "Column";
+  const rowOrColumn =
+    autoLayout.layoutWrap == "WRAP" &&
+    autoLayout.primaryAxisSizingMode == "FIXED"
+      ? "Wrap"
+      : autoLayout.layoutMode === "HORIZONTAL"
+        ? "Row"
+        : "Column";
 
-  const widgetProps: Record<string, any> = autoLayout.layoutWrap == "WRAP"
-    ? {
-      alignment: getWrapAlignment(autoLayout),
-      runAlignment: getWrapRunAlignment(autoLayout),
-    } : 
-    {
-      mainAxisSize: "MainAxisSize.min",
-      // mainAxisSize: getFlex(node, autoLayout),
-      mainAxisAlignment: getMainAxisAlignment(autoLayout),
-      crossAxisAlignment: getCrossAxisAlignment(autoLayout),
-      
-    };
+  const widgetProps: Record<string, any> =
+    autoLayout.layoutWrap == "WRAP"
+      ? {
+          alignment: getWrapAlignment(autoLayout),
+          runAlignment: getWrapRunAlignment(autoLayout),
+        }
+      : {
+          mainAxisSize: "MainAxisSize.min",
+          // mainAxisSize: getFlex(node, autoLayout),
+          mainAxisAlignment: getMainAxisAlignment(autoLayout),
+          crossAxisAlignment: getCrossAxisAlignment(autoLayout),
+        };
 
   // Add spacing parameter if itemSpacing is set
   if (autoLayout.layoutWrap == "WRAP") {
-    if (autoLayout.primaryAxisAlignItems != "SPACE_BETWEEN" && autoLayout.itemSpacing != undefined) {
+    if (
+      autoLayout.primaryAxisAlignItems != "SPACE_BETWEEN" &&
+      autoLayout.itemSpacing != undefined
+    ) {
       widgetProps.spacing = autoLayout.itemSpacing;
     }
-    if (autoLayout.counterAxisAlignContent != "SPACE_BETWEEN" && autoLayout.counterAxisSpacing != undefined) {
+    if (
+      autoLayout.counterAxisAlignContent != "SPACE_BETWEEN" &&
+      autoLayout.counterAxisSpacing != undefined
+    ) {
       widgetProps.runSpacing = autoLayout.counterAxisSpacing;
     }
   } else if (autoLayout.itemSpacing > 0) {

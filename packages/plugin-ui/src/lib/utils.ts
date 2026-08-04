@@ -37,6 +37,6 @@ export function replaceExternalImagesWithCanvas(html: string): string {
     /https:\/\/placehold\.co\/(\d+)x(\d+)/g,
     (_match, width, height) => {
       return createCanvasImageUrl(parseInt(width), parseInt(height));
-    }
+    },
   );
 }

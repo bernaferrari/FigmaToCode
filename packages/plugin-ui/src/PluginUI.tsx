@@ -85,6 +85,7 @@ const FrameworkTabs = ({
           variant="ghost"
           size="sm"
           key={`tab ${tab}`}
+          aria-pressed={selectedFramework === tab && !showAbout}
           className={`w-full h-8 rounded-md text-sm ${
             selectedFramework === tab && !showAbout
               ? "bg-primary text-primary-foreground shadow-xs hover:bg-primary hover:text-primary-foreground dark:hover:bg-primary"
@@ -144,6 +145,7 @@ export const PluginUI = (props: PluginUIProps) => {
                 setShowAbout(!showAbout);
               }}
               aria-label="About"
+              aria-pressed={showAbout}
             >
               <InfoIcon size={16} />
             </Button>

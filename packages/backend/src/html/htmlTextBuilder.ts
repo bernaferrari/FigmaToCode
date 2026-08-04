@@ -1,4 +1,8 @@
-import { formatMultipleJSX, formatWithJSX, escapeJSXText } from "../common/parseJSX";
+import {
+  formatMultipleJSX,
+  formatWithJSX,
+  escapeJSXText,
+} from "../common/parseJSX";
 import { HtmlDefaultBuilder } from "./htmlDefaultBuilder";
 import { htmlColorFromFills } from "./builderImpl/htmlColor";
 import {
@@ -108,7 +112,11 @@ export class HtmlTextBuilder extends HtmlDefaultBuilder {
         // In both modes, use span for text segments to avoid selector conflicts
         const elementTag = "span";
 
-        const componentName = getComponentName(segmentName, className, elementTag);
+        const componentName = getComponentName(
+          segmentName,
+          className,
+          elementTag,
+        );
 
         // Store in cssCollection with consistent metadata
         cssCollection[className] = {

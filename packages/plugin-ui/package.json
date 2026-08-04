@@ -6,28 +6,24 @@
   "sideEffects": false,
   "main": "./src/index.tsx",
   "types": "./src/index.tsx",
-  "scripts": {
-    "lint": "eslint \"src/**/*.ts*\""
-  },
   "dependencies": {
-    "@base-ui/react": "^1.4.1",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@base-ui/react": "^1.6.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "@types/react-syntax-highlighter": "15.5.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "copy-to-clipboard": "^4.0.2",
-    "lucide-react": "^1.14.0",
-    "react": "^19.2.6",
+    "lucide-react": "^1.28.0",
+    "react": "^19.2.8",
     "react-syntax-highlighter": "^16.1.1",
     "tailwind-merge": "^3.6.0",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "eslint": "^9.39.2",
-    "eslint-config-custom": "workspace:*",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "tsconfig": "workspace:*",
     "types": "workspace:*",
-    "typescript": "^6.0.3"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
 }

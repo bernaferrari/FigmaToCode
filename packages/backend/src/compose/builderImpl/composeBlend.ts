@@ -50,7 +50,7 @@ export const composeRotation = (node: AltNode, child: string): string => {
     Math.round(node.rotation) !== 0
   ) {
     const totalRotation = (node.rotation || 0) + (node.cumulativeRotation || 0);
-    
+
     if (Math.round(totalRotation) === 0) {
       return child;
     }
@@ -71,25 +71,25 @@ export const composeRotation = (node: AltNode, child: string): string => {
  */
 export const composeBlendModifiers = (node: AltNode, child: string): string => {
   const modifiers: string[] = [];
-  
+
   // Add opacity modifier
   if (node.opacity !== undefined && node.opacity !== 1) {
     const opacity = numberToFixedString(node.opacity);
     modifiers.push(`alpha(${opacity}f)`);
   }
-  
+
   // Add visibility modifier (using alpha for invisible elements)
   if (node.visible !== undefined && !node.visible) {
     modifiers.push(`alpha(0f)`);
   }
-  
+
   // Add rotation modifier
   const totalRotation = (node.rotation || 0) + (node.cumulativeRotation || 0);
   if (Math.round(totalRotation) !== 0) {
     const rotationDegrees = numberToFixedString(totalRotation);
     modifiers.push(`rotate(${rotationDegrees}f)`);
   }
-  
+
   // If we have modifiers, wrap in Box with combined modifier chain
   if (modifiers.length > 0 && child !== "") {
     const modifierChain = `Modifier.${modifiers.join(".")}`;
@@ -99,6 +99,6 @@ export const composeBlendModifiers = (node: AltNode, child: string): string => {
     ${child}
 }`;
   }
-  
+
   return child;
 };

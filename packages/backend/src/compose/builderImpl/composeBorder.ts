@@ -18,7 +18,9 @@ const rgbaToHex = (fill: Paint): string => {
  * Compose doesn't have perfect equivalents for all stroke alignments,
  * but we can approximate with different approaches
  */
-const getStrokeAlignment = (node: SceneNode): "inside" | "center" | "outside" => {
+const getStrokeAlignment = (
+  node: SceneNode,
+): "inside" | "center" | "outside" => {
   if ("strokeAlign" in node) {
     switch (node.strokeAlign) {
       case "INSIDE":
@@ -39,7 +41,10 @@ const getStrokeAlignment = (node: SceneNode): "inside" | "center" | "outside" =>
  * @param node - The scene node with stroke properties
  * @returns Compose border modifier string
  */
-export const composeBorder = (node: SceneNode, shape?: string | null): string => {
+export const composeBorder = (
+  node: SceneNode,
+  shape?: string | null,
+): string => {
   if (!("strokes" in node)) {
     return "";
   }
@@ -62,7 +67,12 @@ export const composeBorder = (node: SceneNode, shape?: string | null): string =>
       return "";
     }
 
-    return generateBorderModifier(stroke.all, strokeFill, strokeAlignment, shape);
+    return generateBorderModifier(
+      stroke.all,
+      strokeFill,
+      strokeAlignment,
+      shape,
+    );
   } else {
     // Handle non-uniform borders
     // Compose doesn't have direct support for different border widths per side
@@ -71,7 +81,7 @@ export const composeBorder = (node: SceneNode, shape?: string | null): string =>
       stroke.left,
       stroke.top,
       stroke.right,
-      stroke.bottom
+      stroke.bottom,
     );
 
     if (maxWidth === 0) {
@@ -91,17 +101,20 @@ const generateBorderModifier = (
   width: number,
   fill: Paint,
   alignment: "inside" | "center" | "outside",
-  shape?: string | null
+  shape?: string | null,
 ): string => {
   const widthDp = `${numberToFixedString(width)}.dp`;
 
   if (fill.type === "SOLID") {
     const color = rgbaToHex(fill);
     const opacity = fill.opacity ?? 1.0;
-    
+
     let colorValue: string;
     if (opacity < 1) {
-      const alpha = Math.round(opacity * 255).toString(16).padStart(2, '0').toUpperCase();
+      const alpha = Math.round(opacity * 255)
+        .toString(16)
+        .padStart(2, "0")
+        .toUpperCase();
       colorValue = `Color(0x${alpha}${color.toUpperCase()})`;
     } else {
       colorValue = `Color(0xFF${color.toUpperCase()})`;
@@ -119,20 +132,25 @@ const generateBorderModifier = (
     }
   } else if (fill.type === "GRADIENT_LINEAR") {
     // Convert gradient to Compose Brush
-    const stops = fill.gradientStops.map(stop => {
-      const stopColor = rgbTo6hex(stop.color);
-      const stopOpacity = stop.color.a ?? 1.0;
-      let colorValue: string;
-      
-      if (stopOpacity < 1) {
-        const alpha = Math.round(stopOpacity * 255).toString(16).padStart(2, '0').toUpperCase();
-        colorValue = `Color(0x${alpha}${stopColor.toUpperCase()})`;
-      } else {
-        colorValue = `Color(0xFF${stopColor.toUpperCase()})`;
-      }
-      
-      return `${numberToFixedString(stop.position)}f to ${colorValue}`;
-    }).join(", ");
+    const stops = fill.gradientStops
+      .map((stop) => {
+        const stopColor = rgbTo6hex(stop.color);
+        const stopOpacity = stop.color.a ?? 1.0;
+        let colorValue: string;
+
+        if (stopOpacity < 1) {
+          const alpha = Math.round(stopOpacity * 255)
+            .toString(16)
+            .padStart(2, "0")
+            .toUpperCase();
+          colorValue = `Color(0x${alpha}${stopColor.toUpperCase()})`;
+        } else {
+          colorValue = `Color(0xFF${stopColor.toUpperCase()})`;
+        }
+
+        return `${numberToFixedString(stop.position)}f to ${colorValue}`;
+      })
+      .join(", ");
 
     const brush = `Brush.linearGradient(
         listOf(${stops})
@@ -146,20 +164,25 @@ const generateBorderModifier = (
     }
   } else if (fill.type === "GRADIENT_RADIAL") {
     // Convert radial gradient to Compose Brush
-    const stops = fill.gradientStops.map(stop => {
-      const stopColor = rgbTo6hex(stop.color);
-      const stopOpacity = stop.color.a ?? 1.0;
-      let colorValue: string;
-      
-      if (stopOpacity < 1) {
-        const alpha = Math.round(stopOpacity * 255).toString(16).padStart(2, '0').toUpperCase();
-        colorValue = `Color(0x${alpha}${stopColor.toUpperCase()})`;
-      } else {
-        colorValue = `Color(0xFF${stopColor.toUpperCase()})`;
-      }
-      
-      return `${numberToFixedString(stop.position)}f to ${colorValue}`;
-    }).join(", ");
+    const stops = fill.gradientStops
+      .map((stop) => {
+        const stopColor = rgbTo6hex(stop.color);
+        const stopOpacity = stop.color.a ?? 1.0;
+        let colorValue: string;
+
+        if (stopOpacity < 1) {
+          const alpha = Math.round(stopOpacity * 255)
+            .toString(16)
+            .padStart(2, "0")
+            .toUpperCase();
+          colorValue = `Color(0x${alpha}${stopColor.toUpperCase()})`;
+        } else {
+          colorValue = `Color(0xFF${stopColor.toUpperCase()})`;
+        }
+
+        return `${numberToFixedString(stop.position)}f to ${colorValue}`;
+      })
+      .join(", ");
 
     const brush = `Brush.radialGradient(
         listOf(${stops})

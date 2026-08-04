@@ -81,9 +81,10 @@ export const composeContainer = (
   }
 
   // Build modifier chain
-  const modifierChain = modifiers.length > 0 
-    ? `modifier = Modifier${modifiers.map(m => `.${m}`).join("")}`
-    : "";
+  const modifierChain =
+    modifiers.length > 0
+      ? `modifier = Modifier${modifiers.map((m) => `.${m}`).join("")}`
+      : "";
 
   // Generate container
   if (child) {

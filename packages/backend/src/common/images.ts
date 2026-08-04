@@ -5,48 +5,6 @@ import { exportAsyncProxy } from "./exportAsyncProxy";
 
 export const PLACEHOLDER_IMAGE_DOMAIN = "https://placehold.co";
 
-const createCanvasImageUrl = (width: number, height: number): string => {
-  // Check if we're in a browser environment
-  if (typeof document === "undefined" || typeof window === "undefined") {
-    // Fallback for non-browser environments
-    return `${PLACEHOLDER_IMAGE_DOMAIN}/${width}x${height}`;
-  }
-
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    // Fallback if canvas context is not available
-    return `${PLACEHOLDER_IMAGE_DOMAIN}/${width}x${height}`;
-  }
-
-  const fontSize = Math.max(12, Math.floor(width * 0.15));
-  ctx.font = `bold ${fontSize}px Inter, Arial, Helvetica, sans-serif`;
-  ctx.fillStyle = "#888888";
-
-  const text = `${width} x ${height}`;
-  const textWidth = ctx.measureText(text).width;
-  const x = (width - textWidth) / 2;
-  const y = (height + fontSize) / 2;
-
-  ctx.fillText(text, x, y);
-
-  const image = canvas.toDataURL();
-  const base64 = image.substring(22);
-  const byteCharacters = atob(base64);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const file = new Blob([byteArray], {
-    type: "image/png;base64",
-  });
-  return URL.createObjectURL(file);
-};
-
 export const getPlaceholderImage = (
   w: number,
   h = -1,
@@ -68,16 +26,16 @@ const fillIsImage = ({ type }: Paint) => type === "IMAGE";
 export const getImageFills = (node: MinimalFillsMixin): ImagePaint[] => {
   try {
     return (node.fills as ImagePaint[]).filter(fillIsImage);
-  } catch (e) {
+  } catch {
     return [];
   }
 };
 
-export const nodeHasImageFill = (node: MinimalFillsMixin): Boolean =>
+export const nodeHasImageFill = (node: MinimalFillsMixin): boolean =>
   getImageFills(node).length > 0;
 
 export const nodeHasMultipleFills = (node: MinimalFillsMixin) =>
-  node.fills instanceof Array && node.fills.length > 1;
+  Array.isArray(node.fills) && node.fills.length > 1;
 
 const imageBytesToBase64 = (bytes: Uint8Array): string => {
   // Convert Uint8Array to binary string

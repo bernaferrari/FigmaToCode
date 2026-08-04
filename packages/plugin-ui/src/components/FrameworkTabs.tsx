@@ -28,6 +28,7 @@ const FrameworkTabs: React.FC<FrameworkTabsProps> = ({
               size="sm"
               key={option.value}
               onClick={() => onChange(option.value)}
+              aria-pressed={isSelected}
               className={`h-7 rounded-md px-3 text-xs ${
                 isSelected
                   ? "bg-blue-500 text-primary-foreground shadow-2xs hover:bg-blue-500 hover:text-primary-foreground dark:bg-blue-500 dark:hover:bg-blue-500"

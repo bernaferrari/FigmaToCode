@@ -3,10 +3,10 @@ import { commonPadding } from "../../common/commonPadding";
 
 /**
  * Generates Jetpack Compose padding modifiers based on node padding properties.
- * 
+ *
  * Returns appropriate padding modifiers:
  * - padding(all = X.dp) for uniform padding
- * - padding(horizontal = X.dp, vertical = Y.dp) for symmetric padding  
+ * - padding(horizontal = X.dp, vertical = Y.dp) for symmetric padding
  * - padding(start = X.dp, end = Y.dp, top = Z.dp, bottom = W.dp) for individual padding
  */
 export const composePadding = (node: InferredAutoLayoutResult): string => {
@@ -28,11 +28,13 @@ export const composePadding = (node: InferredAutoLayoutResult): string => {
 
   if ("horizontal" in padding) {
     const modifiers: string[] = [];
-    
+
     if (padding.horizontal !== 0) {
-      modifiers.push(`horizontal = ${numberToFixedString(padding.horizontal)}.dp`);
+      modifiers.push(
+        `horizontal = ${numberToFixedString(padding.horizontal)}.dp`,
+      );
     }
-    
+
     if (padding.vertical !== 0) {
       modifiers.push(`vertical = ${numberToFixedString(padding.vertical)}.dp`);
     }
@@ -46,19 +48,19 @@ export const composePadding = (node: InferredAutoLayoutResult): string => {
 
   // Individual padding values
   const modifiers: string[] = [];
-  
+
   if (padding.left !== 0) {
     modifiers.push(`start = ${numberToFixedString(padding.left)}.dp`);
   }
-  
+
   if (padding.right !== 0) {
     modifiers.push(`end = ${numberToFixedString(padding.right)}.dp`);
   }
-  
+
   if (padding.top !== 0) {
     modifiers.push(`top = ${numberToFixedString(padding.top)}.dp`);
   }
-  
+
   if (padding.bottom !== 0) {
     modifiers.push(`bottom = ${numberToFixedString(padding.bottom)}.dp`);
   }

@@ -41,10 +41,11 @@ const GradientsPanel = (props: {
                 : "ring-0"
             }`}
             style={{ background: gradient.cssPreview }}
+            aria-label={`Copy gradient ${idx + 1}: ${gradient.exportValue}`}
             onClick={() => {
               handleButtonClick(gradient.exportValue, idx);
             }}
-          ></button>
+          />
         ))}
       </div>
     </div>

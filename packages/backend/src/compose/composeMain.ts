@@ -202,7 +202,11 @@ const composeGroup = (node: GroupNode): string => {
 const composeContainer = (node: SceneNode, child: string): string => {
   let propChild = "";
 
-  if ("fills" in node && node.fills !== figma.mixed && retrieveTopFill(node.fills as any)?.type === "IMAGE") {
+  if (
+    "fills" in node &&
+    node.fills !== figma.mixed &&
+    retrieveTopFill(node.fills as any)?.type === "IMAGE"
+  ) {
     addWarning("Image fills are replaced with placeholders in Compose");
   }
 

@@ -1,0 +1,13 @@
+.git
+.vercel
+.turbo
+.crush
+.idea
+.vscode
+**/.next
+**/.turbo
+**/node_modules
+coverage
+web
+apps/plugin/dist
+dist

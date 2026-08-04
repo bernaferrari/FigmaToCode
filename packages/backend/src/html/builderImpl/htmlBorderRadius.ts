@@ -20,13 +20,10 @@ export const htmlBorderRadius = (node: SceneNode, isJsx: boolean): string[] => {
 
   const radius = getCommonRadius(node);
 
-  let singleCorner: number = 0;
-
   if ("all" in radius) {
     if (radius.all === 0) {
       return comp;
     }
-    singleCorner = radius.all;
     comp.push(formatWithJSX("border-radius", isJsx, radius.all));
   } else {
     const cornerValues = [

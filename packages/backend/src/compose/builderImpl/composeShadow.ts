@@ -14,7 +14,7 @@ export const composeShadow = (effects: readonly Effect[]): string => {
   const shadowEffects = effects.filter(
     (effect) =>
       (effect.type === "DROP_SHADOW" || effect.type === "INNER_SHADOW") &&
-      effect.visible !== false
+      effect.visible !== false,
   );
 
   if (shadowEffects.length === 0) {
@@ -28,11 +28,13 @@ export const composeShadow = (effects: readonly Effect[]): string => {
       const offsetX = numberToFixedString(effect.offset.x);
       const offsetY = numberToFixedString(effect.offset.y);
       const blurRadius = numberToFixedString(effect.radius);
-      const spreadRadius = effect.spread ? numberToFixedString(effect.spread) : "0";
-      
+      const spreadRadius = effect.spread
+        ? numberToFixedString(effect.spread)
+        : "0";
+
       // Convert Figma color to Compose Color
       const color = rgbTo8hex(effect.color, effect.color.a);
-      
+
       // For simple shadows with no spread and small blur, use elevation
       if (effect.spread === 0 && effect.radius <= 8 && effect.offset.x === 0) {
         const elevation = Math.abs(effect.offset.y);
@@ -41,9 +43,13 @@ export const composeShadow = (effects: readonly Effect[]): string => {
           return;
         }
       }
-      
+
       // For complex shadows, use drawBehind with custom drawing
-      if (effect.offset.x !== 0 || effect.offset.y !== 0 || effect.spread !== 0) {
+      if (
+        effect.offset.x !== 0 ||
+        effect.offset.y !== 0 ||
+        effect.spread !== 0
+      ) {
         shadowModifiers.push(`drawBehind {
     drawRect(
         color = Color(0x${color.toUpperCase()}),
@@ -57,15 +63,16 @@ export const composeShadow = (effects: readonly Effect[]): string => {
 }`);
       } else {
         // Simple shadow with custom color
-        shadowModifiers.push(`shadow(${blurRadius}.dp, shape = RectangleShape)`);
+        shadowModifiers.push(
+          `shadow(${blurRadius}.dp, shape = RectangleShape)`,
+        );
       }
     } else if (effect.type === "INNER_SHADOW") {
       // Inner shadows in Compose require custom drawing
       const offsetX = numberToFixedString(effect.offset.x);
       const offsetY = numberToFixedString(effect.offset.y);
-      const blurRadius = numberToFixedString(effect.radius);
       const color = rgbTo8hex(effect.color, effect.color.a);
-      
+
       shadowModifiers.push(`drawWithContent {
     drawContent()
     drawRect(
@@ -90,7 +97,7 @@ export const canUseSimpleElevation = (effect: Effect): boolean => {
   if (effect.type !== "DROP_SHADOW") {
     return false;
   }
-  
+
   return (
     effect.offset.x === 0 &&
     effect.offset.y > 0 &&
@@ -112,7 +119,7 @@ export const getMaterialElevation = (effect: Effect): number | null => {
 
   const offsetY = Math.abs(effect.offset.y);
   const blur = effect.radius;
-  
+
   // Material Design elevation mappings
   if (offsetY === 1 && blur === 3) return 1;
   if (offsetY === 2 && blur === 4) return 2;
@@ -123,6 +130,6 @@ export const getMaterialElevation = (effect: Effect): number | null => {
   if (offsetY === 12 && blur === 17) return 12;
   if (offsetY === 16 && blur === 24) return 16;
   if (offsetY === 24 && blur === 38) return 24;
-  
+
   return offsetY; // Fallback to offset as elevation
 };

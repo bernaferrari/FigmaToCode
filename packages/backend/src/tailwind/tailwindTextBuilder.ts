@@ -74,14 +74,12 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
     });
   }
 
-  truncateText = (
-    node: TextNode, 
-  ) => {
+  truncateText = (node: TextNode) => {
     if (node.textTruncation !== "DISABLED" && node.maxLines) {
       if (node.maxLines > 0 && node.maxLines < 7) {
-        return `line-clamp-${node.maxLines}`
+        return `line-clamp-${node.maxLines}`;
       } else {
-        return `line-clamp-[${node.maxLines}]`
+        return `line-clamp-[${node.maxLines}]`;
       }
     }
     return "";
@@ -115,9 +113,12 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
   fontFamily = (fontName: FontName): string => {
     // Check if the font matches the base font family setting
     const baseFontFamily = localTailwindSettings.baseFontFamily;
-    
+
     // If the font matches exactly the base font, don't add a class
-    if (baseFontFamily && fontName.family.toLowerCase() === baseFontFamily.toLowerCase()) {
+    if (
+      baseFontFamily &&
+      fontName.family.toLowerCase() === baseFontFamily.toLowerCase()
+    ) {
       return "";
     }
 
@@ -127,7 +128,7 @@ export class TailwindTextBuilder extends TailwindDefaultBuilder {
       // Check if current font is part of custom tailwind config
       for (const family in fontFamilyCustomConfig) {
         if (fontFamilyCustomConfig[family].includes(fontName.family)) {
-          return `font-${family}`
+          return `font-${family}`;
         }
       }
     } else {

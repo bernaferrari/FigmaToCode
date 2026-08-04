@@ -198,7 +198,6 @@ const tailwindFrame = async (
   return tailwindContainer(node, childrenStr, combinedProps, settings);
 };
 
-
 // Helper function to generate Twig component syntax for component instances
 const tailwindTwigComponentInstance = async (
   node: InstanceNode,
@@ -208,17 +207,17 @@ const tailwindTwigComponentInstance = async (
   const componentName = extractComponentName(node);
 
   // Get component properties if needed
-  const builder = new TailwindDefaultBuilder(node, settings)
-    // .commonPositionStyles()
-    // .commonShapeStyles()
-  ;
-
+  const builder = new TailwindDefaultBuilder(node, settings);
+  // .commonPositionStyles()
+  // .commonShapeStyles()
   const attributes = builder.build();
 
   // If we have children, process them
   let childrenStr = "";
 
-  const embeddableChildren = node.children ? node.children.filter((n) => isTwigContentNode(n)) : [];
+  const embeddableChildren = node.children
+    ? node.children.filter((n) => isTwigContentNode(n))
+    : [];
 
   if (embeddableChildren.length > 0) {
     // We keep embedded components and Frame named "TwigContent"
@@ -231,12 +230,17 @@ const tailwindTwigComponentInstance = async (
 };
 
 const isTwigComponentNode = (node: SceneNode): boolean => {
-  return localTailwindSettings.tailwindGenerationMode === "twig" && node.type === "INSTANCE" && !extractComponentName(node).startsWith("HTML:") && !isTwigContentNode(node);
-}
+  return (
+    localTailwindSettings.tailwindGenerationMode === "twig" &&
+    node.type === "INSTANCE" &&
+    !extractComponentName(node).startsWith("HTML:") &&
+    !isTwigContentNode(node)
+  );
+};
 
 const isTwigContentNode = (node: SceneNode): boolean => {
   return node.type === "INSTANCE" && node.name.startsWith("TwigContent");
-}
+};
 
 // Helper function to extract component name from an instance
 const extractComponentName = (node: InstanceNode): string => {

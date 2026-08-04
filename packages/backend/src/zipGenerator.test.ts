@@ -19,6 +19,7 @@ const unzipProject = (zip: Uint8Array) => {
   return {
     files,
     text: (path: string) => strFromU8(files[path]),
+    json: <T>(path: string) => JSON.parse(strFromU8(files[path])) as T,
   };
 };
 
@@ -81,9 +82,12 @@ describe("generated project archives", () => {
     expect(project.files["landing-page/images/hero-12-34.png"]).toEqual(
       image.bytes,
     );
+    expect(project.text("landing-page/README.md")).toContain(
+      "This export has no runtime dependencies and works offline.",
+    );
   });
 
-  it("creates Vite and Next.js projects from JSX without floating dependencies", () => {
+  it("creates Vite and Next.js projects with current, reproducible manifests", () => {
     const jsx = '<div className="p-4" style={{ color: "red" }}>Hello</div>';
     const vite = unzipProject(
       generateProjectZip(jsx, "Tailwind", [image], "vite", "dashboard"),
@@ -101,6 +105,55 @@ describe("generated project archives", () => {
     expect(next.text("package.json")).not.toContain('"latest"');
     expect(next.files["postcss.config.mjs"]).toBeDefined();
     expect(next.files["public/images/hero-12-34.png"]).toEqual(image.bytes);
+
+    const vitePackage = vite.json<{
+      engines: Record<string, string>;
+      dependencies: Record<string, string>;
+      devDependencies: Record<string, string>;
+      scripts: Record<string, string>;
+    }>("package.json");
+    expect(vitePackage.engines).toEqual({ node: ">=24", pnpm: "^11" });
+    expect(vitePackage.dependencies).toMatchObject({
+      react: "^19.2.8",
+      "react-dom": "^19.2.8",
+    });
+    expect(vitePackage.devDependencies).toMatchObject({
+      "@tailwindcss/vite": "^4.3.3",
+      "@typescript/native": "npm:typescript@^7.0.2",
+      "@vitejs/plugin-react": "^6.0.5",
+      tailwindcss: "4.3.3",
+      typescript: "npm:@typescript/typescript6@^6.0.2",
+      vite: "^8.2.0",
+    });
+    expect(vitePackage.scripts.typecheck).toBe("tsc --noEmit");
+    expect(vite.text("README.md")).toContain("pnpm typecheck");
+    expect(vite.text("tsconfig.json")).toContain('"vite/client"');
+
+    const nextPackage = next.json<{
+      engines: Record<string, string>;
+      dependencies: Record<string, string>;
+      devDependencies: Record<string, string>;
+      scripts: Record<string, string>;
+    }>("package.json");
+    expect(nextPackage.engines).toEqual({ node: ">=24", pnpm: "^11" });
+    expect(nextPackage.dependencies).toMatchObject({
+      next: "^16.2.12",
+      react: "^19.2.8",
+      "react-dom": "^19.2.8",
+    });
+    expect(nextPackage.devDependencies).toMatchObject({
+      "@tailwindcss/postcss": "^4.3.3",
+      "@types/node": "^26.1.2",
+      "@typescript/native": "npm:typescript@^7.0.2",
+      postcss: "^8.5.25",
+      tailwindcss: "4.3.3",
+      typescript: "npm:@typescript/typescript6@^6.0.2",
+    });
+    expect(nextPackage.scripts.typecheck).toBe("tsc --noEmit");
+    expect(next.text("README.md")).toContain("pnpm build");
+    expect(next.text("pnpm-workspace.yaml")).toContain("sharp: true");
+    expect(next.text("tsconfig.json")).toContain('"jsx": "react-jsx"');
+    expect(next.text("tsconfig.json")).toContain(".next/dev/types/**/*.ts");
   });
 
   it("creates Flutter and SwiftUI asset structures referenced by source", () => {
@@ -128,6 +181,7 @@ describe("generated project archives", () => {
     );
     expect(flutter.text("pubspec.yaml")).toContain("- assets/images/");
     expect(flutter.files["assets/images/hero-12-34.png"]).toEqual(image.bytes);
+    expect(flutter.text("README.md")).toContain("flutter pub get");
 
     expect(swiftui.text("mobile-app/ContentView.swift")).toContain(
       'Image("hero-12-34")',
@@ -142,5 +196,8 @@ describe("generated project archives", () => {
         "mobile-app/Assets.xcassets/hero-12-34.imageset/Contents.json",
       ),
     ).toContain('"filename": "hero-12-34.png"');
+    expect(swiftui.text("mobile-app/README.md")).toContain(
+      "Review previews, accessibility labels, dynamic type",
+    );
   });
 });

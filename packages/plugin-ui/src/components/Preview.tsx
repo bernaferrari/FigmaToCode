@@ -1,14 +1,6 @@
 import React from "react";
 import { HTMLPreview } from "types";
-import {
-  Maximize2,
-  Minimize2,
-  MonitorSmartphone,
-  Smartphone,
-  Circle,
-  Ruler,
-  Monitor,
-} from "lucide-react";
+import { Maximize2, Minimize2, MonitorSmartphone, Circle } from "lucide-react";
 import { cn, replaceExternalImagesWithCanvas } from "../lib/utils";
 import { Button } from "./ui/button";
 
@@ -24,15 +16,8 @@ const Preview: React.FC<{
   bgColor: "white" | "black";
   setBgColor: React.Dispatch<React.SetStateAction<"white" | "black">>;
 }> = (props) => {
-  const {
-    htmlPreview,
-    expanded,
-    setExpanded,
-    viewMode,
-    setViewMode,
-    bgColor,
-    setBgColor,
-  } = props;
+  const { htmlPreview, expanded, setExpanded, viewMode, bgColor, setBgColor } =
+    props;
 
   // Define consistent dimensions regardless of mode
   const containerWidth = expanded ? 320 : 240;
