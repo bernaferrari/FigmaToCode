@@ -17,7 +17,7 @@
     "copy-to-clipboard": "^4.0.2",
     "lucide-react": "^1.28.0",
     "motion": "^12.43.0",
-    "nanoid": "^6.0.0",
+    "nanoid": "^6.0.1",
     "plugin-ui": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -37,7 +37,7 @@
     "tailwindcss": "4.3.3",
     "tsconfig": "workspace:*",
     "types": "workspace:*",
-    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript": "^7.0.2",
     "vite": "^8.2.0",
     "vite-plugin-singlefile": "^2.3.3"
   }

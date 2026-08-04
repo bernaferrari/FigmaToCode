@@ -7,7 +7,7 @@
   "main": "./src/index.tsx",
   "types": "./src/index.tsx",
   "dependencies": {
-    "@base-ui/react": "^1.6.0",
+    "@base-ui/react": "^1.7.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@types/react-syntax-highlighter": "15.5.13",
@@ -24,6 +24,6 @@
     "@typescript/native": "npm:typescript@^7.0.2",
     "tsconfig": "workspace:*",
     "types": "workspace:*",
-    "typescript": "npm:@typescript/typescript6@^6.0.2"
+    "typescript": "^7.0.2"
   }
 }
