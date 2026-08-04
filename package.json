@@ -1,7 +1,6 @@
 {
   "name": "figma-to-code",
   "private": true,
-  "packageManager": "pnpm@11.20.0",
   "scripts": {
     "build": "turbo run build",
     "build:watch": "turbo run build:watch",
@@ -21,5 +20,11 @@
   "engines": {
     "node": ">=24",
     "pnpm": ">=11"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.0.0"
+    }
   }
 }
